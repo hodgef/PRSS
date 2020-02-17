@@ -96,7 +96,7 @@ const CreateBlog: FunctionComponent = () => {
                         onClick={handleSubmit}
                         type="button"
                         className="btn btn-primary btn-lg"
-                    >Create Blog</button>
+                    >Create</button>
                 </div>
             </div>
 

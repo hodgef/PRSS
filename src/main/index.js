@@ -13,9 +13,9 @@ function createMainWindow() {
   let options = {
     icon: iconPath,
     width: 800,
-    height: 600,
+    height: 800,
     minWidth: 800,
-    minHeight: 600,
+    minHeight: 800,
     webPreferences: {
       nodeIntegration: true
     }
