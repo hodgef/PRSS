@@ -1,11 +1,18 @@
 .CreateBlog {
     .content {
+        max-width: 400px;
+        margin: 0 auto;
+
         .input-group-text {
             width: 150px;
         }
 
         .input-group {
             margin-bottom: 10px;
+        }
+
+        button {
+            width: 100%;
         }
     }
 }

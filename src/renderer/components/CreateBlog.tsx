@@ -91,7 +91,7 @@ const CreateBlog: FunctionComponent = () => {
                     </label>
                 </div>
 
-                <div className="button-container mt-3">
+                <div className="button-container mt-4">
                     <button
                         onClick={handleSubmit}
                         type="button"

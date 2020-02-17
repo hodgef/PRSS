@@ -3,7 +3,7 @@ import './styles/Footer.scss';
 
 const Footer: FunctionComponent = () => (
     <footer>
-        <div className="credit">© 2020, Francisco Hodge</div>
+        <div className="credit">© 2020, PRSS</div>
     </footer>
 );
 

@@ -16,7 +16,7 @@ const Home: FunctionComponent = () => {
                     onClick={() => history.push("/create/blog")}
                     type="button"
                     className="btn btn-primary btn-lg"
-                >Create Blog</button>
+                >Welcome</button>
             </div>
             <Footer />
         </div>
