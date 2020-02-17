@@ -1,9 +1,9 @@
 'use strict'
 
-import { app, BrowserWindow, Menu } from 'electron'
-import * as path from 'path'
-import { format as formatUrl } from 'url'
-
+import { app, BrowserWindow, Menu } from 'electron';
+import * as path from 'path';
+import { format as formatUrl } from 'url';
+const iconPath = path.join(__static, "icon.png");
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
@@ -11,6 +11,7 @@ let mainWindow
 
 function createMainWindow() {
   let options = {
+    icon: iconPath,
     width: 800,
     height: 600,
     minWidth: 800,
@@ -27,11 +28,7 @@ function createMainWindow() {
     };
   } else {
     options = {
-      ...options,
-      webPreferences: {
-        ...options.webPreferences,
-        devTools: false
-      }
+      ...options
     };
   }
 

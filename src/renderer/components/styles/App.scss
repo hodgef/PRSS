@@ -1,0 +1,23 @@
+#app {
+    .page {
+        height: 100%;
+        display: flex;
+        flex-flow: column;
+    }
+    
+    .content {
+        flex: 1;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 30px;
+        padding-bottom: 20px;
+        color: #343435;
+    }
+
+    h2 {
+        font-size: 20px;
+        margin: 15px 0;
+    }
+}

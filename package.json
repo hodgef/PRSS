@@ -9,6 +9,7 @@
     "dist:dir": "npm run dist --dir -c.compression=store -c.mac.identity=null"
   },
   "dependencies": {
+    "electron-store": "^5.1.0",
     "source-map-support": "^0.5.12"
   },
   "devDependencies": {
@@ -17,6 +18,8 @@
     "@types/react-dom": "^16.9.5",
     "@typescript-eslint/eslint-plugin": "^2.19.2",
     "@typescript-eslint/parser": "^2.19.2",
+    "bootstrap": "^4.4.1",
+    "classnames": "^2.2.6",
     "electron": "5.0.6",
     "electron-builder": "^21.2.0",
     "electron-webpack": "^2.7.4",
