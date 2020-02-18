@@ -1,18 +1,20 @@
+import './styles/CreateBlog.scss';
+
 import React, { FunctionComponent, useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import { remote } from 'electron';
-const { dialog } = remote;
+import { getHostingTypes } from '../services/hosting';
+import { setSite } from '../services/utils';
 
-import './styles/CreateBlog.scss';
-import { setBlog } from '../services/utils';
+const { dialog } = remote;
 
 
 const CreateBlog: FunctionComponent = () => {
     const [title, setTitle] = useState("");
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
-    const [hosting, setHosting] = useState("automatic");
+    const [hosting, setHosting] = useState("github");
+    const [hostingFields, setHostingFields] = useState({});
+    const hostingTypes = getHostingTypes();
 
     const handleSubmit = (): void => {
         if(!(title && hosting)){
@@ -20,16 +22,18 @@ const CreateBlog: FunctionComponent = () => {
             return;
         }
 
-        const data = {
-            title, hosting
-        };
-
-        setBlog(data);
+        setSite({
+            title,
+            hosting: {
+                name: hosting,
+                ...hostingFields
+            },
+        });
     };
 
     return (
         <div className="CreateBlog page">
-            <Header />
+            <Header fixed />
             <div className="content">
                 <h1>Create your blog</h1>
 
@@ -43,53 +47,36 @@ const CreateBlog: FunctionComponent = () => {
                             onChange={e => setTitle(e.target.value)}
                         />
                     </div>
-
-                    <div className="input-group input-group-lg">
-                        <input
-                            type="text"
-                            placeholder="Username (Optional)"
-                            className="form-control"
-                            value={username}
-                            onChange={e => setUsername(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="input-group input-group-lg">
-                        <input
-                            type="text"
-                            placeholder="Email (Optional)"
-                            className="form-control"
-                            value={email}
-                            onChange={e => setEmail(e.target.value)}
-                        />
-                    </div>
                 </fieldset>
-                
-                <h2>Hosting</h2>
-                
-                <div className="form-check">
-                    <input
-                        className="form-check-input"
-                        type="radio"
-                        name="hosting"
-                        onChange={e => setHosting(e.target.value)}
-                        checked
-                    />
-                    <label className="form-check-label">
-                        Automatic
-                    </label>
-                </div>
-                <div className="form-check disabled">
-                    <input
-                        className="form-check-input"
-                        type="radio"
-                        name="hosting"
-                        onChange={e => setHosting(e.target.value)}
-                    />
-                    <label className="form-check-label">
-                        Manual
-                    </label>
-                </div>
+ 
+
+                    {Object.keys(hostingTypes).map((key) => {
+                        const { title } = hostingTypes[key];
+
+                        return (
+                            <div className="input-group input-group-lg" key={`hosting-${key}`}>
+                                <div className="input-group-prepend">
+                                    <label className="input-group-text">Hosting</label>
+                                </div>
+                                <select className="custom-select" onChange={(e) => setHosting(e.target.value)}>
+                                    <option value={key}>{title}</option>
+                                </select>
+                            </div>
+                        );
+                    })}
+
+
+                {hosting && hostingTypes[hosting].fields && hostingTypes[hosting].fields.map(({ name, title }) => (
+                    <div className="input-group input-group-lg"  key={`${name}-fields`}>
+                        <input
+                            type="text"
+                            placeholder={title}
+                            className="form-control"
+                            value={hostingFields[name] || ""}
+                            onChange={e => setHostingFields({...hostingFields, ...{[name]: e.target.value}})}
+                        />
+                    </div>
+                ))}
 
                 <div className="button-container mt-4">
                     <button
