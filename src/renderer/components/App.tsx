@@ -15,7 +15,8 @@ const App: FunctionComponent = () => {
             <HashRouter> 
                 <Route exact={true} path='/' render={(props) => {
                     const sites = store.get('sites');
-                    return Object.keys(sites) ? <Home {...props} /> : <CreateSelector {...props} />;
+                    return (Object.keys(sites) && Object.keys(sites).length) ?
+                        <Home {...props} /> : <CreateSelector {...props} />;
                 }} />
                 <Route path='/create/blog' component={CreateBlog}/>
                 <Route path='/login' component={Login}/>

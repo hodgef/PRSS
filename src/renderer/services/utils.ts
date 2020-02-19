@@ -1,7 +1,9 @@
 import { store } from '../components/Store';
+import { remote } from 'electron';
+const { dialog } = remote;
 
-export const setSite = (data) => {
-    const siteId =  normalize(data.title);
+export const setSite = (data: ISite) => {
+    const { id: siteId } = data;
     const sites = get('sites');
 
     set({
@@ -29,3 +31,7 @@ export const normalize = (str: string) => {
 
 export const set = (...params: any) => store.set(params[0] as never);
 export const get = (param: any) => store.get(param as never);
+
+export const error = (message = "An error has occurred. Please try again later.", title = "Error") => {
+    dialog.showMessageBox({ title, message });
+}

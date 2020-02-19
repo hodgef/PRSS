@@ -3,12 +3,8 @@ import './styles/CreateBlog.scss';
 import React, { FunctionComponent, useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
-import { remote } from 'electron';
-import { getHostingTypes } from '../services/hosting';
-import { setSite } from '../services/utils';
-
-const { dialog } = remote;
-
+import { getHostingTypes, setupRemote } from '../services/hosting';
+import { normalize, error } from '../services/utils';
 
 const CreateBlog: FunctionComponent = () => {
     const [title, setTitle] = useState("");
@@ -18,17 +14,23 @@ const CreateBlog: FunctionComponent = () => {
 
     const handleSubmit = (): void => {
         if(!(title && hosting)){
-            dialog.showMessageBox({ title: "Error", message: "Please fill out all fields." });
+            error("Please fill out all fields.");
             return;
         }
 
-        setSite({
+        const siteId =  normalize(title);
+
+        const site = {
+            id: siteId,
             title,
             hosting: {
                 name: hosting,
                 ...hostingFields
             },
-        });
+            type: 'blog'
+        } as ISite;
+
+        setupRemote(site);
     };
 
     return (
@@ -66,10 +68,10 @@ const CreateBlog: FunctionComponent = () => {
                     })}
 
 
-                {hosting && hostingTypes[hosting].fields && hostingTypes[hosting].fields.map(({ name, title }) => (
+                {hosting && hostingTypes[hosting].fields && hostingTypes[hosting].fields.map(({ name, title, type }) => (
                     <div className="input-group input-group-lg"  key={`${name}-fields`}>
                         <input
-                            type="text"
+                            type={type}
                             placeholder={title}
                             className="form-control"
                             value={hostingFields[name] || ""}
