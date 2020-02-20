@@ -2,11 +2,12 @@ import './styles/App.scss';
 
 import React, { FunctionComponent } from 'react';
 import { HashRouter, Route } from 'react-router-dom';
-import { AppContext, store } from './Store';
+
 import CreateBlog from './CreateBlog';
+import CreateSelector from './CreateSelector';
 import Home from './Home';
 import Login from './Login';
-import CreateSelector from './CreateSelector';
+import { AppContext, store } from './Store';
 
 const App: FunctionComponent = () => {
 

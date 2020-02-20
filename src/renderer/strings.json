@@ -1,0 +1,15 @@
+{
+    "create_blog_title": "Create your blog",
+    "create_blog_button": "Create",
+    "created_with": "Created with PRSS",
+    "hosting_label": "Hosting",
+    "error_repo_exists": "A %s repository with this name (%s) already exists. Please choose another title for your %s.",
+    "error_occurred": "An error has occurred. Please try again later.",
+    "error_fill_fields": "Please fill out all fields.",
+    "error_repo_creation": "The repository could not be created. Please try again later.",
+    "create_blog": "Create Blog",
+    "create_docs": "Create Docs",
+    "creating_repository": "Creating Repository",
+    "footer_notice": "© 2020, PRSS",
+    "prss_domain": "prss.io"
+}

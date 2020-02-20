@@ -1,5 +1,7 @@
-import { store } from '../components/Store';
 import { remote } from 'electron';
+
+import { store } from '../components/Store';
+import strings from '../strings.json';
 const { dialog } = remote;
 
 export const setSite = (data: ISite) => {
@@ -12,7 +14,7 @@ export const setSite = (data: ISite) => {
 }
 
 export const merge = (var1, var2) => {
-    if(Array.isArray(var1) && Array.isArray(var2)){
+    if (Array.isArray(var1) && Array.isArray(var2)) {
         return [...var1, ...var2];
     } else {
         return {...var1, ...var2};
@@ -32,6 +34,18 @@ export const normalize = (str: string) => {
 export const set = (...params: any) => store.set(params[0] as never);
 export const get = (param: any) => store.get(param as never);
 
-export const error = (message = "An error has occurred. Please try again later.", title = "Error") => {
+export const error = (message = getString('error_occurred'), title = 'Error') => {
     dialog.showMessageBox({ title, message });
 }
+
+export const getString = (id: string, replaceWith: string[] = []) => {
+    let str = strings[id] || '';
+
+    replaceWith.forEach(replacement => {
+        str = str.replace('%s', replacement);
+    });
+
+    return str;
+}
+
+export const noop = () => {};

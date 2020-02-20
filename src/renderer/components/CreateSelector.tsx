@@ -1,9 +1,11 @@
-import React, { FunctionComponent } from 'react';
-import { useHistory } from "react-router-dom";
-import Header from './Header';
-import Footer from './Footer';
-
 import './styles/CreateSelector.scss';
+
+import React, { FunctionComponent } from 'react';
+import { useHistory } from 'react-router-dom';
+
+import { getString } from '../services/utils';
+import Footer from './Footer';
+import Header from './Header';
 
 const CreateSelector: FunctionComponent = () => {
     const history = useHistory();
@@ -13,16 +15,16 @@ const CreateSelector: FunctionComponent = () => {
             <Header />
             <div className="content">
                 <button
-                    onClick={() => history.push("/create/blog")}
+                    onClick={() => history.push('/create/blog')}
                     type="button"
                     className="btn btn-primary btn-lg mb-3"
-                >Create Blog</button>
+                >{getString('create_blog')}</button>
 
                 <button
                     onClick={() => {}}
                     type="button"
                     className="btn btn-primary btn-lg disabled"
-                >Create Docs</button>
+                >{getString('create_docs')}</button>
             </div>
             <Footer />
         </div>

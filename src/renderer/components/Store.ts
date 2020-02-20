@@ -1,6 +1,6 @@
-import { createContext } from 'react';
 // import os from 'os';
 import Store from 'electron-store';
+import { createContext } from 'react';
 
 const AppContext = createContext(null);
 
@@ -9,9 +9,9 @@ const defaults = {
 };
 
 const store = new Store({
-    name: "PRSS",
+    name: 'PRSS',
     // encryptionKey: os.hostname(),
-    defaults,
+    defaults
 });
 
 export { AppContext, store };

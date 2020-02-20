@@ -1,9 +1,12 @@
-import React, { FunctionComponent } from 'react';
 import './styles/Footer.scss';
+
+import React, { FunctionComponent } from 'react';
+
+import { getString } from '../services/utils';
 
 const Footer: FunctionComponent = () => (
     <footer>
-        <div className="credit">© 2020, PRSS</div>
+        <div className="credit">{getString('footer_notice')}</div>
     </footer>
 );
 

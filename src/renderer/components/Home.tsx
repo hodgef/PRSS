@@ -1,9 +1,10 @@
+import './styles/Home.scss';
+
 import React, { FunctionComponent } from 'react';
+
+import Footer from './Footer';
 // import { useHistory } from "react-router-dom";
 import Header from './Header';
-import Footer from './Footer';
-
-import './styles/Home.scss';
 
 const Home: FunctionComponent = () => {
     // const history = useHistory();

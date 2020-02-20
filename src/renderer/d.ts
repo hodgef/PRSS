@@ -1,14 +1,20 @@
-declare module "*.png";
-declare module "*.jpg"
+declare module '*.png';
+declare module '*.jpg'
 
 interface ISite {
     id: string;
     title: string;
+    type: string;
     hosting: IHosting;
 }
 
 interface IHosting extends hostingType {
     name: string;
+}
+
+interface ILoading {
+    title?: string;
+    message?: string;
 }
 
 type IRequest = (
@@ -23,3 +29,4 @@ type hostingGithubType = {
 };
 
 type hostingType = hostingGithubType;
+type noop = () => void;

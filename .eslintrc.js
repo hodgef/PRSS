@@ -21,12 +21,18 @@ module.exports = {
     },
     "plugins": [
         "react",
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "simple-import-sort"
     ],
     "rules": {
         "react/jsx-uses-react": "error",   
         "react/jsx-uses-vars": "error",
-        "react/prop-types": 0
+        "react/prop-types": 0,
+        "quotes": ["warn", "single"],
+        "keyword-spacing": "warn",
+        "space-before-blocks": "warn",
+        "comma-dangle": "warn",
+        "simple-import-sort/sort": "warn"
     },
     "settings": {
         "react": {
