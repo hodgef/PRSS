@@ -44,25 +44,32 @@ class Github {
 
         if (!uploadThemeFilesResArr.every(item => !!item.content)) {
             error(getString('error_uploading_theme_files'));
-                return false;
+            return false;
         }
 
         /**
          * Enabling pages site
          */
-        await this.enablePagesSite();
-        return true;
+        const siteUrl = await this.enablePagesSite();
+
+        if (!siteUrl) {
+            error(getString('error_setup_remote'));
+            return false;
+        }
+
+        this.site.url = siteUrl;
+        return this.site;
     }
 
     enablePagesSite = async () => {
-        const enableGHPagesRes = await this.request('POST', `repos/${this.site.hosting.username}/${this.site.id}/pages`, {
+        const { html_url } = await this.request('POST', `repos/${this.site.hosting.username}/${this.site.id}/pages`, {
             source: {
                 branch: 'master',
                 directory: '/'
             }
-        }, { Accept : 'application/vnd.github.switcheroo-preview+json' });
+        }, { Accept : 'application/vnd.github.switcheroo-preview+json' }) || {};
 
-        console.log('enableGHPagesRes', enableGHPagesRes);
+        return html_url;
     }
 
     uploadThemeFiles = async (type, theme, updates) => {

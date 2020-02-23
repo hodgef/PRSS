@@ -40,15 +40,13 @@ const CreateBlog: FunctionComponent = () => {
          */
         const site = await setupRemote(baseSite, setLoadingStatus);
         if (!site) {
-            error(getString('error_setup_remore'));
             return;
         };
 
         /**
          * Save site
          */
-        //setSite(site);
-
+        setSite(site);
         setLoading(false);
     };
 

@@ -7,6 +7,7 @@ interface ISite {
     title: string;
     type: string;
     hosting: IHosting;
+    url: string;
 }
 
 interface ISites {

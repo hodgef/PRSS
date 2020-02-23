@@ -19,5 +19,5 @@
     "error_no_theme_files": "No theme files found.",
     "uploading_theme_files": "Uploading theme files (%s%)",
     "error_uploading_theme_files": "Error uploading theme files.",
-    "error_setup_remore": "Could not set up remote. Please try again later."
+    "error_setup_remote": "Could not set up remote. Please try again later."
 }
