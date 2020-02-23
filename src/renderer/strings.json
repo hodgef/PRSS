@@ -11,5 +11,13 @@
     "create_docs": "Create Docs",
     "creating_repository": "Creating Repository",
     "footer_notice": "© 2020, PRSS",
-    "prss_domain": "prss.io"
+    "prss_domain": "prss.io",
+    "confirmation_request_title": "Confirm",
+    "confirmation_request_message": "Are you sure?",
+    "error_occurred_title": "Error",
+    "action_cancelled": "Action Cancelled",
+    "error_no_theme_files": "No theme files found.",
+    "uploading_theme_files": "Uploading theme files (%s%)",
+    "error_uploading_theme_files": "Error uploading theme files.",
+    "error_setup_remore": "Could not set up remote. Please try again later."
 }

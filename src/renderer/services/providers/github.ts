@@ -1,6 +1,11 @@
 import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+import slash from 'slash';
 
-import { error, getString } from '../utils';
+import { getFilePaths } from '../files';
+import { error, get,getString } from '../utils';
+import { confirmation, sequential } from './../utils';
 
 class Github {
     private readonly site: ISite;
@@ -20,46 +25,108 @@ class Github {
     }
 
     setup = async (updates) => {
-        const { } = this.site;
+        const { type } = this.site;
+
         /**
          * Creating repo
          */
         console.log('site', this.site);
 
         updates(getString('creating_repository'));
-        return false;
-        await this.createRepo();
+        const createRepoRes = await this.createRepo();
+
+        if (!createRepoRes) return false;
+
+        /**
+         * Uploading theme files
+         */
+        const uploadThemeFilesResArr = await this.uploadThemeFiles(type, 'default', updates) || [];
+
+        if (!uploadThemeFilesResArr.every(item => !!item.content)) {
+            error(getString('error_uploading_theme_files'));
+                return false;
+        }
+
+        /**
+         * Enabling pages site
+         */
+        await this.enablePagesSite();
+        return true;
+    }
+
+    enablePagesSite = async () => {
+        const enableGHPagesRes = await this.request('POST', `repos/${this.site.hosting.username}/${this.site.id}/pages`, {
+            source: {
+                branch: 'master',
+                directory: '/'
+            }
+        }, { Accept : 'application/vnd.github.switcheroo-preview+json' });
+
+        console.log('enableGHPagesRes', enableGHPagesRes);
+    }
+
+    uploadThemeFiles = async (type, theme, updates) => {
+        const themeDir = get('paths.themes');
+        const themeTypeDir = path.join(themeDir, type, theme);
+        const themeFilePaths = await getFilePaths(themeTypeDir);
+
+        if (!themeFilePaths || !themeFilePaths.length) {
+            error(getString('error_no_theme_files'));
+            return;
+        }
+
+        return this.uploadFiles(themeFilePaths, themeTypeDir, (progress) => {
+            updates && updates(getString('uploading_theme_files', [progress]));
+        });
+    }
+
+    uploadFiles = async (filePaths = [], basePath = '', updater?) => {
+        if (!filePaths.length) return;
+        
+        const fileRequests = filePaths.map(filePath => {
+            const normalizedFilePath = slash(filePath);
+            const normalizedBasePath = slash(basePath);
+            const remoteFilePath = normalizedFilePath.replace(normalizedBasePath + '/', '');
+
+            return [
+                'PUT',
+                `repos/${this.site.hosting.username}/${this.site.id}/contents/${remoteFilePath}`,
+                {
+                    message: `Added ${remoteFilePath}`,
+                    content: btoa(fs.readFileSync(filePath, 'utf8'))
+                }
+            ]
+        });
+
+        return sequential(fileRequests, this.request, 1000, updater);
     }
 
     createRepo = async () => {
         const repo = await this.getRepo();
 
         if (repo) {
-            error(
-                getString('error_repo_exists', [
-                    Github.hostingTypeDef.title,
-                    repo.full_name,
-                    this.site.type
-                ])
-            );
-            return;
+            const confirmationRes = await confirmation('The repository already exists. Do you want to use it?');
+            if (confirmationRes !== 0) {
+                error(getString('action_cancelled'));
+                return false;
+            } else {
+                return true;
+            }
         }
 
-        const { clone_url } = await this.request('POST', 'user/repos', {
+        const { created_at } = await this.request('POST', 'user/repos', {
             name: this.site.id,
             description: getString('created_with'),
             homepage: getString('prss_domain'),
             auto_init: true
         }) || {};
 
-        console.log('created_at', clone_url);
-
-        if (!clone_url) {
+        if (!created_at) {
             error(getString('error_repo_creation'));
-            return;
+            return false;
         }
 
-        console.log('Success!');
+        return true;
     }
 
     getRepo = async () => {
@@ -74,7 +141,7 @@ class Github {
         return repo;
     }
 
-    request: IRequest = (method, endpoint, data = {}) => {
+    request: RequestType = (method, endpoint, data = {}, headers = {}) => {
         const url = this.vars.baseApiUrl() + endpoint;
         return axios({
             method,
@@ -83,7 +150,8 @@ class Github {
                 username: this.site.hosting.username,
                 password: this.site.hosting.token
             },
-            data
+            data,
+            headers
         }).then(response => response.data);
     }
 }

@@ -3,12 +3,11 @@ import './styles/Loading.scss';
 import React, { FunctionComponent } from 'react';
 
 const Loading: FunctionComponent<ILoading> = ({ title, message }) => {
-    console.log(title, message);
     return (
-        <div className="loading">
+        <div className="Loading">
             <div className="spinner" />
             {title && <div className="title">{title}</div>}
-            {message && <div className="title">{message}</div>}
+            {message && <div className="subtitle">{message}</div>}
         </div>
     )
 };

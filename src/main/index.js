@@ -3,7 +3,7 @@
 import { app, BrowserWindow, Menu } from 'electron';
 import * as path from 'path';
 import { format as formatUrl } from 'url';
-const iconPath = path.join(__static, "icon.png");
+const iconPath = path.join(__static, 'icon.png');
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
@@ -12,10 +12,10 @@ let mainWindow
 function createMainWindow() {
   let options = {
     icon: iconPath,
-    width: 800,
-    height: 800,
-    minWidth: 800,
-    minHeight: 800,
+    width: 1100,
+    height: 725,
+    minWidth: 1100,
+    minHeight: 725,
     webPreferences: {
       nodeIntegration: true
     }

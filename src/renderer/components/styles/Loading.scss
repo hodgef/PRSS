@@ -1,0 +1,53 @@
+.Loading {
+    display: flex;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    flex-flow: column;
+    z-index: 99999;
+    animation: fadeIn 0.3s linear forwards;
+
+    .title {
+        font-size: 30px;
+    }
+
+    .subtitle {
+        font-size: 25px;
+        margin-top: 5px;
+        opacity: 0.8;
+        font-weight: 300;
+    }
+
+    .spinner {
+        color: black;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+      
+    .spinner:after {
+        animation: spinner .8s linear infinite;
+        display: block;
+        content: "⠋";
+        font-size: 80px;
+    }
+
+    @keyframes spinner {
+        10% { content: "⠙"; }
+        20% { content: "⠹"; }
+        30% { content: "⠸"; }
+        40% { content: "⠼"; }
+        50% { content: "⠴"; }
+        60% { content: "⠦"; }
+        70% { content: "⠧"; }
+        80% { content: "⠇"; }
+        90% { content: "⠏"; }
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: scale(0.9); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+}

@@ -32,7 +32,8 @@ module.exports = {
         "keyword-spacing": "warn",
         "space-before-blocks": "warn",
         "comma-dangle": "warn",
-        "simple-import-sort/sort": "warn"
+        "simple-import-sort/sort": "warn",
+        "no-multi-spaces": "warn"
     },
     "settings": {
         "react": {

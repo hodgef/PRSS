@@ -2,7 +2,7 @@ import './styles/CreateBlog.scss';
 
 import React, { FunctionComponent, useState } from 'react';
 
-import { getHostingTypes, setupRemote } from '../services/hosting';
+import { getHostingTypes, setSite,setupRemote } from '../services/hosting';
 import { error, getString, normalize } from '../services/utils';
 import Footer from './Footer';
 import Header from './Header';
@@ -16,16 +16,16 @@ const CreateBlog: FunctionComponent = () => {
     const [hostingFields, setHostingFields] = useState({});
     const hostingTypes = getHostingTypes();
 
-    const handleSubmit = (): void => {
-        setLoading(true);
-        /*if (!(title && hosting)) {
+    const handleSubmit = async () => {
+        if (!(title && hosting)) {
             error(getString('error_fill_fields'));
             return;
-        }*/
+        }
 
-        const siteId =  normalize(title);
+        setLoading(true);
+        const siteId = normalize(title);
 
-        const site = {
+        const baseSite = {
             id: siteId,
             title,
             hosting: {
@@ -35,8 +35,21 @@ const CreateBlog: FunctionComponent = () => {
             type: 'blog'
         } as ISite;
 
-        
-        setupRemote(site, setLoadingStatus);
+        /**
+         * Set up remote
+         */
+        const site = await setupRemote(baseSite, setLoadingStatus);
+        if (!site) {
+            error(getString('error_setup_remore'));
+            return;
+        };
+
+        /**
+         * Save site
+         */
+        //setSite(site);
+
+        setLoading(false);
     };
 
     return (
@@ -76,7 +89,7 @@ const CreateBlog: FunctionComponent = () => {
 
 
                     {hosting && hostingTypes[hosting].fields && hostingTypes[hosting].fields.map(({ name, title, type }) => (
-                        <div className="input-group input-group-lg"  key={`${name}-fields`}>
+                        <div className="input-group input-group-lg" key={`${name}-fields`}>
                             <input
                                 type={type}
                                 placeholder={title}
