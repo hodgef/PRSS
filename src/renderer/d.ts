@@ -8,6 +8,14 @@ interface ISite {
     type: string;
     hosting: IHosting;
     url: string;
+    theme: string;
+    items: IBlogItem[];
+}
+
+interface IBlogItem {
+    id: string;
+    children: string[];
+    content: string;
 }
 
 interface ISites {

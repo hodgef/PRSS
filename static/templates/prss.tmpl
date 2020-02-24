@@ -1,0 +1,10 @@
+class PRSSClient {
+    constructor(store) {
+        this.store = store;
+        this.setTitle();
+    }
+    setTitle(title) { document.title = title || this.get('title') };
+    get(s) { return s.split('.').reduce((a, b) => a[b], this.store) };
+}
+
+window.prss = new PRSSClient({{site}});

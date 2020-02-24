@@ -56,6 +56,14 @@ export const getString = (id: string, replaceWith: string[] = []) => {
     return str;
 }
 
+export const stringReplace = (str = '', replaceWith = {}) => {
+    Object.keys(replaceWith).forEach(key => {
+        str = str.replace(`{{${key}}}`, replaceWith[key]);
+    });
+
+    return str;
+}
+
 export const noop = () => {};
 
 export const sequential = (
@@ -88,3 +96,13 @@ export const sequential = (
         });
       });
 };
+
+export const exclude = (obj = {}, keys = []) => {
+    const newObj = {...obj};
+
+    keys.forEach(key => {
+        delete newObj[key];
+    });
+
+    return newObj;
+}

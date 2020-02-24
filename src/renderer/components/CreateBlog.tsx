@@ -2,6 +2,7 @@ import './styles/CreateBlog.scss';
 
 import React, { FunctionComponent, useState } from 'react';
 
+import { getSampleSiteStructure } from '../services/blog';
 import { getHostingTypes, setSite,setupRemote } from '../services/hosting';
 import { error, getString, normalize } from '../services/utils';
 import Footer from './Footer';
@@ -26,6 +27,7 @@ const CreateBlog: FunctionComponent = () => {
         const siteId = normalize(title);
 
         const baseSite = {
+            ...getSampleSiteStructure(),
             id: siteId,
             title,
             hosting: {

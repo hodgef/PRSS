@@ -25,6 +25,7 @@
     "@typescript-eslint/eslint-plugin": "^2.19.2",
     "@typescript-eslint/parser": "^2.19.2",
     "axios": "^0.19.2",
+    "babel-minify": "^0.5.1",
     "bootstrap": "^4.4.1",
     "classnames": "^2.2.6",
     "electron": "5.0.6",

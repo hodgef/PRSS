@@ -1,10 +1,12 @@
 import axios from 'axios';
+import minify from 'babel-minify';
 import fs from 'fs';
 import path from 'path';
 import slash from 'slash';
 
 import { getFilePaths } from '../files';
-import { error, get,getString } from '../utils';
+import { getTemplate } from '../templates';
+import { error, exclude,get,getString } from '../utils';
 import { confirmation, sequential } from './../utils';
 
 class Github {
@@ -48,6 +50,17 @@ class Github {
         }
 
         /**
+         * Uploading prss-client
+         */
+        updates(getString('completing_setup'));
+        const uploadPRSSClientRes = await this.uploadPRSSClient();
+
+        if (!uploadPRSSClientRes || !uploadPRSSClientRes.content) {
+            error(getString('error_completing_setup'));
+            return false;
+        }
+
+        /**
          * Enabling pages site
          */
         const siteUrl = await this.enablePagesSite();
@@ -57,12 +70,31 @@ class Github {
             return false;
         }
 
-        this.site.url = siteUrl;
-        return this.site;
+        return {
+            ...this.site,
+            url: siteUrl
+        };
+    }
+
+    uploadPRSSClient = async () => {
+        const { code: prssTemplate } = minify(
+            getTemplate('prss', {
+                site: JSON.stringify(exclude(this.site, ['hosting']))
+            })
+        );
+
+        return this.createFile('assets/js/prss.js', prssTemplate);
     }
 
     enablePagesSite = async () => {
-        const { html_url } = await this.request('POST', `repos/${this.site.hosting.username}/${this.site.id}/pages`, {
+        const endpoint = `repos/${this.site.hosting.username}/${this.site.id}/pages`;
+        const existingSite = await this.request('GET', endpoint);
+
+        if (existingSite && existingSite.html_url) {
+            return existingSite.html_url;
+        }
+
+        const { html_url } = await this.request('POST', endpoint, {
             source: {
                 branch: 'master',
                 directory: '/'
@@ -91,8 +123,8 @@ class Github {
         if (!filePaths.length) return;
         
         const fileRequests = filePaths.map(filePath => {
-            const normalizedFilePath = slash(filePath);
             const normalizedBasePath = slash(basePath);
+            const normalizedFilePath = slash(filePath);
             const remoteFilePath = normalizedFilePath.replace(normalizedBasePath + '/', '');
 
             return [
@@ -105,7 +137,27 @@ class Github {
             ]
         });
 
-        return sequential(fileRequests, this.request, 1000, updater);
+        return sequential(fileRequests, this.uploadOrUpdateFile, 1000, updater);
+    }
+
+    uploadOrUpdateFile = async (method, endpoint, data = {}, headers = {}) => {
+        /**
+         * Check if file is already uploaded
+         */
+        const { sha } = await this.request('GET', endpoint);
+        
+        if (sha) {
+            data = {...data, sha};
+        }
+
+        return this.request(method, endpoint, data, headers);
+    }
+
+    createFile = async (path: string, content = '') => {
+        return this.uploadOrUpdateFile('PUT', `repos/${this.site.hosting.username}/${this.site.id}/contents/${path}`, {
+            message: `Added ${path}`,
+            content: btoa(content)
+        });
     }
 
     createRepo = async () => {
@@ -159,7 +211,9 @@ class Github {
             },
             data,
             headers
-        }).then(response => response.data);
+        })
+        .then(response => response.data)
+        .catch(res => res);
     }
 }
 

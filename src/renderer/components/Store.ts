@@ -1,7 +1,7 @@
-// import os from 'os';
 import Store from 'electron-store';
 import path from 'path';
 import { createContext } from 'react';
+const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const AppContext = createContext(null);
 
@@ -12,13 +12,14 @@ const defaults = {
 
 const store = new Store({
     name: 'PRSS',
-    // encryptionKey: os.hostname(),
+    encryptionKey: isDevelopment ? null : 'PRSS',
     defaults
 });
 
 store.set({
     paths: {
-        themes: path.join(__static, 'themes')
+        themes: path.join(__static, 'themes'),
+        templates: path.join(__static, 'templates')
     }
 });
 
