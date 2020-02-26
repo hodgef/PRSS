@@ -140,14 +140,21 @@ class Github {
         return sequential(fileRequests, this.uploadOrUpdateFile, 1000, updater);
     }
 
-    uploadOrUpdateFile = async (method, endpoint, data = {}, headers = {}) => {
+    uploadOrUpdateFile = async (method, endpoint, data = {} as any, headers = {}) => {
         /**
          * Check if file is already uploaded
          */
-        const { sha } = await this.request('GET', endpoint);
+        const existingFile = await this.request('GET', endpoint);
         
-        if (sha) {
-            data = {...data, sha};
+        if (existingFile && existingFile.sha) {
+            /**
+             * If content is the same, skip
+             */
+            if (JSON.stringify(`"${atob(existingFile.content)}"`) === JSON.stringify(`"${atob(data.content)}"`)) {
+                return Promise.resolve({ content: existingFile });
+            }
+
+            data = {...data, sha: existingFile.sha};
         }
 
         return this.request(method, endpoint, data, headers);

@@ -5,8 +5,9 @@ import { HashRouter, Route } from 'react-router-dom';
 
 import CreateBlog from './CreateBlog';
 import CreateSelector from './CreateSelector';
-import Home from './Home';
+import Dashboard from './Dashboard';
 import Login from './Login';
+import SitePreview from './SitePreview';
 import { AppContext, store } from './Store';
 
 const App: FunctionComponent = () => {
@@ -17,9 +18,10 @@ const App: FunctionComponent = () => {
                 <Route exact={true} path='/' render={(props) => {
                     const sites = store.get('sites');
                     return (Object.keys(sites) && Object.keys(sites).length) ?
-                        <Home {...props} /> : <CreateSelector {...props} />;
+                        <Dashboard {...props} /> : <CreateSelector {...props} />;
                 }} />
                 <Route path='/create/blog' component={CreateBlog}/>
+                <Route path='/site/:siteId/preview' component={SitePreview}/>
                 <Route path='/login' component={Login}/>
             </HashRouter>
         </AppContext.Provider>

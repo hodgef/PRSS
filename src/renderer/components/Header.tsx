@@ -13,7 +13,7 @@ const Header: FunctionComponent<IProps> = ({
     fixed
 }) => (
     <header className={cx({ fixed })}>
-        <img src={PRSSLogo} width="200" />
+        <img src={PRSSLogo} width="150" />
     </header>
 );
 

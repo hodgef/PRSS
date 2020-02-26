@@ -11,9 +11,17 @@
     }
 
     h1 {
-        font-size: 30px;
+        font-size: 37px;
         padding-bottom: 20px;
-        color: #343435;
+        color: #5a5a5a;
+        font-weight: 300;
+        display: flex;
+        align-items: center;
+
+        i.material-icons {
+            font-size: 37px;
+            margin-right: 10px;
+        }
     }
 
     h2 {

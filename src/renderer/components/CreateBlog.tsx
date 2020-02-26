@@ -1,6 +1,7 @@
 import './styles/CreateBlog.scss';
 
 import React, { FunctionComponent, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import { getSampleSiteStructure } from '../services/blog';
 import { getHostingTypes, setSite,setupRemote } from '../services/hosting';
@@ -16,6 +17,7 @@ const CreateBlog: FunctionComponent = () => {
     const [hosting, setHosting] = useState('github');
     const [hostingFields, setHostingFields] = useState({});
     const hostingTypes = getHostingTypes();
+    const history = useHistory();
 
     const handleSubmit = async () => {
         if (!(title && hosting)) {
@@ -49,7 +51,11 @@ const CreateBlog: FunctionComponent = () => {
          * Save site
          */
         setSite(site);
-        setLoading(false);
+
+        /**
+         * Go to site preview
+         */
+        history.push(`/site/${site.id}/preview`);
     };
 
     return (
