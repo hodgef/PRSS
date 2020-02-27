@@ -1,0 +1,44 @@
+@mixin boxlist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+        box-sizing: border-box;
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 5px;
+        border-bottom-width: 3px;
+        display: flex;
+        padding: 15px;
+        cursor: pointer;
+
+        &:hover {
+            opacity: 0.5;
+        }
+
+        &:active {
+            opacity: 0.3;
+        }
+    }
+}
+
+@mixin boxblocks {
+    @include boxlist;
+    display: inline-flex;
+    width: 100%;
+    flex-wrap: wrap;
+    
+    li {
+        width: calc(50% - 10px);
+        margin-bottom: 20px;
+        min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-flow: column;
+        
+        &:nth-child(2n + 1) {
+            margin-right: 20px;
+        }
+    }
+}

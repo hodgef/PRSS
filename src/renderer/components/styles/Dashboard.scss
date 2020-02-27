@@ -1,3 +1,21 @@
+@import './Mixins.scss';
+
 .Dashboard {
-    
+    ul {
+        @include boxblocks;
+
+        i.material-icons {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: #464646;
+        }
+
+        .feature-title {
+            font-size: 23px;
+        }
+
+        .feature-description {
+            opacity: 0.5;
+        }
+    }
 }

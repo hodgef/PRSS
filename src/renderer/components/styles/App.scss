@@ -7,7 +7,7 @@
     
     .content {
         flex: 1;
-        padding: 20px;
+        padding: 40px;
     }
 
     h1 {
@@ -27,5 +27,17 @@
     h2 {
         font-size: 20px;
         margin: 15px 0;
+    }
+
+    .clickable {
+        cursor: pointer;
+        
+        &:hover {
+            opacity: 0.5;
+        }
+
+        &:active {
+            opacity: 0.3;
+        }
     }
 }

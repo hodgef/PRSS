@@ -21,5 +21,13 @@
     "error_uploading_theme_files": "Error uploading theme files.",
     "error_setup_remote": "Could not set up remote. Please try again later.",
     "completing_setup": "Completing Setup",
-    "error_completing_setup": "An error has prevented the setup completion."
+    "error_completing_setup": "An error has prevented the setup completion.",
+    "posts": "Posts",
+    "posts_description": "Create or edit posts",
+    "preview": "Preview",
+    "preview_description": "Preview your site",
+    "themes": "Themes",
+    "themes_description": "Manage your themes",
+    "settings": "Settings",
+    "settings_description": "Adjust site settings"
 }

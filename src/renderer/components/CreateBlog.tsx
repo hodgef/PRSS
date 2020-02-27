@@ -55,7 +55,7 @@ const CreateBlog: FunctionComponent = () => {
         /**
          * Go to site preview
          */
-        history.push(`/site/${site.id}/preview`);
+        history.push(`/sites/${site.id}`);
     };
 
     return (

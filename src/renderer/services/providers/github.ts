@@ -6,7 +6,7 @@ import slash from 'slash';
 
 import { getFilePaths } from '../files';
 import { getTemplate } from '../templates';
-import { error, exclude,get,getString } from '../utils';
+import { error, exclude, get, getString } from '../utils';
 import { confirmation, sequential } from './../utils';
 
 class Github {
