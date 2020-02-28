@@ -5,20 +5,40 @@
 
     li {
         box-sizing: border-box;
-        border: 1px solid rgba(0,0,0,0.1);
+        border: 1px solid rgba(0, 0, 0, 0.1);
         border-radius: 5px;
         border-bottom-width: 3px;
         display: flex;
-        padding: 15px;
-        cursor: pointer;
+        padding: 0 20px;
+        height: 60px;
+        align-items: center;
+    }
 
-        &:hover {
-            opacity: 0.5;
+    .left-align {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        height: 100%;
+
+        > i {
+            margin-right: 10px;
         }
 
-        &:active {
-            opacity: 0.3;
+        .form-check {
+            margin-right: 10px;
         }
+
+        .site-title.clickable {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    .right-align {
+        display: flex;
+        margin-left: 20px;
     }
 }
 

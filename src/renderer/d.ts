@@ -14,6 +14,7 @@ interface ISite {
 
 interface IBlogItem {
     id: string;
+    title: string;
     children: string[];
     content: string;
 }

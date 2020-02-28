@@ -1,8 +1,9 @@
-import { remote } from 'electron';
+// import { remote } from 'electron';
 
+import { modal } from '../components/Modal';
 import { store } from '../components/Store';
 import strings from '../strings.json';
-const { dialog } = remote;
+// const { dialog } = remote;
 
 export const merge = (var1, var2) => {
     if (Array.isArray(var1) && Array.isArray(var2)) {
@@ -23,27 +24,42 @@ export const normalize = (str: string) => {
 }
 
 export const set = (...params: any) => store.set(params[0] as never);
-export const get = (param: any) => store.get(param as never);
+export const get = (param: any) => store.get(param);
 
-export const error = (message = getString('error_occurred'), title = getString('error_occurred_title')) => {
-    dialog.showMessageBox({ title, message });
+export const alert = (message: string, title?: string) => {
+    modal.alert(message, title);
 }
 
-export const confirmation = (
-    message = getString('confirmation_request_message'),
-    title = getString('confirmation_request_title'),
-    buttons = ['Yes', 'No', 'Cancel']
-) => {
-    return new Promise((resolve) => {
-        dialog.showMessageBox(
-            {
-                title,
-                message,
-                buttons
-            },
-            resolve
-        );
-    })
+export const error = (message = getString('error_occurred'), title?: string) => {
+    alert(message, title);
+    // dialog.showMessageBox({ title, message });
+}
+
+export const confirmation = ({
+    title,
+    buttons = [
+        {label: 'Yes', action: () => {}}
+    ],
+    showCancel = true
+}) => {
+    return new Promise(resolve => {
+        const mappedButtons = buttons.map(({ label, action = () => {} }, index) => {
+            return ({
+                label,
+                action: () => {
+                    action();
+                    resolve(index);
+                    modal.close();
+                }
+            })
+        });
+
+        modal.confirm({
+            title,
+            buttons: mappedButtons,
+            showCancel
+        });
+    });
 }
 
 export const getString = (id: string, replaceWith: string[] = []) => {

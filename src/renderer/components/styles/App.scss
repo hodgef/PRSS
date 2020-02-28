@@ -11,16 +11,46 @@
     }
 
     h1 {
-        font-size: 37px;
-        padding-bottom: 20px;
-        color: #5a5a5a;
+        font-size: 30px;
+        padding-bottom: 10px;
         font-weight: 300;
         display: flex;
         align-items: center;
 
-        i.material-icons {
-            font-size: 37px;
+        button.btn {
+            display: flex;
+            align-items: center;
             margin-right: 10px;
+
+            &:last-child {
+                margin-right: 0;
+            }
+
+            i.material-icons {
+                font-size: 20px;
+                line-height: 20px;
+            }
+        }
+
+        .right-align {
+            display: flex;
+            align-items: normal;
+
+            button {
+                i + span {
+                    margin-left: 5px;
+                }
+            }
+        }
+
+        .left-align {
+            display: flex;
+            align-items: center;
+
+            i.material-icons {
+                font-size: 30px;
+                margin-right: 10px;
+            }
         }
     }
 
@@ -30,6 +60,7 @@
     }
 
     .clickable {
+        transition: opacity 0.1s ease-in-out;
         cursor: pointer;
         
         &:hover {

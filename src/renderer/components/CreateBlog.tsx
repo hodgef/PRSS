@@ -4,7 +4,7 @@ import React, { FunctionComponent, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { getSampleSiteStructure } from '../services/blog';
-import { getHostingTypes, setSite,setupRemote } from '../services/hosting';
+import { getHostingTypes, setSite, setupRemote } from '../services/hosting';
 import { error, getString, normalize } from '../services/utils';
 import Footer from './Footer';
 import Header from './Header';
@@ -44,6 +44,7 @@ const CreateBlog: FunctionComponent = () => {
          */
         const site = await setupRemote(baseSite, setLoadingStatus);
         if (!site) {
+            setLoading(false);
             return;
         };
 

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { get,stringReplace } from './utils';
+import { get, stringReplace } from './utils';
 
 export const getTemplate = (templateName: string, replaceWith) => {
     const templateDir = get('paths.templates');

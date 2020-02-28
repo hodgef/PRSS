@@ -1,15 +1,25 @@
 @import './Mixins.scss';
 
-.ListSites {
+.ListPosts {
     ul {
         @include boxlist;
     }
 
-    .site-title {
+    .left-align {
+        flex: 1;
+        display: flex;
+        align-items: center;
+
+        > i {
+            margin-right: 10px;
+        }
+    }
+
+    .site-post {
         font-size: 20px;
     }
 
-    .site-tag {
+    .post-tag {
         background: rgba(0,0,0,0.1);
         border-radius: 5px;
         padding: 5px 10px;

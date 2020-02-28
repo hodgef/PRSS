@@ -4,10 +4,11 @@ import fs from 'fs';
 import path from 'path';
 import slash from 'slash';
 
+import { modal } from '../../components/Modal';
 import { getFilePaths } from '../files';
 import { getTemplate } from '../templates';
-import { error, exclude, get, getString } from '../utils';
-import { confirmation, sequential } from './../utils';
+import { confirmation, error, exclude, get, getString } from '../utils';
+import { sequential } from './../utils';
 
 class Github {
     private readonly site: ISite;
@@ -171,7 +172,10 @@ class Github {
         const repo = await this.getRepo();
 
         if (repo) {
-            const confirmationRes = await confirmation('The repository already exists. Do you want to use it?');
+            const confirmationRes = await confirmation({
+                title: 'The repository already exists. Do you want to use it?'
+            });
+            
             if (confirmationRes !== 0) {
                 error(getString('action_cancelled'));
                 return false;

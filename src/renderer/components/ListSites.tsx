@@ -22,7 +22,7 @@ const ListSites: FunctionComponent = () => {
                             const { id, title, type } = site as ISite;
 
                             return (
-                                <li key={id} onClick={() => history.push(`/sites/${id}`)}>
+                                <li key={id} className="clickable" onClick={() => history.push(`/sites/${id}`)}>
                                     <div className="left-align">
                                         <i className="material-icons">public</i>
                                         <div className="site-title">{title}</div>

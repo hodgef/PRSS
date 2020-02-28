@@ -14,7 +14,8 @@ export const getSampleSiteStructure = () => {
 export const getSampleBlogItem = () => {
     return {
         id: 'sample-post',
-        content: 'Hello World!',
+        title: 'Hello World!',
+        content: 'This is a post',
         children: []
     };
 };
