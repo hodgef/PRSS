@@ -23,7 +23,7 @@ export const normalize = (str: string) => {
     .replace(/-+$/, '');
 }
 
-export const set = (...params: any) => store.set(params[0] as never);
+export const set = (...params) => typeof params[0] === 'object' ? store.set(params[0]) : store.set(params[0], params[1]);
 export const get = (param: any) => store.get(param);
 
 export const alert = (message: string, title?: string) => {
@@ -57,7 +57,10 @@ export const confirmation = ({
         modal.confirm({
             title,
             buttons: mappedButtons,
-            showCancel
+            showCancel,
+            onCancel: () => {
+                resolve(-1);
+            }
         });
     });
 }
@@ -122,3 +125,5 @@ export const exclude = (obj = {}, keys = []) => {
 
     return newObj;
 }
+
+export const objGet = (s, obj) => s.split('.').reduce((a, b) => a[b], obj);

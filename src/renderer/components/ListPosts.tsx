@@ -1,20 +1,35 @@
 import './styles/ListPosts.scss';
 
-import React, { Fragment, FunctionComponent, useState } from 'react';
+import React, { Fragment, FunctionComponent, useEffect, useState } from 'react';
 import { useHistory, useParams} from 'react-router-dom';
+import { toast } from 'react-toastify';
 
+import { deletePosts } from '../services/blog';
 import { confirmation, get } from '../services/utils';
 import Footer from './Footer';
 import Header from './Header';
+import { store } from './Store';
 
 const ListPosts: FunctionComponent = () => {
     const { siteId } = useParams();
     const { items, title } = get(`sites.${siteId}`);
+    const [posts, setPosts] = useState(items);
     const history = useHistory();
     const [selectEnabled, setSelectEnabled] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
 
+    /**
+     * Check for item changes
+     */
+    const unsubscribe = store.onDidChange(`sites.${siteId}.items` as any, (newValue) => {
+        setPosts(newValue);
+    });
+
     const toggleSelectEnabled = () => setSelectEnabled(!selectEnabled);
+
+    useEffect(() => () => {
+        unsubscribe();
+    }, []);
 
     const toggleSelectCheck = (id: string) => {
         if (selectedItems.includes(id)) {
@@ -26,8 +41,25 @@ const ListPosts: FunctionComponent = () => {
         }
     }
 
-    const deleteSelectedPosts = () => {
-        confirmation({ title: 'Are you sure?' });
+    const deleteSelectedPosts = async (itemsToDelete) => {
+        if (items.length === 1) {
+            toast.error('Your site needs at least one post. Please create a new post, then delete this one.');
+            return;
+        }
+
+        const confRes = await confirmation({ title: 'Are you sure?' });
+        if (confRes === 0) {
+            const deleteSuccess = await deletePosts(siteId, itemsToDelete || selectedItems);
+
+            if (deleteSuccess) {
+                toast.success('Posts deleted!');
+            } else {
+                toast.error('Posts could not be deleted');
+            }
+
+            setSelectedItems([])
+            setSelectEnabled(false);
+        }
     }
 
     return (
@@ -44,13 +76,20 @@ const ListPosts: FunctionComponent = () => {
                         <span>Posts</span>
                     </div>
                     <div className="right-align">
-                        <button type="button" className="btn btn-outline-primary" onClick={toggleSelectEnabled}>Toggle Select</button>
+                        {!!items.length && (
+                            <button type="button" className="btn btn-outline-primary" onClick={toggleSelectEnabled}>Toggle Select</button>
+                        )}
+                        
                         {!!selectedItems.length && (
                             <button type="button" className="btn btn-outline-danger" onClick={deleteSelectedPosts}>
                                 <i className="material-icons">delete</i>
                             </button>
                         )}
-                        <button type="button" className="btn btn-primary">
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => history.push(`/sites/${siteId}/posts/editor`)}
+                        >
                             <i className="material-icons">add</i>
                             <span>Add New</span>
                         </button>
@@ -58,9 +97,9 @@ const ListPosts: FunctionComponent = () => {
                 </h1>
                 <div className="items">
                     <ul>
-                        {items.map(({ id, title }) => {
+                        {posts.map(({ id, title }) => {
                             return (
-                                <li key={id} onClick={() => {}/*history.push(`/sites/${id}`)*/}>
+                                <li key={id} onClick={() => history.push(`/sites/${siteId}/posts/editor/${id}`)}>
                                     <div className="left-align">
                                         {selectEnabled && (
                                             <div className="form-check">
@@ -75,7 +114,10 @@ const ListPosts: FunctionComponent = () => {
                                     </div>
                                     <div className="right-align">
                                         <i className="material-icons clickable mr-3">edit</i>
-                                        <i className="material-icons clickable">delete</i>
+                                        <i
+                                            className="material-icons clickable"
+                                            onClick={() => deleteSelectedPosts([ id ])}
+                                        >delete</i>
                                     </div>
                                 </li>
                             );

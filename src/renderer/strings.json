@@ -11,7 +11,7 @@
     "create_docs": "Create Docs",
     "creating_repository": "Creating Repository",
     "footer_notice": "© 2020, PRSS",
-    "prss_domain": "prss.io",
+    "prss_domain": "https://prss.io",
     "confirmation_request_title": "Confirm",
     "confirmation_request_message": "Are you sure?",
     "error_occurred_title": "Error",

@@ -26,3 +26,17 @@ export const setSite = (data: ISite) => {
         sites: merge(sites, { [siteId]: { id: siteId, ...data } })
     });
 }
+
+export const uploadConfig = (siteId: string) => {
+    const site = get(`sites.${siteId}`);
+    const hostingName = site.hosting.name;
+
+    switch (hostingName) {
+        case 'github':
+            const github = new Github(site);
+            return github.uploadConfig();
+    
+        default:
+            return Promise.resolve();
+    }
+}

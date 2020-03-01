@@ -1,6 +1,6 @@
 import './styles/CreateBlog.scss';
 
-import React, { FunctionComponent, useState } from 'react';
+import React, { Fragment, FunctionComponent, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { getSampleSiteStructure } from '../services/blog';
@@ -48,15 +48,17 @@ const CreateBlog: FunctionComponent = () => {
             return;
         };
 
+        console.log('site', site);
+
         /**
          * Save site
          */
-        setSite(site);
+        // setSite(site);
 
         /**
          * Go to site preview
          */
-        history.push(`/sites/${site.id}`);
+        // history.push(`/sites/${site.id}`);
     };
 
     return (
@@ -107,7 +109,18 @@ const CreateBlog: FunctionComponent = () => {
                         </div>
                     ))}
 
-                    <div className="button-container mt-4">
+                        <div className="id-info">
+                            <span>ID</span>&nbsp;
+                            {(hosting && hostingTypes[hosting] && title) ? (
+                                <Fragment>
+                                    {normalize(title)}
+                                </Fragment>
+                            ) : (
+                                'Enter title'
+                            )}
+                        </div>
+
+                    <div className="button-container mt-2">
                         <button
                             onClick={handleSubmit}
                             type="button"

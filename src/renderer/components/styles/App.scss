@@ -71,4 +71,54 @@
             opacity: 0.3;
         }
     }
+
+    .toast-container .Toastify__toast {
+        padding: 10px 15px;
+        border-radius: 5px;
+        background: white !important;
+        color: #383838;
+
+        .Toastify__toast-body {
+            margin-left: 10px;
+
+            &:before {
+                content: "";
+                height: 100%;
+                width: 5px;
+                display: inline-block;
+                position: absolute;
+                bottom: 0px;
+                left: 0;
+                opacity: 0.5;
+            }
+        }
+
+        .Toastify__close-button {
+            color: #b7b6b6;
+        }
+
+        &.Toastify__toast--success {
+            .Toastify__toast-body {
+                &:before {
+                    background: #07bc0c;
+                }
+            }
+        }
+
+        &.Toastify__toast--error {
+            .Toastify__toast-body {
+                &:before {
+                    background: #e74c3c;
+                }
+            }
+        }
+
+        &.Toastify__toast--info {
+            .Toastify__toast-body {
+                &:before {
+                    background: #3498db;
+                }
+            }
+        }
+    }
 }

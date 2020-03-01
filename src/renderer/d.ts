@@ -6,16 +6,17 @@ interface ISite {
     id: string;
     title: string;
     type: string;
-    hosting: IHosting;
+    hosting?: IHosting;
     url: string;
     theme: string;
     items: IBlogItem[];
+    structure: any[];
 }
 
 interface IBlogItem {
     id: string;
+    slug: string;
     title: string;
-    children: string[];
     content: string;
 }
 

@@ -7,18 +7,20 @@ class Modal extends Component {
     show: false,
     buttons: [],
     showCancel: true,
-    mode: null
+    mode: null,
+    onCancel: () => {}
   };
 
   initialState = { ...this.state };
 
-  confirm = ({ title, buttons = [], showCancel = false }) => {
+  confirm = ({ title, buttons = [], showCancel = false, onCancel = () => {} }) => {
     this.setState({
       mode: 'confirm',
       show: true,
       title,
       buttons,
-      showCancel
+      showCancel,
+      onCancel
     });
   };
 
@@ -119,7 +121,10 @@ class Modal extends Component {
 
               {showCancel && (
                 <div
-                  onClick={() => this.close()}
+                  onClick={() => {
+                    this.close();
+                    this.state.onCancel();
+                  }}
                   style={{
                     padding: 20,
                     alignItems: 'center',

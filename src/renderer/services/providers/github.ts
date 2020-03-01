@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import slash from 'slash';
 
-import { modal } from '../../components/Modal';
+import { build } from '../build';
 import { getFilePaths } from '../files';
 import { getTemplate } from '../templates';
 import { confirmation, error, exclude, get, getString } from '../utils';
@@ -28,56 +28,63 @@ class Github {
     }
 
     setup = async (updates) => {
-        const { type } = this.site;
 
         /**
          * Creating repo
          */
-        console.log('site', this.site);
-
         updates(getString('creating_repository'));
         const createRepoRes = await this.createRepo();
 
         if (!createRepoRes) return false;
 
+
+        /**
+         * Build project based on theme and structure
+         */
+        const buildRes = build(this.site);
+
+        console.log('buildRes', buildRes);
+
         /**
          * Uploading theme files
          */
-        const uploadThemeFilesResArr = await this.uploadThemeFiles(type, 'default', updates) || [];
+        // const uploadThemeFilesResArr = await this.uploadThemeFiles(updates) || [];
 
-        if (!uploadThemeFilesResArr.every(item => !!item.content)) {
-            error(getString('error_uploading_theme_files'));
-            return false;
-        }
+        // if (!uploadThemeFilesResArr.every(item => !!item.content)) {
+        //     error(getString('error_uploading_theme_files'));
+        //     return false;
+        // }
 
         /**
          * Uploading prss-client
          */
-        updates(getString('completing_setup'));
-        const uploadPRSSClientRes = await this.uploadPRSSClient();
+        // updates(getString('completing_setup'));
+        // const uploadConfigRes = await this.uploadConfig();
 
-        if (!uploadPRSSClientRes || !uploadPRSSClientRes.content) {
-            error(getString('error_completing_setup'));
-            return false;
-        }
+        // if (!uploadConfigRes || !uploadConfigRes.content) {
+        //     error(getString('error_completing_setup'));
+        //     return false;
+        // }
 
-        /**
-         * Enabling pages site
-         */
-        const siteUrl = await this.enablePagesSite();
+        // /**
+        //  * Enabling pages site
+        //  */
+        // const siteUrl = await this.enablePagesSite();
 
-        if (!siteUrl) {
-            error(getString('error_setup_remote'));
-            return false;
-        }
+        // if (!siteUrl) {
+        //     error(getString('error_setup_remote'));
+        //     return false;
+        // }
 
-        return {
-            ...this.site,
-            url: siteUrl
-        };
+        return this.site;
+
+        // return {
+        //     ...this.site,
+        //     url: siteUrl
+        // };
     }
 
-    uploadPRSSClient = async () => {
+    uploadConfig = async () => {
         const { code: prssTemplate } = minify(
             getTemplate('prss', {
                 site: JSON.stringify(exclude(this.site, ['hosting']))
@@ -105,9 +112,9 @@ class Github {
         return html_url;
     }
 
-    uploadThemeFiles = async (type, theme, updates) => {
+    uploadThemeFiles = async (updates) => {
         const themeDir = get('paths.themes');
-        const themeTypeDir = path.join(themeDir, type, theme);
+        const themeTypeDir = path.join(themeDir, this.site.type, this.site.theme);
         const themeFilePaths = await getFilePaths(themeTypeDir);
 
         if (!themeFilePaths || !themeFilePaths.length) {

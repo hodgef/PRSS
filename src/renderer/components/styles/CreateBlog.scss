@@ -20,5 +20,18 @@
         select {
             -webkit-appearance: none;
         }
+
+        .id-info {
+            height: 20px;
+            font-size: 12px;
+            margin: 5px 0;
+
+            span {
+                background: #efefef;
+                border-radius: 5px;
+                padding: 5px 10px;
+                margin-right: 5px;
+            }
+        }
     }
 }

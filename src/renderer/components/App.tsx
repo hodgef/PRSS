@@ -1,7 +1,9 @@
 import './styles/App.scss';
+import 'react-toastify/dist/ReactToastify.css';
 
 import React, { FunctionComponent } from 'react';
 import { HashRouter, Route } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 
 import CreateBlog from './CreateBlog';
 import CreateSelector from './CreateSelector';
@@ -10,6 +12,7 @@ import ListPosts from './ListPosts';
 import ListSites from './ListSites';
 import Login from './Login';
 import { StandardModal } from './Modal';
+import PostEditor from './PostEditor';
 import SitePreview from './SitePreview';
 import { AppContext, store } from './Store';
 
@@ -27,12 +30,20 @@ const App: FunctionComponent = () => {
 
                 <Route path='/sites' exact={true} component={ListSites}/>
                 <Route path='/sites/:siteId/posts' exact={true} component={ListPosts}/>
+                <Route path='/sites/:siteId/posts/editor/:postId' exact={true} component={PostEditor}/>
+                <Route path='/sites/:siteId/posts/editor' exact={true} component={PostEditor}/>
                 <Route path='/sites/:siteId/preview' exact={true} component={SitePreview}/>
                 <Route path='/sites/:siteId' exact={true} component={Dashboard}/>
 
                 <Route path='/login' exact={true} component={Login}/>
             </HashRouter>
+
             <StandardModal />
+            <ToastContainer
+                className="toast-container"
+                hideProgressBar
+                position={toast.POSITION.BOTTOM_RIGHT}
+            />
         </AppContext.Provider>
     );
 };
