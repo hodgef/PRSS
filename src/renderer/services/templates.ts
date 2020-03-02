@@ -3,12 +3,13 @@ import { error } from './utils';
 export const getTemplate = async (templateId: string, extension: string) => {
     const templateRelPath = templateId.split('.').join('/');
     const templatePath = `${templateRelPath}.${extension}`;
-    const module = await import('C:/Dev/prss/src/renderer/themes/' + templatePath);
 
-    if (!module) {
-        error(`The template (${templateId}) does not exist.`);
-        return () => {};
+    const template = await import('../themes/' + templatePath);
+
+    if (template && template.default) {
+        return template.default;
     } else {
-        return module.default;
-    };
+        error(`Could not find theme "${templateId}"`);
+        return false;
+    }
 }
