@@ -10,6 +10,6 @@ export const getTemplate = async (templateId: string, extension: string) => {
         return template.default;
     } else {
         error(`Could not find theme "${templateId}"`);
-        return false;
+        return () => {};
     }
 }
