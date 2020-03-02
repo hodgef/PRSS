@@ -27,16 +27,16 @@ export const setSite = (data: ISite) => {
     });
 }
 
-export const uploadConfig = (siteId: string) => {
-    const site = get(`sites.${siteId}`);
-    const hostingName = site.hosting.name;
+// export const uploadConfig = (siteId: string) => {
+//     const site = get(`sites.${siteId}`);
+//     const hostingName = site.hosting.name;
 
-    switch (hostingName) {
-        case 'github':
-            const github = new Github(site);
-            return github.uploadConfig();
+//     switch (hostingName) {
+//         case 'github':
+//             const github = new Github(site);
+//             return github.uploadConfig();
     
-        default:
-            return Promise.resolve();
-    }
-}
+//         default:
+//             return Promise.resolve();
+//     }
+// }

@@ -86,16 +86,20 @@ export const stringReplace = (str = '', replaceWith = {}) => {
 export const noop = () => {};
 
 export const sequential = (
-    arr: any[][],
+    arr: any[],
     asyncFn: (...p: any) => any,
     timeoutWait = 0,
     updater?: (p: any, r: any) => void,
+    spreadItems = true,
     index = 0,
     resArr = []
 ) => {
     if (index >= arr.length) return Promise.resolve(resArr);
-    return asyncFn(...arr[index])
-      .then(r => {
+    console.log('params', arr, arr[index])
+    const asyncFnPromise = spreadItems ? asyncFn(...arr[index]) : asyncFn(arr[index]);
+    if (!isPromise(asyncFnPromise)) throw new Error('asyncFn must be a promise!');
+
+    return asyncFnPromise.then(r => {
         const progress = parseInt('' + (((index+1) * 100) / arr.length));
         if (updater) updater(progress, r);
 
@@ -107,6 +111,7 @@ export const sequential = (
                     asyncFn,
                     timeoutWait,
                     updater,
+                    spreadItems,
                     index + 1,
                     [...resArr, r]
                 );
@@ -127,3 +132,5 @@ export const exclude = (obj = {}, keys = []) => {
 }
 
 export const objGet = (s, obj) => s.split('.').reduce((a, b) => a[b], obj);
+
+export const isPromise = (value) => Boolean(value && typeof value.then === 'function');

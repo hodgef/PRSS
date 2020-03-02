@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { uploadConfig } from './hosting';
 import { get, set } from './utils';
 
 export const getSampleSiteStructure = () => {
@@ -9,7 +8,7 @@ export const getSampleSiteStructure = () => {
     return {
         id: '',
         title: '',
-        type: '',
+        type: 'blog',
         url: '',
         theme: 'default',
         items: [
@@ -37,35 +36,40 @@ export const getSampleBlogItems = (nbItems = 1) => {
             slug: 'hello-home',
             title: 'Hello home!',
             content: 'This is a home',
-            template: 'blog.default.home'
+            template: 'home',
+            parser: 'react'
         },
         {
             id: uuidv4(),
             slug: 'test-post',
             title: 'My test post',
             content: 'This is a test post',
-            template: 'blog.default.home'
+            template: 'home',
+            parser: 'react'
         },
         {
             id: uuidv4(),
             slug: 'test-world',
             title: 'My home world',
             content: 'This is a test world',
-            template: 'blog.default.home'
+            template: 'home',
+            parser: 'react'
         },
         {
             id: uuidv4(),
             slug: 'test-blog',
             title: 'My blog post',
             content: 'This is a test blog',
-            template: 'blog.default.home'
+            template: 'home',
+            parser: 'react'
         },
         {
             id: uuidv4(),
             slug: 'test-stuff',
             title: 'My blog stuff',
             content: 'This is a test stuff',
-            template: 'blog.default.home'
+            template: 'home',
+            parser: 'react'
         }
     ];
 
@@ -73,7 +77,7 @@ export const getSampleBlogItems = (nbItems = 1) => {
 };
 
 export const deletePosts = async (siteId: string, postIds: string[]) => {
-    const site = get(`sites.${siteId}`);
+    /*const site = get(`sites.${siteId}`);
     site.items = site.items.filter(item => !postIds.includes(item.id));
 
     if (site.items.length === 1) {
@@ -87,5 +91,6 @@ export const deletePosts = async (siteId: string, postIds: string[]) => {
         return true;
     } else {
         return false;
-    }
+    }*/
+    return false;
 }

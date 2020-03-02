@@ -1,6 +1,10 @@
-import { get } from './utils';
+import del from 'del';
+import path from 'path';
 
-export const build = (siteIdOrSite) => {
+import reactParser from './parsers/react';
+import { get, sequential } from './utils';
+
+export const build = async (siteIdOrSite) => {
     let site = {} as any;
 
     if (typeof siteIdOrSite === 'object') {
@@ -12,14 +16,62 @@ export const build = (siteIdOrSite) => {
     }
 
     const { structure } = site as ISite;
-    const structurePaths = getBufferItems(structure, site);
 
-    console.log('structure', structurePaths);
+    /**
+     * Clear Buffer
+     */
+    await clearBuffer();
+
+    /**
+     * Buffer items
+     */
+    const bufferItems = getBufferItems(structure, site);
+
+    /**
+     * Load buffer
+     */
+    const loadBufferRes = loadBuffer(bufferItems);
+
+    console.log('structure', bufferItems, loadBufferRes);
 }
 
-export const getBufferItems = (structure, site) => {
+export const clearBuffer = () => {
+    const bufferDir = get('paths.buffer');
+
+    if (bufferDir && bufferDir.includes('buffer')) {
+        return del([path.join(bufferDir, '*'), `!${bufferDir}`]);
+    } else {
+        return Promise.resolve();
+    }
+};
+
+export const loadBuffer: loadBufferType = (bufferItems) => {
+    return sequential(bufferItems, buildBufferItem, 1000, (p, r) => console.log(p, r), false);
+}
+
+export const buildBufferItem = async (item) => {
+    let output: string;
+    const { templateId, /*path, */parser } = item;
+    // console.log('routePath', templatePath, routePath, parser, item);
+
+    switch (parser) {
+        case 'react':
+            output = await reactParser(templateId, item);
+            break;
+    
+        default:
+            output = '';
+            break;
+    }
+
+    // console.log('parsedItem', output);
+
+    return output;
+}
+
+export const getBufferItems = (structure, site): IBufferItem[] => {
     const structurePaths = getStructurePaths(structure);
-    const bufferPaths =
+    const bufferItems =
         structurePaths
             .map(item => {
                 const path = item.split('/');
@@ -39,12 +91,15 @@ export const getBufferItems = (structure, site) => {
                 })
 
                 return post ? {
-                    ...post,
-                    path: '/' + mappedPath.slice(2).join('/')
+                    path: '/' + mappedPath.slice(2).join('/'),
+                    templateId: `${site.type}.${site.theme}.${post.template}`,
+                    parser: post.parser,
+                    item: post as IBaseItem,
+                    site: site as ISite
                 } : null
             });
 
-    return bufferPaths;
+    return bufferItems;
 }
 
 export const getStructurePaths = (arr, prefix = '', store = []) => {

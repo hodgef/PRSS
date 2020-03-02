@@ -1,16 +1,14 @@
-import fs from 'fs';
-import path from 'path';
+import { error } from './utils';
 
-import { get, stringReplace } from './utils';
+export const getTemplate = async (templateId: string, extension: string) => {
+    const templateRelPath = templateId.split('.').join('/');
+    const templatePath = `${templateRelPath}.${extension}`;
+    const module = await import('C:/Dev/prss/src/renderer/themes/' + templatePath);
 
-export const getTemplate = (templateName: string, replaceWith) => {
-    const templateDir = get('paths.templates');
-    const templatePath = path.join(templateDir, `${templateName}.tmpl`);
-    const contents = fs.readFileSync(templatePath, 'utf8');
-
-    if (contents) {
-        return stringReplace(contents, replaceWith);
+    if (!module) {
+        error(`The template (${templateId}) does not exist.`);
+        return () => {};
     } else {
-        return false;
-    }
+        return module.default;
+    };
 }

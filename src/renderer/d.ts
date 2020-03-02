@@ -2,6 +2,9 @@ declare module '*.png';
 declare module '*.jpg';
 declare const __static: string;
 
+/**
+ * Interfaces
+ */
 interface ISite {
     id: string;
     title: string;
@@ -9,16 +12,19 @@ interface ISite {
     hosting?: IHosting;
     url: string;
     theme: string;
-    items: IBlogItem[];
+    items: IBaseItem[];
     structure: any[];
 }
 
-interface IBlogItem {
+interface IBaseItem {
     id: string;
     slug: string;
     title: string;
     content: string;
+    parser: string;
 }
+
+interface IBlogItem extends IBaseItem {}
 
 interface ISites {
     [name: string]: ISite; 
@@ -33,6 +39,14 @@ interface IStore {
     paths: IPaths;
 }
 
+interface IBufferItem {
+    path: string;
+    templateId: string;
+    parser: string;
+    item: IBlogItem;
+    site: ISite;
+}
+
 interface IHosting extends hostingType {
     name: string;
 }
@@ -42,12 +56,24 @@ interface ILoading {
     message?: string;
 }
 
-type RequestType = (
+/**
+ * Types
+ */
+type requestType = (
     method: any,
     endpoint: string,
     data?: object,
     headers?: object
 ) => any;
+
+type loadBufferType = (
+    bufferItems: IBufferItem[]
+) => any;
+
+type parserType = (
+    templateId?: string,
+    data?: any
+) => Promise<string>;
 
 type hostingGithubType = {
     token?: string;

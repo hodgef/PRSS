@@ -28,6 +28,7 @@
     "babel-minify": "^0.5.1",
     "bootstrap": "^4.4.1",
     "classnames": "^2.2.6",
+    "del": "^5.1.0",
     "electron": "5.0.6",
     "electron-builder": "^21.2.0",
     "electron-webpack": "^2.7.4",

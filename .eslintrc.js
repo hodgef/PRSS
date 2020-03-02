@@ -34,8 +34,7 @@ module.exports = {
         "comma-dangle": "warn",
         "simple-import-sort/sort": "warn",
         "no-multi-spaces": "warn",
-        "comma-spacing": ["warn", { "before": false, "after": true }],
-        // "no-console": "warn"
+        "comma-spacing": ["warn", { "before": false, "after": true }]
     },
     "settings": {
         "react": {

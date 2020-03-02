@@ -1,13 +1,13 @@
 import axios from 'axios';
-import minify from 'babel-minify';
+// import minify from 'babel-minify';
 import fs from 'fs';
 import path from 'path';
 import slash from 'slash';
 
 import { build } from '../build';
 import { getFilePaths } from '../files';
-import { getTemplate } from '../templates';
-import { confirmation, error, exclude, get, getString } from '../utils';
+// import { getTemplate } from '../templates';
+import { confirmation, error/*, exclude,*/, get, getString } from '../utils';
 import { sequential } from './../utils';
 
 class Github {
@@ -41,7 +41,7 @@ class Github {
         /**
          * Build project based on theme and structure
          */
-        const buildRes = build(this.site);
+        const buildRes = await build(this.site);
 
         console.log('buildRes', buildRes);
 
@@ -84,15 +84,15 @@ class Github {
         // };
     }
 
-    uploadConfig = async () => {
-        const { code: prssTemplate } = minify(
-            getTemplate('prss', {
-                site: JSON.stringify(exclude(this.site, ['hosting']))
-            })
-        );
+    // uploadConfig = async () => {
+    //     const { code: prssTemplate } = minify(
+    //         getTemplate('prss', {
+    //             site: JSON.stringify(exclude(this.site, ['hosting']))
+    //         })
+    //     );
 
-        return this.createFile('assets/js/prss.js', prssTemplate);
-    }
+    //     return this.createFile('assets/js/prss.js', prssTemplate);
+    // }
 
     enablePagesSite = async () => {
         const endpoint = `repos/${this.site.hosting.username}/${this.site.id}/pages`;
@@ -112,20 +112,20 @@ class Github {
         return html_url;
     }
 
-    uploadThemeFiles = async (updates) => {
-        const themeDir = get('paths.themes');
-        const themeTypeDir = path.join(themeDir, this.site.type, this.site.theme);
-        const themeFilePaths = await getFilePaths(themeTypeDir);
+    // uploadThemeFiles = async (updates) => {
+    //     const themeDir = get('paths.themes');
+    //     const themeTypeDir = path.join(themeDir, this.site.type, this.site.theme);
+    //     const themeFilePaths = await getFilePaths(themeTypeDir);
 
-        if (!themeFilePaths || !themeFilePaths.length) {
-            error(getString('error_no_theme_files'));
-            return;
-        }
+    //     if (!themeFilePaths || !themeFilePaths.length) {
+    //         error(getString('error_no_theme_files'));
+    //         return;
+    //     }
 
-        return this.uploadFiles(themeFilePaths, themeTypeDir, (progress) => {
-            updates && updates(getString('uploading_theme_files', [progress]));
-        });
-    }
+    //     return this.uploadFiles(themeFilePaths, themeTypeDir, (progress) => {
+    //         updates && updates(getString('uploading_theme_files', [progress]));
+    //     });
+    // }
 
     uploadFiles = async (filePaths = [], basePath = '', updater?) => {
         if (!filePaths.length) return;
@@ -218,7 +218,7 @@ class Github {
         return repo;
     }
 
-    request: RequestType = (method, endpoint, data = {}, headers = {}) => {
+    request: requestType = (method, endpoint, data = {}, headers = {}) => {
         const url = this.vars.baseApiUrl() + endpoint;
         return axios({
             method,
