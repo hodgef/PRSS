@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useContext } from 'react';
 
-import { AppContext } from './Store';
+import { AppContext } from '../../common/Store';
 
 const Login: FunctionComponent = () => {
     const { score, addPoints } = useContext(AppContext);

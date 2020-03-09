@@ -42,5 +42,5 @@ module.exports = {
             "version": "detect",
         }
     },
-    "ignorePatterns": ["node_modules", "src/main"]
+    "ignorePatterns": ["node_modules", "./static/buffer", "./static/themes"]
 };

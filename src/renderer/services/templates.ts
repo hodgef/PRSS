@@ -1,16 +1,28 @@
-import { error } from './utils';
+import fs from 'fs';
+import path from 'path';
+
+import { get } from '../../common/utils';
 
 export const getTemplate = async (templateId: string, extension: string) => {
     const templateRelPath = templateId.split('.').join('/');
-    const templatePath = `${templateRelPath}.${extension}`;
-    const noop = () => {};
+    const templatePathName = `${templateRelPath}.${extension}`;
 
-    const template = await import('../themes/' + templatePath);
+    const templatePath = path.join(get('paths.themes'), templatePathName);
 
-    if (template && template.default) {
-        return template.default as any;
-    } else {
-        error(`Could not find theme "${templateId}"`);
-        return noop as any;
-    }
+    return fs.readFileSync(templatePath, 'utf8');
 }
+
+export const baseTemplate = ({ head, body }: any) => {
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          ${head}
+        </head>
+        
+        <body>
+          ${body}
+        </body>
+      </html>
+    `;
+};

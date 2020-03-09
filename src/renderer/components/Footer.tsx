@@ -2,7 +2,7 @@ import './styles/Footer.scss';
 
 import React, { FunctionComponent } from 'react';
 
-import { getString } from '../services/utils';
+import { getString } from '../../common/utils';
 
 const Footer: FunctionComponent = () => (
     <footer>

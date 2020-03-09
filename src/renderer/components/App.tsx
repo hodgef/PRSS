@@ -5,6 +5,8 @@ import React, { FunctionComponent } from 'react';
 import { HashRouter, Route } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 
+import { AppContext } from '../../common/Store';
+import { get } from '../../common/utils';
 import CreateBlog from './CreateBlog';
 import CreateSelector from './CreateSelector';
 import Dashboard from './Dashboard';
@@ -14,14 +16,13 @@ import Login from './Login';
 import { StandardModal } from './Modal';
 import PostEditor from './PostEditor';
 import SitePreview from './SitePreview';
-import { AppContext, store } from './Store';
 
 const App: FunctionComponent = () => {
     return (
         <AppContext.Provider value={{}}>
             <HashRouter> 
                 <Route exact={true} path='/' render={(props) => {
-                    const sites = store.get('sites');
+                    const sites = get('sites');
                     return (Object.keys(sites) && Object.keys(sites).length) ?
                         <ListSites {...props} /> : <CreateSelector {...props} />;
                 }} />

@@ -3,9 +3,10 @@ import './styles/CreateBlog.scss';
 import React, { Fragment, FunctionComponent, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { getString } from '../../common/utils';
 import { getSampleSiteStructure } from '../services/blog';
 import { getHostingTypes, setSite, setupRemote } from '../services/hosting';
-import { error, getString, normalize } from '../services/utils';
+import { error, normalize } from '../services/utils';
 import Footer from './Footer';
 import Header from './Header';
 import Loading from './Loading';

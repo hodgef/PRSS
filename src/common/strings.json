@@ -22,6 +22,7 @@
     "error_setup_remote": "Could not set up remote. Please try again later.",
     "completing_setup": "Completing Setup",
     "error_completing_setup": "An error has prevented the setup completion.",
+    "error_buffer": "Could not load buffer.",
     "posts": "Posts",
     "posts_description": "Create or edit posts",
     "preview": "Preview",

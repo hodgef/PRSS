@@ -4,10 +4,11 @@ import fs from 'fs';
 import path from 'path';
 import slash from 'slash';
 
+import { getString } from '../../../common/utils';
 import { build } from '../build';
 import { getFilePaths } from '../files';
 // import { getTemplate } from '../templates';
-import { confirmation, error/*, exclude,*/, get, getString } from '../utils';
+import { confirmation, error/*, exclude,*/ } from '../utils';
 import { sequential } from './../utils';
 
 class Github {
@@ -42,6 +43,11 @@ class Github {
          * Build project based on theme and structure
          */
         const buildRes = await build(this.site);
+
+        if (!buildRes) {
+            error(getString('error_buffer'));
+            return false;
+        }
 
         console.log('buildRes', buildRes);
 

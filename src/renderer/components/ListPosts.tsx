@@ -4,11 +4,12 @@ import React, { Fragment, FunctionComponent, useEffect, useState } from 'react';
 import { useHistory, useParams} from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+import { store } from '../../common/Store';
+import { get } from '../../common/utils';
 import { deletePosts } from '../services/blog';
-import { confirmation, get } from '../services/utils';
+import { confirmation } from '../services/utils';
 import Footer from './Footer';
 import Header from './Header';
-import { store } from './Store';
 
 const ListPosts: FunctionComponent = () => {
     const { siteId } = useParams();

@@ -12,11 +12,11 @@ interface ISite {
     hosting?: IHosting;
     url: string;
     theme: string;
-    items: IBaseItem[];
+    items: IPostItem[];
     structure: any[];
 }
 
-interface IBaseItem {
+interface IPostItem {
     id: string;
     slug: string;
     title: string;
@@ -24,7 +24,9 @@ interface IBaseItem {
     parser: string;
 }
 
-interface IBlogItem extends IBaseItem {}
+interface ITemplateComponent {
+    props: IBufferItem;
+}
 
 interface ISites {
     [name: string]: ISite; 
@@ -43,7 +45,7 @@ interface IBufferItem {
     path: string;
     templateId: string;
     parser: string;
-    item: IBlogItem;
+    item: IPostItem;
     site: ISite;
 }
 
@@ -70,10 +72,15 @@ type loadBufferType = (
     bufferItems: IBufferItem[]
 ) => any;
 
-type parserType = (
+type handlerType = (
     templateId?: string,
     data?: any
-) => Promise<string>;
+) => Promise<handlerTypeReturn>;
+
+type handlerTypeReturn = {
+    js?: string;
+    html?: string;
+};
 
 type hostingGithubType = {
     token?: string;

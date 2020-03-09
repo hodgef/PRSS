@@ -3,7 +3,7 @@ import './styles/ListSites.scss';
 import React, { FunctionComponent } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { get } from '../services/utils';
+import { get } from '../../common/utils';
 import Footer from './Footer';
 import Header from './Header';
 

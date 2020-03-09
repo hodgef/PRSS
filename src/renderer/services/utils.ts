@@ -1,8 +1,5 @@
-// import { remote } from 'electron';
-
+import { getString } from '../../common/utils';
 import { modal } from '../components/Modal';
-import { store } from '../components/Store';
-import strings from '../strings.json';
 // const { dialog } = remote;
 
 export const merge = (var1, var2) => {
@@ -22,9 +19,6 @@ export const normalize = (str: string) => {
     .replace(/^-+/, '')
     .replace(/-+$/, '');
 }
-
-export const set = (...params) => typeof params[0] === 'object' ? store.set(params[0]) : store.set(params[0], params[1]);
-export const get = (param: any) => store.get(param);
 
 export const alert = (message: string, title?: string) => {
     modal.alert(message, title);
@@ -63,16 +57,6 @@ export const confirmation = ({
             }
         });
     });
-}
-
-export const getString = (id: string, replaceWith: string[] = []) => {
-    let str = strings[id] || '';
-
-    replaceWith.forEach(replacement => {
-        str = str.replace('%s', replacement);
-    });
-
-    return str;
 }
 
 export const stringReplace = (str = '', replaceWith = {}) => {
@@ -134,3 +118,29 @@ export const exclude = (obj = {}, keys = []) => {
 export const objGet = (s, obj) => s.split('.').reduce((a, b) => a[b], obj);
 
 export const isPromise = (value) => Boolean(value && typeof value.then === 'function');
+
+export const sanitizeSite = (siteObj) => {
+    const newObj = {...siteObj};
+    
+    ['hosting', 'structure'].forEach((field) => {
+        delete newObj[field];
+    });
+
+    newObj.items = newObj.items.map(item => {
+        item.content = truncateString(stripTags(item.content));
+        return item;
+    });
+
+    return newObj;
+}
+
+export const truncateString = (string, maxLength = 50) => {
+    if (!string) return null;
+    if (string.length <= maxLength) return string;
+    return `${string.substring(0, maxLength)}...`;
+};
+
+export const stripTags = (html) => {
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || '';
+}

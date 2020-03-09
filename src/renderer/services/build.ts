@@ -1,8 +1,10 @@
 import del from 'del';
+import fse from 'fs-extra';
 import path from 'path';
 
-import reactParser from './parsers/react';
-import { get, sequential } from './utils';
+import { get } from '../../common/utils';
+import reactHandler from './handlers/react';
+import { sanitizeSite, sequential } from './utils';
 
 export const build = async (siteIdOrSite) => {
     let site = {} as any;
@@ -12,7 +14,7 @@ export const build = async (siteIdOrSite) => {
     } else if (siteIdOrSite) {
         site = get(`sites.${siteIdOrSite}`);
     } else {
-        return;
+        return false;
     }
 
     const { structure } = site as ISite;
@@ -30,9 +32,13 @@ export const build = async (siteIdOrSite) => {
     /**
      * Load buffer
      */
-    const loadBufferRes = loadBuffer(bufferItems);
+    const loadBufferRes = await loadBuffer(bufferItems);
 
-    console.log('structure', bufferItems, loadBufferRes);
+    if (!loadBufferRes) {
+        return false;
+    }
+
+    return true;
 }
 
 export const clearBuffer = () => {
@@ -50,23 +56,46 @@ export const loadBuffer: loadBufferType = (bufferItems) => {
 }
 
 export const buildBufferItem = async (item) => {
-    let output: string;
-    const { templateId, /*path, */parser } = item;
-    // console.log('routePath', templatePath, routePath, parser, item);
+    let handler: handlerType;
+    const { templateId, path: itemPath, parser } = item;
 
     switch (parser) {
         case 'react':
-            output = await reactParser(templateId, item);
+            handler = reactHandler;
             break;
     
         default:
-            output = '';
+            handler = async () => ({ html: '', js: ''});
             break;
     }
 
-    // console.log('parsedItem', output);
+    const { html, js } = await handler(templateId, item);
 
-    return output;
+    /**
+     * Making directory if it does exist 
+     */
+    const bufferDir = get('paths.buffer');
+    const targetDir = path.join(bufferDir, itemPath);
+
+    /**
+     * Write HTML
+     */
+    if (html) {
+        try {
+            fse.outputFileSync(path.join(targetDir, 'index.html'), html);
+        } catch (e) { return false; }
+    }
+
+    /**
+     * Write JS
+     */
+    if (js) {
+        try {
+            fse.outputFileSync(path.join(targetDir, 'index.js'), js);
+        } catch (e) { return false; }
+    }
+
+    return true;
 }
 
 export const getBufferItems = (structure, site): IBufferItem[] => {
@@ -94,8 +123,8 @@ export const getBufferItems = (structure, site): IBufferItem[] => {
                     path: '/' + mappedPath.slice(2).join('/'),
                     templateId: `${site.type}.${site.theme}.${post.template}`,
                     parser: post.parser,
-                    item: post as IBaseItem,
-                    site: site as ISite
+                    item: post as IPostItem,
+                    site: sanitizeSite(site) as ISite
                 } : null
             });
 

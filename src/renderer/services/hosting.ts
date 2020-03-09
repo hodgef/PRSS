@@ -1,5 +1,6 @@
+import { get, set } from '../../common/utils';
 import Github from './providers/github';
-import { get, merge, set } from './utils';
+import { merge } from './utils';
 
 export const getHostingTypes = () => ({
     github: Github.hostingTypeDef

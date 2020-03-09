@@ -22,6 +22,7 @@
     "@babel/preset-react": "^7.8.3",
     "@types/react": "^16.9.19",
     "@types/react-dom": "^16.9.5",
+    "@types/styled-components": "^5.0.1",
     "@typescript-eslint/eslint-plugin": "^2.19.2",
     "@typescript-eslint/parser": "^2.19.2",
     "axios": "^0.19.2",
@@ -37,21 +38,33 @@
     "eslint": "^6.8.0",
     "eslint-plugin-react": "^7.18.3",
     "eslint-plugin-simple-import-sort": "^5.0.1",
+    "fs-extra": "^8.1.0",
     "glob": "^7.1.6",
+    "html-minifier": "^4.0.0",
     "keytar": "^5.2.0",
     "node-sass": "^4.13.1",
+    "raw-loader": "^4.0.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-router-dom": "^5.1.2",
     "react-toastify": "^5.5.0",
     "sass-loader": "^8.0.2",
     "slash": "^3.0.0",
+    "styled-components": "^5.0.1",
     "typescript": "^3.7.5",
     "uuid": "^3.4.0",
     "webpack": "~4.35.3"
   },
   "electronWebpack": {
-    "title": "PRSS - Powerful Blogging"
+    "title": "PRSS - Powerful Blogging",
+    "whiteListedModules": [],
+    "main": {
+      "webpackConfig": "webpack.main.js"
+    },
+    "renderer": {
+      "template": "src/renderer/index.html",
+      "webpackConfig": "webpack.renderer.js"
+    }
   },
   "build": {
     "productName": "PRSS",

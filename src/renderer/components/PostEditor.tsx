@@ -3,7 +3,7 @@ import './styles/PostEditor.scss';
 import React, { Fragment, FunctionComponent } from 'react';
 import { useHistory, useParams} from 'react-router-dom';
 
-import { get } from '../services/utils';
+import { get } from '../../common/utils';
 import Footer from './Footer';
 import Header from './Header';
 

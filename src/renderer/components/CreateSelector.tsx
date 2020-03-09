@@ -3,7 +3,7 @@ import './styles/CreateSelector.scss';
 import React, { FunctionComponent } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { getString } from '../services/utils';
+import { getString } from '../../common/utils';
 import Footer from './Footer';
 import Header from './Header';
 

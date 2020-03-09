@@ -1,7 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { get, set } from './utils';
-
 export const getSampleSiteStructure = () => {
     const [ item1, item2, item3, item4, item5 ] = getSampleBlogItems(5);
 
@@ -43,7 +41,7 @@ export const getSampleBlogItems = (nbItems = 1) => {
             id: uuidv4(),
             slug: 'test-post',
             title: 'My test post',
-            content: 'This is a test post',
+            content: '<h1>This is a test post</h1>',
             template: 'home',
             parser: 'react'
         },

@@ -18,7 +18,9 @@ const store = new Store({
 
 store.set({
     paths: {
-        buffer: path.join(__static, 'buffer')
+        buffer: path.join(__static, 'buffer'),
+        vendor: path.join(__static, 'vendor'),
+        themes: path.join(__static, 'themes')
     }
 });
 

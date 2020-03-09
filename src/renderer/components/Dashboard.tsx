@@ -3,7 +3,7 @@ import './styles/Dashboard.scss';
 import React, { Fragment, FunctionComponent } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
-import { get, getString } from '../services/utils';
+import { get, getString } from '../../common/utils';
 import Footer from './Footer';
 import Header from './Header';
 
