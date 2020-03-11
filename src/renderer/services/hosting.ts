@@ -1,18 +1,48 @@
 import { get, set } from '../../common/utils';
-import Github from './providers/github';
+import GithubProvider from './providers/github';
+import FallbackProvider from './providers/none';
 import { merge } from './utils';
 
+
 export const getHostingTypes = () => ({
-    github: Github.hostingTypeDef
+    github: GithubProvider.hostingTypeDef,
+    none: FallbackProvider.hostingTypeDef
 });
 
-export const setupRemote = (site: ISite, updates: any) => {
+export const setupRemote = (site: ISite, onUpdate: any) => {
     const { hosting : { name }} = site;
 
     switch (name) {
         case 'github':
-            const github = new Github(site);
-            return github.setup(updates);
+            const githubProvider = new GithubProvider(site);
+            return githubProvider.setup(onUpdate);
+    
+        default:
+            const fallbackProvider = new FallbackProvider(site);
+            return fallbackProvider.setup(onUpdate);
+    }
+}
+
+export const deploy = (site: ISite) => {
+    const { hosting : { name }} = site;
+
+    switch (name) {
+        case 'github':
+            const githubProvider = new GithubProvider(site);
+            return githubProvider.deploy();
+    
+        default:
+            return Promise.resolve();
+    }
+}
+
+export const deleteItems = (filesToDeleteArr, site: ISite) => {
+    const { hosting : { name }} = site;
+
+    switch (name) {
+        case 'github':
+            const githubProvider = new GithubProvider(site);
+            return githubProvider.deleteFiles(filesToDeleteArr);
     
         default:
             return Promise.resolve();
@@ -34,8 +64,8 @@ export const setSite = (data: ISite) => {
 
 //     switch (hostingName) {
 //         case 'github':
-//             const github = new Github(site);
-//             return github.uploadConfig();
+//             const githubProvider = new GithubProvider(site);
+//             return githubProvider.uploadConfig();
     
 //         default:
 //             return Promise.resolve();

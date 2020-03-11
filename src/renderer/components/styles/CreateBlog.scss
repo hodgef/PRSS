@@ -1,4 +1,4 @@
-.CreateBlog {
+#app .CreateBlog.page {
     .content {
         width: 100%;
         max-width: 700px;
@@ -7,7 +7,8 @@
         padding: 20px;
         display: flex;
         flex-flow: column;
-        justify-content: center;
+        justify-content: flex-start;
+        padding-top: 60px;
 
         .input-group {
             margin-bottom: 10px;

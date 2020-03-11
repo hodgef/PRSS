@@ -1,12 +1,16 @@
+import minify from 'babel-minify';
 import del from 'del';
 import fse from 'fs-extra';
 import path from 'path';
 
-import { get } from '../../common/utils';
+import { get, getString } from '../../common/utils';
 import reactHandler from './handlers/react';
 import { sanitizeSite, sequential } from './utils';
 
-export const build = async (siteIdOrSite) => {
+export const bufferPathFileNames = ['index.html', 'index.js'];
+export const configFileName = 'prss.config.js';
+
+export const build = async (siteIdOrSite, onUpdate?) => {
     let site = {} as any;
 
     if (typeof siteIdOrSite === 'object') {
@@ -17,22 +21,32 @@ export const build = async (siteIdOrSite) => {
         return false;
     }
 
-    const { structure } = site as ISite;
-
     /**
      * Clear Buffer
      */
     await clearBuffer();
 
     /**
+     * Adding config file
+     */
+    const buildBufferSiteConfigRes = buildBufferSiteConfig(site);
+
+    if (!buildBufferSiteConfigRes) {
+        return false;
+    }
+
+
+    /**
      * Buffer items
      */
-    const bufferItems = getBufferItems(structure, site);
+    const bufferItems = getBufferItems(site);
 
     /**
      * Load buffer
      */
-    const loadBufferRes = await loadBuffer(bufferItems);
+    const loadBufferRes = await loadBuffer(bufferItems, (progress) => {
+        onUpdate && onUpdate(getString('building_progress', [progress]));
+    });
 
     if (!loadBufferRes) {
         return false;
@@ -51,8 +65,22 @@ export const clearBuffer = () => {
     }
 };
 
-export const loadBuffer: loadBufferType = (bufferItems) => {
-    return sequential(bufferItems, buildBufferItem, 1000, (p, r) => console.log(p, r), false);
+export const loadBuffer: loadBufferType = (bufferItems, onUpdate = () => {}) => {
+    return sequential(bufferItems, buildBufferItem, 300, onUpdate, false);
+}
+
+export const buildBufferSiteConfig = (site) => {
+    const bufferDir = get('paths.buffer');
+    const { code } = minify(`var PRSSConfig = ${JSON.stringify(sanitizeSite(site))}`);
+
+    try {
+        fse.outputFileSync(
+            path.join(bufferDir, configFileName),
+            code
+        );
+    } catch (e) { return false; }
+
+    return true;
 }
 
 export const buildBufferItem = async (item) => {
@@ -98,8 +126,8 @@ export const buildBufferItem = async (item) => {
     return true;
 }
 
-export const getBufferItems = (structure, site): IBufferItem[] => {
-    const structurePaths = getStructurePaths(structure);
+export const getBufferItems = (site): IBufferItem[] => {
+    const structurePaths = getStructurePaths(site.structure);
     const bufferItems =
         structurePaths
             .map(item => {
@@ -117,14 +145,20 @@ export const getBufferItems = (structure, site): IBufferItem[] => {
                     });
 
                     return post.slug;
-                })
+                });
+
+                const basePostPathArr = mappedPath.slice(2);
+                const postPath = basePostPathArr.join('/');
+                const configPath = (basePostPathArr.length ?
+                    basePostPathArr.map(() => '../').join('') : '') + configFileName;
 
                 return post ? {
-                    path: '/' + mappedPath.slice(2).join('/'),
+                    path: '/' + postPath,
                     templateId: `${site.type}.${site.theme}.${post.template}`,
                     parser: post.parser,
                     item: post as IPostItem,
-                    site: sanitizeSite(site) as ISite
+                    configPath
+                    // site: sanitizeSite(site) as ISite
                 } : null
             });
 

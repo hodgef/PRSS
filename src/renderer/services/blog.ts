@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 export const getSampleSiteStructure = () => {
+    // const [ item1 ] = getSampleBlogItems();
     const [ item1, item2, item3, item4, item5 ] = getSampleBlogItems(5);
 
     return {
@@ -17,6 +18,7 @@ export const getSampleSiteStructure = () => {
             item5
         ],
         structure: [
+            //[item1.id]
             [item1.id, [
                 [item2.id,
                     [item3.id, item4.id]

@@ -1,7 +1,7 @@
 import './styles/PostEditor.scss';
 
 import React, { Fragment, FunctionComponent } from 'react';
-import { useHistory, useParams} from 'react-router-dom';
+import { Link, useHistory, useParams} from 'react-router-dom';
 
 import { get } from '../../common/utils';
 import Footer from './Footer';
@@ -17,7 +17,17 @@ const PostEditor: FunctionComponent = () => {
         <div className="PostEditor page">
             <Header undertitle={(
                 <Fragment>
-                    <i className="material-icons">public</i><span>{title}</span>
+                    <div className="align-center">
+                        <i className="material-icons">public</i><Link to={`/sites/${siteId}`}>{title}</Link>
+                    </div>
+                    <div className="align-center">
+                        <i className="material-icons">keyboard_arrow_right</i><Link to={`/sites/${siteId}/posts`}>Posts</Link>
+                    </div>
+                    {post && (
+                        <div className="align-center">
+                            <i className="material-icons">keyboard_arrow_right</i><span>{post.title}</span>
+                        </div>
+                    )}
                 </Fragment>
             )} />
             <div className="content">
@@ -41,7 +51,7 @@ const PostEditor: FunctionComponent = () => {
                 <div className="editor-container">
                     {post && (
                         <div className="slug-editor">
-                            <span className="slug-label">Editing: </span><span className="slug-url">{url}{post.slug}</span>
+                            <span className="slug-label">Editing: </span><span className="slug-url">{url}{post.slug}/</span>
                         </div>
                     )}
                 </div>

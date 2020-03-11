@@ -4,14 +4,14 @@ import fs from 'fs';
 import path from 'path';
 import slash from 'slash';
 
-import { getString } from '../../../common/utils';
-import { build } from '../build';
+import { get, getString } from '../../../common/utils';
+import { bufferPathFileNames, build, configFileName, getBufferItems } from '../build';
 import { getFilePaths } from '../files';
 // import { getTemplate } from '../templates';
 import { confirmation, error/*, exclude,*/ } from '../utils';
 import { sequential } from './../utils';
 
-class Github {
+class GithubProvider {
     private readonly site: ISite;
     public readonly vars = {
         baseApiUrl: () => 'https://api.github.com/'
@@ -28,66 +28,84 @@ class Github {
         this.site = site;
     }
 
-    setup = async (updates) => {
+    setup = async (onUpdate) => {
 
         /**
          * Creating repo
          */
-        updates(getString('creating_repository'));
+        onUpdate(getString('creating_repository'));
         const createRepoRes = await this.createRepo();
 
         if (!createRepoRes) return false;
 
 
         /**
-         * Build project based on theme and structure
+         * Build project
          */
-        const buildRes = await build(this.site);
+        const buildRes = await build(this.site, onUpdate);
 
         if (!buildRes) {
             error(getString('error_buffer'));
             return false;
         }
 
-        console.log('buildRes', buildRes);
+        /**
+         * Deploy project
+         */
+        const deployResArr = await this.deploy(onUpdate);
+
+        if (!deployResArr.every(item => !!item.content)) {
+            error(getString('error_completing_setup'));
+            return false;
+        }
 
         /**
-         * Uploading theme files
+         * Enabling pages site
          */
-        // const uploadThemeFilesResArr = await this.uploadThemeFiles(updates) || [];
+        const siteUrl = await this.enablePagesSite();
 
-        // if (!uploadThemeFilesResArr.every(item => !!item.content)) {
-        //     error(getString('error_uploading_theme_files'));
-        //     return false;
-        // }
+        if (!siteUrl) {
+            error(getString('error_setup_remote'));
+            return false;
+        }
 
-        /**
-         * Uploading prss-client
-         */
-        // updates(getString('completing_setup'));
-        // const uploadConfigRes = await this.uploadConfig();
+        return {
+            ...this.site,
+            url: siteUrl
+        };
+    }
 
-        // if (!uploadConfigRes || !uploadConfigRes.content) {
-        //     error(getString('error_completing_setup'));
-        //     return false;
-        // }
+    deploy = async (onUpdate?) => {
+        console.log('deploy', this.site);
+        
+        const bufferItems = getBufferItems(this.site);
+        const bufferDir = get('paths.buffer');
 
-        // /**
-        //  * Enabling pages site
-        //  */
-        // const siteUrl = await this.enablePagesSite();
+        const siteConfigFilePath = path.join(bufferDir, configFileName);
 
-        // if (!siteUrl) {
-        //     error(getString('error_setup_remote'));
-        //     return false;
-        // }
+        const bufferFilePaths = [
+            siteConfigFilePath
+        ];
+        
+        bufferItems.forEach(item => {
+            const baseFilePath = path.join(bufferDir, item.path);
 
-        return this.site;
+            bufferPathFileNames.forEach(bufferPathFileName => {
+                const filePath = path.join(baseFilePath, bufferPathFileName);
 
-        // return {
-        //     ...this.site,
-        //     url: siteUrl
-        // };
+                try {
+                    if (fs.existsSync(filePath)) {
+                        bufferFilePaths.push(filePath);
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            });
+        });
+
+        return this.uploadFiles(bufferFilePaths, bufferDir, (progress) => {
+            onUpdate && onUpdate(getString('completing_setup_progress', [progress]));
+        });
     }
 
     // uploadConfig = async () => {
@@ -118,22 +136,27 @@ class Github {
         return html_url;
     }
 
-    // uploadThemeFiles = async (updates) => {
-    //     const themeDir = get('paths.themes');
-    //     const themeTypeDir = path.join(themeDir, this.site.type, this.site.theme);
-    //     const themeFilePaths = await getFilePaths(themeTypeDir);
+    deleteFiles = async (filePaths = [], basePath = '', onUpdate?) => {
+        if (!filePaths.length) return;
+        
+        const fileRequests = filePaths.map(filePath => {
+            const normalizedBasePath = slash(basePath);
+            const normalizedFilePath = slash(filePath);
+            const remoteFilePath = normalizedFilePath.replace(normalizedBasePath + '/', '');
 
-    //     if (!themeFilePaths || !themeFilePaths.length) {
-    //         error(getString('error_no_theme_files'));
-    //         return;
-    //     }
+            return [
+                'DELETE',
+                `repos/${this.site.hosting.username}/${this.site.id}/contents/${remoteFilePath}`,
+                {
+                    message: `Added ${remoteFilePath}`
+                }
+            ]
+        });
 
-    //     return this.uploadFiles(themeFilePaths, themeTypeDir, (progress) => {
-    //         updates && updates(getString('uploading_theme_files', [progress]));
-    //     });
-    // }
+        return sequential(fileRequests, this.fileRequest, 1000, onUpdate);
+    }
 
-    uploadFiles = async (filePaths = [], basePath = '', updater?) => {
+    uploadFiles = async (filePaths = [], basePath = '', onUpdate?) => {
         if (!filePaths.length) return;
         
         const fileRequests = filePaths.map(filePath => {
@@ -151,10 +174,13 @@ class Github {
             ]
         });
 
-        return sequential(fileRequests, this.uploadOrUpdateFile, 1000, updater);
+        return sequential(fileRequests, this.fileRequest, 1000, onUpdate);
     }
 
-    uploadOrUpdateFile = async (method, endpoint, data = {} as any, headers = {}) => {
+    /**
+     * Adds SHA when file already exists
+     */
+    fileRequest = async (method, endpoint, data = {} as any, headers = {}) => {
         /**
          * Check if file is already uploaded
          */
@@ -168,14 +194,18 @@ class Github {
                 return Promise.resolve({ content: existingFile });
             }
 
-            data = {...data, sha: existingFile.sha};
+            data = {
+                ...data,
+                message: (method === 'DELETE') ? 'Deleted' : data.message.replace('Added', 'Updated'),
+                sha: existingFile.sha
+            };
         }
 
         return this.request(method, endpoint, data, headers);
     }
 
     createFile = async (path: string, content = '') => {
-        return this.uploadOrUpdateFile('PUT', `repos/${this.site.hosting.username}/${this.site.id}/contents/${path}`, {
+        return this.fileRequest('PUT', `repos/${this.site.hosting.username}/${this.site.id}/contents/${path}`, {
             message: `Added ${path}`,
             content: btoa(content)
         });
@@ -241,4 +271,4 @@ class Github {
     }
 }
 
-export default Github;
+export default GithubProvider;

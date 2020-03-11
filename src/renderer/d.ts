@@ -46,7 +46,7 @@ interface IBufferItem {
     templateId: string;
     parser: string;
     item: IPostItem;
-    site: ISite;
+    site?: ISite;
 }
 
 interface IHosting extends hostingType {
@@ -68,8 +68,14 @@ type requestType = (
     headers?: object
 ) => any;
 
+type updaterType = (
+    p: string,
+    ref?: any
+) => any;
+
 type loadBufferType = (
-    bufferItems: IBufferItem[]
+    bufferItems: IBufferItem[],
+    onUpdate?: updaterType
 ) => any;
 
 type handlerType = (

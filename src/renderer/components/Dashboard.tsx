@@ -43,7 +43,9 @@ const Dashboard: FunctionComponent = () => {
         <div className="Dashboard page">
             <Header undertitle={(
                 <Fragment>
-                    <i className="material-icons">public</i><span>{title}</span>
+                    <div className="align-center">
+                        <i className="material-icons">public</i><span>{title}</span>
+                    </div>
                 </Fragment>
             )} />
             <div className="content">

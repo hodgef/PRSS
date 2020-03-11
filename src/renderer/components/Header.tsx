@@ -6,15 +6,13 @@ import React, { FunctionComponent, ReactNode } from 'react';
 import PRSSLogo from '../images/PRSS.png';
 
 interface IProps {
-    fixed?: boolean;
     undertitle?: ReactNode;
 }
 
 const Header: FunctionComponent<IProps> = ({
-    fixed,
     undertitle
 }) => (
-    <header className={cx({ fixed })}>
+    <header className={cx({ 'has-undertitle': undertitle })}>
         <div className="header-cont">
             <img src={PRSSLogo} width="150" />
         </div>

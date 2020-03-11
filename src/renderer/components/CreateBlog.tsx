@@ -54,18 +54,18 @@ const CreateBlog: FunctionComponent = () => {
         /**
          * Save site
          */
-        // setSite(site);
+        setSite(site);
 
         /**
          * Go to site preview
          */
-        // history.push(`/sites/${site.id}`);
+        history.push(`/sites/${site.id}`);
     };
 
     return (
         !loading ? (
             <div className="CreateBlog page">
-                <Header fixed />
+                <Header />
                 <div className="content">
                     <h1>{getString('create_blog_title')}</h1>
 
@@ -81,22 +81,20 @@ const CreateBlog: FunctionComponent = () => {
                         </div>
                     </fieldset>
     
+                    <div className="input-group input-group-lg">
+                        <div className="input-group-prepend">
+                            <label className="input-group-text">{getString('hosting_label')}</label>
+                        </div>
+                        <select className="custom-select" onChange={(e) => setHosting(e.target.value)}>
+                            {Object.keys(hostingTypes).map((key) => {
+                                const { title } = hostingTypes[key];
 
-                        {Object.keys(hostingTypes).map((key) => {
-                            const { title } = hostingTypes[key];
-
-                            return (
-                                <div className="input-group input-group-lg" key={`hosting-${key}`}>
-                                    <div className="input-group-prepend">
-                                        <label className="input-group-text">{getString('hosting_label')}</label>
-                                    </div>
-                                    <select className="custom-select" onChange={(e) => setHosting(e.target.value)}>
-                                        <option value={key}>{title}</option>
-                                    </select>
-                                </div>
-                            );
-                        })}
-
+                                return (
+                                    <option key={`hosting-${key}`} value={key}>{title}</option>
+                                );
+                            })}
+                        </select>
+                    </div>
 
                     {hosting && hostingTypes[hosting].fields && hostingTypes[hosting].fields.map(({ name, title, type }) => (
                         <div className="input-group input-group-lg" key={`${name}-fields`}>

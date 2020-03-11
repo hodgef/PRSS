@@ -1,13 +1,34 @@
 #app {
+    .content {
+        flex: 1;
+        padding: 40px;
+    }
+
     .page {
         height: 100%;
         display: flex;
         flex-flow: column;
+
+        &.fixed {
+            header {
+                position: fixed;
+                top: 0;
+                left: 0;
+            }
+
+            .content {
+                padding-top: calc(40px + 100px);
+            }
+
+            header.has-undertitle + .content {
+                padding-top: calc(40px + 120px);
+            }
+        }
     }
-    
-    .content {
-        flex: 1;
-        padding: 40px;
+
+    .align-center {
+        display: flex;
+        align-items: center;
     }
 
     h1 {

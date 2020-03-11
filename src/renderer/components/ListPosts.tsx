@@ -1,7 +1,7 @@
 import './styles/ListPosts.scss';
 
 import React, { Fragment, FunctionComponent, useEffect, useState } from 'react';
-import { useHistory, useParams} from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { store } from '../../common/Store';
@@ -64,10 +64,15 @@ const ListPosts: FunctionComponent = () => {
     }
 
     return (
-        <div className="ListPosts page">
+        <div className="ListPosts page fixed">
             <Header undertitle={(
                 <Fragment>
-                    <i className="material-icons">public</i><span>{title}</span>
+                    <div className="align-center">
+                        <i className="material-icons">public</i><Link to={`/sites/${siteId}`}>{title}</Link>
+                    </div>
+                    <div className="align-center">
+                        <i className="material-icons">keyboard_arrow_right</i><Link to={`/sites/${siteId}/posts`}>Posts</Link>
+                    </div>
                 </Fragment>
             )} />
             <div className="content">

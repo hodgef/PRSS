@@ -73,7 +73,7 @@ export const sequential = (
     arr: any[],
     asyncFn: (...p: any) => any,
     timeoutWait = 0,
-    updater?: (p: any, r: any) => void,
+    onUpdate?: (p: any, r: any) => void,
     spreadItems = true,
     index = 0,
     resArr = []
@@ -85,7 +85,7 @@ export const sequential = (
 
     return asyncFnPromise.then(r => {
         const progress = parseInt('' + (((index+1) * 100) / arr.length));
-        if (updater) updater(progress, r);
+        if (onUpdate) onUpdate(progress, r);
 
         return new Promise(resolve => {
             const timeout = setTimeout(async () => {
@@ -94,7 +94,7 @@ export const sequential = (
                     arr,
                     asyncFn,
                     timeoutWait,
-                    updater,
+                    onUpdate,
                     spreadItems,
                     index + 1,
                     [...resArr, r]
@@ -120,7 +120,7 @@ export const objGet = (s, obj) => s.split('.').reduce((a, b) => a[b], obj);
 export const isPromise = (value) => Boolean(value && typeof value.then === 'function');
 
 export const sanitizeSite = (siteObj) => {
-    const newObj = {...siteObj};
+    const newObj = JSON.parse(JSON.stringify(siteObj));
     
     ['hosting', 'structure'].forEach((field) => {
         delete newObj[field];

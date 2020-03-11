@@ -12,7 +12,7 @@ export const getTemplate = async (templateId: string, extension: string) => {
     return fs.readFileSync(templatePath, 'utf8');
 }
 
-export const baseTemplate = ({ head, body }: any) => {
+export const baseTemplate = ({ head = '', body = '' }: any) => {
     return `
       <!DOCTYPE html>
       <html>

@@ -10,13 +10,14 @@ const handler: handlerType = async (templateId, data) => {
 
     const html = htmlMinifier.minify(
         baseTemplate({
-            head: `
-                <title>${data.site.title}</title>
-            `,
+            // head: `
+            //     <title>${data.site.title}</title>
+            // `,
             body: `
                 <div id="root"></div>
                 <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
                 <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+                <script src="${data.configPath}"></script>
                 <script src="index.js"></script>
             `
         })
@@ -26,7 +27,7 @@ const handler: handlerType = async (templateId, data) => {
 
     const js = minify(`
         ${templateJs}
-        var PRSSElement = React.createElement(PRSSComponent.default, ${JSON.stringify(data)});
+        var PRSSElement = React.createElement(PRSSComponent.default, Object.assign({ site: PRSSConfig }, ${JSON.stringify(data)}));
         ReactDOM.render(PRSSElement, document.getElementById("root"));
     `).code;
 
