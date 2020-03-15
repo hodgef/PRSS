@@ -179,7 +179,7 @@ export const getStructurePaths = (nodes, prefix = '', store = []) => {
     return store;
 }
 
-export const augmentStructure = (siteId, nodes, parseItem = (post) => ({})) => {
+export const formatStructure = (siteId, nodes, parseItem?) => {
     let outputNodes = nodes;
     const site = get(`sites.${siteId}`);
 
@@ -191,7 +191,7 @@ export const augmentStructure = (siteId, nodes, parseItem = (post) => ({})) => {
 
         return {
             key,
-            ...parseItem(post),
+            ...(parseItem ? parseItem(post) : {}),
             children: children.map(parseNodes)
         }
     };

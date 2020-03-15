@@ -15,8 +15,15 @@
         &.drag-over {
             .ant-tree-node-content-wrapper {
                 background-color: #f7f7f7;
-                color: unset;
+                color: black;
                 font-weight: 700;
+            } 
+        }
+
+        .ant-tree-node-selected:hover {
+            &.ant-tree-node-content-wrapper {
+                background-color: #f7f7f7;
+                color: black;
             } 
         }
     }
@@ -40,7 +47,6 @@
 
         &.ant-tree-node-selected {
             background-color: unset;
-            color: unset;
         }
     }
 

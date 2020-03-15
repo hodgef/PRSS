@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 
 import { store } from '../../common/Store';
 import { get } from '../../common/utils';
-import { augmentStructure } from '../services/build';
+import { formatStructure } from '../services/build';
 import { deletePosts, updateSiteStructure } from '../services/hosting';
 import { confirmation } from '../services/utils';
 import DraggableTree from './DraggableTree';
@@ -65,7 +65,8 @@ const ListPosts: FunctionComponent = () => {
     });
 
     const onStructureUpdate = (data) => {
-        updateSiteStructure(siteId, data);
+        const updatedStructure = formatStructure(siteId, data)
+        updateSiteStructure(siteId, updatedStructure);
         toast.success('Changes saved');
     }
 
@@ -110,7 +111,7 @@ const ListPosts: FunctionComponent = () => {
                 <div className="items">
                     <DraggableTree
                         checkable={selectEnabled}
-                        data={augmentStructure(siteId, structure, renderItem)}
+                        data={formatStructure(siteId, structure, renderItem)}
                         onUpdate={onStructureUpdate}
                     />
                 </div>
