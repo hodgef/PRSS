@@ -15,7 +15,24 @@ const ListSites: FunctionComponent = () => {
         <div className="ListSites page">
             <Header />
             <div className="content">
-                <h1>Your Sites</h1>
+                <h1>
+                    <div className="left-align">
+                        <span>Your Sites</span>
+                    </div>
+                    <div className="right-align">
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => history.push({
+                                pathname: '/sites/create',
+                                state: { showBack: true }
+                            })}
+                        >
+                            <i className="material-icons">add</i>
+                            <span>Create New</span>
+                        </button>
+                    </div>
+                </h1>
                 <div className="items">
                     <ul>
                         {Object.values(sites).map((site) => {

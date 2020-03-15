@@ -6,14 +6,16 @@ import { toast } from 'react-toastify';
 
 import { store } from '../../common/Store';
 import { get } from '../../common/utils';
-import { deletePosts } from '../services/blog';
+import { augmentStructure } from '../services/build';
+import { deletePosts, updateSiteStructure } from '../services/hosting';
 import { confirmation } from '../services/utils';
+import DraggableTree from './DraggableTree';
 import Footer from './Footer';
 import Header from './Header';
 
 const ListPosts: FunctionComponent = () => {
     const { siteId } = useParams();
-    const { items, title } = get(`sites.${siteId}`);
+    const { items, title, structure } = get(`sites.${siteId}`);
     const [posts, setPosts] = useState(items);
     const history = useHistory();
     const [selectEnabled, setSelectEnabled] = useState(false);
@@ -42,12 +44,7 @@ const ListPosts: FunctionComponent = () => {
         }
     }
 
-    const deleteSelectedPosts = async (itemsToDelete) => {
-        if (items.length === 1) {
-            toast.error('Your site needs at least one post. Please create a new post, then delete this one.');
-            return;
-        }
-
+    const deleteSelectedPosts = async (itemsToDelete?) => {
         const confRes = await confirmation({ title: 'Are you sure?' });
         if (confRes === 0) {
             const deleteSuccess = await deletePosts(siteId, itemsToDelete || selectedItems);
@@ -61,6 +58,15 @@ const ListPosts: FunctionComponent = () => {
             setSelectedItems([])
             setSelectEnabled(false);
         }
+    }
+
+    const renderItem = ({ title }) => ({
+        title
+    });
+
+    const onStructureUpdate = (data) => {
+        updateSiteStructure(siteId, data);
+        toast.success('Changes saved');
     }
 
     return (
@@ -87,7 +93,7 @@ const ListPosts: FunctionComponent = () => {
                         )}
                         
                         {!!selectedItems.length && (
-                            <button type="button" className="btn btn-outline-danger" onClick={deleteSelectedPosts}>
+                            <button type="button" className="btn btn-outline-danger" onClick={() => deleteSelectedPosts()}>
                                 <i className="material-icons">delete</i>
                             </button>
                         )}
@@ -102,33 +108,11 @@ const ListPosts: FunctionComponent = () => {
                     </div>
                 </h1>
                 <div className="items">
-                    <ul>
-                        {posts.map(({ id, title }) => {
-                            return (
-                                <li key={id} onClick={() => history.push(`/sites/${siteId}/posts/editor/${id}`)}>
-                                    <div className="left-align">
-                                        {selectEnabled && (
-                                            <div className="form-check">
-                                                <input
-                                                    className="form-check-input position-static"
-                                                    type="checkbox"
-                                                    onChange={() => toggleSelectCheck(id)}
-                                                />
-                                            </div>
-                                        )}
-                                        <div className="site-title clickable">{title}</div>
-                                    </div>
-                                    <div className="right-align">
-                                        <i className="material-icons clickable mr-3">edit</i>
-                                        <i
-                                            className="material-icons clickable"
-                                            onClick={() => deleteSelectedPosts([ id ])}
-                                        >delete</i>
-                                    </div>
-                                </li>
-                            );
-                        })}
-                    </ul>
+                    <DraggableTree
+                        checkable={selectEnabled}
+                        data={augmentStructure(siteId, structure, renderItem)}
+                        onUpdate={onStructureUpdate}
+                    />
                 </div>
             </div>
             <Footer />

@@ -5,6 +5,7 @@ import path from 'path';
 
 import { get, getString } from '../../common/utils';
 import reactHandler from './handlers/react';
+import { getPostItem } from './hosting';
 import { sanitizeSite, sequential } from './utils';
 
 export const bufferPathFileNames = ['index.html', 'index.js'];
@@ -140,9 +141,7 @@ export const getBufferItems = (site): IBufferItem[] => {
                         return '';
                     }
 
-                    post = site.items.find((siteItem) => {
-                        return siteItem.id === postId;
-                    });
+                    post = getPostItem(site, postId);
 
                     return post.slug;
                 });
@@ -165,18 +164,39 @@ export const getBufferItems = (site): IBufferItem[] => {
     return bufferItems;
 }
 
-export const getStructurePaths = (arr, prefix = '', store = []) => {
-    if (Array.isArray(arr)) {
-        arr.forEach(item => {
-            const pathNode = typeof item === 'string' ? item : item[0];
-            const curPath = `${prefix}/${pathNode}`;
+export const getStructurePaths = (nodes, prefix = '', store = []) => {
+    nodes.forEach(node => {
+        const pathNode = node.key;
+        const curPath = `${prefix}/${pathNode}`;
 
-            store.push(curPath);
+        store.push(curPath);
 
-            if (item[1]) {
-                getStructurePaths(item[1], curPath, store);
-            } 
-        });
-    }
+        if (node.children) {
+            getStructurePaths(node.children, curPath, store);
+        }
+    });
+
     return store;
+}
+
+export const augmentStructure = (siteId, nodes, parseItem = (post) => ({})) => {
+    let outputNodes = nodes;
+    const site = get(`sites.${siteId}`);
+
+    const parseNodes = (obj) => {
+        const { key, children = [] } = obj;
+        const post = getPostItem(site, key);
+
+        if (!post) return obj;
+
+        return {
+            key,
+            ...parseItem(post),
+            children: children.map(parseNodes)
+        }
+    };
+
+    outputNodes = outputNodes.map(node => parseNodes(node));
+
+    return outputNodes;
 }

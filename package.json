@@ -25,6 +25,7 @@
     "@types/styled-components": "^5.0.1",
     "@typescript-eslint/eslint-plugin": "^2.19.2",
     "@typescript-eslint/parser": "^2.19.2",
+    "antd": "^4.0.2",
     "axios": "^0.19.2",
     "babel-minify": "^0.5.1",
     "bootstrap": "^4.4.1",
@@ -69,9 +70,12 @@
   "build": {
     "productName": "PRSS",
     "appId": "com.prss.app",
-    "copyright": "Copyright © 2020-present, Francisco Hodge",
+    "copyright": "2020-present, Francisco Hodge",
     "files": [
       "build/*"
-    ]
+    ],
+    "win": {
+      "icon": "static/icons/icon.ico"
+    }
   }
 }

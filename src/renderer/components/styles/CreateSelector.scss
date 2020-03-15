@@ -1,14 +1,19 @@
 .CreateSelector {
     .content {
         display: flex;
-        justify-content: center;
-        align-items: center;
         flex-flow: column;
-        width: 240px;
-        margin: 0 auto;
 
         button {
-            width:  100%;
+           min-width: 250px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-flow: column;
+            margin: 0 auto;
+            flex: 1;
         }
     }
 }

@@ -17,15 +17,29 @@ export const getSampleSiteStructure = () => {
             item4,
             item5
         ],
-        structure: [
-            //[item1.id]
-            [item1.id, [
-                [item2.id,
-                    [item3.id, item4.id]
-                ],
-                item5.id
-            ]]
-        ]
+        structure: [{
+            key: item1.id,
+            children: [
+                {
+                    key: item2.id,
+                    children: [
+                        {
+                            key: item3.id,
+                            children: []
+                        },
+                        {
+                            key: item4.id,
+                            children: []
+                        }
+                    ]
+                },
+                {
+                    key: item5.id,
+                    children: []
+                }
+            ]
+        }]
+        
     } as ISite;
 }
 
@@ -75,22 +89,3 @@ export const getSampleBlogItems = (nbItems = 1) => {
 
     return items.slice(0, nbItems);
 };
-
-export const deletePosts = async (siteId: string, postIds: string[]) => {
-    /*const site = get(`sites.${siteId}`);
-    site.items = site.items.filter(item => !postIds.includes(item.id));
-
-    if (site.items.length === 1) {
-        return false;
-    }
-
-    set(`sites.${siteId}`, site);
-    const { content } = await uploadConfig(siteId) || {};
-
-    if (content) {
-        return true;
-    } else {
-        return false;
-    }*/
-    return false;
-}

@@ -35,5 +35,8 @@
     "themes": "Themes",
     "themes_description": "Manage your themes",
     "settings": "Settings",
-    "settings_description": "Adjust site settings"
+    "settings_description": "Adjust site settings",
+    "error_delete_single_post": "Cannot delete your only post. Create another post before deleting this one.",
+    "error_delete_root_post": "You cannot delete the site index. Please edit it instead",
+    "warn_delete_post_with_children": "At least one selected post contains children. These will be deleted as well. Continue?"
 }

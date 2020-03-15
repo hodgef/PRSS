@@ -1,7 +1,8 @@
-import { get, set } from '../../common/utils';
+import { get, getString, set } from '../../common/utils';
+import { getStructurePaths } from './build';
 import GithubProvider from './providers/github';
 import FallbackProvider from './providers/none';
-import { merge } from './utils';
+import { error, merge } from './utils';
 
 
 export const getHostingTypes = () => ({
@@ -71,3 +72,76 @@ export const setSite = (data: ISite) => {
 //             return Promise.resolve();
 //     }
 // }
+
+export const checkIfPostsHaveChildren = (site, postIds = []) => {
+    const { structure } = site;
+    const structurePaths = getStructurePaths(structure);
+
+    return postIds.filter((postId) => {
+        return structurePaths.some(structurePath => {
+            const structurePathArr = structurePath.split('/');
+            const postIdIndex = structurePathArr.indexOf(postId);
+            return postIdIndex > 0 && postIdIndex !== structurePathArr.length - 1;
+        });
+    });
+}
+
+export const getRootPost = (site) => {
+    const { structure } = site;
+    const structurePaths = getStructurePaths(structure);
+    return structurePaths[0].split('/')[1];
+}
+
+export const deletePosts = async (siteId: string, postIds: string[]) => {
+    const site = get(`sites.${siteId}`);
+    site.items = site.items.filter(item => !postIds.includes(item.id));
+
+    /**
+     * Can't delete only post
+     */
+    if (site.items.length === 1) {
+        error(getString('error_delete_single_post'));
+        return false;
+    }
+    
+    /**
+     * Can't delete root post
+     */
+    const rootPost = getRootPost(site);
+
+    if (postIds.includes(rootPost)) {
+        error(getString('error_delete_root_post'));
+        return false;
+    }
+
+    /**
+     * Warn about deleting posts with children
+     */
+    const postsWithChildren = checkIfPostsHaveChildren(site, postIds);
+
+    
+    console.log('postsWithChildren', postsWithChildren);
+
+    // set(`sites.${siteId}`, site);
+    // const { content } = await uploadConfig(siteId) || {};
+
+    // if (content) {
+    //     return true;
+    // } else {
+    //     return false;
+    // }
+    return false;
+}
+
+export const getPostItem = (site, postId) => {
+    return site.items.find((siteItem) => {
+        return siteItem.id === postId;
+    });
+}
+
+export const updateSiteStructure = (siteId, newStructure) => {
+    const site = get(`sites.${siteId}`);
+    if (site) {
+        set(`sites.${site.id}.structure`, newStructure);
+    }
+}

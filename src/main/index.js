@@ -6,7 +6,7 @@ import { format as formatUrl } from 'url';
 
 import { reactParser } from './parsers';
 
-const iconPath = path.join(__static, 'icon.png');
+const iconPath = path.join(__static, 'icons', 'icon.png');
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // global reference to mainWindow (necessary to prevent window from being garbage collected)

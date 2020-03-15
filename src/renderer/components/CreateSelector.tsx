@@ -1,30 +1,46 @@
 import './styles/CreateSelector.scss';
 
 import React, { FunctionComponent } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import { getString } from '../../common/utils';
 import Footer from './Footer';
 import Header from './Header';
 
-const CreateSelector: FunctionComponent = () => {
+interface IProps {
+    showBack?: boolean;
+}
+
+const CreateSelector: FunctionComponent<IProps> = (props) => {
     const history = useHistory();
+    const { state = {} } = useLocation();
 
     return (
         <div className="CreateSelector page">
             <Header />
             <div className="content">
-                <button
-                    onClick={() => history.push('/create/blog')}
-                    type="button"
-                    className="btn btn-primary btn-lg mb-3"
-                >{getString('create_blog')}</button>
+                <h1 className="mb-4">
+                    <div className="left-align">
+                        {state.showBack && (
+                            <i className="material-icons clickable" onClick={() => history.goBack()}>arrow_back</i>
+                        )}
+                        <span>What site do you want to create?</span>
+                    </div>
+                </h1>
 
-                <button
-                    onClick={() => {}}
-                    type="button"
-                    className="btn btn-primary btn-lg disabled"
-                >{getString('create_docs')}</button>
+                <div className="button-container">
+                    <button
+                        onClick={() => history.push('/sites/create/blog')}
+                        type="button"
+                        className="btn btn-primary btn-lg mb-3"
+                    >{getString('create_blog')}</button>
+
+                    <button
+                        onClick={() => {}}
+                        type="button"
+                        className="btn btn-primary btn-lg disabled"
+                    >{getString('create_docs')}</button>
+                </div>
             </div>
             <Footer />
         </div>

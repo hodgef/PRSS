@@ -13,7 +13,12 @@ interface ISite {
     url: string;
     theme: string;
     items: IPostItem[];
-    structure: any[];
+    structure: IStructureItem[];
+}
+
+interface IStructureItem {
+    key: string;
+    children: IStructureItem[];
 }
 
 interface IPostItem {
