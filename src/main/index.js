@@ -15,10 +15,10 @@ let mainWindow
 const createMainWindow = () => {
   let options = {
     icon: iconPath,
-    width: 1100,
-    height: 725,
-    minWidth: 1100,
-    minHeight: 725,
+    width: 1380,
+    height: 750,
+    minWidth: 1380,
+    minHeight: 750,
     webPreferences: {
       nodeIntegration: true
     }

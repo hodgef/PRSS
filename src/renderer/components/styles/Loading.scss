@@ -26,28 +26,52 @@
         align-items: center;
         justify-content: center;
     }
-      
+
     .spinner:after {
-        animation: spinner .8s linear infinite;
+        animation: spinner 0.8s linear infinite;
         display: block;
-        content: "⠋";
+        content: '⠋';
         font-size: 80px;
     }
 
     @keyframes spinner {
-        10% { content: "⠙"; }
-        20% { content: "⠹"; }
-        30% { content: "⠸"; }
-        40% { content: "⠼"; }
-        50% { content: "⠴"; }
-        60% { content: "⠦"; }
-        70% { content: "⠧"; }
-        80% { content: "⠇"; }
-        90% { content: "⠏"; }
+        10% {
+            content: '⠙';
+        }
+        20% {
+            content: '⠹';
+        }
+        30% {
+            content: '⠸';
+        }
+        40% {
+            content: '⠼';
+        }
+        50% {
+            content: '⠴';
+        }
+        60% {
+            content: '⠦';
+        }
+        70% {
+            content: '⠧';
+        }
+        80% {
+            content: '⠇';
+        }
+        90% {
+            content: '⠏';
+        }
     }
 
     @keyframes fadeIn {
-        0% { opacity: 0; transform: scale(0.9); }
-        100% { opacity: 1; transform: scale(1); }
+        0% {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
 }

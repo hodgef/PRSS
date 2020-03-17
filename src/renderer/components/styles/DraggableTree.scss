@@ -17,14 +17,14 @@
                 background-color: #f7f7f7;
                 color: black;
                 font-weight: 700;
-            } 
+            }
         }
 
         .ant-tree-node-selected:hover {
             &.ant-tree-node-content-wrapper {
                 background-color: #f7f7f7;
                 color: black;
-            } 
+            }
         }
     }
 
@@ -64,11 +64,9 @@
 
     .ant-tree-treenode:first-child {
         + .drag-over-gap-top,
-        + .drag-over-gap-bottom  {
+        + .drag-over-gap-bottom {
             border-bottom: unset;
             border-top: unset;
         }
     }
-
-    
 }

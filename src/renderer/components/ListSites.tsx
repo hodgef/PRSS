@@ -23,10 +23,12 @@ const ListSites: FunctionComponent = () => {
                         <button
                             type="button"
                             className="btn btn-primary"
-                            onClick={() => history.push({
-                                pathname: '/sites/create',
-                                state: { showBack: true }
-                            })}
+                            onClick={() =>
+                                history.push({
+                                    pathname: '/sites/create',
+                                    state: { showBack: true }
+                                })
+                            }
                         >
                             <i className="material-icons">add</i>
                             <span>Create New</span>
@@ -35,14 +37,20 @@ const ListSites: FunctionComponent = () => {
                 </h1>
                 <div className="items">
                     <ul>
-                        {Object.values(sites).map((site) => {
+                        {Object.values(sites).map(site => {
                             const { id, title, type } = site as ISite;
 
                             return (
-                                <li key={id} className="clickable" onClick={() => history.push(`/sites/${id}`)}>
+                                <li
+                                    key={id}
+                                    className="clickable"
+                                    onClick={() => history.push(`/sites/${id}`)}
+                                >
                                     <div className="left-align">
                                         <i className="material-icons">public</i>
-                                        <div className="site-title">{title}</div>
+                                        <div className="site-title">
+                                            {title}
+                                        </div>
                                     </div>
                                     <div className="right-align">
                                         <div className="site-tag">{type}</div>

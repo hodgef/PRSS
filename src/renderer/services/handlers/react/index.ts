@@ -20,18 +20,21 @@ const handler: handlerType = async (templateId, data) => {
                 <script src="${data.configPath}"></script>
                 <script src="index.js"></script>
             `
-        })
-    , {
-        collapseWhitespace: true
-    });
+        }),
+        {
+            collapseWhitespace: true
+        }
+    );
 
     const js = minify(`
         ${templateJs}
-        var PRSSElement = React.createElement(PRSSComponent.default, Object.assign({ site: PRSSConfig }, ${JSON.stringify(data)}));
+        var PRSSElement = React.createElement(PRSSComponent.default, Object.assign({ site: PRSSConfig }, ${JSON.stringify(
+            data
+        )}));
         ReactDOM.render(PRSSElement, document.getElementById("root"));
     `).code;
 
     return { html, js };
-}
+};
 
 export default handler;

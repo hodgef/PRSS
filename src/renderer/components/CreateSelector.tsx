@@ -11,7 +11,7 @@ interface IProps {
     showBack?: boolean;
 }
 
-const CreateSelector: FunctionComponent<IProps> = (props) => {
+const CreateSelector: FunctionComponent<IProps> = props => {
     const history = useHistory();
     const { state = {} } = useLocation();
 
@@ -22,7 +22,12 @@ const CreateSelector: FunctionComponent<IProps> = (props) => {
                 <h1 className="mb-4">
                     <div className="left-align">
                         {state.showBack && (
-                            <i className="material-icons clickable" onClick={() => history.goBack()}>arrow_back</i>
+                            <i
+                                className="material-icons clickable"
+                                onClick={() => history.goBack()}
+                            >
+                                arrow_back
+                            </i>
                         )}
                         <span>What site do you want to create?</span>
                     </div>
@@ -33,13 +38,17 @@ const CreateSelector: FunctionComponent<IProps> = (props) => {
                         onClick={() => history.push('/sites/create/blog')}
                         type="button"
                         className="btn btn-primary btn-lg mb-3"
-                    >{getString('create_blog')}</button>
+                    >
+                        {getString('create_blog')}
+                    </button>
 
                     <button
                         onClick={() => {}}
                         type="button"
                         className="btn btn-primary btn-lg disabled"
-                    >{getString('create_docs')}</button>
+                    >
+                        {getString('create_docs')}
+                    </button>
                 </div>
             </div>
             <Footer />

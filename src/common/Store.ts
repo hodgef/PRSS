@@ -1,7 +1,7 @@
 import Store from 'electron-store';
 import path from 'path';
 import { createContext } from 'react';
-const isDevelopment = process.env.NODE_ENV !== 'production'
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const AppContext = createContext(null);
 

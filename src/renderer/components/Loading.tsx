@@ -9,7 +9,7 @@ const Loading: FunctionComponent<ILoading> = ({ title, message }) => {
             {title && <div className="title">{title}</div>}
             {message && <div className="subtitle">{message}</div>}
         </div>
-    )
+    );
 };
 
 export default Loading;

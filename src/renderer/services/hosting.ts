@@ -1,9 +1,8 @@
-import { get, getString, set } from '../../common/utils';
+import { get, getString, rem, set } from '../../common/utils';
 import { getStructurePaths } from './build';
 import GithubProvider from './providers/github';
 import FallbackProvider from './providers/none';
-import { error, merge } from './utils';
-
+import { confirmation, error, merge } from './utils';
 
 export const getHostingTypes = () => ({
     github: GithubProvider.hostingTypeDef,
@@ -11,44 +10,50 @@ export const getHostingTypes = () => ({
 });
 
 export const setupRemote = (site: ISite, onUpdate: any) => {
-    const { hosting : { name }} = site;
+    const {
+        hosting: { name }
+    } = site;
 
     switch (name) {
         case 'github':
             const githubProvider = new GithubProvider(site);
             return githubProvider.setup(onUpdate);
-    
+
         default:
             const fallbackProvider = new FallbackProvider(site);
             return fallbackProvider.setup(onUpdate);
     }
-}
+};
 
 export const deploy = (site: ISite) => {
-    const { hosting : { name }} = site;
+    const {
+        hosting: { name }
+    } = site;
 
     switch (name) {
         case 'github':
             const githubProvider = new GithubProvider(site);
             return githubProvider.deploy();
-    
+
         default:
             return Promise.resolve();
     }
-}
+};
 
 export const deleteItems = (filesToDeleteArr, site: ISite) => {
-    const { hosting : { name }} = site;
+    const {
+        hosting: { name }
+    } = site;
 
     switch (name) {
         case 'github':
             const githubProvider = new GithubProvider(site);
             return githubProvider.deleteFiles(filesToDeleteArr);
-    
+
         default:
             return Promise.resolve();
     }
-}
+};
 
 export const setSite = (data: ISite) => {
     const { id: siteId } = data;
@@ -57,7 +62,7 @@ export const setSite = (data: ISite) => {
     set({
         sites: merge(sites, { [siteId]: { id: siteId, ...data } })
     });
-}
+};
 
 // export const uploadConfig = (siteId: string) => {
 //     const site = get(`sites.${siteId}`);
@@ -67,7 +72,7 @@ export const setSite = (data: ISite) => {
 //         case 'github':
 //             const githubProvider = new GithubProvider(site);
 //             return githubProvider.uploadConfig();
-    
+
 //         default:
 //             return Promise.resolve();
 //     }
@@ -77,33 +82,34 @@ export const checkIfPostsHaveChildren = (site, postIds = []) => {
     const { structure } = site;
     const structurePaths = getStructurePaths(structure);
 
-    return postIds.filter((postId) => {
+    return postIds.filter(postId => {
         return structurePaths.some(structurePath => {
             const structurePathArr = structurePath.split('/');
             const postIdIndex = structurePathArr.indexOf(postId);
-            return postIdIndex > 0 && postIdIndex !== structurePathArr.length - 1;
+            return (
+                postIdIndex > 0 && postIdIndex !== structurePathArr.length - 1
+            );
         });
     });
-}
+};
 
-export const getRootPost = (site) => {
+export const getRootPost = site => {
     const { structure } = site;
     const structurePaths = getStructurePaths(structure);
     return structurePaths[0].split('/')[1];
-}
+};
 
 export const deletePosts = async (siteId: string, postIds: string[]) => {
     const site = get(`sites.${siteId}`);
-    site.items = site.items.filter(item => !postIds.includes(item.id));
 
     /**
      * Can't delete only post
      */
     if (site.items.length === 1) {
         error(getString('error_delete_single_post'));
-        return false;
+        return;
     }
-    
+
     /**
      * Can't delete root post
      */
@@ -111,7 +117,7 @@ export const deletePosts = async (siteId: string, postIds: string[]) => {
 
     if (postIds.includes(rootPost)) {
         error(getString('error_delete_root_post'));
-        return false;
+        return;
     }
 
     /**
@@ -119,29 +125,74 @@ export const deletePosts = async (siteId: string, postIds: string[]) => {
      */
     const postsWithChildren = checkIfPostsHaveChildren(site, postIds);
 
-    
-    console.log('postsWithChildren', postsWithChildren);
+    const confRes = await confirmation({
+        title: getString(
+            postsWithChildren.length
+                ? 'warn_delete_post_with_children'
+                : 'confirmation_request_message'
+        )
+    });
 
-    // set(`sites.${siteId}`, site);
-    // const { content } = await uploadConfig(siteId) || {};
+    if (confRes !== 0) {
+        return;
+    }
 
-    // if (content) {
-    //     return true;
-    // } else {
-    //     return false;
-    // }
-    return false;
-}
+    /**
+     * Filter out deleted items from item list
+     */
+    const filteredItems = site.items.filter(item => !postIds.includes(item.id));
+
+    /**
+     * Filter out deleted items from site structure
+     */
+    const filteredStructure = filterItemsFromNodes(
+        siteId,
+        site.structure,
+        postIds
+    );
+
+    /**
+     * Saving changes
+     */
+    site.items = filteredItems;
+    site.structure = filteredStructure;
+
+    set(`sites.${siteId}`, site);
+    return site;
+};
 
 export const getPostItem = (site, postId) => {
-    return site.items.find((siteItem) => {
+    return site.items.find(siteItem => {
         return siteItem.id === postId;
     });
-}
+};
 
 export const updateSiteStructure = (siteId, newStructure) => {
     const site = get(`sites.${siteId}`);
     if (site) {
         set(`sites.${site.id}.structure`, newStructure);
     }
-}
+};
+
+export const filterItemsFromNodes = (siteId, nodes, itemIds = []) => {
+    let outputNodes = nodes;
+    const site = get(`sites.${siteId}`);
+
+    const parseNodes = obj => {
+        const { key, children = [] } = obj;
+        const post = getPostItem(site, key);
+
+        if (!post) return obj;
+
+        return {
+            key,
+            children: children
+                .filter(node => !itemIds.includes(node.key))
+                .map(parseNodes)
+        };
+    };
+
+    outputNodes = outputNodes.map(node => parseNodes(node));
+
+    return outputNodes;
+};

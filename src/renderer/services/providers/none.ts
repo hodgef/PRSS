@@ -14,7 +14,7 @@ class FallbackProvider {
         this.site = site;
     }
 
-    setup = async (onUpdate) => {
+    setup = async onUpdate => {
         /**
          * Build project
          */
@@ -26,7 +26,7 @@ class FallbackProvider {
         }
 
         return this.site;
-    }
+    };
 }
 
 export default FallbackProvider;

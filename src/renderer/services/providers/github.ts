@@ -5,10 +5,15 @@ import path from 'path';
 import slash from 'slash';
 
 import { get, getString } from '../../../common/utils';
-import { bufferPathFileNames, build, configFileName, getBufferItems } from '../build';
+import {
+    bufferPathFileNames,
+    build,
+    configFileName,
+    getBufferItems
+} from '../build';
 import { getFilePaths } from '../files';
 // import { getTemplate } from '../templates';
-import { confirmation, error/*, exclude,*/ } from '../utils';
+import { confirmation, error /*, exclude,*/ } from '../utils';
 import { sequential } from './../utils';
 
 class GithubProvider {
@@ -19,8 +24,8 @@ class GithubProvider {
     public static hostingTypeDef = {
         title: 'Github',
         fields: [
-            {name: 'username', title: 'Github Username', type: 'text'},
-            {name: 'token', title: 'Github Token', type: 'password'}
+            { name: 'username', title: 'Github Username', type: 'text' },
+            { name: 'token', title: 'Github Token', type: 'password' }
         ]
     };
 
@@ -28,8 +33,7 @@ class GithubProvider {
         this.site = site;
     }
 
-    setup = async (onUpdate) => {
-
+    setup = async onUpdate => {
         /**
          * Creating repo
          */
@@ -37,7 +41,6 @@ class GithubProvider {
         const createRepoRes = await this.createRepo();
 
         if (!createRepoRes) return false;
-
 
         /**
          * Build project
@@ -73,20 +76,18 @@ class GithubProvider {
             ...this.site,
             url: siteUrl
         };
-    }
+    };
 
     deploy = async (onUpdate?) => {
         console.log('deploy', this.site);
-        
+
         const bufferItems = getBufferItems(this.site);
         const bufferDir = get('paths.buffer');
 
         const siteConfigFilePath = path.join(bufferDir, configFileName);
 
-        const bufferFilePaths = [
-            siteConfigFilePath
-        ];
-        
+        const bufferFilePaths = [siteConfigFilePath];
+
         bufferItems.forEach(item => {
             const baseFilePath = path.join(bufferDir, item.path);
 
@@ -103,10 +104,11 @@ class GithubProvider {
             });
         });
 
-        return this.uploadFiles(bufferFilePaths, bufferDir, (progress) => {
-            onUpdate && onUpdate(getString('completing_setup_progress', [progress]));
+        return this.uploadFiles(bufferFilePaths, bufferDir, progress => {
+            onUpdate &&
+                onUpdate(getString('completing_setup_progress', [progress]));
         });
-    }
+    };
 
     // uploadConfig = async () => {
     //     const { code: prssTemplate } = minify(
@@ -126,23 +128,32 @@ class GithubProvider {
             return existingSite.html_url;
         }
 
-        const { html_url } = await this.request('POST', endpoint, {
-            source: {
-                branch: 'master',
-                directory: '/'
-            }
-        }, { Accept : 'application/vnd.github.switcheroo-preview+json' }) || {};
+        const { html_url } =
+            (await this.request(
+                'POST',
+                endpoint,
+                {
+                    source: {
+                        branch: 'master',
+                        directory: '/'
+                    }
+                },
+                { Accept: 'application/vnd.github.switcheroo-preview+json' }
+            )) || {};
 
         return html_url;
-    }
+    };
 
     deleteFiles = async (filePaths = [], basePath = '', onUpdate?) => {
         if (!filePaths.length) return;
-        
+
         const fileRequests = filePaths.map(filePath => {
             const normalizedBasePath = slash(basePath);
             const normalizedFilePath = slash(filePath);
-            const remoteFilePath = normalizedFilePath.replace(normalizedBasePath + '/', '');
+            const remoteFilePath = normalizedFilePath.replace(
+                normalizedBasePath + '/',
+                ''
+            );
 
             return [
                 'DELETE',
@@ -150,19 +161,22 @@ class GithubProvider {
                 {
                     message: `Added ${remoteFilePath}`
                 }
-            ]
+            ];
         });
 
         return sequential(fileRequests, this.fileRequest, 1000, onUpdate);
-    }
+    };
 
     uploadFiles = async (filePaths = [], basePath = '', onUpdate?) => {
         if (!filePaths.length) return;
-        
+
         const fileRequests = filePaths.map(filePath => {
             const normalizedBasePath = slash(basePath);
             const normalizedFilePath = slash(filePath);
-            const remoteFilePath = normalizedFilePath.replace(normalizedBasePath + '/', '');
+            const remoteFilePath = normalizedFilePath.replace(
+                normalizedBasePath + '/',
+                ''
+            );
 
             return [
                 'PUT',
@@ -171,11 +185,11 @@ class GithubProvider {
                     message: `Added ${remoteFilePath}`,
                     content: btoa(fs.readFileSync(filePath, 'utf8'))
                 }
-            ]
+            ];
         });
 
         return sequential(fileRequests, this.fileRequest, 1000, onUpdate);
-    }
+    };
 
     /**
      * Adds SHA when file already exists
@@ -185,31 +199,41 @@ class GithubProvider {
          * Check if file is already uploaded
          */
         const existingFile = await this.request('GET', endpoint);
-        
+
         if (existingFile && existingFile.sha) {
             /**
              * If content is the same, skip
              */
-            if (JSON.stringify(`"${atob(existingFile.content)}"`) === JSON.stringify(`"${atob(data.content)}"`)) {
+            if (
+                JSON.stringify(`"${atob(existingFile.content)}"`) ===
+                JSON.stringify(`"${atob(data.content)}"`)
+            ) {
                 return Promise.resolve({ content: existingFile });
             }
 
             data = {
                 ...data,
-                message: (method === 'DELETE') ? 'Deleted' : data.message.replace('Added', 'Updated'),
+                message:
+                    method === 'DELETE'
+                        ? 'Deleted'
+                        : data.message.replace('Added', 'Updated'),
                 sha: existingFile.sha
             };
         }
 
         return this.request(method, endpoint, data, headers);
-    }
+    };
 
     createFile = async (path: string, content = '') => {
-        return this.fileRequest('PUT', `repos/${this.site.hosting.username}/${this.site.id}/contents/${path}`, {
-            message: `Added ${path}`,
-            content: btoa(content)
-        });
-    }
+        return this.fileRequest(
+            'PUT',
+            `repos/${this.site.hosting.username}/${this.site.id}/contents/${path}`,
+            {
+                message: `Added ${path}`,
+                content: btoa(content)
+            }
+        );
+    };
 
     createRepo = async () => {
         const repo = await this.getRepo();
@@ -218,7 +242,7 @@ class GithubProvider {
             const confirmationRes = await confirmation({
                 title: 'The repository already exists. Do you want to use it?'
             });
-            
+
             if (confirmationRes !== 0) {
                 error(getString('action_cancelled'));
                 return false;
@@ -227,12 +251,13 @@ class GithubProvider {
             }
         }
 
-        const { created_at } = await this.request('POST', 'user/repos', {
-            name: this.site.id,
-            description: getString('created_with'),
-            homepage: getString('prss_domain'),
-            auto_init: true
-        }) || {};
+        const { created_at } =
+            (await this.request('POST', 'user/repos', {
+                name: this.site.id,
+                description: getString('created_with'),
+                homepage: getString('prss_domain'),
+                auto_init: true
+            })) || {};
 
         if (!created_at) {
             error(getString('error_repo_creation'));
@@ -240,10 +265,14 @@ class GithubProvider {
         }
 
         return true;
-    }
+    };
 
     getRepo = async () => {
-        const repos = await this.request('GET', `users/${this.site.hosting.username}/repos`) || [];
+        const repos =
+            (await this.request(
+                'GET',
+                `users/${this.site.hosting.username}/repos`
+            )) || [];
 
         if (!Array.isArray(repos)) {
             error();
@@ -252,7 +281,7 @@ class GithubProvider {
 
         const repo = repos.find(item => item.name === this.site.id);
         return repo;
-    }
+    };
 
     request: requestType = (method, endpoint, data = {}, headers = {}) => {
         const url = this.vars.baseApiUrl() + endpoint;
@@ -266,9 +295,9 @@ class GithubProvider {
             data,
             headers
         })
-        .then(response => response.data)
-        .catch(res => res);
-    }
+            .then(response => response.data)
+            .catch(res => res);
+    };
 }
 
 export default GithubProvider;

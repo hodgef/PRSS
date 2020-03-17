@@ -22,7 +22,7 @@ module.exports = {
     "plugins": [
         "react",
         "@typescript-eslint",
-        "simple-import-sort"
+        //"simple-import-sort"
     ],
     "rules": {
         "react/jsx-uses-react": "error",   
@@ -32,9 +32,11 @@ module.exports = {
         "keyword-spacing": "warn",
         "space-before-blocks": "warn",
         "comma-dangle": "warn",
-        "simple-import-sort/sort": "warn",
+        //"simple-import-sort/sort": "warn",
         "no-multi-spaces": "warn",
-        "comma-spacing": ["warn", { "before": false, "after": true }]
+        "comma-spacing": ["warn", { "before": false, "after": true }],
+        "prefer-const": ["warn", {"destructuring": "all"}],
+        "no-var": "warn"
     },
     "settings": {
         "react": {

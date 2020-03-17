@@ -48,7 +48,7 @@
     display: inline-flex;
     width: 100%;
     flex-wrap: wrap;
-    
+
     li {
         width: calc(50% - 10px);
         margin-bottom: 20px;
@@ -57,7 +57,7 @@
         align-items: center;
         justify-content: center;
         flex-flow: column;
-        
+
         &:nth-child(2n + 1) {
             margin-right: 20px;
         }

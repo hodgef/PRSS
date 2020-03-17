@@ -37,31 +37,45 @@ const Dashboard: FunctionComponent = () => {
             icon: 'settings',
             route: ''
         }
-    ]
+    ];
 
     return (
         <div className="Dashboard page">
-            <Header undertitle={(
-                <Fragment>
-                    <div className="align-center">
-                        <i className="material-icons">public</i><span>{title}</span>
-                    </div>
-                </Fragment>
-            )} />
+            <Header
+                undertitle={
+                    <Fragment>
+                        <div className="align-center">
+                            <i className="material-icons">public</i>
+                            <span>{title}</span>
+                        </div>
+                    </Fragment>
+                }
+            />
             <div className="content">
                 <h1>
                     <div className="left-align">
-                        <i className="material-icons clickable" onClick={() => history.goBack()}>arrow_back</i>
+                        <i
+                            className="material-icons clickable"
+                            onClick={() => history.goBack()}
+                        >
+                            arrow_back
+                        </i>
                         <span>Dashboard</span>
                     </div>
                 </h1>
                 <div className="items">
                     <ul>
                         {features.map(({ title, description, icon, route }) => (
-                            <li key={title} className="clickable" onClick={() => route && history.push(route)}>
+                            <li
+                                key={title}
+                                className="clickable"
+                                onClick={() => route && history.push(route)}
+                            >
                                 <i className="material-icons">{icon}</i>
                                 <div className="feature-title">{title}</div>
-                                <div className="feature-description">{description}</div>
+                                <div className="feature-description">
+                                    {description}
+                                </div>
                             </li>
                         ))}
                     </ul>

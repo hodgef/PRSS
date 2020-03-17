@@ -47,7 +47,7 @@ const CreateBlog: FunctionComponent = () => {
         if (!site) {
             setLoading(false);
             return;
-        };
+        }
 
         console.log('site', site);
 
@@ -62,77 +62,94 @@ const CreateBlog: FunctionComponent = () => {
         history.push(`/sites/${site.id}`);
     };
 
-    return (
-        !loading ? (
-            <div className="CreateBlog page">
-                <Header />
-                <div className="content">
-                    <h1>{getString('create_blog_title')}</h1>
+    return !loading ? (
+        <div className="CreateBlog page">
+            <Header />
+            <div className="content">
+                <h1>{getString('create_blog_title')}</h1>
 
-                    <fieldset>
-                        <div className="input-group input-group-lg">
-                            <input
-                                type="text"
-                                placeholder="Title"
-                                className="form-control"
-                                value={title}
-                                onChange={e => setTitle(e.target.value)}
-                            />
-                        </div>
-                    </fieldset>
-    
+                <fieldset>
                     <div className="input-group input-group-lg">
-                        <div className="input-group-prepend">
-                            <label className="input-group-text">{getString('hosting_label')}</label>
-                        </div>
-                        <select className="custom-select" onChange={(e) => setHosting(e.target.value)}>
-                            {Object.keys(hostingTypes).map((key) => {
-                                const { title } = hostingTypes[key];
-
-                                return (
-                                    <option key={`hosting-${key}`} value={key}>{title}</option>
-                                );
-                            })}
-                        </select>
+                        <input
+                            type="text"
+                            placeholder="Title"
+                            className="form-control"
+                            value={title}
+                            onChange={e => setTitle(e.target.value)}
+                        />
                     </div>
+                </fieldset>
 
-                    {hosting && hostingTypes[hosting].fields && hostingTypes[hosting].fields.map(({ name, title, type }) => (
-                        <div className="input-group input-group-lg" key={`${name}-fields`}>
-                            <input
-                                type={type}
-                                placeholder={title}
-                                className="form-control"
-                                value={hostingFields[name] || ''}
-                                onChange={e => setHostingFields({...hostingFields, ...{[name]: e.target.value}})}
-                            />
-                        </div>
-                    ))}
-
-                        <div className="id-info">
-                            <span>ID</span>&nbsp;
-                            {(hosting && hostingTypes[hosting] && title) ? (
-                                <Fragment>
-                                    {normalize(title)}
-                                </Fragment>
-                            ) : (
-                                'Enter title'
-                            )}
-                        </div>
-
-                    <div className="button-container mt-2">
-                        <button
-                            onClick={handleSubmit}
-                            type="button"
-                            className="btn btn-primary btn-lg"
-                        >{getString('create_blog_button')}</button>
+                <div className="input-group input-group-lg">
+                    <div className="input-group-prepend">
+                        <label className="input-group-text">
+                            {getString('hosting_label')}
+                        </label>
                     </div>
+                    <select
+                        className="custom-select"
+                        onChange={e => setHosting(e.target.value)}
+                    >
+                        {Object.keys(hostingTypes).map(key => {
+                            const { title } = hostingTypes[key];
+
+                            return (
+                                <option key={`hosting-${key}`} value={key}>
+                                    {title}
+                                </option>
+                            );
+                        })}
+                    </select>
                 </div>
 
-                <Footer />
+                {hosting &&
+                    hostingTypes[hosting].fields &&
+                    hostingTypes[hosting].fields.map(
+                        ({ name, title, type }) => (
+                            <div
+                                className="input-group input-group-lg"
+                                key={`${name}-fields`}
+                            >
+                                <input
+                                    type={type}
+                                    placeholder={title}
+                                    className="form-control"
+                                    value={hostingFields[name] || ''}
+                                    onChange={e =>
+                                        setHostingFields({
+                                            ...hostingFields,
+                                            ...{ [name]: e.target.value }
+                                        })
+                                    }
+                                />
+                            </div>
+                        )
+                    )}
+
+                <div className="id-info">
+                    <span>ID</span>&nbsp;
+                    {hosting && hostingTypes[hosting] && title ? (
+                        <Fragment>{normalize(title)}</Fragment>
+                    ) : (
+                        'Enter title'
+                    )}
+                </div>
+
+                <div className="button-container mt-2">
+                    <button
+                        onClick={handleSubmit}
+                        type="button"
+                        className="btn btn-primary btn-lg"
+                    >
+                        {getString('create_blog_button')}
+                    </button>
+                </div>
             </div>
-        ) : (
-            <Loading title={loadingStatus} />
-        )
+
+            <Footer />
+        </div>
+    ) : (
+        <Loading title={loadingStatus} />
     );
 };
 

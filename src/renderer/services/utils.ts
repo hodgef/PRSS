@@ -6,47 +6,52 @@ export const merge = (var1, var2) => {
     if (Array.isArray(var1) && Array.isArray(var2)) {
         return [...var1, ...var2];
     } else {
-        return {...var1, ...var2};
+        return { ...var1, ...var2 };
     }
-}
+};
 
 export const normalize = (str: string) => {
-  return str.toString().toLowerCase()
-    .normalize('NFD')
-    .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-')
-    .replace(/^-+/, '')
-    .replace(/-+$/, '');
-}
+    return str
+        .toString()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+};
 
 export const alert = (message: string, title?: string) => {
     modal.alert(message, title);
-}
+};
 
-export const error = (message = getString('error_occurred'), title?: string) => {
+export const error = (
+    message = getString('error_occurred'),
+    title?: string
+) => {
     alert(message, title);
     // dialog.showMessageBox({ title, message });
-}
+};
 
 export const confirmation = ({
     title,
-    buttons = [
-        {label: 'Yes', action: () => {}}
-    ],
+    buttons = [{ label: 'Yes', action: () => {} }],
     showCancel = true
 }) => {
     return new Promise(resolve => {
-        const mappedButtons = buttons.map(({ label, action = () => {} }, index) => {
-            return ({
-                label,
-                action: () => {
-                    action();
-                    resolve(index);
-                    modal.close();
-                }
-            })
-        });
+        const mappedButtons = buttons.map(
+            ({ label, action = () => {} }, index) => {
+                return {
+                    label,
+                    action: () => {
+                        action();
+                        resolve(index);
+                        modal.close();
+                    }
+                };
+            }
+        );
 
         modal.confirm({
             title,
@@ -57,7 +62,7 @@ export const confirmation = ({
             }
         });
     });
-}
+};
 
 export const stringReplace = (str = '', replaceWith = {}) => {
     Object.keys(replaceWith).forEach(key => {
@@ -65,7 +70,7 @@ export const stringReplace = (str = '', replaceWith = {}) => {
     });
 
     return str;
-}
+};
 
 export const noop = () => {};
 
@@ -79,12 +84,15 @@ export const sequential = (
     resArr = []
 ) => {
     if (index >= arr.length) return Promise.resolve(resArr);
-    console.log('params', arr, arr[index])
-    const asyncFnPromise = spreadItems ? asyncFn(...arr[index]) : asyncFn(arr[index]);
-    if (!isPromise(asyncFnPromise)) throw new Error('asyncFn must be a promise!');
+    console.log('params', arr, arr[index]);
+    const asyncFnPromise = spreadItems
+        ? asyncFn(...arr[index])
+        : asyncFn(arr[index]);
+    if (!isPromise(asyncFnPromise))
+        throw new Error('asyncFn must be a promise!');
 
     return asyncFnPromise.then(r => {
-        const progress = parseInt('' + (((index+1) * 100) / arr.length));
+        const progress = parseInt('' + ((index + 1) * 100) / arr.length);
         if (onUpdate) onUpdate(progress, r);
 
         return new Promise(resolve => {
@@ -102,27 +110,28 @@ export const sequential = (
                 resolve(res);
             }, timeoutWait);
         });
-      });
+    });
 };
 
 export const exclude = (obj = {}, keys = []) => {
-    const newObj = {...obj};
+    const newObj = { ...obj };
 
     keys.forEach(key => {
         delete newObj[key];
     });
 
     return newObj;
-}
+};
 
 export const objGet = (s, obj) => s.split('.').reduce((a, b) => a[b], obj);
 
-export const isPromise = (value) => Boolean(value && typeof value.then === 'function');
+export const isPromise = value =>
+    Boolean(value && typeof value.then === 'function');
 
-export const sanitizeSite = (siteObj) => {
+export const sanitizeSite = siteObj => {
     const newObj = JSON.parse(JSON.stringify(siteObj));
-    
-    ['hosting', 'structure'].forEach((field) => {
+
+    ['hosting', 'structure'].forEach(field => {
         delete newObj[field];
     });
 
@@ -132,7 +141,7 @@ export const sanitizeSite = (siteObj) => {
     });
 
     return newObj;
-}
+};
 
 export const truncateString = (string, maxLength = 50) => {
     if (!string) return null;
@@ -140,7 +149,7 @@ export const truncateString = (string, maxLength = 50) => {
     return `${string.substring(0, maxLength)}...`;
 };
 
-export const stripTags = (html) => {
-    var doc = new DOMParser().parseFromString(html, 'text/html');
+export const stripTags = html => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
     return doc.body.textContent || '';
-}
+};

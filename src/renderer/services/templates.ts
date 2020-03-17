@@ -10,7 +10,7 @@ export const getTemplate = async (templateId: string, extension: string) => {
     const templatePath = path.join(get('paths.themes'), templatePathName);
 
     return fs.readFileSync(templatePath, 'utf8');
-}
+};
 
 export const baseTemplate = ({ head = '', body = '' }: any) => {
     return `

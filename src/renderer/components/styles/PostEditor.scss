@@ -1,17 +1,19 @@
 @import './Mixins.scss';
 
 .PostEditor {
-    ul {
-        @include boxlist;
-    }
+    h1 {
+        .left-align {
+            flex: 1;
+            display: flex;
+            align-items: center;
 
-    .left-align {
-        flex: 1;
-        display: flex;
-        align-items: center;
+            > i {
+                margin-right: 10px;
+            }
+        }
 
-        > i {
-            margin-right: 10px;
+        ul {
+            @include boxlist;
         }
     }
 
@@ -20,7 +22,7 @@
     }
 
     .post-tag {
-        background: rgba(0,0,0,0.1);
+        background: rgba(0, 0, 0, 0.1);
         border-radius: 5px;
         padding: 5px 10px;
         text-transform: uppercase;
@@ -33,6 +35,27 @@
 
         span.slug-label {
             font-weight: 500;
+        }
+    }
+
+    .editor-container {
+        display: flex;
+        height: 100%;
+
+        .left-align {
+            flex: 1;
+        }
+
+        .right-align {
+            display: flex;
+        }
+
+        .editor-sidebar {
+            width: 250px;
+            background: #f3f3f3;
+            border-radius: 5px;
+            padding: 20px;
+            margin-left: 20px;
         }
     }
 }

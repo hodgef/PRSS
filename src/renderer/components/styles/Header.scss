@@ -1,15 +1,17 @@
 header {
     box-sizing: border-box;
     width: 100%;
-    background: #f7f7f7;
+    background: white;
     z-index: 99;
+    border-bottom: 1px solid #efefef9e;
+    box-shadow: 0px 5px 20px #efefef47;
 
     .header-cont {
         padding: 20px;
     }
 
     .header-subtitle {
-        background: #f3f3f3;
+        // background: #f3f3f3;
         color: #252525;
         padding: 5px 20px;
         font-size: 13px;
@@ -22,7 +24,7 @@ header {
             font-size: 15px;
         }
 
-        &>div:first-child {
+        & > div:first-child {
             i.material-icons {
                 &:first-child {
                     margin-left: 0;

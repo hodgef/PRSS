@@ -9,18 +9,12 @@ interface IProps {
     undertitle?: ReactNode;
 }
 
-const Header: FunctionComponent<IProps> = ({
-    undertitle
-}) => (
+const Header: FunctionComponent<IProps> = ({ undertitle }) => (
     <header className={cx({ 'has-undertitle': undertitle })}>
         <div className="header-cont">
             <img src={PRSSLogo} width="150" />
         </div>
-        {undertitle && (
-            <div className="header-subtitle">
-                {undertitle}
-            </div>
-        )}
+        {undertitle && <div className="header-subtitle">{undertitle}</div>}
     </header>
 );
 

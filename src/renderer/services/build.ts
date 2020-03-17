@@ -36,7 +36,6 @@ export const build = async (siteIdOrSite, onUpdate?) => {
         return false;
     }
 
-
     /**
      * Buffer items
      */
@@ -45,7 +44,7 @@ export const build = async (siteIdOrSite, onUpdate?) => {
     /**
      * Load buffer
      */
-    const loadBufferRes = await loadBuffer(bufferItems, (progress) => {
+    const loadBufferRes = await loadBuffer(bufferItems, progress => {
         onUpdate && onUpdate(getString('building_progress', [progress]));
     });
 
@@ -54,7 +53,7 @@ export const build = async (siteIdOrSite, onUpdate?) => {
     }
 
     return true;
-}
+};
 
 export const clearBuffer = () => {
     const bufferDir = get('paths.buffer');
@@ -66,25 +65,29 @@ export const clearBuffer = () => {
     }
 };
 
-export const loadBuffer: loadBufferType = (bufferItems, onUpdate = () => {}) => {
+export const loadBuffer: loadBufferType = (
+    bufferItems,
+    onUpdate = () => {}
+) => {
     return sequential(bufferItems, buildBufferItem, 300, onUpdate, false);
-}
+};
 
-export const buildBufferSiteConfig = (site) => {
+export const buildBufferSiteConfig = site => {
     const bufferDir = get('paths.buffer');
-    const { code } = minify(`var PRSSConfig = ${JSON.stringify(sanitizeSite(site))}`);
+    const { code } = minify(
+        `var PRSSConfig = ${JSON.stringify(sanitizeSite(site))}`
+    );
 
     try {
-        fse.outputFileSync(
-            path.join(bufferDir, configFileName),
-            code
-        );
-    } catch (e) { return false; }
+        fse.outputFileSync(path.join(bufferDir, configFileName), code);
+    } catch (e) {
+        return false;
+    }
 
     return true;
-}
+};
 
-export const buildBufferItem = async (item) => {
+export const buildBufferItem = async item => {
     let handler: handlerType;
     const { templateId, path: itemPath, parser } = item;
 
@@ -92,16 +95,16 @@ export const buildBufferItem = async (item) => {
         case 'react':
             handler = reactHandler;
             break;
-    
+
         default:
-            handler = async () => ({ html: '', js: ''});
+            handler = async () => ({ html: '', js: '' });
             break;
     }
 
     const { html, js } = await handler(templateId, item);
 
     /**
-     * Making directory if it does exist 
+     * Making directory if it does exist
      */
     const bufferDir = get('paths.buffer');
     const targetDir = path.join(bufferDir, itemPath);
@@ -112,7 +115,9 @@ export const buildBufferItem = async (item) => {
     if (html) {
         try {
             fse.outputFileSync(path.join(targetDir, 'index.html'), html);
-        } catch (e) { return false; }
+        } catch (e) {
+            return false;
+        }
     }
 
     /**
@@ -121,48 +126,51 @@ export const buildBufferItem = async (item) => {
     if (js) {
         try {
             fse.outputFileSync(path.join(targetDir, 'index.js'), js);
-        } catch (e) { return false; }
+        } catch (e) {
+            return false;
+        }
     }
 
     return true;
-}
+};
 
 export const getBufferItems = (site): IBufferItem[] => {
     const structurePaths = getStructurePaths(site.structure);
-    const bufferItems =
-        structurePaths
-            .map(item => {
-                const path = item.split('/');
-                let post;
+    const bufferItems = structurePaths.map(item => {
+        const path = item.split('/');
+        let post;
 
-                const mappedPath = path.map(postId => {
+        const mappedPath = path.map(postId => {
+            if (!postId) {
+                return '';
+            }
 
-                    if (!postId) {
-                        return '';
-                    }
+            post = getPostItem(site, postId);
 
-                    post = getPostItem(site, postId);
+            return post.slug;
+        });
 
-                    return post.slug;
-                });
+        const basePostPathArr = mappedPath.slice(2);
+        const postPath = basePostPathArr.join('/');
+        const configPath =
+            (basePostPathArr.length
+                ? basePostPathArr.map(() => '../').join('')
+                : '') + configFileName;
 
-                const basePostPathArr = mappedPath.slice(2);
-                const postPath = basePostPathArr.join('/');
-                const configPath = (basePostPathArr.length ?
-                    basePostPathArr.map(() => '../').join('') : '') + configFileName;
-
-                return post ? {
-                    path: '/' + postPath,
-                    templateId: `${site.type}.${site.theme}.${post.template}`,
-                    parser: post.parser,
-                    item: post as IPostItem,
-                    configPath
-                    // site: sanitizeSite(site) as ISite
-                } : null
-            });
+        return post
+            ? {
+                  path: '/' + postPath,
+                  templateId: `${site.type}.${site.theme}.${post.template}`,
+                  parser: post.parser,
+                  item: post as IPostItem,
+                  configPath
+                  // site: sanitizeSite(site) as ISite
+              }
+            : null;
+    });
 
     return bufferItems;
-}
+};
 
 export const getStructurePaths = (nodes, prefix = '', store = []) => {
     nodes.forEach(node => {
@@ -177,13 +185,13 @@ export const getStructurePaths = (nodes, prefix = '', store = []) => {
     });
 
     return store;
-}
+};
 
 export const formatStructure = (siteId, nodes, parseItem?) => {
     let outputNodes = nodes;
     const site = get(`sites.${siteId}`);
 
-    const parseNodes = (obj) => {
+    const parseNodes = obj => {
         const { key, children = [] } = obj;
         const post = getPostItem(site, key);
 
@@ -193,10 +201,10 @@ export const formatStructure = (siteId, nodes, parseItem?) => {
             key,
             ...(parseItem ? parseItem(post) : {}),
             children: children.map(parseNodes)
-        }
+        };
     };
 
     outputNodes = outputNodes.map(node => parseNodes(node));
 
     return outputNodes;
-}
+};

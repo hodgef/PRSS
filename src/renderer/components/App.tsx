@@ -2,7 +2,7 @@ import './styles/App.scss';
 import 'react-toastify/dist/ReactToastify.css';
 
 import React, { FunctionComponent } from 'react';
-import { HashRouter, Redirect, Route, Switch} from 'react-router-dom';
+import { HashRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 
 import { AppContext } from '../../common/Store';
@@ -22,23 +22,55 @@ const App: FunctionComponent = () => {
         <AppContext.Provider value={{}}>
             <HashRouter>
                 <Switch>
-                    <Route exact path='/sites' component={ListSites}/>
-                    <Route exact path='/sites/create' component={CreateSelector}/>
-                    <Route exact path='/sites/create/blog' component={CreateBlog}/>
+                    <Route exact path="/sites" component={ListSites} />
+                    <Route
+                        exact
+                        path="/sites/create"
+                        component={CreateSelector}
+                    />
+                    <Route
+                        exact
+                        path="/sites/create/blog"
+                        component={CreateBlog}
+                    />
 
-                    <Route exact path='/sites/:siteId/posts' component={ListPosts}/>
-                    <Route exact path='/sites/:siteId/posts/editor/:postId' component={PostEditor}/>
-                    <Route exact path='/sites/:siteId/posts/editor' component={PostEditor}/>
-                    <Route exact path='/sites/:siteId/preview' component={SitePreview}/>
-                    <Route exact path='/sites/:siteId' component={Dashboard}/>
+                    <Route
+                        exact
+                        path="/sites/:siteId/posts"
+                        component={ListPosts}
+                    />
+                    <Route
+                        exact
+                        path="/sites/:siteId/posts/editor/:postId"
+                        component={PostEditor}
+                    />
+                    <Route
+                        exact
+                        path="/sites/:siteId/posts/editor"
+                        component={PostEditor}
+                    />
+                    <Route
+                        exact
+                        path="/sites/:siteId/preview"
+                        component={SitePreview}
+                    />
+                    <Route exact path="/sites/:siteId" component={Dashboard} />
 
-                    <Route exact path='/' render={(props) => {
-                        const sites = get('sites');
-                        return (Object.keys(sites) && Object.keys(sites).length) ?
-                            <Redirect to="/sites" /> : <Redirect to="/sites/create" />;
-                    }} />
+                    <Route
+                        exact
+                        path="/"
+                        render={props => {
+                            const sites = get('sites');
+                            return Object.keys(sites) &&
+                                Object.keys(sites).length ? (
+                                <Redirect to="/sites" />
+                            ) : (
+                                <Redirect to="/sites/create" />
+                            );
+                        }}
+                    />
 
-                    <Redirect to='/' />
+                    <Redirect to="/" />
                 </Switch>
             </HashRouter>
 
