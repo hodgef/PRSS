@@ -1,5 +1,5 @@
 import minify from 'babel-minify';
-import del from 'del';
+import rimraf from 'rimraf';
 import fse from 'fs-extra';
 import path from 'path';
 
@@ -11,7 +11,11 @@ import { sanitizeSite, sequential } from './utils';
 export const bufferPathFileNames = ['index.html', 'index.js'];
 export const configFileName = 'prss.config.js';
 
-export const build = async (siteIdOrSite, onUpdate?) => {
+export const build = async (
+    siteIdOrSite,
+    onUpdate = (a?) => {},
+    itemIdToLoad?
+) => {
     let site = {} as any;
 
     if (typeof siteIdOrSite === 'object') {
@@ -39,30 +43,68 @@ export const build = async (siteIdOrSite, onUpdate?) => {
     /**
      * Buffer items
      */
+
     const bufferItems = getBufferItems(site);
+    let itemsToLoad = bufferItems;
+    let mainBufferItem;
+
+    if (itemIdToLoad) {
+        mainBufferItem = bufferItems.find(
+            bufferItem => itemIdToLoad === bufferItem.item.id
+        );
+
+        const itemSlugsToLoad = mainBufferItem.path
+            // left-right trim forward slash
+            .replace(/^\/+|\/+$/g, '')
+            .split('/');
+
+        const rootPostItemId = site.items[0].id;
+        const itemIdsToLoad = [rootPostItemId];
+
+        itemSlugsToLoad.forEach(itemSlug => {
+            const foundBufferItem = bufferItems.find(
+                bufferItem => bufferItem.item.slug === itemSlug
+            );
+
+            if (foundBufferItem) {
+                itemIdsToLoad.push(foundBufferItem.item.id);
+            }
+        });
+
+        itemsToLoad = bufferItems.filter(bufferItem =>
+            itemIdsToLoad.includes(bufferItem.item.id)
+        );
+    }
 
     /**
      * Load buffer
      */
-    const loadBufferRes = await loadBuffer(bufferItems, progress => {
+    const loadBufferRes = await loadBuffer(itemsToLoad, progress => {
         onUpdate && onUpdate(getString('building_progress', [progress]));
     });
+
+    console.log('buffer', loadBufferRes);
 
     if (!loadBufferRes) {
         return false;
     }
 
-    return true;
+    return mainBufferItem ? [mainBufferItem] : bufferItems;
 };
 
 export const clearBuffer = () => {
-    const bufferDir = get('paths.buffer');
+    return new Promise(resolve => {
+        const bufferDir = get('paths.buffer');
 
-    if (bufferDir && bufferDir.includes('buffer')) {
-        return del([path.join(bufferDir, '*'), `!${bufferDir}`]);
-    } else {
-        return Promise.resolve();
-    }
+        if (bufferDir && bufferDir.includes('buffer')) {
+            rimraf(path.join(bufferDir, '*'), [], () => {
+                resolve();
+            });
+            //return del([path.join(bufferDir, '*'), `!${bufferDir}`]);
+        } else {
+            resolve();
+        }
+    });
 };
 
 export const loadBuffer: loadBufferType = (
@@ -116,6 +158,7 @@ export const buildBufferItem = async item => {
         try {
             fse.outputFileSync(path.join(targetDir, 'index.html'), html);
         } catch (e) {
+            console.error(e);
             return false;
         }
     }
@@ -127,6 +170,7 @@ export const buildBufferItem = async item => {
         try {
             fse.outputFileSync(path.join(targetDir, 'index.js'), js);
         } catch (e) {
+            console.error(e);
             return false;
         }
     }

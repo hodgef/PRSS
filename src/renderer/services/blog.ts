@@ -10,6 +10,8 @@ export const getSampleSiteStructure = () => {
         type: 'blog',
         url: '',
         theme: 'default',
+        updatedAt: null,
+        publishedAt: null,
         items: [item1, item2, item3, item4, item5],
         structure: [
             {
@@ -46,7 +48,9 @@ export const getSampleBlogItems = (nbItems = 1) => {
             title: 'Hello home!',
             content: 'This is a home',
             template: 'home',
-            parser: 'react'
+            parser: 'react',
+            updatedAt: null,
+            createdAt: Date.now()
         },
         {
             id: uuidv4(),
@@ -54,7 +58,9 @@ export const getSampleBlogItems = (nbItems = 1) => {
             title: 'My test post',
             content: '<h1>This is a test post</h1>',
             template: 'home',
-            parser: 'react'
+            parser: 'react',
+            updatedAt: null,
+            createdAt: Date.now()
         },
         {
             id: uuidv4(),
@@ -62,7 +68,9 @@ export const getSampleBlogItems = (nbItems = 1) => {
             title: 'My home world',
             content: 'This is a test world',
             template: 'home',
-            parser: 'react'
+            parser: 'react',
+            updatedAt: null,
+            createdAt: Date.now()
         },
         {
             id: uuidv4(),
@@ -70,7 +78,9 @@ export const getSampleBlogItems = (nbItems = 1) => {
             title: 'My blog post',
             content: 'This is a test blog',
             template: 'home',
-            parser: 'react'
+            parser: 'react',
+            updatedAt: null,
+            createdAt: Date.now()
         },
         {
             id: uuidv4(),
@@ -78,7 +88,9 @@ export const getSampleBlogItems = (nbItems = 1) => {
             title: 'My blog stuff',
             content: 'This is a test stuff',
             template: 'home',
-            parser: 'react'
+            parser: 'react',
+            updatedAt: null,
+            createdAt: Date.now()
         }
     ];
 

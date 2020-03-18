@@ -95,6 +95,18 @@
         }
     }
 
+    .disabled {
+        opacity: 0.5;
+
+        &:hover {
+            opacity: 0.5;
+        }
+
+        &:active {
+            opacity: 0.5;
+        }
+    }
+
     .toast-container .Toastify__toast {
         padding: 10px 15px;
         border-radius: 5px;

@@ -1,10 +1,27 @@
 import './styles/Loading.scss';
 
+import cx from 'classnames';
 import React, { FunctionComponent } from 'react';
 
-const Loading: FunctionComponent<ILoading> = ({ title, message }) => {
+interface ILoading {
+    title?: string;
+    message?: string;
+    small?: boolean;
+    classNames?: string;
+}
+
+const Loading: FunctionComponent<ILoading> = ({
+    title,
+    message,
+    small,
+    classNames = ''
+}) => {
     return (
-        <div className="Loading">
+        <div
+            className={cx('Loading', classNames, {
+                'loading-small': small
+            })}
+        >
             <div className="spinner" />
             {title && <div className="title">{title}</div>}
             {message && <div className="subtitle">{message}</div>}

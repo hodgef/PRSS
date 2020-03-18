@@ -13,8 +13,8 @@ export const imageUploadCallback = file =>
             const originWidth = this.width;
             const originHeight = this.height;
 
-            const maxWidth = 400,
-                maxHeight = 500;
+            const maxWidth = 1000,
+                maxHeight = 600;
 
             let targetWidth = originWidth,
                 targetHeight = originHeight;

@@ -26,6 +26,8 @@ const handler: handlerType = async (templateId, data) => {
         }
     );
 
+    console.log('DATA', data);
+
     const js = minify(`
         ${templateJs}
         var PRSSElement = React.createElement(PRSSComponent.default, Object.assign({ site: PRSSConfig }, ${JSON.stringify(

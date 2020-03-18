@@ -4,7 +4,7 @@ import './styles/Editor.scss';
 import { ContentState, convertToRaw, EditorState } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import htmlToDraft from 'html-to-draftjs';
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useState, useRef } from 'react';
 import AceEditor from 'react-ace';
 import { Editor } from 'react-draft-wysiwyg';
 import pretty from 'pretty';
@@ -16,9 +16,15 @@ import { imageUploadCallback } from '../services/editor';
 
 interface IProps {
     value: string;
+    onChange?: any;
+    onEditModeChange?: any;
 }
 
-const StandardEditor: FunctionComponent<IProps> = ({ value }) => {
+const StandardEditor: FunctionComponent<IProps> = ({
+    value,
+    onChange,
+    onEditModeChange
+}) => {
     const htmlToEditorState = html => {
         let output = EditorState.createEmpty();
 
@@ -37,54 +43,61 @@ const StandardEditor: FunctionComponent<IProps> = ({ value }) => {
     };
 
     const initialEditorState = htmlToEditorState(value);
-
-    console.log('initialEditorState', initialEditorState);
-
     const [editorState, setEditorState] = useState(initialEditorState);
     const [editHTMLEnabled, setEditHTMLEnabled] = useState(false);
-    let htmlState = '';
+    const htmlState = useRef('');
 
     const EditHTMLButton = ({ onClick, title }: any) => (
         <div
             className="edit-html-button clickable"
-            onClick={() =>
-                onClick ? onClick() : setEditHTMLEnabled(!editHTMLEnabled)
-            }
+            onClick={() => (onClick ? onClick() : toggleEditMode())}
         >
             <i className="material-icons">code</i>
             {title && <span>{title}</span>}
         </div>
     );
 
-    const onEditorStateChange: Function = editorState => {
-        console.log(
-            'editorState',
-            draftToHtml(convertToRaw(editorState.getCurrentContent()))
-        );
-        setEditorState(editorState);
+    const updateEditorState = state => {
+        setEditorState(state);
+
+        const htmlState = draftToHtml(convertToRaw(state.getCurrentContent()));
+        onChange && onChange(htmlState);
+    };
+
+    const onEditorStateChange: Function = newState => {
+        updateEditorState(newState);
     };
 
     const getDraftHTMLState = () => {
         const html = pretty(
             draftToHtml(convertToRaw(editorState.getCurrentContent()))
         );
-        htmlState = html;
+        htmlState.current = html;
         return html;
+    };
+
+    const toggleEditMode = () => {
+        const isEditHTMLEnabled = !editHTMLEnabled;
+        setEditHTMLEnabled(isEditHTMLEnabled);
+        onEditModeChange &&
+            onEditModeChange(isEditHTMLEnabled ? 'html' : 'text');
     };
 
     return (
         <div className="standard-editor">
             {editHTMLEnabled ? (
                 <div className="html-editor">
-                    <div className="html-editor-toolbar">
+                    <div className="html-editor-toolbar rdw-editor-toolbar">
                         <div className="html-editor-toolbar-item">
                             <EditHTMLButton
                                 title="Close HTML Editor"
                                 onClick={() => {
-                                    const html = htmlToEditorState(htmlState);
-                                    setEditorState(html);
-                                    setEditHTMLEnabled(!editHTMLEnabled);
-                                    htmlState = '';
+                                    const editorVal = htmlToEditorState(
+                                        htmlState.current
+                                    );
+                                    updateEditorState(editorVal);
+                                    toggleEditMode();
+                                    htmlState.current = '';
                                 }}
                             />
                         </div>
@@ -100,8 +113,7 @@ const StandardEditor: FunctionComponent<IProps> = ({ value }) => {
                             fontSize={17}
                             defaultValue={getDraftHTMLState()}
                             onChange={html => {
-                                console.log('html', html);
-                                htmlState = html;
+                                htmlState.current = html;
                             }}
                             name="html-editor-component"
                             editorProps={{ $blockScrolling: true }}

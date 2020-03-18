@@ -31,14 +31,14 @@ const ListPosts: FunctionComponent = () => {
         }
     );
 
-    const toggleSelectEnabled = () => setSelectEnabled(!selectEnabled);
-
     useEffect(
         () => () => {
             unsubscribe();
         },
         []
     );
+
+    const toggleSelectEnabled = () => setSelectEnabled(!selectEnabled);
 
     const deleteSelectedPosts = async () => {
         const deleteSuccess = await deletePosts(siteId, selectedItems);

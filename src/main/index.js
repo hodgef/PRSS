@@ -3,6 +3,7 @@
 import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import path from 'path';
 import { format as formatUrl } from 'url';
+import { previewServer } from '../renderer/services/preview';
 
 import { reactParser } from './parsers';
 
@@ -59,6 +60,12 @@ const createMainWindow = () => {
 
   window.on('closed', () => {
     mainWindow = null
+  });
+
+  window.on('closed', () => {
+    if (previewServer && previewServer.active) {
+      previewServer.exit();
+    }
   });
 
   window.webContents.on('devtools-opened', () => {

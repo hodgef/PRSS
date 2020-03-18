@@ -1,21 +1,147 @@
 import './styles/PostEditor.scss';
 
-import React, { Fragment, FunctionComponent } from 'react';
+import React, {
+    Fragment,
+    FunctionComponent,
+    useRef,
+    useState,
+    useEffect
+} from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
 
-import { get } from '../../common/utils';
+import { get, getString, set } from '../../common/utils';
 import StandardEditor from './Editor';
 import Footer from './Footer';
 import Header from './Header';
+import { modal } from './Modal';
+import { toast } from 'react-toastify';
+import {
+    previewServer,
+    stopPreview,
+    bufferAndStartPreview
+} from '../services/preview';
+import Loading from './Loading';
+import { build } from '../services/build';
+import { store } from '../../common/Store';
 
 const PostEditor: FunctionComponent = () => {
     const { siteId, postId } = useParams();
-    const { title, url, items } = get(`sites.${siteId}`);
+    const [site, setSite] = useState(get(`sites.${siteId}`));
+    const { title, url, items } = site;
     const post = postId ? items.find(item => item.id === postId) : null;
     const history = useHistory();
+    const editorContent = useRef(post ? post.content : '');
+    const editorMode = useRef('');
+    const [previewStarted, setPreviewStarted] = useState(previewServer.active);
+
+    const [previewLoading, setPreviewLoading] = useState(false);
+    const [buildLoading, setBuildLoading] = useState(false);
+
+    // const autosaveInterval = useRef(null);
+    // const autosaveMs = 600000; // 10 mins
+
+    /**
+     * Check for item changes
+     */
+    const unsubscribe = store.onDidChange(
+        `sites.${siteId}` as any,
+        newValue => {
+            console.log('NEW SITE', newValue);
+            setSite({ ...newValue });
+        }
+    );
+
+    useEffect(
+        () => () => {
+            unsubscribe();
+        },
+        []
+    );
+
+    const handleSave = async (isAutosave = false) => {
+        setBuildLoading(true);
+
+        if (editorMode.current === 'html') {
+            modal.alert(getString('error_save_text_editor'));
+            setBuildLoading(false);
+            return;
+        }
+
+        if (editorContent.current === post.content) {
+            setBuildLoading(false);
+            toast.success('No changes to save');
+            return;
+        }
+
+        const content = editorContent.current;
+        const itemIndex = items.findIndex(item => item.id === postId);
+        const msTime = Date.now();
+
+        if (itemIndex > -1) {
+            const updatedItem = { ...post, content, updatedAt: msTime };
+
+            /**
+             *  Update items
+             */
+            set(`sites.${siteId}.items.${itemIndex}`, updatedItem);
+
+            /**
+             * Update site updatedAt
+             */
+            set(`sites.${siteId}.updatedAt`, msTime);
+
+            if (isAutosave) {
+                toast.success('Post autosaved');
+            } else {
+                if (previewServer.active) {
+                    await buildPost(postId);
+                    previewServer.reload();
+                }
+
+                toast.success('Post saved!');
+            }
+        }
+
+        setBuildLoading(false);
+    };
+
+    const buildPost = async postId => {
+        if (previewServer.active) {
+            previewServer.pause();
+        }
+        await build(siteId, null, postId);
+        if (previewServer.active) {
+            previewServer.resume();
+        }
+    };
+
+    const handleStartPreview = async () => {
+        setPreviewLoading(true);
+        const previewRes = await bufferAndStartPreview(site, postId);
+
+        if (previewRes) {
+            setPreviewStarted(true);
+        }
+
+        setPreviewLoading(false);
+    };
+
+    const handleStopPreview = () => {
+        setPreviewLoading(true);
+        stopPreview();
+        setPreviewStarted(false);
+        setPreviewLoading(false);
+    };
+
+    useEffect(
+        () => () => {
+            stopPreview();
+        },
+        []
+    );
 
     return (
-        <div className="PostEditor page">
+        <div className="PostEditor page fixed">
             <Header
                 undertitle={
                     <Fragment>
@@ -66,7 +192,7 @@ const PostEditor: FunctionComponent = () => {
                                 <span className="slug-label">Editing: </span>
                                 <span className="slug-url">
                                     {url}
-                                    {post.slug}/
+                                    {post.slug + '/'}
                                 </span>
                             </div>
                         )}
@@ -75,10 +201,67 @@ const PostEditor: FunctionComponent = () => {
 
                 <div className="editor-container">
                     <div className="left-align">
-                        <StandardEditor value={post ? post.content : ''} />
+                        <StandardEditor
+                            value={post ? post.content : ''}
+                            onChange={content =>
+                                (editorContent.current = content)
+                            }
+                            onEditModeChange={mode =>
+                                (editorMode.current = mode)
+                            }
+                        />
                     </div>
                     <div className="right-align">
-                        <div className="editor-sidebar">fff</div>
+                        <div className="editor-sidebar">
+                            <ul>
+                                <li
+                                    className="clickable"
+                                    onClick={() => handleSave()}
+                                >
+                                    {buildLoading ? (
+                                        <Loading small classNames="mr-1" />
+                                    ) : (
+                                        <i className="material-icons">
+                                            save_alt
+                                        </i>
+                                    )}
+                                    <span>Save</span>
+                                </li>
+                                {previewStarted ? (
+                                    <li
+                                        className="clickable"
+                                        onClick={() => handleStopPreview()}
+                                    >
+                                        {previewLoading ? (
+                                            <Loading small classNames="mr-1" />
+                                        ) : (
+                                            <i className="material-icons">
+                                                stop
+                                            </i>
+                                        )}
+                                        <span>Stop Preview</span>
+                                    </li>
+                                ) : (
+                                    <li
+                                        className="clickable"
+                                        onClick={() => handleStartPreview()}
+                                    >
+                                        {previewLoading ? (
+                                            <Loading small classNames="mr-1" />
+                                        ) : (
+                                            <i className="material-icons">
+                                                play_arrow
+                                            </i>
+                                        )}
+                                        <span>Preview</span>
+                                    </li>
+                                )}
+                                <li className="clickable">
+                                    <i className="material-icons">publish</i>
+                                    <span>Publish</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

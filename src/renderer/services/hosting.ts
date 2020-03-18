@@ -156,8 +156,10 @@ export const deletePosts = async (siteId: string, postIds: string[]) => {
      */
     site.items = filteredItems;
     site.structure = filteredStructure;
+    site.updatedAt = Date.now();
 
     set(`sites.${siteId}`, site);
+
     return site;
 };
 
@@ -171,6 +173,7 @@ export const updateSiteStructure = (siteId, newStructure) => {
     const site = get(`sites.${siteId}`);
     if (site) {
         set(`sites.${site.id}.structure`, newStructure);
+        set(`sites.${site.id}.updatedAt`, Date.now());
     }
 };
 

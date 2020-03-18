@@ -14,6 +14,8 @@ interface ISite {
     theme: string;
     items: IPostItem[];
     structure: IStructureItem[];
+    updatedAt: number | null;
+    publishedAt: number | null;
 }
 
 interface IStructureItem {
@@ -27,6 +29,8 @@ interface IPostItem {
     title: string;
     content: string;
     parser: string;
+    updatedAt: number | null;
+    createdAt: number | null;
 }
 
 interface ITemplateComponent {
@@ -56,11 +60,6 @@ interface IBufferItem {
 
 interface IHosting extends hostingType {
     name: string;
-}
-
-interface ILoading {
-    title?: string;
-    message?: string;
 }
 
 /**
