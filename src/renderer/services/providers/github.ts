@@ -124,13 +124,6 @@ class GithubProvider {
         return `https://${this.vars.baseUrl()}/${this.getUsername()}/${this.getRepositoryName()}`;
     };
 
-    getRepositoryAuthedUrl = () => {
-        const {
-            hosting: { username, token }
-        } = this.site;
-        return `https://${username}:${token}@${this.vars.baseUrl()}/${this.getUsername()}/${this.getRepositoryName()}`;
-    };
-
     deploy = async (onUpdate?, itemIdToDeploy?) => {
         console.log('deploy', this.site);
 
@@ -198,7 +191,7 @@ class GithubProvider {
             const execSync = require('child_process').execSync;
 
             execSync(
-                `cd "${bufferDir}" && git clone "${this.getRepositoryAuthedUrl()}" .`
+                `cd "${bufferDir}" && git clone "${this.getRepositoryUrl()}" .`
             );
 
             if (bufferDir && bufferDir.includes('buffer')) {
