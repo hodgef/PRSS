@@ -199,7 +199,7 @@ class GithubProvider {
             }
 
             execSync(
-                `cd "${bufferDir}" && git add --all && git commit -m "Wipe" && git push`
+                `cd "${bufferDir}" && git add --all && git commit -m "Clearing for deployment" && git push`
             );
         } catch (e) {}
 
