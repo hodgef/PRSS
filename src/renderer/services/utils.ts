@@ -131,7 +131,8 @@ export const isPromise = value =>
 export const sanitizeSite = siteObj => {
     const newObj = JSON.parse(JSON.stringify(siteObj));
 
-    ['hosting', 'structure'].forEach(field => {
+    ['hosting'].forEach(field => {
+        newObj[field] = null;
         delete newObj[field];
     });
 
@@ -140,7 +141,7 @@ export const sanitizeSite = siteObj => {
         return item;
     });
 
-    return newObj;
+    return newObj.hosting ? null : newObj;
 };
 
 export const truncateString = (string, maxLength = 50) => {

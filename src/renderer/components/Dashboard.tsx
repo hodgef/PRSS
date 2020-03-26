@@ -56,7 +56,7 @@ const Dashboard: FunctionComponent = () => {
                     <div className="left-align">
                         <i
                             className="material-icons clickable"
-                            onClick={() => history.goBack()}
+                            onClick={() => history.push('/sites')}
                         >
                             arrow_back
                         </i>

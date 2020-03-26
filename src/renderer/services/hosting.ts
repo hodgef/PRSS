@@ -1,5 +1,5 @@
 import { get, getString, rem, set } from '../../common/utils';
-import { getStructurePaths } from './build';
+import { getStructurePaths, build } from './build';
 import GithubProvider from './providers/github';
 import FallbackProvider from './providers/none';
 import { confirmation, error, merge } from './utils';
@@ -9,7 +9,7 @@ export const getHostingTypes = () => ({
     none: FallbackProvider.hostingTypeDef
 });
 
-export const setupRemote = (site: ISite, onUpdate: any) => {
+export const setupRemote = (site: ISite, onUpdate: updaterType) => {
     const {
         hosting: { name }
     } = site;
@@ -25,22 +25,45 @@ export const setupRemote = (site: ISite, onUpdate: any) => {
     }
 };
 
-export const deploy = (site: ISite) => {
+export const deploy = (site: ISite, params = []) => {
     const {
         hosting: { name }
     } = site;
-
     switch (name) {
         case 'github':
             const githubProvider = new GithubProvider(site);
-            return githubProvider.deploy();
+            return githubProvider.deploy(...params);
+
+        default:
+            const fallbackProvider = new FallbackProvider(site);
+            return fallbackProvider.deploy(...params);
+    }
+};
+
+/**
+ * Delete all files in remote
+ */
+export const wipe = (site: ISite, onUpdate?) => {
+    const {
+        hosting: { name }
+    } = site;
+    switch (name) {
+        case 'github':
+            const githubProvider = new GithubProvider(site);
+            return githubProvider.wipe(onUpdate);
 
         default:
             return Promise.resolve();
     }
 };
 
-export const deleteItems = (filesToDeleteArr, site: ISite) => {
+export const buildAndDeploy = async (site: ISite, onUpdate?: updaterType) => {
+    await build(site, onUpdate);
+    await deploy(site, [onUpdate]);
+    return true;
+};
+
+export const deleteRemoteItems = (filesToDeleteArr, site: ISite) => {
     const {
         hosting: { name }
     } = site;
@@ -174,6 +197,7 @@ export const updateSiteStructure = (siteId, newStructure) => {
     if (site) {
         set(`sites.${site.id}.structure`, newStructure);
         set(`sites.${site.id}.updatedAt`, Date.now());
+        set(`sites.${site.id}.requiresFullDeployment`, true);
     }
 };
 

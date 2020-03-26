@@ -12,6 +12,7 @@ export const getSampleSiteStructure = () => {
         theme: 'default',
         updatedAt: null,
         publishedAt: null,
+        requiresFullDeployment: false,
         items: [item1, item2, item3, item4, item5],
         structure: [
             {

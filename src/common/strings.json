@@ -21,7 +21,7 @@
     "error_no_theme_files": "No theme files found.",
     "uploading_theme_files": "Uploading theme files (%s%)",
     "error_uploading_theme_files": "Error uploading theme files.",
-    "deploying_project": "Deploying project (%s%)",
+    "deploying_progress": "Deploying (%s%)",
     "error_setup_remote": "Could not set up remote. Please try again later.",
     "completing_setup": "Completing Setup",
     "building_progress": "Building (%s%)",
@@ -39,5 +39,6 @@
     "error_delete_single_post": "You cannot delete your only post. Create another post before deleting this one.",
     "error_delete_root_post": "You cannot delete the site index. Please edit it instead",
     "warn_delete_post_with_children": "At least one selected post contains children. These will be deleted as well. Continue?",
-    "error_save_text_editor": "You can't save while using the HTML editor. Please switch back to the text editor."
+    "error_save_text_editor": "You can't save while using the HTML editor. Please switch back to the rich text editor.",
+    "error_preview_text_editor": "You can't toggle the Preview mode while using the HTML editor. Please switch back to the rich text editor."
 }

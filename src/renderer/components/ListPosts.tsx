@@ -5,35 +5,62 @@ import { Link, useHistory, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { store } from '../../common/Store';
-import { get } from '../../common/utils';
+import { get, set } from '../../common/utils';
 import { formatStructure } from '../services/build';
-import { deletePosts, updateSiteStructure } from '../services/hosting';
+import {
+    deletePosts,
+    updateSiteStructure,
+    buildAndDeploy,
+    wipe
+} from '../services/hosting';
 import DraggableTree from './DraggableTree';
 import Footer from './Footer';
 import Header from './Header';
+import Loading from './Loading';
+import { error } from '../services/utils';
 
 const ListPosts: FunctionComponent = () => {
     const { siteId } = useParams();
-    const { items, title, structure } = get(`sites.${siteId}`);
+    const { items, title, structure, requiresFullDeployment, hosting } = get(
+        `sites.${siteId}`
+    );
     const [structureState, setStructureState] = useState(structure);
     const history = useHistory();
     const [selectEnabled, setSelectEnabled] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [loadingStatus, setLoadingStatus] = useState('');
+    const [showPublishButton, setShowPublishButton] = useState(
+        requiresFullDeployment
+    );
+
+    const unsubscribeWatchers = [];
 
     /**
-     * Check for item changes
+     * Check for structure changes
      */
-    const unsubscribe = store.onDidChange(
-        `sites.${siteId}.structure` as any,
-        newValue => {
-            console.log('CALLED', newValue);
+    unsubscribeWatchers.push(
+        store.onDidChange(`sites.${siteId}.structure` as any, newValue => {
             setStructureState([...newValue]);
-        }
+        })
+    );
+
+    unsubscribeWatchers.push(
+        store.onDidChange(
+            `sites.${siteId}.requiresFullDeployment` as any,
+            newValue => {
+                if (newValue) {
+                    setShowPublishButton(true);
+                } else {
+                    setShowPublishButton(false);
+                }
+            }
+        )
     );
 
     useEffect(
         () => () => {
-            unsubscribe();
+            unsubscribeWatchers.forEach(unsubscribe => unsubscribe());
         },
         []
     );
@@ -65,6 +92,23 @@ const ListPosts: FunctionComponent = () => {
         const updatedStructure = formatStructure(siteId, data);
         updateSiteStructure(siteId, updatedStructure);
         toast.success('Changes saved');
+    };
+
+    const publishSite = async () => {
+        setLoading(true);
+        const site = get(`sites.${siteId}`);
+        const wipeRes = await wipe(site, setLoadingStatus);
+
+        if (!wipeRes) {
+            error();
+            return;
+        }
+
+        await buildAndDeploy(site, setLoadingStatus);
+        set(`sites.${siteId}.requiresFullDeployment`, false);
+
+        toast.success('Publish complete');
+        setLoading(false);
     };
 
     return (
@@ -126,6 +170,16 @@ const ListPosts: FunctionComponent = () => {
                             <i className="material-icons">add</i>
                             <span>Add New</span>
                         </button>
+                        {showPublishButton && hosting.name !== 'none' && (
+                            <button
+                                type="button"
+                                className="btn btn-outline-success"
+                                onClick={() => publishSite()}
+                            >
+                                <i className="material-icons">publish</i>
+                                <span>Publish Changes</span>
+                            </button>
+                        )}
                     </div>
                 </h1>
                 <div className="items">
@@ -145,6 +199,7 @@ const ListPosts: FunctionComponent = () => {
                 </div>
             </div>
             <Footer />
+            {loading && <Loading classNames="block" title={loadingStatus} />}
         </div>
     );
 };

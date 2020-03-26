@@ -16,6 +16,7 @@ interface ISite {
     structure: IStructureItem[];
     updatedAt: number | null;
     publishedAt: number | null;
+    requiresFullDeployment?: boolean;
 }
 
 interface IStructureItem {
@@ -56,6 +57,7 @@ interface IBufferItem {
     parser: string;
     item: IPostItem;
     site?: ISite;
+    configPath?: string;
 }
 
 interface IHosting extends hostingType {
@@ -95,6 +97,7 @@ type handlerTypeReturn = {
 type hostingGithubType = {
     token?: string;
     username?: string;
+    repository?: string;
 };
 
 type getThemeFilesType = (

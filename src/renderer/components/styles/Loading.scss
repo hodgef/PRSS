@@ -6,7 +6,7 @@
     justify-content: center;
     align-items: center;
     flex-flow: column;
-    z-index: 99999999999;
+    z-index: 999;
     animation: fadeIn 0.3s linear forwards;
     overflow: hidden;
 
@@ -19,6 +19,10 @@
         margin-top: 5px;
         opacity: 0.8;
         font-weight: 300;
+    }
+
+    &.block {
+        background: rgba(255, 255, 255, 0.8);
     }
 
     .spinner {

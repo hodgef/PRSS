@@ -1,5 +1,5 @@
 import minify from 'babel-minify';
-import rimraf from 'rimraf';
+import del from 'del';
 import fse from 'fs-extra';
 import path from 'path';
 
@@ -43,7 +43,28 @@ export const build = async (
     /**
      * Buffer items
      */
+    const { itemsToLoad, mainBufferItem, bufferItems } = getFilteredBufferItems(
+        site,
+        itemIdToLoad
+    );
 
+    /**
+     * Load buffer
+     */
+    const loadBufferRes = await loadBuffer(itemsToLoad, progress => {
+        onUpdate && onUpdate(getString('building_progress', [progress]));
+    });
+
+    console.log('buffer', loadBufferRes);
+
+    if (!loadBufferRes) {
+        return false;
+    }
+
+    return mainBufferItem ? [mainBufferItem] : bufferItems;
+};
+
+export const getFilteredBufferItems = (site, itemIdToLoad?) => {
     const bufferItems = getBufferItems(site);
     let itemsToLoad = bufferItems;
     let mainBufferItem;
@@ -76,31 +97,21 @@ export const build = async (
         );
     }
 
-    /**
-     * Load buffer
-     */
-    const loadBufferRes = await loadBuffer(itemsToLoad, progress => {
-        onUpdate && onUpdate(getString('building_progress', [progress]));
-    });
-
-    console.log('buffer', loadBufferRes);
-
-    if (!loadBufferRes) {
-        return false;
-    }
-
-    return mainBufferItem ? [mainBufferItem] : bufferItems;
+    return {
+        mainBufferItem,
+        itemsToLoad,
+        bufferItems
+    };
 };
 
 export const clearBuffer = () => {
-    return new Promise(resolve => {
+    return new Promise(async resolve => {
         const bufferDir = get('paths.buffer');
 
         if (bufferDir && bufferDir.includes('buffer')) {
-            rimraf(path.join(bufferDir, '*'), [], () => {
-                resolve();
-            });
-            //return del([path.join(bufferDir, '*'), `!${bufferDir}`]);
+            await del(path.join(bufferDir, '*'));
+            await del(path.join(bufferDir, '.git'));
+            resolve();
         } else {
             resolve();
         }
@@ -108,7 +119,7 @@ export const clearBuffer = () => {
 };
 
 export const loadBuffer: loadBufferType = (
-    bufferItems,
+    bufferItems: IBufferItem[],
     onUpdate = () => {}
 ) => {
     return sequential(bufferItems, buildBufferItem, 300, onUpdate, false);
@@ -202,14 +213,13 @@ export const getBufferItems = (site): IBufferItem[] => {
                 : '') + configFileName;
 
         return post
-            ? {
+            ? ({
                   path: '/' + postPath,
                   templateId: `${site.type}.${site.theme}.${post.template}`,
                   parser: post.parser,
                   item: post as IPostItem,
                   configPath
-                  // site: sanitizeSite(site) as ISite
-              }
+              } as IBufferItem)
             : null;
     });
 

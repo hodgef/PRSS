@@ -5,7 +5,9 @@ import { AppContext } from '../../common/Store';
 const Login: FunctionComponent = () => {
     const { score, addPoints } = useContext(AppContext);
     return (
-        <div>Login {score} <button onClick={addPoints}>Increase</button></div>
+        <div>
+            Login {score} <button onClick={addPoints}>Increase</button>
+        </div>
     );
 };
 

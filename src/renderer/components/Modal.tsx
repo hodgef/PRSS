@@ -58,7 +58,7 @@ class Modal extends Component {
                         top: 0,
                         left: 0,
                         display: 'flex',
-                        zIndex: 999
+                        zIndex: 9999
                     }}
                 >
                     <div
@@ -166,7 +166,7 @@ class Modal extends Component {
                         top: 0,
                         left: 0,
                         display: 'flex',
-                        zIndex: 999
+                        zIndex: 9999
                     }}
                 >
                     <div

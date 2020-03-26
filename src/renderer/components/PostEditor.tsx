@@ -23,6 +23,7 @@ import {
 import Loading from './Loading';
 import { build } from '../services/build';
 import { store } from '../../common/Store';
+import { deploy } from '../services/hosting';
 
 const PostEditor: FunctionComponent = () => {
     const { siteId, postId } = useParams();
@@ -36,6 +37,7 @@ const PostEditor: FunctionComponent = () => {
 
     const [previewLoading, setPreviewLoading] = useState(false);
     const [buildLoading, setBuildLoading] = useState(false);
+    const [deployLoading, setDeployLoading] = useState(false);
 
     // const autosaveInterval = useRef(null);
     // const autosaveMs = 600000; // 10 mins
@@ -117,6 +119,13 @@ const PostEditor: FunctionComponent = () => {
 
     const handleStartPreview = async () => {
         setPreviewLoading(true);
+
+        if (editorMode.current === 'html') {
+            modal.alert(getString('error_preview_text_editor'));
+            setPreviewLoading(false);
+            return;
+        }
+
         const previewRes = await bufferAndStartPreview(site, postId);
 
         if (previewRes) {
@@ -128,9 +137,30 @@ const PostEditor: FunctionComponent = () => {
 
     const handleStopPreview = () => {
         setPreviewLoading(true);
+
+        if (editorMode.current === 'html') {
+            modal.alert(getString('error_preview_text_editor'));
+            setPreviewLoading(false);
+            return;
+        }
+
         stopPreview();
         setPreviewStarted(false);
         setPreviewLoading(false);
+    };
+
+    const handlePublish = async () => {
+        setDeployLoading(true);
+        const curSite = get(`sites.${siteId}`);
+
+        await deploy(curSite, [
+            p => {
+                console.log('handlePublish Progress:', p);
+            },
+            postId
+        ]);
+
+        setDeployLoading(false);
     };
 
     useEffect(
@@ -256,8 +286,17 @@ const PostEditor: FunctionComponent = () => {
                                         <span>Preview</span>
                                     </li>
                                 )}
-                                <li className="clickable">
-                                    <i className="material-icons">publish</i>
+                                <li
+                                    className="clickable"
+                                    onClick={() => handlePublish()}
+                                >
+                                    {deployLoading ? (
+                                        <Loading small classNames="mr-1" />
+                                    ) : (
+                                        <i className="material-icons">
+                                            publish
+                                        </i>
+                                    )}
                                     <span>Publish</span>
                                 </li>
                             </ul>
