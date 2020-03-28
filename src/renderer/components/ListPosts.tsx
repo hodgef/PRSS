@@ -164,7 +164,7 @@ const ListPosts: FunctionComponent = () => {
                             type="button"
                             className="btn btn-primary"
                             onClick={() =>
-                                history.push(`/sites/${siteId}/posts/editor`)
+                                history.push(`/sites/${siteId}/posts/create`)
                             }
                         >
                             <i className="material-icons">add</i>

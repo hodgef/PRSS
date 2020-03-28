@@ -15,6 +15,7 @@ import Footer from './Footer';
 import Header from './Header';
 import { modal } from './Modal';
 import { toast } from 'react-toastify';
+import cx from 'classnames';
 import {
     previewServer,
     stopPreview,
@@ -23,21 +24,31 @@ import {
 import Loading from './Loading';
 import { build } from '../services/build';
 import { store } from '../../common/Store';
-import { deploy } from '../services/hosting';
+import { buildAndDeploy, wipe } from '../services/hosting';
+import { error } from '../services/utils';
+import SlugEditor from './SlugEditor';
+import TitleEditor from './TitleEditor';
 
 const PostEditor: FunctionComponent = () => {
     const { siteId, postId } = useParams();
     const [site, setSite] = useState(get(`sites.${siteId}`));
-    const { title, url, items } = site;
-    const post = postId ? items.find(item => item.id === postId) : null;
+    const { title, url, items, requiresFullDeployment } = site;
+    const [post, setPost] = useState(
+        postId ? items.find(item => item.id === postId) : null
+    );
     const history = useHistory();
     const editorContent = useRef(post ? post.content : '');
     const editorMode = useRef('');
     const [previewStarted, setPreviewStarted] = useState(previewServer.active);
+    const itemIndex = postId ? items.findIndex(item => item.id === postId) : -1;
+
+    const editorChangedContent = useRef('');
+    const [editorChanged, setEditorChanged] = useState(false);
 
     const [previewLoading, setPreviewLoading] = useState(false);
     const [buildLoading, setBuildLoading] = useState(false);
     const [deployLoading, setDeployLoading] = useState(false);
+    const [loadingStatus, setLoadingStatus] = useState('');
 
     // const autosaveInterval = useRef(null);
     // const autosaveMs = 600000; // 10 mins
@@ -45,17 +56,29 @@ const PostEditor: FunctionComponent = () => {
     /**
      * Check for item changes
      */
-    const unsubscribe = store.onDidChange(
-        `sites.${siteId}` as any,
-        newValue => {
-            console.log('NEW SITE', newValue);
+    const unsubscribeWatchers = [];
+
+    unsubscribeWatchers.push(
+        store.onDidChange(`sites.${siteId}` as any, newValue => {
             setSite({ ...newValue });
-        }
+        })
     );
+
+    {
+        post &&
+            unsubscribeWatchers.push(
+                store.onDidChange(
+                    `sites.${siteId}.items.${itemIndex}` as any,
+                    newValue => {
+                        setPost({ ...newValue });
+                    }
+                )
+            );
+    }
 
     useEffect(
         () => () => {
-            unsubscribe();
+            unsubscribeWatchers.forEach(unsubscribe => unsubscribe());
         },
         []
     );
@@ -72,11 +95,13 @@ const PostEditor: FunctionComponent = () => {
         if (editorContent.current === post.content) {
             setBuildLoading(false);
             toast.success('No changes to save');
+
+            editorChangedContent.current = '';
+            setEditorChanged(false);
             return;
         }
 
         const content = editorContent.current;
-        const itemIndex = items.findIndex(item => item.id === postId);
         const msTime = Date.now();
 
         if (itemIndex > -1) {
@@ -100,6 +125,8 @@ const PostEditor: FunctionComponent = () => {
                     previewServer.reload();
                 }
 
+                editorChangedContent.current = '';
+                setEditorChanged(false);
                 toast.success('Post saved!');
             }
         }
@@ -152,14 +179,26 @@ const PostEditor: FunctionComponent = () => {
     const handlePublish = async () => {
         setDeployLoading(true);
         const curSite = get(`sites.${siteId}`);
+        const requiresFullDeployment = curSite.requiresFullDeployment;
 
-        await deploy(curSite, [
-            p => {
-                console.log('handlePublish Progress:', p);
-            },
-            postId
-        ]);
+        if (requiresFullDeployment) {
+            const wipeRes = await wipe(curSite);
 
+            if (!wipeRes) {
+                error();
+                return;
+            }
+
+            await buildAndDeploy(curSite, setLoadingStatus);
+        } else {
+            await buildAndDeploy(curSite, setLoadingStatus, postId);
+        }
+
+        if (requiresFullDeployment) {
+            set(`sites.${siteId}.requiresFullDeployment`, false);
+        }
+
+        toast.success(getString('publish_completed'));
         setDeployLoading(false);
     };
 
@@ -205,7 +244,15 @@ const PostEditor: FunctionComponent = () => {
                         >
                             arrow_back
                         </i>
-                        <span>Post Editor</span>
+                        {post ? (
+                            <TitleEditor
+                                siteId={siteId}
+                                postIndex={itemIndex}
+                                initValue={post ? post.title : null}
+                            />
+                        ) : (
+                            <span>Post Editor</span>
+                        )}
                     </div>
                     <div className="right-align">
                         {/*<button type="button" className="btn btn-outline-primary">
@@ -218,13 +265,17 @@ const PostEditor: FunctionComponent = () => {
                             <span>Publish</span>
                         </button>*/}
                         {post && (
-                            <div className="slug-editor mb-2">
-                                <span className="slug-label">Editing: </span>
-                                <span className="slug-url">
-                                    {url}
-                                    {post.slug + '/'}
+                            <Fragment>
+                                <span className="slug-label mr-1">
+                                    Editing:
                                 </span>
-                            </div>
+                                <SlugEditor
+                                    siteId={siteId}
+                                    postIndex={itemIndex}
+                                    url={url}
+                                    initValue={post ? post.slug : null}
+                                />
+                            </Fragment>
                         )}
                     </div>
                 </h1>
@@ -233,9 +284,19 @@ const PostEditor: FunctionComponent = () => {
                     <div className="left-align">
                         <StandardEditor
                             value={post ? post.content : ''}
-                            onChange={content =>
-                                (editorContent.current = content)
-                            }
+                            onChange={content => {
+                                editorContent.current = content;
+
+                                if (!editorChangedContent.current) {
+                                    editorChangedContent.current = content;
+                                }
+
+                                if (editorChangedContent.current === content) {
+                                    setEditorChanged(false);
+                                } else {
+                                    setEditorChanged(true);
+                                }
+                            }}
                             onEditModeChange={mode =>
                                 (editorMode.current = mode)
                             }
@@ -245,6 +306,7 @@ const PostEditor: FunctionComponent = () => {
                         <div className="editor-sidebar">
                             <ul>
                                 <li
+                                    title="Save your changes locally"
                                     className="clickable"
                                     onClick={() => handleSave()}
                                 >
@@ -255,10 +317,23 @@ const PostEditor: FunctionComponent = () => {
                                             save_alt
                                         </i>
                                     )}
-                                    <span>Save</span>
+                                    <span>Save</span>{' '}
+                                    {editorChanged && (
+                                        <span
+                                            className="color-red ml-1"
+                                            title={getString(
+                                                'warn_unsaved_changes'
+                                            )}
+                                        >
+                                            *
+                                        </span>
+                                    )}
                                 </li>
                                 {previewStarted ? (
                                     <li
+                                        title={getString(
+                                            'preview_description_message'
+                                        )}
                                         className="clickable"
                                         onClick={() => handleStopPreview()}
                                     >
@@ -287,8 +362,25 @@ const PostEditor: FunctionComponent = () => {
                                     </li>
                                 )}
                                 <li
-                                    className="clickable"
-                                    onClick={() => handlePublish()}
+                                    title={
+                                        editorChanged
+                                            ? getString('warn_unsaved_changes')
+                                            : ''
+                                    }
+                                    className={cx('clickable', {
+                                        disabled: editorChanged
+                                    })}
+                                    onClick={() => {
+                                        if (!editorChanged) {
+                                            handlePublish();
+                                        } else {
+                                            modal.alert(
+                                                getString(
+                                                    'error_publish_save_changes'
+                                                )
+                                            );
+                                        }
+                                    }}
                                 >
                                     {deployLoading ? (
                                         <Loading small classNames="mr-1" />
@@ -297,7 +389,21 @@ const PostEditor: FunctionComponent = () => {
                                             publish
                                         </i>
                                     )}
-                                    <span>Publish</span>
+                                    <span>
+                                        {deployLoading
+                                            ? loadingStatus
+                                            : 'Publish'}
+                                    </span>
+                                    {requiresFullDeployment && (
+                                        <span
+                                            className="color-red ml-1"
+                                            title={getString(
+                                                'warn_unpublished_changes'
+                                            )}
+                                        >
+                                            *
+                                        </span>
+                                    )}
                                 </li>
                             </ul>
                         </div>

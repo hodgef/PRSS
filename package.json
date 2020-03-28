@@ -18,7 +18,8 @@
     "electron-store": "^5.1.1",
     "source-map-support": "^0.5.12",
     "browser-sync": "^2.26.7",
-    "html-minifier": "^4.0.0"
+    "html-minifier": "^4.0.0",
+    "keytar": "^5.4.0"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.8.3",
@@ -40,6 +41,7 @@
     "draftjs-to-html": "^0.9.1",
     "electron": "5.0.6",
     "electron-builder": "^21.2.0",
+    "electron-rebuild": "^1.10.1",
     "electron-webpack": "^2.8.0",
     "electron-webpack-eslint": "^5.1.0",
     "electron-webpack-ts": "^3.2.0",
@@ -50,7 +52,6 @@
     "glob": "^7.1.6",
     "globby": "^11.0.0",
     "html-to-draftjs": "^1.5.0",
-    "keytar": "^5.4.0",
     "lockfile": "^1.0.4",
     "node-sass": "^4.13.1",
     "prettier": "^1.19.1",

@@ -35,3 +35,25 @@ export const toBase64 = file =>
         reader.onload = () => resolve(reader.result);
         reader.onerror = error => reject(error);
     });
+
+/**
+ * Securely any secrets in the OS keychain
+ */
+export const keychainStore = (
+    service: string,
+    username: string,
+    password: string
+) => {
+    const keytar = globalRequire('keytar');
+    return keytar.setPassword(service, username, password);
+};
+
+export const keychainRetreive = (service: string, username: string) => {
+    const keytar = globalRequire('keytar');
+    return keytar.getPassword(service, username);
+};
+
+export const keychainRemove = (service: string, username: string) => {
+    const keytar = globalRequire('keytar');
+    return keytar.deletePassword(service, username);
+};

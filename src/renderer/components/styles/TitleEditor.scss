@@ -1,0 +1,24 @@
+.title-editor {
+    display: flex;
+    width: 80%;
+
+    &:not(.editing) {
+        align-items: center;
+    }
+
+    span {
+        margin-right: 10px;
+    }
+
+    input {
+        height: 36px;
+        margin-right: 10px;
+        flex: 1;
+        padding: 0 5px;
+        font-size: 20px;
+    }
+
+    i.material-icons {
+        margin-right: 0 !important;
+    }
+}

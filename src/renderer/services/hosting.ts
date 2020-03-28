@@ -1,3 +1,4 @@
+import { keychainStore } from './../../common/utils';
 import { get, getString, rem, set } from '../../common/utils';
 import { getStructurePaths, build } from './build';
 import GithubProvider from './providers/github';
@@ -57,9 +58,13 @@ export const wipe = (site: ISite, onUpdate?) => {
     }
 };
 
-export const buildAndDeploy = async (site: ISite, onUpdate?: updaterType) => {
-    await build(site, onUpdate);
-    await deploy(site, [onUpdate]);
+export const buildAndDeploy = async (
+    site: ISite,
+    onUpdate?: updaterType,
+    itemId?: string
+) => {
+    // await build(site, onUpdate, itemId);
+    await deploy(site, [onUpdate, itemId]);
     return true;
 };
 
@@ -222,4 +227,29 @@ export const filterItemsFromNodes = (siteId, nodes, itemIds = []) => {
     outputNodes = outputNodes.map(node => parseNodes(node));
 
     return outputNodes;
+};
+
+export const handleHostingFields = (hostingFields = {}) => {
+    return new Promise(resolve => {
+        const fields = { ...hostingFields };
+        const { name, username } = fields as IHosting;
+
+        if (!name || !username) {
+            error('Error while handling hosting fields');
+            resolve({});
+        }
+
+        const storePromises = [];
+        ['password', 'token'].forEach(sensitiveField => {
+            if (fields[sensitiveField]) {
+                storePromises.push(
+                    keychainStore(name, username, fields[sensitiveField])
+                );
+            }
+            fields[sensitiveField] = null;
+            delete fields[sensitiveField];
+        });
+
+        Promise.all(storePromises).finally(() => resolve(fields));
+    });
 };

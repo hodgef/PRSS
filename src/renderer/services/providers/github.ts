@@ -1,3 +1,4 @@
+import { keychainRetreive } from './../../../common/utils';
 import axios from 'axios';
 // import minify from 'babel-minify';
 import fs from 'fs';
@@ -16,6 +17,7 @@ import {
 // import { getTemplate } from '../templates';
 import { confirmation, error /*, exclude,*/ } from '../utils';
 import { sequential } from './../utils';
+import { modal } from '../../components/Modal';
 
 class GithubProvider {
     private readonly site: ISite;
@@ -35,6 +37,8 @@ class GithubProvider {
             {
                 name: 'token',
                 title: 'Github Token',
+                description:
+                    'The token will be saved in your operating system keychain (secure store)',
                 type: 'password'
             },
             {
@@ -64,22 +68,22 @@ class GithubProvider {
         /**
          * Build project
          */
-        const buildRes = await build(this.site, onUpdate);
+        // const buildRes = await build(this.site, onUpdate);
 
-        if (!buildRes) {
-            error(getString('error_buffer'));
-            return false;
-        }
+        // if (!buildRes) {
+        //     error(getString('error_buffer'));
+        //     return false;
+        // }
 
         /**
          * Deploy project
          */
-        const deployResArr = await this.deploy(onUpdate);
+        await this.deployWithAPI(onUpdate);
 
-        if (!deployResArr.every(item => !!item.content)) {
-            error(getString('error_completing_setup'));
-            return false;
-        }
+        // if (!deployResArr.every(item => !!item.content)) {
+        //     error(getString('error_completing_setup'));
+        //     return false;
+        // }
 
         /**
          * Enabling pages site
@@ -125,14 +129,49 @@ class GithubProvider {
     };
 
     deploy = async (onUpdate?, itemIdToDeploy?) => {
-        console.log('deploy', this.site);
+        /**
+         * Clearing buffer
+         */
+        await clearBuffer();
 
-        const { bufferItems } = getFilteredBufferItems(
+        /**
+         * Creating git repo in buffer
+         */
+        try {
+            const bufferDir = get('paths.buffer');
+            const execSync = require('child_process').execSync;
+
+            execSync(
+                `cd "${bufferDir}" && git clone "${this.getRepositoryUrl()}" .`
+            );
+
+            const buildRes = await build(this.site, onUpdate, null, true);
+
+            if (!buildRes) {
+                error(getString('error_buffer'));
+                return false;
+            }
+
+            onUpdate('Deploying...');
+
+            setTimeout(() => {
+                execSync(
+                    `cd "${bufferDir}" && git add --all && git commit -m "Site Update" && git push`
+                );
+            }, 1000);
+        } catch (e) {
+            modal.alert(e.message);
+        }
+
+        await clearBuffer();
+        return true;
+    };
+
+    deployWithAPI = async (onUpdate?, itemIdToDeploy?) => {
+        const { itemsToLoad } = getFilteredBufferItems(
             this.site,
             itemIdToDeploy
         );
-
-        console.log('deploy bufferItems', bufferItems);
 
         const bufferDir = get('paths.buffer');
 
@@ -140,7 +179,7 @@ class GithubProvider {
 
         const bufferFilePaths = [siteConfigFilePath];
 
-        bufferItems.forEach(item => {
+        itemsToLoad.forEach(item => {
             const baseFilePath = path.join(bufferDir, item.path);
 
             bufferPathFileNames.forEach(bufferPathFileName => {
@@ -368,15 +407,20 @@ class GithubProvider {
         return repo;
     };
 
-    request: requestType = (method, endpoint, data = {}, headers = {}) => {
+    request: requestType = async (
+        method,
+        endpoint,
+        data = {},
+        headers = {}
+    ) => {
         const url = `https://${this.vars.baseApiUrl()}/${endpoint}`;
+        const { name, username } = this.site.hosting;
+        const password = await keychainRetreive(name, username);
+
         return axios({
             method,
             url,
-            auth: {
-                username: this.site.hosting.username,
-                password: this.site.hosting.token
-            },
+            auth: { username, password },
             data,
             headers
         })

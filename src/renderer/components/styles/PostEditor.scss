@@ -1,7 +1,9 @@
 @import './Mixins.scss';
 
-.PostEditor {
+#app .PostEditor {
     h1 {
+        padding-bottom: 0;
+
         .left-align {
             flex: 1;
             display: flex;
@@ -10,6 +12,11 @@
             > i {
                 margin-right: 10px;
             }
+        }
+
+        .right-align {
+            display: block;
+            width: 250px;
         }
 
         ul {
@@ -29,13 +36,9 @@
         font-size: 12px;
     }
 
-    .slug-editor {
+    span.slug-label {
         font-size: 13px;
-        opacity: 0.7;
-
-        span.slug-label {
-            font-weight: 500;
-        }
+        font-weight: 500;
     }
 
     .editor-container {

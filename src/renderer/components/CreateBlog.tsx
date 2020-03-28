@@ -5,7 +5,12 @@ import { useHistory } from 'react-router-dom';
 
 import { getString } from '../../common/utils';
 import { getSampleSiteStructure } from '../services/blog';
-import { getHostingTypes, setSite, setupRemote } from '../services/hosting';
+import {
+    getHostingTypes,
+    setSite,
+    setupRemote,
+    handleHostingFields
+} from '../services/hosting';
 import { error, normalize } from '../services/utils';
 import Footer from './Footer';
 import Header from './Header';
@@ -29,14 +34,20 @@ const CreateBlog: FunctionComponent = () => {
         setLoading(true);
         const siteId = normalize(title);
 
+        /**
+         * Handle hosting fields
+         * We'll keep any passcode from being saved and will store that safely in the OS keychain
+         */
+        const parsedHosting = await handleHostingFields({
+            name: hosting,
+            ...hostingFields
+        });
+
         const baseSite = {
             ...getSampleSiteStructure(),
             id: siteId,
             title,
-            hosting: {
-                name: hosting,
-                ...hostingFields
-            },
+            hosting: parsedHosting,
             type: 'blog'
         } as ISite;
 

@@ -9,8 +9,10 @@ import { reactParser } from './parsers';
 const iconPath = path.join(__static, 'icons', 'icon.png');
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
+const gotTheLock = app.requestSingleInstanceLock()
+
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
-let mainWindow
+let mainWindow;
 
 const createMainWindow = () => {
   let options = {
@@ -68,7 +70,28 @@ const createMainWindow = () => {
     });
   });
 
+  window.webContents.on('new-window', function(event, url) {
+    event.preventDefault();
+    require('electron').shell.openExternal(url);
+  });
+
   return window;
+}
+
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+  })
+
+  // Create myWindow, load the rest of the app, etc...
+  app.on('ready', () => {
+  })
 }
 
 // quit application when all windows are closed

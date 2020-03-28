@@ -9,12 +9,13 @@ import { getPostItem } from './hosting';
 import { sanitizeSite, sequential } from './utils';
 
 export const bufferPathFileNames = ['index.html', 'index.js'];
-export const configFileName = 'prss.config.js';
+export const configFileName = 'config.js';
 
 export const build = async (
     siteIdOrSite,
     onUpdate = (a?) => {},
-    itemIdToLoad?
+    itemIdToLoad?,
+    skipClear?
 ) => {
     let site = {} as any;
 
@@ -26,15 +27,22 @@ export const build = async (
         return false;
     }
 
-    /**
-     * Clear Buffer
-     */
-    await clearBuffer();
+    if (!skipClear) {
+        /**
+         * Clear Buffer
+         */
+        await clearBuffer();
+    }
 
     /**
      * Adding config file
      */
     const buildBufferSiteConfigRes = buildBufferSiteConfig(site);
+
+    /**
+     * Copying anything under static/public
+     */
+    copyPublicToBuffer();
 
     if (!buildBufferSiteConfigRes) {
         return false;
@@ -62,6 +70,12 @@ export const build = async (
     }
 
     return mainBufferItem ? [mainBufferItem] : bufferItems;
+};
+
+export const copyPublicToBuffer = () => {
+    const bufferDir = get('paths.buffer');
+    const publicDir = get('paths.public');
+    return fse.copy(publicDir, bufferDir);
 };
 
 export const getFilteredBufferItems = (site, itemIdToLoad?) => {
@@ -94,6 +108,13 @@ export const getFilteredBufferItems = (site, itemIdToLoad?) => {
 
         itemsToLoad = bufferItems.filter(bufferItem =>
             itemIdsToLoad.includes(bufferItem.item.id)
+        );
+
+        console.log(
+            'itemIdsToLoad',
+            itemIdsToLoad,
+            itemsToLoad,
+            itemSlugsToLoad
         );
     }
 

@@ -95,7 +95,6 @@ type handlerTypeReturn = {
 };
 
 type hostingGithubType = {
-    token?: string;
     username?: string;
     repository?: string;
 };

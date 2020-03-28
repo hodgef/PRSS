@@ -12,10 +12,9 @@ import CreateSelector from './CreateSelector';
 import Dashboard from './Dashboard';
 import ListPosts from './ListPosts';
 import ListSites from './ListSites';
-import Login from './Login';
 import { StandardModal } from './Modal';
 import PostEditor from './PostEditor';
-import SitePreview from './SitePreview';
+import CreatePost from './CreatePost';
 
 const App: FunctionComponent = () => {
     return (
@@ -44,16 +43,13 @@ const App: FunctionComponent = () => {
                         path="/sites/:siteId/posts/editor/:postId"
                         component={PostEditor}
                     />
+
                     <Route
                         exact
-                        path="/sites/:siteId/posts/editor"
-                        component={PostEditor}
+                        path="/sites/:siteId/posts/create"
+                        component={CreatePost}
                     />
-                    <Route
-                        exact
-                        path="/sites/:siteId/preview"
-                        component={SitePreview}
-                    />
+
                     <Route exact path="/sites/:siteId" component={Dashboard} />
 
                     <Route
