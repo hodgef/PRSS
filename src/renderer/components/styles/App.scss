@@ -45,6 +45,7 @@
         font-weight: 300;
         display: flex;
         align-items: center;
+        width: 100%;
 
         button.btn {
             display: flex;
@@ -190,5 +191,37 @@
         padding: 5px 10px;
         overflow-x: hidden;
         overflow-y: auto;
+    }
+
+    .description-icon {
+        position: absolute;
+        right: 10px;
+        height: 24px;
+        width: 24px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #343435;
+        z-index: 5;
+    }
+
+    .hosting-field-desc {
+        max-width: 400px !important;
+    }
+
+    .text-tag {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        padding: 5px 10px;
+        text-transform: uppercase;
+        font-size: 12px;
+        font-weight: 400;
+    }
+
+    .standard-modal {
+        .standard-modal-title {
+            a {
+                color: white;
+            }
+        }
     }
 }

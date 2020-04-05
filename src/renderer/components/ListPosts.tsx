@@ -98,7 +98,6 @@ const ListPosts: FunctionComponent = () => {
         const site = get(`sites.${siteId}`);
         await buildAndDeploy(site, setLoadingStatus);
         setInt(`sites.${siteId}.publishSuggested`, false);
-
         toast.success('Publish complete');
         setLoading(false);
     };

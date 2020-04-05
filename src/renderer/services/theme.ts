@@ -14,30 +14,42 @@ export const getTemplate = async (templateId: string, extension: string) => {
     return fs.readFileSync(templatePath, 'utf8');
 };
 
-export const getThemeList = themeType => {
-    const themeDir = path.join(getInt('paths.themes'), themeType);
+export const getThemeListDetails = () => {
+    const themeNameList = getThemeList();
+
+    return themeNameList.map(themeName => {
+        const themeDir = path.join(getInt('paths.themes'), themeName);
+        return {
+            ...(getThemeManifest(themeName) || {}),
+            name: themeName,
+            themeDir: themeDir
+        };
+    });
+};
+
+export const getThemeList = () => {
+    const themeDir = path.join(getInt('paths.themes'));
     const templateList = getDirPaths(themeDir).map(filePath =>
         path.basename(filePath)
     );
     return templateList;
 };
 
-export const getTemplateList = (themeType, themeName) => {
-    const themeDir = path.join(getInt('paths.themes'), themeType, themeName);
+export const getTemplateList = themeName => {
+    const themeDir = path.join(getInt('paths.themes'), themeName);
     const templateList = getFilePaths(themeDir)
         .map(filePath => path.basename(filePath, path.extname(filePath)))
         .filter(templateName => !['manifest'].includes(templateName));
     return templateList;
 };
 
-export const getThemeManifest = (type: string, theme: string) => {
-    if (!type || !theme) {
+export const getThemeManifest = (theme: string) => {
+    if (!theme) {
         return false;
     }
 
     const manifestPath = path.join(
         getInt('paths.themes'),
-        type,
         theme,
         'manifest.json'
     );

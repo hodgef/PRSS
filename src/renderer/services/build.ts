@@ -226,7 +226,7 @@ export const buildBufferItem = async item => {
 
 export const getBufferItems = (site): IBufferItem[] => {
     const structurePaths = getStructurePaths(site.structure);
-    const themeManifest = getThemeManifest(site.type, site.theme);
+    const themeManifest = getThemeManifest(site.theme);
 
     if (!themeManifest) {
         modal.alert('Could not find theme manifest.');
@@ -257,7 +257,7 @@ export const getBufferItems = (site): IBufferItem[] => {
         return post
             ? ({
                   path: '/' + postPath,
-                  templateId: `${site.type}.${site.theme}.${post.template}`,
+                  templateId: `${site.theme}.${post.template}`,
                   parser: themeManifest.parser,
                   item: sanitizeItem(post) as IPostItem,
                   site, // Will be removed in bufferItem parser

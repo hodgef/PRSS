@@ -1,6 +1,6 @@
 {
     "path": "/my-path",
-    "templateId": "blog.default.home",
+    "templateId": "default.home",
     "parser": "react",
     "item": {
         "id": "0000000-0000-0000-0000-0000000",
@@ -14,7 +14,6 @@
     "site": {
         "id": "my-site",
         "title": "My Site",
-        "type": "blog",
         "url": "https://my-site-url",
         "theme": "default",
         "updatedAt": 1585400000000,

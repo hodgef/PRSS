@@ -35,11 +35,11 @@ const CreateSelector: FunctionComponent<IProps> = props => {
 
                 <div className="button-container">
                     <button
-                        onClick={() => history.push('/sites/create/blog')}
+                        onClick={() => history.push('/sites/create')}
                         type="button"
                         className="btn btn-primary btn-lg mb-3"
                     >
-                        {getString('create_blog')}
+                        {getString('create_site')}
                     </button>
 
                     <button

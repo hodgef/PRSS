@@ -1,15 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
 
 export const getSampleSiteStructure = () => {
-    // const [ item1 ] = getSampleBlogItems();
-    const [item1, item2, item3, item4, item5] = getSampleBlogItems(5);
+    // const [ item1 ] = getSampleSiteItems();
+    const [item1, item2, item3, item4, item5] = getSampleSiteItems(5);
 
     return {
         id: '',
         title: '',
-        type: 'blog',
         url: '',
-        theme: 'default',
+        theme: 'press',
         updatedAt: null,
         publishedAt: null,
         items: [item1, item2, item3, item4, item5],
@@ -42,7 +41,7 @@ export const getSampleSiteStructure = () => {
     } as ISite;
 };
 
-export const getSampleBlogItems = (nbItems = 1) => {
+export const getSampleSiteItems = (nbItems = 1) => {
     const items = [
         {
             id: uuidv4(),
@@ -79,9 +78,9 @@ export const getSampleBlogItems = (nbItems = 1) => {
         },
         {
             id: uuidv4(),
-            slug: 'test-blog',
-            title: 'My blog post',
-            content: 'This is a test blog',
+            slug: 'test-site',
+            title: 'My site post',
+            content: 'This is a test site',
             template: 'home',
             headHtml: null,
             footerHtml: null,
@@ -91,7 +90,7 @@ export const getSampleBlogItems = (nbItems = 1) => {
         {
             id: uuidv4(),
             slug: 'test-stuff',
-            title: 'My blog stuff',
+            title: 'My site stuff',
             content: 'This is a test stuff',
             template: 'home',
             headHtml: null,

@@ -37,14 +37,21 @@ class GithubProvider {
             {
                 name: 'token',
                 title: 'Github Token',
-                description:
-                    'The token will be saved in your operating system keychain (secure store)',
+                description: `
+                    <p>A Github token with "repo" permissions is required.</p>
+                    <p>Your token will be stored locally in your OS keychain (secure store).</p>
+                `,
                 type: 'password'
             },
             {
                 name: 'repository',
                 title: 'Github Repository Name (optional)',
-                description: '',
+                description: `
+                    <p>If you'll be using your own repository to serve your site, enter the repository name.</p>
+                    <p>For example: <span class="code-dark-inline">myRepo</span>
+                    <p>If you're connecting to someone else's repository, use the username/repository syntax.</p>
+                    <p>For example: <span class="code-dark-inline">username/repoName</span>
+                `,
                 type: 'text'
             }
         ]
@@ -374,7 +381,8 @@ class GithubProvider {
 
         if (repo) {
             const confirmationRes = await confirmation({
-                title: 'The repository already exists. Do you want to use it?'
+                title:
+                    'The repository already exists. Do you want to use it? (Contents will be overwritten)'
             });
 
             if (confirmationRes !== 0) {

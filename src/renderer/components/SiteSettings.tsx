@@ -15,7 +15,7 @@ import { getThemeList } from '../services/theme';
 const SiteSettings: FunctionComponent = () => {
     const { siteId: urlSiteId } = useParams();
     const site = get(`sites.${urlSiteId}`) as ISite;
-    const { title, id, headHtml, footerHtml, type, theme, url } = site;
+    const { title, id, headHtml, footerHtml, theme, url } = site;
 
     const [siteTitle, setSiteTitle] = useState(title);
     const [siteId, setSiteId] = useState(id);
@@ -26,7 +26,7 @@ const SiteSettings: FunctionComponent = () => {
         false
     );
 
-    const themeList = getThemeList(type);
+    const themeList = getThemeList();
     const history = useHistory();
 
     const handleSubmit = async () => {

@@ -57,6 +57,7 @@ class Modal extends Component {
         if (mode === 'confirm') {
             return (
                 <div
+                    className="standard-modal"
                     style={{
                         position: 'fixed',
                         backgroundColor: 'rgba(0,0,0,0.9)',
@@ -80,6 +81,7 @@ class Modal extends Component {
                     >
                         {title && (
                             <div
+                                className="standard-modal-title"
                                 style={{
                                     paddingBottom: 20,
                                     alignItems: 'center',
@@ -189,6 +191,7 @@ class Modal extends Component {
                     >
                         {title && (
                             <div
+                                className="standard-modal-title"
                                 style={{
                                     paddingBottom: 20,
                                     alignItems: 'center',
@@ -210,6 +213,7 @@ class Modal extends Component {
                         )}
 
                         <div
+                            className="standard-modal-content"
                             style={{
                                 backgroundColor: 'white',
                                 borderRadius: 20

@@ -1,13 +1,13 @@
-import './styles/CreateBlog.scss';
+import './styles/CreateSite.scss';
 
 import React, { Fragment, FunctionComponent, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import { getString } from '../../common/utils';
 import {
     getSampleSiteStructure,
     getSampleSiteIntStructure
-} from '../services/blog';
+} from '../services/site';
 import {
     getHostingTypes,
     setSite,
@@ -19,14 +19,16 @@ import { error, normalize } from '../services/utils';
 import Footer from './Footer';
 import Header from './Header';
 import Loading from './Loading';
+import { modal } from './Modal';
 
-const CreateBlog: FunctionComponent = () => {
+const CreateSite: FunctionComponent = () => {
     const [loading, setLoading] = useState(false);
     const [title, setTitle] = useState('');
     const [loadingStatus, setLoadingStatus] = useState('');
     const [hosting, setHosting] = useState('github');
     const [hostingFields, setHostingFields] = useState({});
     const hostingTypes = getHostingTypes();
+    const { state = {} } = useLocation();
     const history = useHistory();
 
     const handleSubmit = async () => {
@@ -50,8 +52,7 @@ const CreateBlog: FunctionComponent = () => {
         const baseSite = {
             ...getSampleSiteStructure(),
             id: siteId,
-            title,
-            type: 'blog'
+            title
         } as ISite;
 
         const baseSiteInternal = {
@@ -85,11 +86,22 @@ const CreateBlog: FunctionComponent = () => {
     };
 
     return !loading ? (
-        <div className="CreateBlog page">
+        <div className="CreateSite page">
             <Header />
             <div className="content">
-                <h1>{getString('create_blog_title')}</h1>
-
+                <h1 className="mb-4">
+                    <div className="left-align">
+                        {state.showBack && (
+                            <i
+                                className="material-icons clickable"
+                                onClick={() => history.goBack()}
+                            >
+                                arrow_back
+                            </i>
+                        )}
+                        <span>{getString('create_site_title')}</span>
+                    </div>
+                </h1>
                 <fieldset>
                     <div className="input-group input-group-lg">
                         <input
@@ -127,7 +139,7 @@ const CreateBlog: FunctionComponent = () => {
                 {hosting &&
                     hostingTypes[hosting].fields &&
                     hostingTypes[hosting].fields.map(
-                        ({ name, title, type }) => (
+                        ({ name, title, type, description }) => (
                             <div
                                 className="input-group input-group-lg"
                                 key={`${name}-fields`}
@@ -144,6 +156,22 @@ const CreateBlog: FunctionComponent = () => {
                                         })
                                     }
                                 />
+                                {description && (
+                                    <div
+                                        className="description-icon clickable"
+                                        onClick={() =>
+                                            modal.alert(
+                                                description,
+                                                null,
+                                                'hosting-field-desc'
+                                            )
+                                        }
+                                    >
+                                        <span className="material-icons mr-2">
+                                            info
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         )
                     )}
@@ -163,7 +191,7 @@ const CreateBlog: FunctionComponent = () => {
                         type="button"
                         className="btn btn-primary btn-lg"
                     >
-                        {getString('create_blog_button')}
+                        {getString('create_site_button')}
                     </button>
                 </div>
             </div>
@@ -175,4 +203,4 @@ const CreateBlog: FunctionComponent = () => {
     );
 };
 
-export default CreateBlog;
+export default CreateSite;

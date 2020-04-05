@@ -141,6 +141,7 @@ const PostEditor: FunctionComponent = () => {
     const changePostTemplate = template => {
         if (!template || itemIndex === -1) return;
         set(`sites.${siteId}.items.${itemIndex}.template`, template);
+        setInt(`sites.${siteId}.publishSuggested`, true);
         toast.success('Template changed successfully');
     };
 

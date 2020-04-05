@@ -43,12 +43,11 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
     onChangePostTemplate = t => {},
     onOpenRawHTMLOverlay = noop
 }) => {
-    const themeType = site.type;
     const themeName = site.theme;
     const currentTemplate = item.template;
     const [showMoreOptions, setShowMoreOptions] = useState(false);
 
-    const templateList = getTemplateList(themeType, themeName);
+    const templateList = getTemplateList(themeName);
 
     return (
         <div className="editor-sidebar">

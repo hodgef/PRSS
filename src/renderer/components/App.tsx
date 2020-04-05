@@ -7,8 +7,8 @@ import { toast, ToastContainer } from 'react-toastify';
 
 import { AppContext } from '../../common/Store';
 import { get } from '../../common/utils';
-import CreateBlog from './CreateBlog';
-import CreateSelector from './CreateSelector';
+import CreateSite from './CreateSite';
+//import CreateSelector from './CreateSelector';
 import Dashboard from './Dashboard';
 import ListPosts from './ListPosts';
 import ListSites from './ListSites';
@@ -17,6 +17,7 @@ import PostEditor from './PostEditor';
 import CreatePost from './CreatePost';
 import SiteSettings from './SiteSettings';
 import AppSettings from './AppSettings';
+import ThemeManager from './ThemeManager';
 
 const App: FunctionComponent = () => {
     return (
@@ -27,22 +28,24 @@ const App: FunctionComponent = () => {
 
                     <Route exact path="/settings" component={AppSettings} />
 
-                    <Route
+                    {/*<Route
                         exact
                         path="/sites/create"
                         component={CreateSelector}
-                    />
+                    />*/}
 
-                    <Route
-                        exact
-                        path="/sites/create/blog"
-                        component={CreateBlog}
-                    />
+                    <Route exact path="/sites/create" component={CreateSite} />
 
                     <Route
                         exact
                         path="/sites/:siteId/posts"
                         component={ListPosts}
+                    />
+
+                    <Route
+                        exact
+                        path="/sites/:siteId/themes"
+                        component={ThemeManager}
                     />
 
                     <Route

@@ -1,0 +1,70 @@
+.ThemeManager {
+    .content {
+        display: flex;
+        align-items: flex-start;
+        flex-flow: column;
+
+        .theme-list {
+            flex: 1;
+            width: 100%;
+            display: flex;
+        }
+
+        .theme-list-item {
+            box-shadow: 0 0 10px #e8e8e859;
+            border: 2px solid #cacaca78;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            display: inline-flex;
+            width: 270px;
+            height: 228px;
+            margin-right: 20px;
+            flex-flow: column;
+
+            &.add-new-theme-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+
+                i {
+                    font-size: 40px;
+                }
+            }
+
+            .theme-name {
+                font-weight: 700;
+                font-size: 20px;
+                display: flex;
+
+                .left-align {
+                    flex: 1;
+                }
+            }
+
+            .theme-list-item-desc {
+                padding: 10px 15px;
+                box-sizing: border-box;
+            }
+
+            &.selected-theme {
+                &::after {
+                    content: 'check_circle';
+                    font-family: 'Material Icons';
+                    font-size: 25px;
+                    position: absolute;
+                    color: #51c722;
+                    top: 3px;
+                    right: 10px;
+                }
+            }
+        }
+
+        .theme-list-item-image {
+            height: 150px;
+            width: 265px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+    }
+}

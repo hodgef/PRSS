@@ -41,7 +41,9 @@ const Dashboard: FunctionComponent = () => {
             description: getString('themes_description'),
             icon: 'brush',
             className: '',
-            onClick: () => {}
+            onClick: () => {
+                history.push(`/sites/${siteId}/themes`);
+            }
         },
         {
             id: 'settings',

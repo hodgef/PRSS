@@ -38,7 +38,7 @@ const ListSites: FunctionComponent = () => {
                 <div className="items">
                     <ul>
                         {Object.values(sites).map(site => {
-                            const { id, title, type } = site as ISite;
+                            const { id, title } = site as ISite;
 
                             return (
                                 <li
@@ -53,7 +53,7 @@ const ListSites: FunctionComponent = () => {
                                         </div>
                                     </div>
                                     <div className="right-align">
-                                        <div className="site-tag">{type}</div>
+                                        {/*<div className="site-tag"></div>*/}
                                     </div>
                                 </li>
                             );

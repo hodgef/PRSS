@@ -8,7 +8,6 @@ declare const __static: string;
 interface ISite {
     id: string;
     title: string;
-    type: string;
     url: string;
     theme: string;
     items: IPostItem[];
@@ -116,7 +115,6 @@ type hostingGithubType = {
 };
 
 type getThemeFilesType = (
-    type: string,
     theme: string,
 ) => any;
 

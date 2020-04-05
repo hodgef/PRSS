@@ -25,16 +25,16 @@ const handler: handlerType = async (templateId, data: IBufferItem) => {
     const postHeadHtml = parseHtmlParams(data.item.headHtml, data);
     const postFooterHtml = parseHtmlParams(data.item.footerHtml, data);
 
-    console.log('siteHeadHtml', siteHeadHtml);
-    console.log('siteFooterHtml', siteFooterHtml);
-    console.log('postHeadHtml', postHeadHtml);
-    console.log('postFooterHtml', postFooterHtml);
+    // console.log('siteHeadHtml', siteHeadHtml);
+    // console.log('siteFooterHtml', siteFooterHtml);
+    // console.log('postHeadHtml', postHeadHtml);
+    // console.log('postFooterHtml', postFooterHtml);
 
     const html = htmlMinifier.minify(
         baseTemplate({
             head: `
                 ${siteHeadHtml}
-                ${siteFooterHtml}
+                ${postHeadHtml}
             `,
             body: `
                 <div id="root"></div>
@@ -42,7 +42,7 @@ const handler: handlerType = async (templateId, data: IBufferItem) => {
                 <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
                 <script src="${data.configPath}?v=${time}"></script>
                 <script src="index.js?v=${time}"></script>
-                ${postHeadHtml}
+                ${siteFooterHtml}
                 ${postFooterHtml}
             `
         }),
