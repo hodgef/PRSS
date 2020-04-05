@@ -1,4 +1,4 @@
-import { getString, get } from '../../../common/utils';
+import { getString, get, getInt } from '../../../common/utils';
 import { build } from '../build';
 import { error } from '../utils';
 import { modal } from '../../components/Modal';
@@ -35,7 +35,7 @@ class FallbackProvider {
         modal.alert(
             'You have no hosting set up with this site. Please set one up in your Site Settings or deploy the files manually.'
         );
-        const bufferDir = get('paths.buffer');
+        const bufferDir = getInt('paths.buffer');
 
         if (providedBufferItems && providedBufferItems.length) {
             if (providedBufferItems.length > 1) {

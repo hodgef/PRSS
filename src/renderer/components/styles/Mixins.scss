@@ -21,7 +21,7 @@
         align-items: center;
         height: 100%;
 
-        > i {
+        > .material-icons {
             margin-right: 10px;
         }
 
@@ -60,6 +60,52 @@
 
         &:nth-child(2n + 1) {
             margin-right: 20px;
+        }
+    }
+}
+
+@mixin boxblocks3 {
+    @include boxblocks;
+
+    li {
+        width: calc(33% - 10px);
+        margin-right: 20px;
+
+        &:nth-child(2n + 1) {
+            margin-right: auto;
+        }
+
+        &:nth-child(3n) {
+            margin-right: 0;
+        }
+    }
+
+    .box-highlight {
+        box-shadow: 0 0 10px #ffc107;
+        border-color: #e8c55f;
+    }
+}
+
+@mixin dropmenu {
+    background: white;
+    border: 1px solid #e8e8e8;
+    margin: 0;
+    padding: 0;
+    border-radius: 5px;
+
+    li {
+        display: flex;
+        align-items: center;
+        padding: 10px 8px;
+        border-bottom: 1px solid #e8e8e84d;
+
+        a {
+            display: flex;
+            align-items: center;
+        }
+
+        .material-icons {
+            margin-right: 10px;
         }
     }
 }

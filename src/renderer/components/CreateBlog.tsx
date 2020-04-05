@@ -4,12 +4,16 @@ import React, { Fragment, FunctionComponent, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { getString } from '../../common/utils';
-import { getSampleSiteStructure } from '../services/blog';
+import {
+    getSampleSiteStructure,
+    getSampleSiteIntStructure
+} from '../services/blog';
 import {
     getHostingTypes,
     setSite,
     setupRemote,
-    handleHostingFields
+    handleHostingFields,
+    setSiteInternal
 } from '../services/hosting';
 import { error, normalize } from '../services/utils';
 import Footer from './Footer';
@@ -47,9 +51,16 @@ const CreateBlog: FunctionComponent = () => {
             ...getSampleSiteStructure(),
             id: siteId,
             title,
-            hosting: parsedHosting,
             type: 'blog'
         } as ISite;
+
+        const baseSiteInternal = {
+            ...getSampleSiteIntStructure(),
+            id: siteId,
+            hosting: parsedHosting
+        } as ISiteInternal;
+
+        await setSiteInternal(baseSiteInternal);
 
         /**
          * Set up remote

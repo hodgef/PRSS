@@ -89,7 +89,7 @@
         display: flex;
         padding-top: 3px;
 
-        i.material-icons {
+        .material-icons {
             font-size: 25px;
         }
     }
@@ -112,7 +112,7 @@
                 align-items: center;
             }
 
-            i {
+            .material-icons {
                 margin-right: 5px;
             }
         }

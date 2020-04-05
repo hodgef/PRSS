@@ -1,17 +1,19 @@
 @import './Mixins.scss';
 
 .ListPosts {
-    ul {
-        @include boxlist;
-    }
+    .content {
+        ul {
+            @include boxlist;
+        }
 
-    .left-align {
-        flex: 1;
-        display: flex;
-        align-items: center;
+        .left-align {
+            flex: 1;
+            display: flex;
+            align-items: center;
 
-        > i {
-            margin-right: 10px;
+            > .material-icons {
+                margin-right: 10px;
+            }
         }
     }
 

@@ -1,3 +1,5 @@
+@import './Mixins.scss';
+
 header {
     box-sizing: border-box;
     width: 100%;
@@ -6,8 +8,40 @@ header {
     border-bottom: 1px solid #efefef9e;
     box-shadow: 0px 5px 20px #efefef47;
 
+    .logo {
+        display: inline-block;
+    }
+
     .header-cont {
         padding: 20px;
+        display: flex;
+
+        .left-align {
+            flex: 1;
+        }
+
+        .right-align {
+            button {
+                display: flex;
+                height: 40px;
+
+                span.material-icons {
+                    font-size: 25px;
+                }
+            }
+
+            .header-more {
+                position: relative;
+            }
+
+            .drop-menu {
+                position: absolute;
+                top: calc(100% + 10px);
+                right: 0;
+                width: 200px;
+                @include dropmenu;
+            }
+        }
     }
 
     .header-subtitle {
@@ -19,13 +53,13 @@ header {
         align-items: center;
         height: 40px;
 
-        i.material-icons {
+        .material-icons {
             margin: 0 5px;
             font-size: 15px;
         }
 
         & > div:first-child {
-            i.material-icons {
+            .material-icons {
                 &:first-child {
                     margin-left: 0;
                 }

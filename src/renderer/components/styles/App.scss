@@ -27,6 +27,13 @@
         }
     }
 
+    .input-group {
+        select {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+    }
+
     .align-center {
         display: flex;
         align-items: center;
@@ -48,7 +55,7 @@
                 margin-right: 0;
             }
 
-            i.material-icons {
+            .material-icons {
                 font-size: 20px;
                 line-height: 20px;
             }
@@ -70,7 +77,7 @@
             display: flex;
             align-items: center;
 
-            i.material-icons {
+            .material-icons {
                 font-size: 30px;
                 margin-right: 10px;
             }
@@ -159,5 +166,29 @@
                 }
             }
         }
+    }
+
+    .code-dark {
+        white-space: pre;
+        font-family: 'Source Code Pro', monospace;
+        font-size: 15px;
+        color: white;
+        background: #4c4c4c;
+        border-radius: 8px;
+        padding: 0 16px;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .code-dark-inline {
+        white-space: pre;
+        font-family: 'Source Code Pro', monospace;
+        font-size: 15px;
+        color: white;
+        background: #4c4c4c;
+        border-radius: 8px;
+        padding: 5px 10px;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 }

@@ -7,6 +7,7 @@ interface ILoading {
     title?: string;
     message?: string;
     small?: boolean;
+    medium?: boolean;
     classNames?: string;
 }
 
@@ -14,12 +15,14 @@ const Loading: FunctionComponent<ILoading> = ({
     title,
     message,
     small,
+    medium,
     classNames = ''
 }) => {
     return (
         <div
             className={cx('Loading', classNames, {
-                'loading-small': small
+                'loading-small': small,
+                'loading-medium': medium
             })}
         >
             <div className="spinner" />

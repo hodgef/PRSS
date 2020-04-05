@@ -5,5 +5,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import App from './components/App';
+import { initStore } from '../common/Store';
 
-ReactDOM.render(<App />, document.getElementById('app'));
+const init = async () => {
+    await initStore();
+    ReactDOM.render(<App />, document.getElementById('app'));
+};
+
+init();

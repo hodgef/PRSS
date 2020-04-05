@@ -9,42 +9,46 @@ import React, {
 } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
 
-import { get, getString, set } from '../../common/utils';
+import { get, getString, set, getInt, setInt } from '../../common/utils';
 import StandardEditor from './Editor';
 import Footer from './Footer';
 import Header from './Header';
 import { modal } from './Modal';
 import { toast } from 'react-toastify';
-import cx from 'classnames';
 import {
     previewServer,
     stopPreview,
     bufferAndStartPreview
 } from '../services/preview';
-import Loading from './Loading';
 import { build } from '../services/build';
 import { store } from '../../common/Store';
 import { buildAndDeploy, wipe } from '../services/hosting';
 import { error } from '../services/utils';
 import SlugEditor from './SlugEditor';
 import TitleEditor from './TitleEditor';
+import PostEditorSidebar from './PostEditorSidebar';
+import HTMLEditorOverlay from './HTMLEditorOverlay';
 
 const PostEditor: FunctionComponent = () => {
     const { siteId, postId } = useParams();
     const [site, setSite] = useState(get(`sites.${siteId}`));
-    const { title, url, items, requiresFullDeployment } = site;
+    const { title, url, items } = site;
+    const { publishSuggested } = getInt(`sites.${siteId}`);
     const [post, setPost] = useState(
         postId ? items.find(item => item.id === postId) : null
     );
     const history = useHistory();
     const editorContent = useRef(post ? post.content : '');
     const editorMode = useRef('');
-    const [previewStarted, setPreviewStarted] = useState(previewServer.active);
     const itemIndex = postId ? items.findIndex(item => item.id === postId) : -1;
 
     const editorChangedContent = useRef('');
-    const [editorChanged, setEditorChanged] = useState(false);
 
+    const [previewStarted, setPreviewStarted] = useState(previewServer.active);
+    const [showRawHTMLEditorOverlay, setShowRawHTMLEditorOverlay] = useState(
+        false
+    );
+    const [editorChanged, setEditorChanged] = useState(false);
     const [previewLoading, setPreviewLoading] = useState(false);
     const [buildLoading, setBuildLoading] = useState(false);
     const [deployLoading, setDeployLoading] = useState(false);
@@ -134,6 +138,12 @@ const PostEditor: FunctionComponent = () => {
         setBuildLoading(false);
     };
 
+    const changePostTemplate = template => {
+        if (!template || itemIndex === -1) return;
+        set(`sites.${siteId}.items.${itemIndex}.template`, template);
+        toast.success('Template changed successfully');
+    };
+
     const buildPost = async postId => {
         if (previewServer.active) {
             previewServer.pause();
@@ -179,23 +189,25 @@ const PostEditor: FunctionComponent = () => {
     const handlePublish = async () => {
         setDeployLoading(true);
         const curSite = get(`sites.${siteId}`);
-        const requiresFullDeployment = curSite.requiresFullDeployment;
+        const curSiteInt = getInt(`sites.${siteId}`);
 
-        if (requiresFullDeployment) {
-            const wipeRes = await wipe(curSite);
+        const publishSuggested = curSiteInt.publishSuggested;
 
-            if (!wipeRes) {
-                error();
-                return;
-            }
+        // if (publishSuggested) {
+        //     const wipeRes = await wipe(curSite);
 
-            await buildAndDeploy(curSite, setLoadingStatus);
-        } else {
-            await buildAndDeploy(curSite, setLoadingStatus, postId);
-        }
+        //     if (!wipeRes) {
+        //         error();
+        //         return;
+        //     }
 
-        if (requiresFullDeployment) {
-            set(`sites.${siteId}.requiresFullDeployment`, false);
+        //     await buildAndDeploy(curSite, setLoadingStatus);
+        // } else {
+        await buildAndDeploy(curSite, setLoadingStatus, postId);
+        //}
+
+        if (publishSuggested) {
+            setInt(`sites.${siteId}.publishSuggested`, false);
         }
 
         toast.success(getString('publish_completed'));
@@ -208,6 +220,21 @@ const PostEditor: FunctionComponent = () => {
         },
         []
     );
+
+    const openRawHTMLOverlay = () => {
+        setShowRawHTMLEditorOverlay(true);
+    };
+
+    const handleRawHTMLOverlaySave = async (headHtml, footerHtml) => {
+        if (itemIndex > -1) {
+            await set(`sites.${siteId}.items.${itemIndex}.headHtml`, headHtml);
+            await set(
+                `sites.${siteId}.items.${itemIndex}.footerHtml`,
+                footerHtml
+            );
+            toast.success('Post updated');
+        }
+    };
 
     return (
         <div className="PostEditor page fixed">
@@ -303,114 +330,35 @@ const PostEditor: FunctionComponent = () => {
                         />
                     </div>
                     <div className="right-align">
-                        <div className="editor-sidebar">
-                            <ul>
-                                <li
-                                    title="Save your changes locally"
-                                    className="clickable"
-                                    onClick={() => handleSave()}
-                                >
-                                    {buildLoading ? (
-                                        <Loading small classNames="mr-1" />
-                                    ) : (
-                                        <i className="material-icons">
-                                            save_alt
-                                        </i>
-                                    )}
-                                    <span>Save</span>{' '}
-                                    {editorChanged && (
-                                        <span
-                                            className="color-red ml-1"
-                                            title={getString(
-                                                'warn_unsaved_changes'
-                                            )}
-                                        >
-                                            *
-                                        </span>
-                                    )}
-                                </li>
-                                {previewStarted ? (
-                                    <li
-                                        title={getString(
-                                            'preview_description_message'
-                                        )}
-                                        className="clickable"
-                                        onClick={() => handleStopPreview()}
-                                    >
-                                        {previewLoading ? (
-                                            <Loading small classNames="mr-1" />
-                                        ) : (
-                                            <i className="material-icons">
-                                                stop
-                                            </i>
-                                        )}
-                                        <span>Stop Preview</span>
-                                    </li>
-                                ) : (
-                                    <li
-                                        className="clickable"
-                                        onClick={() => handleStartPreview()}
-                                    >
-                                        {previewLoading ? (
-                                            <Loading small classNames="mr-1" />
-                                        ) : (
-                                            <i className="material-icons">
-                                                play_arrow
-                                            </i>
-                                        )}
-                                        <span>Preview</span>
-                                    </li>
-                                )}
-                                <li
-                                    title={
-                                        editorChanged
-                                            ? getString('warn_unsaved_changes')
-                                            : ''
-                                    }
-                                    className={cx('clickable', {
-                                        disabled: editorChanged
-                                    })}
-                                    onClick={() => {
-                                        if (!editorChanged) {
-                                            handlePublish();
-                                        } else {
-                                            modal.alert(
-                                                getString(
-                                                    'error_publish_save_changes'
-                                                )
-                                            );
-                                        }
-                                    }}
-                                >
-                                    {deployLoading ? (
-                                        <Loading small classNames="mr-1" />
-                                    ) : (
-                                        <i className="material-icons">
-                                            publish
-                                        </i>
-                                    )}
-                                    <span>
-                                        {deployLoading
-                                            ? loadingStatus
-                                            : 'Publish'}
-                                    </span>
-                                    {requiresFullDeployment && (
-                                        <span
-                                            className="color-red ml-1"
-                                            title={getString(
-                                                'warn_unpublished_changes'
-                                            )}
-                                        >
-                                            *
-                                        </span>
-                                    )}
-                                </li>
-                            </ul>
-                        </div>
+                        <PostEditorSidebar
+                            site={site}
+                            item={post}
+                            previewStarted={previewStarted}
+                            editorChanged={editorChanged}
+                            previewLoading={previewLoading}
+                            buildLoading={buildLoading}
+                            deployLoading={deployLoading}
+                            publishSuggested={publishSuggested}
+                            loadingStatus={loadingStatus}
+                            onSave={handleSave}
+                            onStopPreview={handleStopPreview}
+                            onStartPreview={handleStartPreview}
+                            onPublish={handlePublish}
+                            onChangePostTemplate={changePostTemplate}
+                            onOpenRawHTMLOverlay={openRawHTMLOverlay}
+                        />
                     </div>
                 </div>
             </div>
             <Footer />
+            {post && showRawHTMLEditorOverlay && (
+                <HTMLEditorOverlay
+                    headDefaultValue={post.headHtml}
+                    footerDefaultValue={post.footerHtml}
+                    onSave={handleRawHTMLOverlaySave}
+                    onClose={() => setShowRawHTMLEditorOverlay(false)}
+                />
+            )}
         </div>
     );
 };

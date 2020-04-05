@@ -9,6 +9,7 @@ import AceEditor from 'react-ace';
 import { Editor } from 'react-draft-wysiwyg';
 import pretty from 'pretty';
 
+import 'ace-builds/webpack-resolver';
 import 'ace-builds/src-noconflict/mode-html';
 import 'ace-builds/src-noconflict/theme-github';
 
@@ -109,7 +110,7 @@ const StandardEditor: FunctionComponent<IProps> = ({
                             wrapEnabled
                             width="100%"
                             showPrintMargin={false}
-                            showGutter={false}
+                            showGutter
                             fontSize={17}
                             defaultValue={getDraftHTMLState()}
                             onChange={html => {

@@ -13,7 +13,7 @@ import { toast } from 'react-toastify';
 
 const CreatePost: FunctionComponent = () => {
     const { siteId } = useParams();
-    const { items, title, structure, hosting } = get(`sites.${siteId}`);
+    const { items, title, structure } = get(`sites.${siteId}`);
     const [postTitle, setPostTitle] = useState('');
     const [postSlug, setPostSlug] = useState('');
     const [postParent, setPostParent] = useState('');
@@ -29,7 +29,7 @@ const CreatePost: FunctionComponent = () => {
         const indent = parents.map(() => '--').join('') + ' ';
 
         options.push(
-            <option value={node.key}>
+            <option value={node.key} key={node.key}>
                 {indent}
                 {node.title}
             </option>
@@ -79,7 +79,6 @@ const CreatePost: FunctionComponent = () => {
             slug: normalize(postSlug || postTitle),
             content: '',
             template: 'post',
-            parser: 'react',
             updatedAt: null,
             createdAt: Date.now()
         };
@@ -157,40 +156,71 @@ const CreatePost: FunctionComponent = () => {
                     </div>
                 </h1>
 
-                <div className="form-group">
-                    <input
-                        className="form-control form-control-lg mb-2"
-                        type="text"
-                        placeholder="Title"
-                        value={postTitle}
-                        onChange={e => setPostTitle(e.target.value)}
-                    ></input>
-                    <input
-                        className="form-control form-control-lg mb-2"
-                        type="text"
-                        placeholder="Slug (optional)"
-                        value={postSlug}
-                        onChange={e => setPostSlug(e.target.value)}
-                        onBlur={e => setPostSlug(normalize(e.target.value))}
-                    ></input>
-                    <select
-                        className="form-control form-control-lg mb-3"
-                        value={postParent}
-                        onChange={e => setPostParent(e.target.value)}
-                    >
-                        <option value="">
-                            Select a parent post (optional)
-                        </option>
-                        {formattedStructureOptions}
-                    </select>
-                    <button
-                        type="button"
-                        className="btn btn-primary btn-lg"
-                        onClick={() => handleSubmit()}
-                    >
-                        Continue
-                    </button>
-                </div>
+                <form className="mt-4">
+                    <div className="form-group row">
+                        <div className="input-group input-group-lg">
+                            <label className="col-sm-2 col-form-label">
+                                Post Title
+                            </label>
+                            <div className="col-sm-10">
+                                <input
+                                    className="form-control form-control mb-2"
+                                    type="text"
+                                    placeholder="Title"
+                                    value={postTitle}
+                                    onChange={e => setPostTitle(e.target.value)}
+                                ></input>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <div className="input-group input-group-lg">
+                            <label className="col-sm-2 col-form-label">
+                                Post Slug (optional)
+                            </label>
+                            <div className="col-sm-10">
+                                <input
+                                    className="form-control form-control mb-2"
+                                    type="text"
+                                    placeholder="Slug"
+                                    value={postSlug}
+                                    onChange={e => setPostSlug(e.target.value)}
+                                    onBlur={e =>
+                                        setPostSlug(normalize(e.target.value))
+                                    }
+                                ></input>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <div className="input-group input-group-lg">
+                            <label className="col-sm-2 col-form-label">
+                                Parent (optional)
+                            </label>
+                            <div className="col-sm-10">
+                                <select
+                                    className="form-control form-control custom-select mb-3"
+                                    value={postParent}
+                                    onChange={e =>
+                                        setPostParent(e.target.value)
+                                    }
+                                >
+                                    <option value="">No parent</option>
+                                    {formattedStructureOptions}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <button
+                            type="button"
+                            className="btn btn-primary btn-lg"
+                            onClick={() => handleSubmit()}
+                        >
+                            Continue
+                        </button>
+                    </div>
+                </form>
             </div>
             <Footer />
         </div>

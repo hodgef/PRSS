@@ -1,4 +1,4 @@
-import { keychainRetreive } from './../../../common/utils';
+import { keychainRetreive, getInt } from './../../../common/utils';
 import axios from 'axios';
 // import minify from 'babel-minify';
 import fs from 'fs';
@@ -14,7 +14,7 @@ import {
     getFilteredBufferItems,
     clearBuffer
 } from '../build';
-// import { getTemplate } from '../templates';
+// import { getTemplate } from '../theme';
 import { confirmation, error /*, exclude,*/ } from '../utils';
 import { sequential } from './../utils';
 import { modal } from '../../components/Modal';
@@ -58,7 +58,9 @@ class GithubProvider {
         /**
          * Creating repo
          */
-        if (this.getUsername() === this.site.hosting.username) {
+        const { hosting } = getInt(`sites.${this.site.id}`);
+
+        if (this.getUsername() === hosting.username) {
             onUpdate(getString('creating_repository'));
             const createRepoRes = await this.createRepo();
 
@@ -78,7 +80,7 @@ class GithubProvider {
         /**
          * Deploy project
          */
-        await this.deployWithAPI(onUpdate);
+        await this.deploy(onUpdate);
 
         // if (!deployResArr.every(item => !!item.content)) {
         //     error(getString('error_completing_setup'));
@@ -102,7 +104,8 @@ class GithubProvider {
     };
 
     getUsername = () => {
-        const { username, repository } = this.site.hosting;
+        const { hosting } = getInt(`sites.${this.site.id}`);
+        const { username, repository } = hosting;
 
         if (repository && repository.includes('/')) {
             return repository.split('/')[0];
@@ -112,10 +115,11 @@ class GithubProvider {
     };
 
     getRepositoryName = () => {
+        const { id } = this.site;
+
         const {
-            id,
             hosting: { repository }
-        } = this.site;
+        } = getInt(`sites.${this.site.id}`);
 
         if (repository && repository.includes('/')) {
             return repository.split('/')[1];
@@ -128,7 +132,7 @@ class GithubProvider {
         return `https://${this.vars.baseUrl()}/${this.getUsername()}/${this.getRepositoryName()}`;
     };
 
-    deploy = async (onUpdate?, itemIdToDeploy?) => {
+    deploy = async (onUpdate = s => {}, itemIdToDeploy?) => {
         /**
          * Clearing buffer
          */
@@ -138,7 +142,7 @@ class GithubProvider {
          * Creating git repo in buffer
          */
         try {
-            const bufferDir = get('paths.buffer');
+            const bufferDir = getInt('paths.buffer');
             const execSync = require('child_process').execSync;
 
             execSync(
@@ -152,15 +156,19 @@ class GithubProvider {
                 return false;
             }
 
-            onUpdate('Deploying...');
+            onUpdate('Deploying');
 
-            setTimeout(() => {
-                execSync(
-                    `cd "${bufferDir}" && git add --all && git commit -m "Site Update" && git push`
-                );
-            }, 1000);
+            await new Promise(resolve => {
+                setTimeout(() => {
+                    execSync(
+                        `cd "${bufferDir}" && git add --all && git commit -m "Site update" && git push`
+                    );
+                    resolve();
+                }, 1000);
+            });
         } catch (e) {
             modal.alert(e.message);
+            console.error(e);
         }
 
         await clearBuffer();
@@ -173,7 +181,7 @@ class GithubProvider {
             itemIdToDeploy
         );
 
-        const bufferDir = get('paths.buffer');
+        const bufferDir = getInt('paths.buffer');
 
         const siteConfigFilePath = path.join(bufferDir, configFileName);
 
@@ -226,7 +234,7 @@ class GithubProvider {
          * Creating git repo in buffer
          */
         try {
-            const bufferDir = get('paths.buffer');
+            const bufferDir = getInt('paths.buffer');
             const execSync = require('child_process').execSync;
 
             execSync(
@@ -414,7 +422,8 @@ class GithubProvider {
         headers = {}
     ) => {
         const url = `https://${this.vars.baseApiUrl()}/${endpoint}`;
-        const { name, username } = this.site.hosting;
+        const { hosting } = getInt(`sites.${this.site.id}`);
+        const { name, username } = hosting;
         const password = await keychainRetreive(name, username);
 
         return axios({

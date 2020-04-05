@@ -1,12 +1,15 @@
 import minify from 'babel-minify';
 import del from 'del';
 import fse from 'fs-extra';
+import fs from 'fs';
 import path from 'path';
 
-import { get, getString } from '../../common/utils';
+import { get, getString, getInt } from '../../common/utils';
 import reactHandler from './handlers/react';
 import { getPostItem } from './hosting';
-import { sanitizeSite, sequential } from './utils';
+import { sequential, sanitizeSite, sanitizeItem } from './utils';
+import { modal } from '../components/Modal';
+import { getThemeManifest } from './theme';
 
 export const bufferPathFileNames = ['index.html', 'index.js'];
 export const configFileName = 'config.js';
@@ -25,6 +28,14 @@ export const build = async (
         site = get(`sites.${siteIdOrSite}`);
     } else {
         return false;
+    }
+
+    /**
+     * Ensure buffer exists
+     */
+    const bufferDir = getInt('paths.buffer');
+    if (!fs.existsSync(bufferDir)) {
+        fs.mkdirSync(bufferDir);
     }
 
     if (!skipClear) {
@@ -73,8 +84,8 @@ export const build = async (
 };
 
 export const copyPublicToBuffer = () => {
-    const bufferDir = get('paths.buffer');
-    const publicDir = get('paths.public');
+    const bufferDir = getInt('paths.buffer');
+    const publicDir = getInt('paths.public');
     return fse.copy(publicDir, bufferDir);
 };
 
@@ -127,7 +138,7 @@ export const getFilteredBufferItems = (site, itemIdToLoad?) => {
 
 export const clearBuffer = () => {
     return new Promise(async resolve => {
-        const bufferDir = get('paths.buffer');
+        const bufferDir = getInt('paths.buffer');
 
         if (bufferDir && bufferDir.includes('buffer')) {
             await del(path.join(bufferDir, '*'));
@@ -147,7 +158,7 @@ export const loadBuffer: loadBufferType = (
 };
 
 export const buildBufferSiteConfig = site => {
-    const bufferDir = get('paths.buffer');
+    const bufferDir = getInt('paths.buffer');
     const { code } = minify(
         `var PRSSConfig = ${JSON.stringify(sanitizeSite(site))}`
     );
@@ -172,6 +183,9 @@ export const buildBufferItem = async item => {
 
         default:
             handler = async () => ({ html: '', js: '' });
+            modal.alert(
+                `There was an error parsing the template for post id (${item.id})`
+            );
             break;
     }
 
@@ -180,7 +194,7 @@ export const buildBufferItem = async item => {
     /**
      * Making directory if it does exist
      */
-    const bufferDir = get('paths.buffer');
+    const bufferDir = getInt('paths.buffer');
     const targetDir = path.join(bufferDir, itemPath);
 
     /**
@@ -212,6 +226,13 @@ export const buildBufferItem = async item => {
 
 export const getBufferItems = (site): IBufferItem[] => {
     const structurePaths = getStructurePaths(site.structure);
+    const themeManifest = getThemeManifest(site.type, site.theme);
+
+    if (!themeManifest) {
+        modal.alert('Could not find theme manifest.');
+        throw 'Could not find theme manifest.';
+    }
+
     const bufferItems = structurePaths.map(item => {
         const path = item.split('/');
         let post;
@@ -237,8 +258,9 @@ export const getBufferItems = (site): IBufferItem[] => {
             ? ({
                   path: '/' + postPath,
                   templateId: `${site.type}.${site.theme}.${post.template}`,
-                  parser: post.parser,
-                  item: post as IPostItem,
+                  parser: themeManifest.parser,
+                  item: sanitizeItem(post) as IPostItem,
+                  site, // Will be removed in bufferItem parser
                   configPath
               } as IBufferItem)
             : null;

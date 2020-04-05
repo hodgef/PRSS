@@ -4,8 +4,8 @@ import React, { Fragment, FunctionComponent, useEffect, useState } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import { store } from '../../common/Store';
-import { get, set } from '../../common/utils';
+import { store, storeInt } from '../../common/Store';
+import { get, set, getInt, setInt } from '../../common/utils';
 import { formatStructure } from '../services/build';
 import {
     deletePosts,
@@ -21,9 +21,8 @@ import { error } from '../services/utils';
 
 const ListPosts: FunctionComponent = () => {
     const { siteId } = useParams();
-    const { items, title, structure, requiresFullDeployment, hosting } = get(
-        `sites.${siteId}`
-    );
+    const { items, title, structure } = get(`sites.${siteId}`);
+    const { hosting, publishSuggested } = getInt(`sites.${siteId}`);
     const [structureState, setStructureState] = useState(structure);
     const history = useHistory();
     const [selectEnabled, setSelectEnabled] = useState(false);
@@ -31,7 +30,7 @@ const ListPosts: FunctionComponent = () => {
     const [loading, setLoading] = useState(false);
     const [loadingStatus, setLoadingStatus] = useState('');
     const [showPublishButton, setShowPublishButton] = useState(
-        requiresFullDeployment
+        publishSuggested
     );
 
     const unsubscribeWatchers = [];
@@ -46,8 +45,8 @@ const ListPosts: FunctionComponent = () => {
     );
 
     unsubscribeWatchers.push(
-        store.onDidChange(
-            `sites.${siteId}.requiresFullDeployment` as any,
+        storeInt.onDidChange(
+            `sites.${siteId}.publishSuggested` as any,
             newValue => {
                 if (newValue) {
                     setShowPublishButton(true);
@@ -97,15 +96,8 @@ const ListPosts: FunctionComponent = () => {
     const publishSite = async () => {
         setLoading(true);
         const site = get(`sites.${siteId}`);
-        const wipeRes = await wipe(site, setLoadingStatus);
-
-        if (!wipeRes) {
-            error();
-            return;
-        }
-
         await buildAndDeploy(site, setLoadingStatus);
-        set(`sites.${siteId}.requiresFullDeployment`, false);
+        setInt(`sites.${siteId}.publishSuggested`, false);
 
         toast.success('Publish complete');
         setLoading(false);

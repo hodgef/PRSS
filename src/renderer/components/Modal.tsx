@@ -8,7 +8,9 @@ class Modal extends Component {
         buttons: [],
         showCancel: true,
         mode: null,
-        onCancel: () => {}
+        onCancel: () => {},
+        contentClassName: '',
+        innerContentClassName: ''
     };
 
     initialState = { ...this.state };
@@ -29,12 +31,19 @@ class Modal extends Component {
         });
     };
 
-    alert = (message, title?) => {
+    alert = (
+        message,
+        title?,
+        contentClassName = '',
+        innerContentClassName = ''
+    ) => {
         this.setState({
             mode: 'alert',
             show: true,
+            title,
             message,
-            title
+            contentClassName,
+            innerContentClassName
         });
     };
 
@@ -50,7 +59,7 @@ class Modal extends Component {
                 <div
                     style={{
                         position: 'fixed',
-                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        backgroundColor: 'rgba(0,0,0,0.9)',
                         height: '100%',
                         width: '101%',
                         alignItems: 'center',
@@ -64,10 +73,10 @@ class Modal extends Component {
                     <div
                         style={{
                             width: '100%',
-                            minWidth: 250,
                             maxWidth: 300,
                             overflow: 'hidden'
                         }}
+                        className={this.state.contentClassName}
                     >
                         {title && (
                             <div
@@ -84,9 +93,10 @@ class Modal extends Component {
                                         fontSize: 22,
                                         fontWeight: 300
                                     }}
-                                >
-                                    {title}
-                                </span>
+                                    dangerouslySetInnerHTML={{
+                                        __html: title
+                                    }}
+                                />
                             </div>
                         )}
 
@@ -158,7 +168,7 @@ class Modal extends Component {
                 <div
                     style={{
                         position: 'fixed',
-                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        backgroundColor: 'rgba(0,0,0,0.9)',
                         height: '100%',
                         width: '101%',
                         alignItems: 'center',
@@ -172,10 +182,10 @@ class Modal extends Component {
                     <div
                         style={{
                             width: '100%',
-                            minWidth: 300,
-                            maxWidth: 320,
+                            maxWidth: 300,
                             overflow: 'hidden'
                         }}
+                        className={this.state.contentClassName}
                     >
                         {title && (
                             <div
@@ -192,9 +202,10 @@ class Modal extends Component {
                                         fontSize: 22,
                                         fontWeight: 300
                                     }}
-                                >
-                                    {title}
-                                </span>
+                                    dangerouslySetInnerHTML={{
+                                        __html: title
+                                    }}
+                                />
                             </div>
                         )}
 
@@ -209,18 +220,21 @@ class Modal extends Component {
                                     style={{
                                         padding: 20,
                                         // minHeight: 100,
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
+                                        //alignItems: 'center',
+                                        //justifyContent: 'center',
                                         display: 'flex'
                                     }}
+                                    className={this.state.innerContentClassName}
                                 >
-                                    <span
+                                    <div
                                         style={{
-                                            fontSize: 18
+                                            fontSize: 18,
+                                            width: '100%'
                                         }}
-                                    >
-                                        {message}
-                                    </span>
+                                        dangerouslySetInnerHTML={{
+                                            __html: message
+                                        }}
+                                    />
                                 </div>
                             )}
 

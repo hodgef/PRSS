@@ -123,7 +123,8 @@ export const exclude = (obj = {}, keys = []) => {
     return newObj;
 };
 
-export const objGet = (s, obj) => s.split('.').reduce((a, b) => a[b], obj);
+export const objGet = (s, obj) =>
+    s.split('.').reduce((a, b) => (a ? a[b] : ''), obj);
 
 export const isPromise = value =>
     Boolean(value && typeof value.then === 'function');
@@ -131,17 +132,36 @@ export const isPromise = value =>
 export const sanitizeSite = siteObj => {
     const newObj = JSON.parse(JSON.stringify(siteObj));
 
-    ['hosting'].forEach(field => {
-        newObj[field] = null;
+    /**
+     * Remove site keys
+     */
+    ['headHtml', 'footerHtml'].forEach(field => {
         delete newObj[field];
     });
 
+    /**
+     * Update items
+     */
     newObj.items = newObj.items.map(item => {
         item.content = truncateString(stripTags(item.content));
-        return item;
+        return sanitizeItem(item);
     });
 
-    return newObj.hosting ? null : newObj;
+    return newObj;
+};
+
+export const sanitizeItem = itemObj => {
+    const newObj = JSON.parse(JSON.stringify(itemObj));
+    ['headHtml', 'footerHtml'].forEach(field => {
+        delete newObj[field];
+    });
+    return newObj;
+};
+
+export const sanitizeBufferItem = itemObj => {
+    const newObj = JSON.parse(JSON.stringify(itemObj));
+    delete newObj.site;
+    return newObj;
 };
 
 export const truncateString = (string, maxLength = 50) => {
@@ -154,3 +174,5 @@ export const stripTags = html => {
     const doc = new DOMParser().parseFromString(html, 'text/html');
     return doc.body.textContent || '';
 };
+
+export const isHtml = RegExp.prototype.test.bind(/(<([^>]+)>)/i);

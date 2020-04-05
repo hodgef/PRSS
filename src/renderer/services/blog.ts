@@ -12,8 +12,9 @@ export const getSampleSiteStructure = () => {
         theme: 'default',
         updatedAt: null,
         publishedAt: null,
-        requiresFullDeployment: false,
         items: [item1, item2, item3, item4, item5],
+        headHtml: '<title>%item.title% - %site.title%</title>',
+        footerHtml: '',
         structure: [
             {
                 key: item1.id,
@@ -49,7 +50,8 @@ export const getSampleBlogItems = (nbItems = 1) => {
             title: 'Hello home!',
             content: 'This is a home',
             template: 'home',
-            parser: 'react',
+            headHtml: null,
+            footerHtml: null,
             updatedAt: null,
             createdAt: Date.now()
         },
@@ -59,7 +61,8 @@ export const getSampleBlogItems = (nbItems = 1) => {
             title: 'My test post',
             content: '<h1>This is a test post</h1>',
             template: 'home',
-            parser: 'react',
+            headHtml: null,
+            footerHtml: null,
             updatedAt: null,
             createdAt: Date.now()
         },
@@ -69,7 +72,8 @@ export const getSampleBlogItems = (nbItems = 1) => {
             title: 'My home world',
             content: 'This is a test world',
             template: 'home',
-            parser: 'react',
+            headHtml: null,
+            footerHtml: null,
             updatedAt: null,
             createdAt: Date.now()
         },
@@ -79,7 +83,8 @@ export const getSampleBlogItems = (nbItems = 1) => {
             title: 'My blog post',
             content: 'This is a test blog',
             template: 'home',
-            parser: 'react',
+            headHtml: null,
+            footerHtml: null,
             updatedAt: null,
             createdAt: Date.now()
         },
@@ -89,11 +94,18 @@ export const getSampleBlogItems = (nbItems = 1) => {
             title: 'My blog stuff',
             content: 'This is a test stuff',
             template: 'home',
-            parser: 'react',
+            headHtml: null,
+            footerHtml: null,
             updatedAt: null,
             createdAt: Date.now()
         }
     ];
 
     return items.slice(0, nbItems);
+};
+
+export const getSampleSiteIntStructure = () => {
+    return {
+        publishSuggested: false
+    };
 };

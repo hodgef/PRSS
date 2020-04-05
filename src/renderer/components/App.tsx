@@ -15,6 +15,8 @@ import ListSites from './ListSites';
 import { StandardModal } from './Modal';
 import PostEditor from './PostEditor';
 import CreatePost from './CreatePost';
+import SiteSettings from './SiteSettings';
+import AppSettings from './AppSettings';
 
 const App: FunctionComponent = () => {
     return (
@@ -22,11 +24,15 @@ const App: FunctionComponent = () => {
             <HashRouter>
                 <Switch>
                     <Route exact path="/sites" component={ListSites} />
+
+                    <Route exact path="/settings" component={AppSettings} />
+
                     <Route
                         exact
                         path="/sites/create"
                         component={CreateSelector}
                     />
+
                     <Route
                         exact
                         path="/sites/create/blog"
@@ -38,6 +44,13 @@ const App: FunctionComponent = () => {
                         path="/sites/:siteId/posts"
                         component={ListPosts}
                     />
+
+                    <Route
+                        exact
+                        path="/sites/:siteId/settings"
+                        component={SiteSettings}
+                    />
+
                     <Route
                         exact
                         path="/sites/:siteId/posts/editor/:postId"

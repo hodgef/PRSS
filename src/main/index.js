@@ -3,8 +3,9 @@
 import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import path from 'path';
 import { format as formatUrl } from 'url';
+import { initStore } from '../common/Store';
 
-import { reactParser } from './parsers';
+//import { reactParser } from './parsers';
 
 const iconPath = path.join(__static, 'icons', 'icon.png');
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -115,17 +116,17 @@ app.on('ready', () => {
 });
 
 
-ipcMain.on('parse', (event, { parser, code }) => {
-  let output = '';
+// ipcMain.on('parse', (event, { parser, code }) => {
+//   let output = '';
 
-  switch (parser) {
-    case 'react':
-      output = reactParser(code);
-      break;
+//   switch (parser) {
+//     case 'react':
+//       output = reactParser(code);
+//       break;
   
-    default:
-      break;
-  }
+//     default:
+//       break;
+//   }
 
-  event.returnValue = output;
-});
+//   event.returnValue = output;
+// });

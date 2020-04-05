@@ -1,8 +1,11 @@
 import path from 'path';
 
-import { store } from './Store';
+import { store, storeInt } from './Store';
 import strings from './strings.json';
 
+/**
+ * Store
+ */
 export const set = (...params) =>
     typeof params[0] === 'object'
         ? store.set(params[0])
@@ -10,10 +13,20 @@ export const set = (...params) =>
 export const get = (param: any) => store.get(param);
 export const rem = (param: any) => store.delete(param);
 
+/**
+ * Store int
+ */
+export const setInt = (...params) =>
+    typeof params[0] === 'object'
+        ? storeInt.set(params[0])
+        : storeInt.set(params[0], params[1]);
+export const getInt = (param: any) => storeInt.get(param);
+export const remInt = (param: any) => storeInt.delete(param);
+
 export const globalRequire = __non_webpack_require__;
 
 export const vendorModulePath = pathName => {
-    const vendorDir = get('paths.vendor');
+    const vendorDir = getInt('paths.vendor');
     const vendorModulesDir = path.join(vendorDir, 'node_modules', pathName);
     return vendorModulesDir;
 };

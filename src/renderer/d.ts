@@ -9,14 +9,14 @@ interface ISite {
     id: string;
     title: string;
     type: string;
-    hosting?: IHosting;
     url: string;
     theme: string;
     items: IPostItem[];
     structure: IStructureItem[];
     updatedAt: number | null;
     publishedAt: number | null;
-    requiresFullDeployment?: boolean;
+    headHtml: string;
+    footerHtml: string;
 }
 
 interface IStructureItem {
@@ -28,8 +28,10 @@ interface IPostItem {
     id: string;
     slug: string;
     title: string;
+    template: string;
     content: string;
-    parser: string;
+    headHtml: string;
+    footerHtml: string;
     updatedAt: number | null;
     createdAt: number | null;
 }
@@ -48,7 +50,21 @@ interface IPaths {
 
 interface IStore {
     sites: ISites;
+}
+
+interface ISitesInternal {
+    [name: string]: ISiteInternal; 
+}
+
+interface IStoreInternal {
+    sites: ISitesInternal;
     paths: IPaths;
+}
+
+interface ISiteInternal {
+    id: string;
+    hosting?: IHosting;
+    publishSuggested?: boolean;
 }
 
 interface IBufferItem {
@@ -56,7 +72,7 @@ interface IBufferItem {
     templateId: string;
     parser: string;
     item: IPostItem;
-    site?: ISite;
+    site: ISite;
     configPath?: string;
 }
 

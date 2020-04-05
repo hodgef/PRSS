@@ -2,7 +2,7 @@ import './styles/SlugEditor.scss';
 
 import React, { FunctionComponent, useState, Fragment } from 'react';
 
-import { get, set } from '../../common/utils';
+import { get, set, setInt } from '../../common/utils';
 import { error, normalize } from '../services/utils';
 import { toast } from 'react-toastify';
 import cx from 'classnames';
@@ -64,7 +64,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
         }
 
         set(`sites.${siteId}.items.${postIndex}.slug`, normalizedSlug);
-        set(`sites.${siteId}.requiresFullDeployment`, true);
+        setInt(`sites.${siteId}.publishSuggested`, true);
 
         toast.success('Slug saved');
         setEditing(false);

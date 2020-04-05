@@ -6,23 +6,53 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 const AppContext = createContext(null);
 
 const defaults = {
-    sites: {},
-    paths: {}
+    sites: {}
 } as IStore;
 
-const store = new Store({
-    name: 'PRSS',
-    encryptionKey: isDevelopment ? null : 'PRSS',
-    defaults
-});
+const defaultsInt = {
+    sites: {},
+    paths: {}
+} as IStoreInternal;
 
-store.set({
-    paths: {
-        buffer: path.join(__static, 'buffer'),
-        public: path.join(__static, 'public'),
-        themes: path.join(__static, 'themes'),
-        vendor: path.join(__static, 'vendor')
-    }
-});
+let store;
+let storeInt;
 
-export { AppContext, store };
+const initStore = () => {
+    return new Promise(async resolve => {
+        if (store && storeInt) {
+            resolve();
+        }
+
+        const storePath = await localStorage.getItem('storePath');
+        const baseStorePath = storePath
+            ? storePath.replace('PRSS.json', '')
+            : null;
+
+        console.log('storePath', storePath, baseStorePath);
+
+        store = new Store({
+            name: 'PRSS',
+            defaults,
+            ...(baseStorePath ? { cwd: baseStorePath } : {})
+        });
+
+        storeInt = new Store({
+            name: 'PRSS_Internal',
+            encryptionKey: isDevelopment ? null : 'PRSS_Internal',
+            defaults: defaultsInt
+        });
+
+        storeInt.set({
+            paths: {
+                buffer: path.join(__static, 'buffer'),
+                public: path.join(__static, 'public'),
+                themes: path.join(__static, 'themes'),
+                vendor: path.join(__static, 'vendor')
+            }
+        });
+
+        resolve();
+    });
+};
+
+export { AppContext, initStore, store, storeInt };

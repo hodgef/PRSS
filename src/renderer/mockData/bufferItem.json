@@ -1,0 +1,42 @@
+{
+    "path": "/my-path",
+    "templateId": "blog.default.home",
+    "parser": "react",
+    "item": {
+        "id": "0000000-0000-0000-0000-0000000",
+        "slug": "my-post",
+        "title": "My Post!",
+        "content": "This is my content",
+        "template": "home",
+        "updatedAt": 1585400000000,
+        "createdAt": 1585400000000
+    },
+    "site": {
+        "id": "my-site",
+        "title": "My Site",
+        "type": "blog",
+        "url": "https://my-site-url",
+        "theme": "default",
+        "updatedAt": 1585400000000,
+        "publishedAt": null,
+        "requiresFullDeployment": false,
+        "items": [
+            {
+                "id": "0000000-0000-0000-0000-0000000",
+                "slug": "my-post",
+                "title": "My Post!",
+                "content": "My concatenated content",
+                "template": "home",
+                "updatedAt": 1585400000000,
+                "createdAt": 1585400000000
+            }
+        ],
+        "structure": [
+            {
+                "key": "0000000-0000-0000-0000-0000000",
+                "children": []
+            }
+        ]
+    },
+    "configPath": "config.js"
+}

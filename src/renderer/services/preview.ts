@@ -1,5 +1,5 @@
 // import { toast } from 'react-toastify';
-import { globalRequire } from './../../common/utils';
+import { globalRequire, getInt } from './../../common/utils';
 import { get } from '../../common/utils';
 import { build } from './build';
 
@@ -21,7 +21,7 @@ export const startPreview = (startPath = '/') => {
     stopPreview();
 
     if (!previewServer.active) {
-        const bufferDir = get('paths.buffer');
+        const bufferDir = getInt('paths.buffer');
         previewServer.init({
             server: bufferDir,
             startPath

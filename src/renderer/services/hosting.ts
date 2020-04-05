@@ -1,4 +1,4 @@
-import { keychainStore } from './../../common/utils';
+import { keychainStore, getInt, setInt } from './../../common/utils';
 import { get, getString, rem, set } from '../../common/utils';
 import { getStructurePaths, build } from './build';
 import GithubProvider from './providers/github';
@@ -13,7 +13,7 @@ export const getHostingTypes = () => ({
 export const setupRemote = (site: ISite, onUpdate: updaterType) => {
     const {
         hosting: { name }
-    } = site;
+    } = getInt(`sites.${site.id}`);
 
     switch (name) {
         case 'github':
@@ -29,7 +29,8 @@ export const setupRemote = (site: ISite, onUpdate: updaterType) => {
 export const deploy = (site: ISite, params = []) => {
     const {
         hosting: { name }
-    } = site;
+    } = getInt(`sites.${site.id}`);
+
     switch (name) {
         case 'github':
             const githubProvider = new GithubProvider(site);
@@ -41,13 +42,29 @@ export const deploy = (site: ISite, params = []) => {
     }
 };
 
+export const getRepositoryUrl = (site: ISite) => {
+    const {
+        hosting: { name }
+    } = getInt(`sites.${site.id}`);
+
+    switch (name) {
+        case 'github':
+            const githubProvider = new GithubProvider(site);
+            return githubProvider.getRepositoryUrl();
+
+        default:
+            return false;
+    }
+};
+
 /**
  * Delete all files in remote
  */
 export const wipe = (site: ISite, onUpdate?) => {
     const {
         hosting: { name }
-    } = site;
+    } = getInt(`sites.${site.id}`);
+
     switch (name) {
         case 'github':
             const githubProvider = new GithubProvider(site);
@@ -71,7 +88,7 @@ export const buildAndDeploy = async (
 export const deleteRemoteItems = (filesToDeleteArr, site: ISite) => {
     const {
         hosting: { name }
-    } = site;
+    } = getInt(`sites.${site.id}`);
 
     switch (name) {
         case 'github':
@@ -87,7 +104,16 @@ export const setSite = (data: ISite) => {
     const { id: siteId } = data;
     const sites = get('sites');
 
-    set({
+    return set({
+        sites: merge(sites, { [siteId]: { id: siteId, ...data } })
+    });
+};
+
+export const setSiteInternal = (data: ISiteInternal) => {
+    const { id: siteId } = data;
+    const sites = getInt('sites');
+
+    return setInt({
         sites: merge(sites, { [siteId]: { id: siteId, ...data } })
     });
 };
@@ -202,7 +228,7 @@ export const updateSiteStructure = (siteId, newStructure) => {
     if (site) {
         set(`sites.${site.id}.structure`, newStructure);
         set(`sites.${site.id}.updatedAt`, Date.now());
-        set(`sites.${site.id}.requiresFullDeployment`, true);
+        setInt(`sites.${site.id}.publishSuggested`, true);
     }
 };
 
