@@ -83,7 +83,6 @@ export const sequential = (
     resArr = []
 ) => {
     if (index >= arr.length) return Promise.resolve(resArr);
-    console.log('params', arr, arr[index]);
     const asyncFnPromise = spreadItems
         ? asyncFn(...arr[index])
         : asyncFn(arr[index]);

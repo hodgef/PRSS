@@ -36,7 +36,6 @@ class DraggableTree extends React.Component<IProps, IState> {
     componentDidUpdate(nextProps) {
         const { data } = this.props;
         if (nextProps.data !== data) {
-            console.log('nextProps', nextProps);
             if (data) {
                 this.setState({ gData: nextProps.data });
             }
@@ -119,8 +118,6 @@ class DraggableTree extends React.Component<IProps, IState> {
             selectedKeys = [],
             checkStrictly
         } = this.props;
-
-        console.log('selectedKeys', selectedKeys);
 
         return (
             <div className="draggable-tree">

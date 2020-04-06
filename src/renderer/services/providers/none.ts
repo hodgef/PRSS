@@ -76,7 +76,6 @@ class FallbackProvider {
             }
         }
 
-        console.log('confirmationRes', confirmationRes);
         onUpdate && onUpdate();
         return false;
     };

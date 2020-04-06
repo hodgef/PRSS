@@ -32,8 +32,6 @@ const SlugEditor: FunctionComponent<IProps> = ({
         ? bufferItems.find(bufferItem => bufferItem.item.id === post.id)
         : null;
 
-    console.log('bufferItem', bufferItem);
-
     const save = () => {
         if (!value.trim()) {
             error('The slug must have a value');

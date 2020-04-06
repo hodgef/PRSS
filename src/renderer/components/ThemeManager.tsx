@@ -26,7 +26,6 @@ const ThemeManager: FunctionComponent = () => {
 
     const getThemes = (noToast?) => {
         const themes = getThemeListDetails();
-        console.log('exec', themes);
         setThemeList(themes);
 
         if (!noToast) {

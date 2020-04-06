@@ -28,8 +28,6 @@ const initStore = () => {
             ? storePath.replace('PRSS.json', '')
             : null;
 
-        console.log('storePath', storePath, baseStorePath);
-
         store = new Store({
             name: 'PRSS',
             defaults,

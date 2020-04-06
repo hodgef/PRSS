@@ -85,7 +85,6 @@ const ListPosts: FunctionComponent = () => {
     });
 
     const onStructureUpdate = data => {
-        console.log('STRUCTURE UPDATE', data);
         const updatedStructure = formatStructure(siteId, data);
         updateSiteStructure(siteId, updatedStructure);
         toast.success('Changes saved');

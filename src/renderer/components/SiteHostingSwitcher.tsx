@@ -82,8 +82,6 @@ const SiteHostingSwitcher: FunctionComponent = () => {
             return;
         }
 
-        console.log('site', newSite);
-
         /**
          * Save site
          */

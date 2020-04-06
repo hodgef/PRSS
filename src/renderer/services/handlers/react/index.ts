@@ -18,17 +18,10 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
         collapseWhitespace: true
     };
 
-    console.log('data', data);
-
     const siteHeadHtml = parseHtmlParams(data.site.headHtml, data);
     const siteFooterHtml = parseHtmlParams(data.site.footerHtml, data);
     const postHeadHtml = parseHtmlParams(data.item.headHtml, data);
     const postFooterHtml = parseHtmlParams(data.item.footerHtml, data);
-
-    // console.log('siteHeadHtml', siteHeadHtml);
-    // console.log('siteFooterHtml', siteFooterHtml);
-    // console.log('postHeadHtml', postHeadHtml);
-    // console.log('postFooterHtml', postFooterHtml);
 
     const html = htmlMinifier.minify(
         baseTemplate({
@@ -48,8 +41,6 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
         }),
         minifierOptions
     );
-
-    console.log('DATA', data);
 
     const js = minify(`
         ${templateJs}

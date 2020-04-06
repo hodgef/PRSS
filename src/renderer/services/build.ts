@@ -74,8 +74,6 @@ export const build = async (
         onUpdate && onUpdate(getString('building_progress', [progress]));
     });
 
-    console.log('buffer', loadBufferRes);
-
     if (!loadBufferRes) {
         return false;
     }
@@ -119,13 +117,6 @@ export const getFilteredBufferItems = (site, itemIdToLoad?) => {
 
         itemsToLoad = bufferItems.filter(bufferItem =>
             itemIdsToLoad.includes(bufferItem.item.id)
-        );
-
-        console.log(
-            'itemIdsToLoad',
-            itemIdsToLoad,
-            itemsToLoad,
-            itemSlugsToLoad
         );
     }
 

@@ -96,8 +96,6 @@ const CreateSite: FunctionComponent = () => {
             return;
         }
 
-        console.log('site', site);
-
         /**
          * Save site
          */
