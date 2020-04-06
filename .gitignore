@@ -4,5 +4,4 @@ node_modules/
 thumbs.db
 .idea/
 static/buffer/
-static/themes/
 .vscode

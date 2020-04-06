@@ -1,4 +1,5 @@
-import { getString } from '../../common/utils';
+import fs from 'fs';
+import { getString, getInt } from '../../common/utils';
 import { modal } from '../components/Modal';
 
 export const merge = (var1, var2) => {
@@ -69,6 +70,16 @@ export const stringReplace = (str = '', replaceWith = {}) => {
     });
 
     return str;
+};
+
+export const checkDirs = async () => {
+    /**
+     * Ensure buffer exists
+     */
+    const bufferDir = getInt('paths.buffer');
+    if (!fs.existsSync(bufferDir)) {
+        fs.mkdirSync(bufferDir);
+    }
 };
 
 export const noop = () => {};

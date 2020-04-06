@@ -30,14 +30,6 @@ export const build = async (
         return false;
     }
 
-    /**
-     * Ensure buffer exists
-     */
-    const bufferDir = getInt('paths.buffer');
-    if (!fs.existsSync(bufferDir)) {
-        fs.mkdirSync(bufferDir);
-    }
-
     if (!skipClear) {
         /**
          * Clear Buffer
