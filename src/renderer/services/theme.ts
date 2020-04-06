@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 
 import { getInt } from '../../common/utils';
-import { modal } from '../components/Modal';
 import { getFilePaths, getDirPaths } from './files';
 import { getParserTemplateExtension } from './handlers';
 

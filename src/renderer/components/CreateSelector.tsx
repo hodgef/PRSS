@@ -7,11 +7,7 @@ import { getString } from '../../common/utils';
 import Footer from './Footer';
 import Header from './Header';
 
-interface IProps {
-    showBack?: boolean;
-}
-
-const CreateSelector: FunctionComponent<IProps> = props => {
+const CreateSelector: FunctionComponent = () => {
     const history = useHistory();
     const { state = {} } = useLocation();
 

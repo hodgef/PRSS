@@ -1,18 +1,14 @@
 'use strict'
 
-import { app, BrowserWindow, ipcMain, Menu } from 'electron';
+import { app, BrowserWindow, Menu } from 'electron';
 import path from 'path';
 import { format as formatUrl } from 'url';
-import { initStore } from '../common/Store';
-
-//import { reactParser } from './parsers';
 
 const iconPath = path.join(__static, 'icons', 'icon.png');
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const gotTheLock = app.requestSingleInstanceLock()
 
-// global reference to mainWindow (necessary to prevent window from being garbage collected)
 let mainWindow;
 
 const createMainWindow = () => {
@@ -44,10 +40,9 @@ const createMainWindow = () => {
     Menu.setApplicationMenu(null);
   }
 
-  // TODO: Uncomment on prod
-  //if (isDevelopment) {
+  if (isDevelopment) {
     window.webContents.openDevTools();
-  //}
+  }
 
   if (isDevelopment) {
     window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`);
@@ -82,17 +77,16 @@ const createMainWindow = () => {
 if (!gotTheLock) {
   app.quit()
 } else {
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
+  app.on('second-instance', () => {
     // Someone tried to run a second instance, we should focus our window.
     if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore()
-      mainWindow.focus()
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
     }
   })
 
   // Create myWindow, load the rest of the app, etc...
-  app.on('ready', () => {
-  })
+  app.on('ready', () => {});
 }
 
 // quit application when all windows are closed
@@ -114,19 +108,3 @@ app.on('activate', () => {
 app.on('ready', () => {
   mainWindow = createMainWindow();
 });
-
-
-// ipcMain.on('parse', (event, { parser, code }) => {
-//   let output = '';
-
-//   switch (parser) {
-//     case 'react':
-//       output = reactParser(code);
-//       break;
-  
-//     default:
-//       break;
-//   }
-
-//   event.returnValue = output;
-// });

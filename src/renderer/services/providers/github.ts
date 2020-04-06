@@ -1,12 +1,11 @@
 import { keychainRetreive, getInt } from './../../../common/utils';
 import axios from 'axios';
-// import minify from 'babel-minify';
 import fs from 'fs';
 import path from 'path';
 import slash from 'slash';
 import del from 'del';
 
-import { get, getString } from '../../../common/utils';
+import { getString } from '../../../common/utils';
 import {
     bufferPathFileNames,
     build,
@@ -14,8 +13,7 @@ import {
     getFilteredBufferItems,
     clearBuffer
 } from '../build';
-// import { getTemplate } from '../theme';
-import { confirmation, error /*, exclude,*/ } from '../utils';
+import { confirmation, error } from '../utils';
 import { sequential } from './../utils';
 import { modal } from '../../components/Modal';
 
@@ -51,6 +49,7 @@ class GithubProvider {
                     <p>For example: <span class="code-dark-inline">myRepo</span>
                     <p>If you're connecting to someone else's repository, use the username/repository syntax.</p>
                     <p>For example: <span class="code-dark-inline">username/repoName</span>
+                    <p>Please ensure that you can access the repository locally through Git.</p>
                 `,
                 type: 'text',
                 optional: true
@@ -76,24 +75,9 @@ class GithubProvider {
         }
 
         /**
-         * Build project
-         */
-        // const buildRes = await build(this.site, onUpdate);
-
-        // if (!buildRes) {
-        //     error(getString('error_buffer'));
-        //     return false;
-        // }
-
-        /**
          * Deploy project
          */
         await this.deploy(onUpdate, null, true);
-
-        // if (!deployResArr.every(item => !!item.content)) {
-        //     error(getString('error_completing_setup'));
-        //     return false;
-        // }
 
         /**
          * Enabling pages site
@@ -144,11 +128,11 @@ class GithubProvider {
         return `https://${this.vars.baseUrl()}/${this.getUsername()}/${this.getRepositoryName()}`;
     };
 
-    deploy = async (onUpdate = s => {}, itemIdToDeploy?, forceClear?) => {
+    deploy = async (onUpdate = s => {}, itemIdToDeploy?, clearRemote?) => {
         /**
          * Clearing buffer
          */
-        await clearBuffer();
+        await clearBuffer(true);
 
         /**
          * Creating git repo in buffer
@@ -165,7 +149,7 @@ class GithubProvider {
                 this.site,
                 onUpdate,
                 itemIdToDeploy,
-                !forceClear
+                !clearRemote
             );
 
             if (!buildRes) {
@@ -193,7 +177,7 @@ class GithubProvider {
             console.error(e);
         }
 
-        await clearBuffer();
+        await clearBuffer(true);
         return true;
     };
 

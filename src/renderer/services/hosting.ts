@@ -1,6 +1,6 @@
 import { keychainStore, getInt, setInt, remInt } from './../../common/utils';
 import { get, getString, rem, set } from '../../common/utils';
-import { getStructurePaths, build } from './build';
+import { getStructurePaths } from './build';
 import GithubProvider from './providers/github';
 import FallbackProvider from './providers/none';
 import { confirmation, error, merge } from './utils';

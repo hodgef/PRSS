@@ -10,7 +10,6 @@ export const history = createBrowserHistory();
 import { AppContext } from '../../common/Store';
 import { get } from '../../common/utils';
 import CreateSite from './CreateSite';
-//import CreateSelector from './CreateSelector';
 import Dashboard from './Dashboard';
 import ListPosts from './ListPosts';
 import ListSites from './ListSites';
@@ -28,15 +27,7 @@ const App: FunctionComponent = () => {
             <HashRouter history={history}>
                 <Switch>
                     <Route exact path="/sites" component={ListSites} />
-
                     <Route exact path="/settings" component={AppSettings} />
-
-                    {/*<Route
-                        exact
-                        path="/sites/create"
-                        component={CreateSelector}
-                    />*/}
-
                     <Route exact path="/sites/create" component={CreateSite} />
 
                     <Route

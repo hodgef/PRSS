@@ -1,6 +1,5 @@
 import { getString } from '../../common/utils';
 import { modal } from '../components/Modal';
-// const { dialog } = remote;
 
 export const merge = (var1, var2) => {
     if (Array.isArray(var1) && Array.isArray(var2)) {

@@ -1,13 +1,9 @@
 import './styles/SiteHostingSwitcher.scss';
 
 import React, { Fragment, FunctionComponent, useState } from 'react';
-import { useHistory, useLocation, useParams, Link } from 'react-router-dom';
+import { useHistory, useParams, Link } from 'react-router-dom';
 
 import { getString, get, getInt } from '../../common/utils';
-import {
-    getSampleSiteStructure,
-    getSampleSiteIntStructure
-} from '../services/site';
 import {
     getHostingTypes,
     setSite,
@@ -16,11 +12,12 @@ import {
     setSiteInternal,
     validateHostingFields
 } from '../services/hosting';
-import { error, normalize } from '../services/utils';
+import { error } from '../services/utils';
 import Footer from './Footer';
 import Header from './Header';
 import Loading from './Loading';
 import { modal } from './Modal';
+import { toast } from 'react-toastify';
 
 const SiteHostingSwitcher: FunctionComponent = () => {
     const { siteId } = useParams();
@@ -76,6 +73,12 @@ const SiteHostingSwitcher: FunctionComponent = () => {
         const newSite = await setupRemote(site, setLoadingStatus);
         if (!newSite) {
             setLoading(false);
+
+            /**
+             * Rollback siteInt changes
+             */
+            await setSiteInternal(siteInt);
+
             return;
         }
 
@@ -86,10 +89,12 @@ const SiteHostingSwitcher: FunctionComponent = () => {
          */
         setSite(site);
 
+        toast.success('Hosting saved!');
+
         /**
          * Go to site preview
          */
-        history.push(`/sites/${site.id}`);
+        history.push(`/sites/${site.id}/settings`);
     };
 
     return !loading ? (

@@ -4,7 +4,7 @@ import React, { Fragment, FunctionComponent, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import cx from 'classnames';
 
-import { get, getString, set, getInt, setInt } from '../../common/utils';
+import { get, getString, getInt, setInt } from '../../common/utils';
 import Footer from './Footer';
 import Header from './Header';
 import { buildAndDeploy, getRepositoryUrl } from '../services/hosting';

@@ -22,8 +22,7 @@ import {
 } from '../services/preview';
 import { build } from '../services/build';
 import { store } from '../../common/Store';
-import { buildAndDeploy, wipe } from '../services/hosting';
-import { error } from '../services/utils';
+import { buildAndDeploy } from '../services/hosting';
 import SlugEditor from './SlugEditor';
 import TitleEditor from './TitleEditor';
 import PostEditorSidebar from './PostEditorSidebar';
@@ -194,16 +193,6 @@ const PostEditor: FunctionComponent = () => {
 
         const publishSuggested = curSiteInt.publishSuggested;
 
-        // if (publishSuggested) {
-        //     const wipeRes = await wipe(curSite);
-
-        //     if (!wipeRes) {
-        //         error();
-        //         return;
-        //     }
-
-        //     await buildAndDeploy(curSite, setLoadingStatus);
-        // } else {
         const deployRes = await buildAndDeploy(
             curSite,
             setLoadingStatus,
@@ -219,8 +208,6 @@ const PostEditor: FunctionComponent = () => {
                 history.push(deployRes.value);
             }
         }
-
-        //}
 
         if (publishSuggested) {
             setInt(`sites.${siteId}.publishSuggested`, false);

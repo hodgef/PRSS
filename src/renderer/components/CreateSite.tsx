@@ -3,7 +3,7 @@ import './styles/CreateSite.scss';
 import React, { Fragment, FunctionComponent, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 
-import { getString } from '../../common/utils';
+import { getString, remInt } from '../../common/utils';
 import {
     getSampleSiteStructure,
     getSampleSiteIntStructure
@@ -87,6 +87,12 @@ const CreateSite: FunctionComponent = () => {
         const site = await setupRemote(baseSite, setLoadingStatus);
         if (!site) {
             setLoading(false);
+
+            /**
+             * Rollback siteInt changes
+             */
+            await remInt(`sites.${siteId}`);
+
             return;
         }
 

@@ -1,14 +1,12 @@
 import './styles/AppSettings.scss';
 
-import React, { FunctionComponent, Fragment, useState, useEffect } from 'react';
-import { useHistory, useParams, Link } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
+import React, { FunctionComponent, Fragment, useState } from 'react';
+import { useHistory, Link } from 'react-router-dom';
 
 import Footer from './Footer';
 import Header from './Header';
-import { get, set, getString } from '../../common/utils';
-import { normalize, error, confirmation } from '../services/utils';
-import { toast } from 'react-toastify';
+import { getString } from '../../common/utils';
+import { error, confirmation } from '../services/utils';
 import { store } from '../../common/Store';
 import { modal } from './Modal';
 const { app } = require('electron').remote;

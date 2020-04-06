@@ -136,13 +136,23 @@ export const getFilteredBufferItems = (site, itemIdToLoad?) => {
     };
 };
 
-export const clearBuffer = () => {
+export const clearBuffer = (noExceptions = false) => {
     return new Promise(async resolve => {
         const bufferDir = getInt('paths.buffer');
 
         if (bufferDir && bufferDir.includes('buffer')) {
-            await del(path.join(bufferDir, '*'));
-            await del(path.join(bufferDir, '.git'));
+            if (noExceptions) {
+                await del([
+                    path.join(bufferDir, '*'),
+                    path.join(bufferDir, '.git')
+                ]);
+            } else {
+                await del([
+                    path.join(bufferDir, '*'),
+                    `!${bufferDir}`,
+                    `!${path.join(bufferDir, '.git')}`
+                ]);
+            }
             resolve();
         } else {
             resolve();

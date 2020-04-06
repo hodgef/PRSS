@@ -5,19 +5,17 @@ import { Link, useHistory, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { store, storeInt } from '../../common/Store';
-import { get, set, getInt, setInt } from '../../common/utils';
+import { get, getInt, setInt } from '../../common/utils';
 import { formatStructure } from '../services/build';
 import {
     deletePosts,
     updateSiteStructure,
-    buildAndDeploy,
-    wipe
+    buildAndDeploy
 } from '../services/hosting';
 import DraggableTree from './DraggableTree';
 import Footer from './Footer';
 import Header from './Header';
 import Loading from './Loading';
-import { error } from '../services/utils';
 
 const ListPosts: FunctionComponent = () => {
     const { siteId } = useParams();

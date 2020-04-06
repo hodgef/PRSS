@@ -2,7 +2,7 @@ import './styles/HTMLEditorOverlay.scss';
 
 import React, { FunctionComponent, useRef } from 'react';
 
-import { error, noop } from '../services/utils';
+import { noop } from '../services/utils';
 
 import AceEditor from 'react-ace';
 import 'ace-builds/webpack-resolver';

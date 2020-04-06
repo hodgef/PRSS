@@ -1,7 +1,6 @@
-import { getString, get, getInt } from '../../../common/utils';
+import { getString, getInt } from '../../../common/utils';
 import { build } from '../build';
 import { error, confirmation } from '../utils';
-import { modal } from '../../components/Modal';
 import path from 'path';
 import { shell } from 'electron';
 

@@ -8,20 +8,12 @@ import cx from 'classnames';
 
 import Footer from './Footer';
 import Header from './Header';
-import {
-    get,
-    set,
-    setInt,
-    globalRequire,
-    getString,
-    getInt
-} from '../../common/utils';
-import { normalize, confirmation, error } from '../services/utils';
+import { get, set, setInt, getInt } from '../../common/utils';
+import { confirmation } from '../services/utils';
 import { toast } from 'react-toastify';
-import HTMLEditorOverlay from './HTMLEditorOverlay';
 import { modal } from './Modal';
 import { shell } from 'electron';
-import { getThemeList, getThemeListDetails } from '../services/theme';
+import { getThemeListDetails } from '../services/theme';
 import defaultThumbnail from '../images/defaultThemeThumbnail.png';
 
 const ThemeManager: FunctionComponent = () => {
