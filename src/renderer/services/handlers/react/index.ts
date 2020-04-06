@@ -6,10 +6,10 @@ import { sanitizeBufferItem } from '../../utils';
 
 const htmlMinifier = globalRequire('html-minifier');
 
-const template_extension = 'js';
+const reactHandlerExtension = 'js';
 
-const handler: handlerType = async (templateId, data: IBufferItem) => {
-    const templateJs = await getTemplate(templateId, template_extension);
+const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
+    const templateJs = await getTemplate(templateId, reactHandlerExtension);
     const time = Date.now();
 
     const minifierOptions = {
@@ -62,4 +62,4 @@ const handler: handlerType = async (templateId, data: IBufferItem) => {
     return { html, js };
 };
 
-export default handler;
+export { reactHandler, reactHandlerExtension };

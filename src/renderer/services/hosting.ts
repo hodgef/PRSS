@@ -1,4 +1,4 @@
-import { keychainStore, getInt, setInt } from './../../common/utils';
+import { keychainStore, getInt, setInt, remInt } from './../../common/utils';
 import { get, getString, rem, set } from '../../common/utils';
 import { getStructurePaths, build } from './build';
 import GithubProvider from './providers/github';
@@ -75,14 +75,12 @@ export const wipe = (site: ISite, onUpdate?) => {
     }
 };
 
-export const buildAndDeploy = async (
+export const buildAndDeploy = (
     site: ISite,
     onUpdate?: updaterType,
     itemId?: string
 ) => {
-    // await build(site, onUpdate, itemId);
-    await deploy(site, [onUpdate, itemId]);
-    return true;
+    return deploy(site, [onUpdate, itemId]);
 };
 
 export const deleteRemoteItems = (filesToDeleteArr, site: ISite) => {
@@ -151,6 +149,28 @@ export const getRootPost = site => {
     const { structure } = site;
     const structurePaths = getStructurePaths(structure);
     return structurePaths[0].split('/')[1];
+};
+
+export const deleteSites = async (siteIds: string[]) => {
+    const confRes = await confirmation({
+        title: getString('warn_delete_sites')
+    });
+
+    if (confRes !== 0) {
+        return false;
+    }
+
+    const delPromises = [];
+
+    siteIds.forEach(siteIdToDelete => {
+        delPromises.push(
+            rem(`sites.${siteIdToDelete}`),
+            remInt(`sites.${siteIdToDelete}`)
+        );
+    });
+
+    await Promise.all(delPromises);
+    return true;
 };
 
 export const deletePosts = async (siteId: string, postIds: string[]) => {
@@ -255,13 +275,12 @@ export const filterItemsFromNodes = (siteId, nodes, itemIds = []) => {
     return outputNodes;
 };
 
-export const handleHostingFields = (hostingFields = {}) => {
+export const handleHostingFields = (hostingFieldsObj = {}) => {
     return new Promise(resolve => {
-        const fields = { ...hostingFields };
+        const fields = { ...hostingFieldsObj };
         const { name, username } = fields as IHosting;
 
         if (!name || !username) {
-            error('Error while handling hosting fields');
             resolve({});
         }
 
@@ -277,5 +296,20 @@ export const handleHostingFields = (hostingFields = {}) => {
         });
 
         Promise.all(storePromises).finally(() => resolve(fields));
+    });
+};
+
+export const validateHostingFields = (
+    hostingFieldsObj: object,
+    hostingFields: any[]
+) => {
+    const fields = [...hostingFields];
+
+    return fields.every(field => {
+        if (field.optional) {
+            return true;
+        } else {
+            return !!hostingFieldsObj[field.name];
+        }
     });
 };

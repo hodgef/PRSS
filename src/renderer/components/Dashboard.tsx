@@ -93,10 +93,19 @@ const Dashboard: FunctionComponent = () => {
             onClick: async () => {
                 setLoading('publish');
                 const site = await get(`sites.${siteId}`);
-                await buildAndDeploy(site, setPublishDescription);
+                const publishRes = await buildAndDeploy(
+                    site,
+                    setPublishDescription
+                );
                 setInt(`sites.${siteId}.publishSuggested`, false);
 
                 toast.success('Publish complete');
+
+                if (typeof publishRes === 'object') {
+                    if (publishRes.type === 'redirect') {
+                        history.push(publishRes.value);
+                    }
+                }
                 setLoading(null);
             }
         });

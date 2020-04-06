@@ -5,7 +5,7 @@ import { useHistory, useParams, Link } from 'react-router-dom';
 
 import Footer from './Footer';
 import Header from './Header';
-import { get, set, setInt } from '../../common/utils';
+import { get, set, setInt, getInt } from '../../common/utils';
 import { normalize } from '../services/utils';
 import { toast } from 'react-toastify';
 import HTMLEditorOverlay from './HTMLEditorOverlay';
@@ -15,6 +15,9 @@ import { getThemeList } from '../services/theme';
 const SiteSettings: FunctionComponent = () => {
     const { siteId: urlSiteId } = useParams();
     const site = get(`sites.${urlSiteId}`) as ISite;
+    const {
+        hosting: { name: hostingName = 'none' }
+    } = getInt(`sites.${urlSiteId}`) as ISiteInternal;
     const { title, id, headHtml, footerHtml, theme, url } = site;
 
     const [siteTitle, setSiteTitle] = useState(title);
@@ -189,7 +192,7 @@ const SiteSettings: FunctionComponent = () => {
                             <div className="col-sm-10">
                                 <button
                                     type="button"
-                                    className="btn btn-outline-primary mb-2 d-flex"
+                                    className="btn btn-outline-primary d-flex"
                                     onClick={() =>
                                         setShowRawHTMLEditorOverlay(true)
                                     }
@@ -198,6 +201,29 @@ const SiteSettings: FunctionComponent = () => {
                                         code
                                     </span>
                                     <span>Add Site Raw HTML</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <div className="input-group input-group-lg">
+                            <label className="col-sm-2 col-form-label">
+                                Hosting:{' '}
+                                {hostingName[0].toUpperCase() +
+                                    hostingName.substring(1)}
+                            </label>
+                            <div className="col-sm-10">
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-primary d-flex"
+                                    onClick={() =>
+                                        history.push(`/sites/${siteId}/hosting`)
+                                    }
+                                >
+                                    <span className="material-icons mr-2">
+                                        create
+                                    </span>
+                                    <span>Change hosting</span>
                                 </button>
                             </div>
                         </div>

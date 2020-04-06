@@ -4,6 +4,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import React, { FunctionComponent } from 'react';
 import { HashRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
+import { createBrowserHistory } from 'history';
+export const history = createBrowserHistory();
 
 import { AppContext } from '../../common/Store';
 import { get } from '../../common/utils';
@@ -18,11 +20,12 @@ import CreatePost from './CreatePost';
 import SiteSettings from './SiteSettings';
 import AppSettings from './AppSettings';
 import ThemeManager from './ThemeManager';
+import SiteHostingSwitcher from './SiteHostingSwitcher';
 
 const App: FunctionComponent = () => {
     return (
         <AppContext.Provider value={{}}>
-            <HashRouter>
+            <HashRouter history={history}>
                 <Switch>
                     <Route exact path="/sites" component={ListSites} />
 
@@ -52,6 +55,12 @@ const App: FunctionComponent = () => {
                         exact
                         path="/sites/:siteId/settings"
                         component={SiteSettings}
+                    />
+
+                    <Route
+                        exact
+                        path="/sites/:siteId/hosting"
+                        component={SiteHostingSwitcher}
                     />
 
                     <Route

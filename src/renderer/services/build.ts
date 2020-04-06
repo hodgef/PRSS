@@ -1,3 +1,4 @@
+import { getParserHandler } from './handlers/index';
 import minify from 'babel-minify';
 import del from 'del';
 import fse from 'fs-extra';
@@ -5,7 +6,6 @@ import fs from 'fs';
 import path from 'path';
 
 import { get, getString, getInt } from '../../common/utils';
-import reactHandler from './handlers/react';
 import { getPostItem } from './hosting';
 import { sequential, sanitizeSite, sanitizeItem } from './utils';
 import { modal } from '../components/Modal';
@@ -173,20 +173,14 @@ export const buildBufferSiteConfig = site => {
 };
 
 export const buildBufferItem = async item => {
-    let handler: handlerType;
     const { templateId, path: itemPath, parser } = item;
+    const handler = getParserHandler(parser);
 
-    switch (parser) {
-        case 'react':
-            handler = reactHandler;
-            break;
-
-        default:
-            handler = async () => ({ html: '', js: '' });
-            modal.alert(
-                `There was an error parsing the template for post id (${item.id})`
-            );
-            break;
+    if (!handler) {
+        modal.alert(
+            `There was an error parsing the template for post id (${item.id})`
+        );
+        return false;
     }
 
     const { html, js } = await handler(templateId, item);

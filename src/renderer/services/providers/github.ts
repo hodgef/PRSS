@@ -52,7 +52,8 @@ class GithubProvider {
                     <p>If you're connecting to someone else's repository, use the username/repository syntax.</p>
                     <p>For example: <span class="code-dark-inline">username/repoName</span>
                 `,
-                type: 'text'
+                type: 'text',
+                optional: true
             }
         ]
     };
@@ -87,7 +88,7 @@ class GithubProvider {
         /**
          * Deploy project
          */
-        await this.deploy(onUpdate);
+        await this.deploy(onUpdate, null, true);
 
         // if (!deployResArr.every(item => !!item.content)) {
         //     error(getString('error_completing_setup'));
@@ -128,8 +129,12 @@ class GithubProvider {
             hosting: { repository }
         } = getInt(`sites.${this.site.id}`);
 
-        if (repository && repository.includes('/')) {
-            return repository.split('/')[1];
+        if (repository) {
+            if (repository.includes('/')) {
+                return repository.split('/')[1];
+            } else {
+                return repository;
+            }
         } else {
             return id;
         }
@@ -139,7 +144,7 @@ class GithubProvider {
         return `https://${this.vars.baseUrl()}/${this.getUsername()}/${this.getRepositoryName()}`;
     };
 
-    deploy = async (onUpdate = s => {}, itemIdToDeploy?) => {
+    deploy = async (onUpdate = s => {}, itemIdToDeploy?, forceClear?) => {
         /**
          * Clearing buffer
          */
@@ -156,7 +161,12 @@ class GithubProvider {
                 `cd "${bufferDir}" && git clone "${this.getRepositoryUrl()}" .`
             );
 
-            const buildRes = await build(this.site, onUpdate, null, true);
+            const buildRes = await build(
+                this.site,
+                onUpdate,
+                itemIdToDeploy,
+                !forceClear
+            );
 
             if (!buildRes) {
                 error(getString('error_buffer'));
@@ -167,9 +177,14 @@ class GithubProvider {
 
             await new Promise(resolve => {
                 setTimeout(() => {
-                    execSync(
-                        `cd "${bufferDir}" && git add --all && git commit -m "Site update" && git push`
-                    );
+                    try {
+                        execSync(
+                            `cd "${bufferDir}" && git add --all && git commit -m "Site update" && git push`
+                        );
+                    } catch (e) {
+                        modal.alert(e.message);
+                        console.error(e);
+                    }
                     resolve();
                 }, 1000);
             });
@@ -255,7 +270,10 @@ class GithubProvider {
             execSync(
                 `cd "${bufferDir}" && git add --all && git commit -m "Clearing for deployment" && git push`
             );
-        } catch (e) {}
+        } catch (e) {
+            modal.alert(e.message);
+            console.error(e);
+        }
 
         await clearBuffer();
         return true;
@@ -382,7 +400,7 @@ class GithubProvider {
         if (repo) {
             const confirmationRes = await confirmation({
                 title:
-                    'The repository already exists. Do you want to use it? (Contents will be overwritten)'
+                    'The repository already exists. Do you want to use it? (Contents will be removed)'
             });
 
             if (confirmationRes !== 0) {

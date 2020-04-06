@@ -1,9 +1,9 @@
-import './styles/CreateSite.scss';
+import './styles/SiteHostingSwitcher.scss';
 
 import React, { Fragment, FunctionComponent, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation, useParams, Link } from 'react-router-dom';
 
-import { getString } from '../../common/utils';
+import { getString, get, getInt } from '../../common/utils';
 import {
     getSampleSiteStructure,
     getSampleSiteIntStructure
@@ -22,22 +22,19 @@ import Header from './Header';
 import Loading from './Loading';
 import { modal } from './Modal';
 
-const CreateSite: FunctionComponent = () => {
+const SiteHostingSwitcher: FunctionComponent = () => {
+    const { siteId } = useParams();
+    const site = get(`sites.${siteId}`);
+    const siteInt = getInt(`sites.${siteId}`);
+
     const [loading, setLoading] = useState(false);
-    const [title, setTitle] = useState('');
     const [loadingStatus, setLoadingStatus] = useState('');
     const [hosting, setHosting] = useState('github');
     const [hostingFields, setHostingFields] = useState({});
     const hostingTypes = getHostingTypes();
-    const { state = {} } = useLocation();
     const history = useHistory();
 
     const handleSubmit = async () => {
-        if (!title) {
-            error('Your site must have a title');
-            return;
-        }
-
         if (!hostingTypes[hosting]) {
             error(
                 'The specified hosting is not supported. Please try again later'
@@ -56,7 +53,6 @@ const CreateSite: FunctionComponent = () => {
         }
 
         setLoading(true);
-        const siteId = normalize(title);
 
         /**
          * Handle hosting fields
@@ -67,15 +63,8 @@ const CreateSite: FunctionComponent = () => {
             ...hostingFields
         });
 
-        const baseSite = {
-            ...getSampleSiteStructure(),
-            id: siteId,
-            title
-        } as ISite;
-
         const baseSiteInternal = {
-            ...getSampleSiteIntStructure(),
-            id: siteId,
+            ...siteInt,
             hosting: parsedHosting
         } as ISiteInternal;
 
@@ -84,13 +73,13 @@ const CreateSite: FunctionComponent = () => {
         /**
          * Set up remote
          */
-        const site = await setupRemote(baseSite, setLoadingStatus);
-        if (!site) {
+        const newSite = await setupRemote(site, setLoadingStatus);
+        if (!newSite) {
             setLoading(false);
             return;
         }
 
-        console.log('site', site);
+        console.log('site', newSite);
 
         /**
          * Save site
@@ -104,33 +93,37 @@ const CreateSite: FunctionComponent = () => {
     };
 
     return !loading ? (
-        <div className="CreateSite page">
-            <Header />
+        <div className="SiteHostingSwitcher page">
+            <Header
+                undertitle={
+                    <Fragment>
+                        <div className="align-center">
+                            <i className="material-icons">public</i>
+                            <Link to={`/sites/${siteId}`}>{site.title}</Link>
+                        </div>
+                        <div className="align-center">
+                            <i className="material-icons">
+                                keyboard_arrow_right
+                            </i>
+                            <Link to={`/sites/${siteId}/hosting`}>
+                                Change hosting
+                            </Link>
+                        </div>
+                    </Fragment>
+                }
+            />
             <div className="content">
                 <h1 className="mb-4">
                     <div className="left-align">
-                        {state.showBack && (
-                            <i
-                                className="material-icons clickable"
-                                onClick={() => history.goBack()}
-                            >
-                                arrow_back
-                            </i>
-                        )}
-                        <span>{getString('create_site_title')}</span>
+                        <i
+                            className="material-icons clickable"
+                            onClick={() => history.goBack()}
+                        >
+                            arrow_back
+                        </i>
+                        <span>{getString('hosting_switch_title')}</span>
                     </div>
                 </h1>
-                <fieldset>
-                    <div className="input-group input-group-lg">
-                        <input
-                            type="text"
-                            placeholder="Title"
-                            className="form-control"
-                            value={title}
-                            onChange={e => setTitle(e.target.value)}
-                        />
-                    </div>
-                </fieldset>
 
                 <div className="input-group input-group-lg">
                     <div className="input-group-prepend">
@@ -194,22 +187,13 @@ const CreateSite: FunctionComponent = () => {
                         )
                     )}
 
-                <div className="id-info">
-                    <span>ID</span>&nbsp;
-                    {hosting && hostingTypes[hosting] && title ? (
-                        <Fragment>{normalize(title)}</Fragment>
-                    ) : (
-                        'Enter title'
-                    )}
-                </div>
-
                 <div className="button-container mt-2">
                     <button
                         onClick={handleSubmit}
                         type="button"
                         className="btn btn-primary btn-lg"
                     >
-                        {getString('create_site_button')}
+                        {getString('save_button')}
                     </button>
                 </div>
             </div>
@@ -221,4 +205,4 @@ const CreateSite: FunctionComponent = () => {
     );
 };
 
-export default CreateSite;
+export default SiteHostingSwitcher;

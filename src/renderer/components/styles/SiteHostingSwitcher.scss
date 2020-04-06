@@ -1,0 +1,38 @@
+#app .SiteHostingSwitcher.page {
+    .content {
+        width: 100%;
+        max-width: 700px;
+        margin: 0 auto;
+        flex: 1;
+        padding: 20px;
+        display: flex;
+        flex-flow: column;
+        justify-content: flex-start;
+        padding-top: 60px;
+
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        button {
+            width: 100%;
+        }
+
+        select {
+            -webkit-appearance: none;
+        }
+
+        .id-info {
+            height: 20px;
+            font-size: 12px;
+            margin: 5px 0;
+
+            span {
+                background: #efefef;
+                border-radius: 5px;
+                padding: 5px 10px;
+                margin-right: 5px;
+            }
+        }
+    }
+}

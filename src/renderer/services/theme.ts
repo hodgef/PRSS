@@ -4,6 +4,7 @@ import path from 'path';
 import { getInt } from '../../common/utils';
 import { modal } from '../components/Modal';
 import { getFilePaths, getDirPaths } from './files';
+import { getParserTemplateExtension } from './handlers';
 
 export const getTemplate = async (templateId: string, extension: string) => {
     const templateRelPath = templateId.split('.').join('/');
@@ -37,9 +38,16 @@ export const getThemeList = () => {
 
 export const getTemplateList = themeName => {
     const themeDir = path.join(getInt('paths.themes'), themeName);
+    const themeManifest = getThemeManifest(themeName) || {};
+    const templateExtension = getParserTemplateExtension(themeManifest.parser);
+
     const templateList = getFilePaths(themeDir)
-        .map(filePath => path.basename(filePath, path.extname(filePath)))
-        .filter(templateName => !['manifest'].includes(templateName));
+        .filter(
+            filePath =>
+                templateExtension === path.extname(filePath).replace('.', '')
+        )
+        .map(filePath => path.basename(filePath, path.extname(filePath)));
+
     return templateList;
 };
 

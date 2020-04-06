@@ -96,9 +96,14 @@ const ListPosts: FunctionComponent = () => {
     const publishSite = async () => {
         setLoading(true);
         const site = get(`sites.${siteId}`);
-        await buildAndDeploy(site, setLoadingStatus);
+        const publishRes = await buildAndDeploy(site, setLoadingStatus);
         setInt(`sites.${siteId}.publishSuggested`, false);
         toast.success('Publish complete');
+        if (typeof publishRes === 'object') {
+            if (publishRes.type === 'redirect') {
+                history.push(publishRes.value);
+            }
+        }
         setLoading(false);
     };
 

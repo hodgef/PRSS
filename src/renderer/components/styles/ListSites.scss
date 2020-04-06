@@ -17,5 +17,16 @@
             text-transform: uppercase;
             font-size: 12px;
         }
+
+        .ant-tree-switcher {
+            display: none;
+        }
+
+        .ant-tree-title {
+            .left-align {
+                display: flex;
+                align-items: center;
+            }
+        }
     }
 }

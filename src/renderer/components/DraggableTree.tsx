@@ -13,6 +13,7 @@ interface IProps {
     onSelect?: any;
     selectedKeys?: string[];
     checkStrictly?: boolean;
+    draggable?: boolean;
 }
 
 interface IState {
@@ -126,7 +127,7 @@ class DraggableTree extends React.Component<IProps, IState> {
                 <Tree
                     className="draggable-tree"
                     defaultExpandAll
-                    draggable
+                    draggable={this.props.draggable ?? true}
                     blockNode
                     onDragEnter={this.onDragEnter}
                     onDrop={this.onDrop}

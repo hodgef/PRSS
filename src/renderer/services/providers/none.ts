@@ -1,6 +1,6 @@
 import { getString, get, getInt } from '../../../common/utils';
 import { build } from '../build';
-import { error } from '../utils';
+import { error, confirmation } from '../utils';
 import { modal } from '../../components/Modal';
 import path from 'path';
 import { shell } from 'electron';
@@ -32,31 +32,54 @@ class FallbackProvider {
     };
 
     deploy = async (onUpdate?, providedBufferItems?: IBufferItem[]) => {
-        modal.alert(
-            'You have no hosting set up with this site. Please set one up in your Site Settings or deploy the files manually.'
-        );
-        const bufferDir = getInt('paths.buffer');
+        const confirmationRes = await confirmation({
+            title:
+                'You have no hosting set up with this site. Please change hosting or deploy the files manually.',
+            buttons: [
+                {
+                    label: 'Change hosting',
+                    action: () => {}
+                },
+                {
+                    label: 'View Files',
+                    action: () => {}
+                }
+            ],
+            showCancel: true
+        });
 
-        if (providedBufferItems && providedBufferItems.length) {
-            if (providedBufferItems.length > 1) {
-                /**
-                 * Open root buffer dir
-                 */
-                shell.openItem(bufferDir);
-            } else {
-                /**
-                 * Open item dir
-                 */
-                const itemBufferPath = path.join(
-                    bufferDir,
-                    providedBufferItems[0].path
-                );
-                shell.openItem(itemBufferPath);
+        if (confirmationRes === 0) {
+            return {
+                type: 'redirect',
+                value: `/sites/${this.site.id}/hosting`
+            };
+        }
+
+        if (confirmationRes === 1) {
+            const bufferDir = getInt('paths.buffer');
+
+            if (providedBufferItems && providedBufferItems.length) {
+                if (providedBufferItems.length > 1) {
+                    /**
+                     * Open root buffer dir
+                     */
+                    shell.openItem(bufferDir);
+                } else {
+                    /**
+                     * Open item dir
+                     */
+                    const itemBufferPath = path.join(
+                        bufferDir,
+                        providedBufferItems[0].path
+                    );
+                    shell.openItem(itemBufferPath);
+                }
             }
         }
 
+        console.log('confirmationRes', confirmationRes);
         onUpdate && onUpdate();
-        return true;
+        return false;
     };
 }
 

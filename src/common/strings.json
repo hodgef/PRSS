@@ -45,11 +45,14 @@
     "error_delete_single_post": "You cannot delete your only post. Create another post before deleting this one.",
     "error_delete_root_post": "You cannot delete the site index. Please edit it instead",
     "warn_delete_post_with_children": "At least one selected post contains children. These will be deleted as well. Continue?",
+    "warn_delete_sites": "You're about to delete the selected sites from the local PRSS configuration. This <b>CANNOT</b> be undone. Continue?",
     "error_save_text_editor": "You can't save while using the HTML editor. Please switch back to the rich text editor.",
     "error_preview_text_editor": "You can't toggle the Preview mode while using the HTML editor. Please switch back to the rich text editor.",
     "warn_unsaved_changes": "You have unsaved changes",
     "warn_unpublished_changes": "You have changes to publish",
     "error_publish_save_changes": "Save your changes before publishing",
     "preview_description_message": "Preview your site in your browser",
-    "publish_completed": "Publish completed"
+    "publish_completed": "Publish completed",
+    "hosting_switch_title": "Change site hosting",
+    "save_button": "Save"
 }

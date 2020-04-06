@@ -204,14 +204,28 @@ const PostEditor: FunctionComponent = () => {
 
         //     await buildAndDeploy(curSite, setLoadingStatus);
         // } else {
-        await buildAndDeploy(curSite, setLoadingStatus, postId);
+        const deployRes = await buildAndDeploy(
+            curSite,
+            setLoadingStatus,
+            postId
+        );
+
+        if (deployRes) {
+            toast.success(getString('publish_completed'));
+        }
+
+        if (typeof deployRes === 'object') {
+            if (deployRes.type === 'redirect') {
+                history.push(deployRes.value);
+            }
+        }
+
         //}
 
         if (publishSuggested) {
             setInt(`sites.${siteId}.publishSuggested`, false);
         }
 
-        toast.success(getString('publish_completed'));
         setDeployLoading(false);
     };
 
