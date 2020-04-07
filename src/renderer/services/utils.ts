@@ -16,8 +16,9 @@ export const normalize = (str: string) => {
         .toLowerCase()
         .normalize('NFD')
         .replace(/\s+/g, '-')
-        .replace(/[^\w\-]+/g, '')
+        .replace(/[^\w!.\-]+/g, '')
         .replace(/\-\-+/g, '-')
+        .replace(/\.\.+/g, '.')
         .replace(/^-+/, '')
         .replace(/-+$/, '');
 };
