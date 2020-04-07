@@ -93,7 +93,16 @@
       "build/*"
     ],
     "win": {
-      "icon": "static/icons/icon.ico"
+      "icon": "static/icons/icon.ico",
+      "target": "nsis"
+    },
+    "linux": {
+      "icon": "static/icons/icon.png",
+      "target": "deb"
+    },
+    "mac": {
+      "icon": "static/icons/icon.icns",
+      "target": "dmg"
     }
   }
 }
