@@ -1,6 +1,6 @@
 {
   "name": "prss",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Powerful Blogging",
   "license": "MIT",
   "scripts": {
@@ -95,14 +95,6 @@
     "win": {
       "icon": "static/icons/icon.ico",
       "target": "nsis"
-    },
-    "linux": {
-      "icon": "static/icons/icon.png",
-      "target": "deb"
-    },
-    "mac": {
-      "icon": "static/icons/icon.icns",
-      "target": "dmg"
     }
   }
 }
