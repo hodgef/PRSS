@@ -1,9 +1,6 @@
 name: Build
 
-on:
-  push:
-    branches:
-      - master
+on: push
 
 jobs:
   release:
@@ -22,7 +19,7 @@ jobs:
         with:
           node-version: 10
 
-      - name: Build/release Electron app
+      - name: Build PRSS
         uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.github_token }}
