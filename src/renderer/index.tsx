@@ -7,16 +7,19 @@ import ReactDOM from 'react-dom';
 import App from './components/App';
 import { initStore } from '../common/Store';
 import { checkDirs } from './services/utils';
-import { modal } from './components/Modal';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const init = async () => {
     await initStore();
     await checkDirs();
-    ReactDOM.render(<App />, document.getElementById('app'));
+
+    const PRSS = () => (
+        <ErrorBoundary>
+            <App />
+        </ErrorBoundary>
+    );
+
+    ReactDOM.render(<PRSS />, document.getElementById('app'));
 };
 
-try {
-    init();
-} catch (e) {
-    modal.alert(e.message);
-}
+init();

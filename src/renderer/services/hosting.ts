@@ -107,9 +107,9 @@ export const setSite = (data: ISite) => {
     });
 };
 
-export const setSiteInternal = (data: ISiteInternal) => {
+export const setSiteInternal = async (data: ISiteInternal) => {
     const { id: siteId } = data;
-    const sites = getInt('sites');
+    const sites = await getInt('sites');
 
     return setInt({
         sites: merge(sites, { [siteId]: { id: siteId, ...data } })

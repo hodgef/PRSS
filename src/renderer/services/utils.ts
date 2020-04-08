@@ -10,6 +10,18 @@ export const merge = (var1, var2) => {
     }
 };
 
+export const normalizeStrict = (str: string) => {
+    return str
+        .toString()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+};
+
 export const normalize = (str: string) => {
     return str
         .toString()

@@ -225,4 +225,21 @@
             }
         }
     }
+
+    .standard-modal-content {
+        word-break: break-word;
+    }
+
+    .error-alert-content {
+        white-space: normal !important;
+        padding: 20px !important;
+        max-width: 400px !important;
+        margin: 0;
+
+        .code-dark {
+            white-space: normal;
+            padding: 20px;
+            margin: 0;
+        }
+    }
 }

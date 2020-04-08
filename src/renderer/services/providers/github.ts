@@ -85,7 +85,9 @@ class GithubProvider {
         const siteUrl = await this.enablePagesSite();
 
         if (!siteUrl) {
-            error(getString('error_setup_remote'));
+            if (!modal.isShown()) {
+                error(getString('error_setup_remote'));
+            }
             return false;
         }
 
@@ -397,7 +399,7 @@ class GithubProvider {
 
         const { created_at } =
             (await this.request('POST', 'user/repos', {
-                name: this.site.id,
+                name: this.getRepositoryName(),
                 description: getString('created_with'),
                 homepage: getString('prss_domain'),
                 auto_init: true

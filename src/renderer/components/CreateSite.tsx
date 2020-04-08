@@ -16,7 +16,7 @@ import {
     setSiteInternal,
     validateHostingFields
 } from '../services/hosting';
-import { error, normalize } from '../services/utils';
+import { error, normalizeStrict } from '../services/utils';
 import Footer from './Footer';
 import Header from './Header';
 import Loading from './Loading';
@@ -56,7 +56,7 @@ const CreateSite: FunctionComponent = () => {
         }
 
         setLoading(true);
-        const siteId = normalize(title);
+        const siteId = normalizeStrict(title);
 
         /**
          * Handle hosting fields
@@ -201,7 +201,7 @@ const CreateSite: FunctionComponent = () => {
                 <div className="id-info">
                     <span>ID</span>&nbsp;
                     {hosting && hostingTypes[hosting] && title ? (
-                        <Fragment>{normalize(title)}</Fragment>
+                        <Fragment>{normalizeStrict(title)}</Fragment>
                     ) : (
                         'Enter title'
                     )}

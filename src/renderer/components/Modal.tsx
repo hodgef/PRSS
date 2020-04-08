@@ -15,6 +15,8 @@ class Modal extends Component {
 
     initialState = { ...this.state };
 
+    isShown = () => !!this.state.show;
+
     confirm = ({
         title,
         buttons = [],
