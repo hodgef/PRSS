@@ -54,5 +54,6 @@
     "preview_description_message": "Preview your site in your browser",
     "publish_completed": "Publish completed",
     "hosting_switch_title": "Change site hosting",
-    "save_button": "Save"
+    "save_button": "Save",
+    "error_invalid_slug": "Your slug is either already used or not acceptable. Please choose another."
 }

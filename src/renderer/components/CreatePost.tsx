@@ -10,6 +10,7 @@ import { get, set } from '../../common/utils';
 import { normalize, error } from '../services/utils';
 import { formatStructure } from '../services/build';
 import { toast } from 'react-toastify';
+import { isValidSlug } from '../services/hosting';
 
 const CreatePost: FunctionComponent = () => {
     const { siteId } = useParams();
@@ -73,10 +74,17 @@ const CreatePost: FunctionComponent = () => {
 
         const postId = uuidv4();
 
+        let normalizedSlug = normalize(postSlug || postTitle);
+
+        if (!isValidSlug(normalizedSlug, siteId)) {
+            const randomString = postId.substring(0, 5);
+            normalizedSlug += `-${randomString}`;
+        }
+
         const item = {
             id: postId,
             title: postTitle,
-            slug: normalize(postSlug || postTitle),
+            slug: normalizedSlug,
             content: '',
             template: 'post',
             updatedAt: null,

@@ -2,11 +2,13 @@ import './styles/SlugEditor.scss';
 
 import React, { FunctionComponent, useState, Fragment } from 'react';
 
-import { get, set, setInt } from '../../common/utils';
+import { get, set, setInt, getString } from '../../common/utils';
 import { error, normalize } from '../services/utils';
 import { toast } from 'react-toastify';
 import cx from 'classnames';
 import { getBufferItems } from '../services/build';
+import { isValidSlug } from '../services/hosting';
+import { modal } from './Modal';
 
 interface IProps {
     siteId: string;
@@ -43,6 +45,11 @@ const SlugEditor: FunctionComponent<IProps> = ({
         }
 
         const normalizedSlug = normalize(value);
+
+        if (!isValidSlug(normalizedSlug, siteId, post.id)) {
+            modal.alert(getString('error_invalid_slug'));
+            return;
+        }
 
         /**
          * Ensure slug is unique

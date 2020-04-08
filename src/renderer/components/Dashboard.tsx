@@ -31,6 +31,7 @@ const Dashboard: FunctionComponent = () => {
             description: getString('posts_description'),
             icon: 'layers',
             className: '',
+            tooltip: '',
             onClick: () => {
                 history.push(`/sites/${siteId}/posts`);
             }
@@ -41,6 +42,7 @@ const Dashboard: FunctionComponent = () => {
             description: getString('themes_description'),
             icon: 'brush',
             className: '',
+            tooltip: '',
             onClick: () => {
                 history.push(`/sites/${siteId}/themes`);
             }
@@ -51,6 +53,7 @@ const Dashboard: FunctionComponent = () => {
             description: getString('settings_description'),
             icon: 'settings',
             className: '',
+            tooltip: '',
             onClick: () => {
                 history.push(`/sites/${siteId}/settings`);
             }
@@ -64,6 +67,7 @@ const Dashboard: FunctionComponent = () => {
             description: getString('visit_site_description'),
             icon: 'language',
             className: '',
+            tooltip: url,
             onClick: () => {
                 require('electron').shell.openExternal(url);
             }
@@ -77,6 +81,7 @@ const Dashboard: FunctionComponent = () => {
             description: getString('repository_description'),
             icon: 'open_in_new',
             className: '',
+            tooltip: repositoryUrl,
             onClick: () => {
                 require('electron').shell.openExternal(repositoryUrl);
             }
@@ -89,6 +94,7 @@ const Dashboard: FunctionComponent = () => {
             title: getString('publish'),
             description: publishDescription,
             className: 'box-highlight',
+            tooltip: '',
             icon: 'publish',
             onClick: async () => {
                 setLoading('publish');
@@ -144,13 +150,15 @@ const Dashboard: FunctionComponent = () => {
                                 description,
                                 icon,
                                 onClick = () => {},
-                                className = ''
+                                className = '',
+                                tooltip
                             } = item;
                             return (
                                 <li
                                     key={`${title}-${index}`}
                                     className={cx(className, 'clickable')}
                                     onClick={onClick}
+                                    title={tooltip}
                                 >
                                     {loading === id ? (
                                         <Loading medium classNames="mr-1" />
