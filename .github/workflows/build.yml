@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 10
 
-      - name: Build PRSS
+      - name: Build/Release
         uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.github_token }}
