@@ -423,7 +423,7 @@ class GithubProvider {
             return false;
         }
 
-        const repo = repos.find(item => item.name === this.site.id);
+        const repo = repos.find(item => item.name === this.getRepositoryName());
         return repo;
     };
 
