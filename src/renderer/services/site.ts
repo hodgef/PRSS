@@ -18,7 +18,8 @@ export const getSampleSiteStructure = () => {
                 key: item1.id,
                 children: []
             }
-        ]
+        ],
+        vars: {}
     } as ISite;
 };
 
@@ -33,7 +34,8 @@ export const getSampleSiteItems = (nbItems = 1) => {
             headHtml: null,
             footerHtml: null,
             updatedAt: null,
-            createdAt: Date.now()
+            createdAt: Date.now(),
+            vars: {}
         }
     ];
 

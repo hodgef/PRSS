@@ -27,6 +27,7 @@ import SlugEditor from './SlugEditor';
 import TitleEditor from './TitleEditor';
 import PostEditorSidebar from './PostEditorSidebar';
 import HTMLEditorOverlay from './HTMLEditorOverlay';
+import SiteVariablesEditorOverlay from './SiteVariablesEditorOverlay';
 
 const PostEditor: FunctionComponent = () => {
     const { siteId, postId } = useParams();
@@ -47,6 +48,12 @@ const PostEditor: FunctionComponent = () => {
     const [showRawHTMLEditorOverlay, setShowRawHTMLEditorOverlay] = useState(
         false
     );
+
+    const [
+        showSiteVariablesEditorOverlay,
+        setShowSiteVariablesEditorOverlay
+    ] = useState(false);
+
     const [editorChanged, setEditorChanged] = useState(false);
     const [previewLoading, setPreviewLoading] = useState(false);
     const [buildLoading, setBuildLoading] = useState(false);
@@ -227,6 +234,10 @@ const PostEditor: FunctionComponent = () => {
         setShowRawHTMLEditorOverlay(true);
     };
 
+    const openVariablesOverlay = () => {
+        setShowSiteVariablesEditorOverlay(true);
+    };
+
     const handleRawHTMLOverlaySave = async (headHtml, footerHtml) => {
         if (itemIndex > -1) {
             await set(`sites.${siteId}.items.${itemIndex}.headHtml`, headHtml);
@@ -348,18 +359,33 @@ const PostEditor: FunctionComponent = () => {
                             onPublish={handlePublish}
                             onChangePostTemplate={changePostTemplate}
                             onOpenRawHTMLOverlay={openRawHTMLOverlay}
+                            onOpenVarEditorOverlay={openVariablesOverlay}
                         />
                     </div>
                 </div>
             </div>
             <Footer />
-            {post && showRawHTMLEditorOverlay && (
-                <HTMLEditorOverlay
-                    headDefaultValue={post.headHtml}
-                    footerDefaultValue={post.footerHtml}
-                    onSave={handleRawHTMLOverlaySave}
-                    onClose={() => setShowRawHTMLEditorOverlay(false)}
-                />
+            {post && (
+                <Fragment>
+                    {showRawHTMLEditorOverlay && (
+                        <HTMLEditorOverlay
+                            headDefaultValue={post.headHtml}
+                            footerDefaultValue={post.footerHtml}
+                            onSave={handleRawHTMLOverlaySave}
+                            onClose={() => setShowRawHTMLEditorOverlay(false)}
+                        />
+                    )}
+
+                    {showSiteVariablesEditorOverlay && (
+                        <SiteVariablesEditorOverlay
+                            siteId={siteId}
+                            postId={postId}
+                            onClose={() =>
+                                setShowSiteVariablesEditorOverlay(false)
+                            }
+                        />
+                    )}
+                </Fragment>
             )}
         </div>
     );

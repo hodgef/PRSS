@@ -1,41 +1,61 @@
 {
-    "path": "/my-path",
-    "templateId": "default.home",
+    "path": "/test",
+    "templateId": "press.post",
     "parser": "react",
     "item": {
-        "id": "0000000-0000-0000-0000-0000000",
-        "slug": "my-post",
-        "title": "My Post!",
-        "content": "This is my content",
-        "template": "home",
-        "updatedAt": 1585400000000,
-        "createdAt": 1585400000000
+        "id": "fdf9f450-a6d9-478d-a56d-ef30c8f24f18",
+        "title": "test",
+        "slug": "test",
+        "content": "Test",
+        "template": "post",
+        "updatedAt": 1586000000000,
+        "createdAt": 1586000000000
     },
     "site": {
-        "id": "my-site",
-        "title": "My Site",
-        "url": "https://my-site-url",
-        "theme": "default",
-        "updatedAt": 1585400000000,
+        "id": "test",
+        "title": "test",
+        "url": "https://test",
+        "theme": "press",
+        "updatedAt": 1586000000000,
         "publishedAt": null,
-        "requiresFullDeployment": false,
         "items": [
             {
-                "id": "0000000-0000-0000-0000-0000000",
-                "slug": "my-post",
-                "title": "My Post!",
-                "content": "My concatenated content",
+                "id": "c7d898e8-0f6b-4516-8ae7-9b0c210f28c8",
+                "slug": "home",
+                "title": "Hello World!",
+                "content": "Truncated content",
                 "template": "home",
-                "updatedAt": 1585400000000,
-                "createdAt": 1585400000000
+                "headHtml": null,
+                "footerHtml": null,
+                "updatedAt": null,
+                "createdAt": 1586000000000
+            },
+            {
+                "id": "fdf9f450-a6d9-478d-a56d-ef30c8f24f18",
+                "title": "test",
+                "slug": "test",
+                "content": "Truncated content",
+                "template": "post",
+                "updatedAt": 1586000000000,
+                "createdAt": 1586000000000
             }
         ],
+        "headHtml": "<title>%item.title% - %site.title%</title>",
+        "footerHtml": "",
         "structure": [
             {
-                "key": "0000000-0000-0000-0000-0000000",
-                "children": []
+                "key": "c7d898e8-0f6b-4516-8ae7-9b0c210f28c8",
+                "children": [
+                    {
+                        "key": "fdf9f450-a6d9-478d-a56d-ef30c8f24f18",
+                        "children": []
+                    }
+                ]
             }
         ]
     },
-    "configPath": "config.js"
+    "rootPath": "../",
+    "vars": {
+        "hello": "mytest"
+    }
 }

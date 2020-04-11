@@ -318,3 +318,12 @@ export const isValidSlug = (slug: string, siteId: string, postId?: string) => {
     const site = get(`sites.${siteId}`);
     return !site.items.some(item => slug === item.slug && item.id !== postId);
 };
+
+export const siteVarToArray = (siteVars: ISiteVar) => {
+    return Object.keys(siteVars).map(varName => {
+        return {
+            name: varName,
+            content: siteVars[varName]
+        };
+    });
+};

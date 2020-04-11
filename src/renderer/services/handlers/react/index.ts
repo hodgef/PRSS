@@ -1,8 +1,9 @@
 import minify from 'babel-minify';
 import { baseTemplate, getTemplate } from '../../theme';
-import { globalRequire, get } from '../../../../common/utils';
+import { globalRequire } from '../../../../common/utils';
 import { parseHtmlParams } from '..';
 import { sanitizeBufferItem } from '../../utils';
+import { configFileName } from '../../build';
 
 const htmlMinifier = globalRequire('html-minifier');
 
@@ -10,6 +11,7 @@ const reactHandlerExtension = 'js';
 
 const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
     const templateJs = await getTemplate(templateId, reactHandlerExtension);
+    const templateName = templateId.split('.')[1];
     const time = Date.now();
 
     const minifierOptions = {
@@ -23,6 +25,11 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
     const postHeadHtml = parseHtmlParams(data.item.headHtml, data);
     const postFooterHtml = parseHtmlParams(data.item.footerHtml, data);
 
+    const configPath = data.rootPath + configFileName;
+    const baseTemplatePath = data.rootPath + 'templates/';
+    const templatePath =
+        baseTemplatePath + `${templateName}.${reactHandlerExtension}`;
+
     const html = htmlMinifier.minify(
         baseTemplate({
             head: `
@@ -33,7 +40,8 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
                 <div id="root"></div>
                 <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
                 <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
-                <script src="${data.configPath}?v=${time}"></script>
+                <script src="${templatePath}"></script>
+                <script src="${configPath}"></script>
                 <script src="index.js?v=${time}"></script>
                 ${siteFooterHtml}
                 ${postFooterHtml}
@@ -43,14 +51,21 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
     );
 
     const js = minify(`
-        ${templateJs}
-        var PRSSElement = React.createElement(PRSSComponent.default, Object.assign({ site: PRSSConfig }, ${JSON.stringify(
+        var PRSSElement = React.createElement(PRSSComponent.default, Object.assign(${JSON.stringify(
             sanitizeBufferItem(data)
-        )}));
+        )}, { site: PRSSConfig }));
         ReactDOM.render(PRSSElement, document.getElementById("root"));
     `).code;
 
-    return { html, js };
+    return [
+        { name: 'index.html', content: html, path: './' },
+        { name: 'index.js', content: js, path: './' },
+        {
+            name: `${templateName}.js`,
+            content: templateJs,
+            path: baseTemplatePath
+        }
+    ];
 };
 
 export { reactHandler, reactHandlerExtension };

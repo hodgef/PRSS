@@ -2,12 +2,11 @@ import { getParserHandler } from './handlers/index';
 import minify from 'babel-minify';
 import del from 'del';
 import fse from 'fs-extra';
-import fs from 'fs';
 import path from 'path';
 
 import { get, getString, getInt } from '../../common/utils';
 import { getPostItem } from './hosting';
-import { sequential, sanitizeSite, sanitizeItem } from './utils';
+import { sequential, sanitizeSite, sanitizeItem, error } from './utils';
 import { modal } from '../components/Modal';
 import { getThemeManifest } from './theme';
 
@@ -165,48 +164,39 @@ export const buildBufferSiteConfig = site => {
     return true;
 };
 
-export const buildBufferItem = async item => {
-    const { templateId, path: itemPath, parser } = item;
+export const buildBufferItem = async (bufferItem: IBufferItem) => {
+    const { templateId, path: itemPath, parser } = bufferItem;
     const handler = getParserHandler(parser);
 
     if (!handler) {
         modal.alert(
-            `There was an error parsing the template for post id (${item.id})`
+            `There was an error parsing the template for post id (${bufferItem.item.id})`
         );
         return false;
     }
 
-    const { html, js } = await handler(templateId, item);
-
-    /**
-     * Making directory if it does exist
-     */
     const bufferDir = getInt('paths.buffer');
-    const targetDir = path.join(bufferDir, itemPath);
+    const itemDir = path.join(bufferDir, itemPath);
+    const outputFiles = (await handler(
+        templateId,
+        bufferItem
+    )) as handlerTypeReturn[];
 
     /**
-     * Write HTML
+     * Creating files
      */
-    if (html) {
+    outputFiles.forEach(file => {
         try {
-            fse.outputFileSync(path.join(targetDir, 'index.html'), html);
+            fse.outputFileSync(
+                path.join(itemDir, file.path, file.name),
+                file.content
+            );
         } catch (e) {
             console.error(e);
-            return false;
+            error(e.message);
+            return;
         }
-    }
-
-    /**
-     * Write JS
-     */
-    if (js) {
-        try {
-            fse.outputFileSync(path.join(targetDir, 'index.js'), js);
-        } catch (e) {
-            console.error(e);
-            return false;
-        }
-    }
+    });
 
     return true;
 };
@@ -236,10 +226,9 @@ export const getBufferItems = (site): IBufferItem[] => {
 
         const basePostPathArr = mappedPath.slice(2);
         const postPath = basePostPathArr.join('/');
-        const configPath =
-            (basePostPathArr.length
-                ? basePostPathArr.map(() => '../').join('')
-                : '') + configFileName;
+        const rootPath = basePostPathArr.length
+            ? basePostPathArr.map(() => '../').join('')
+            : '';
 
         return post
             ? ({
@@ -247,8 +236,12 @@ export const getBufferItems = (site): IBufferItem[] => {
                   templateId: `${site.theme}.${post.template}`,
                   parser: themeManifest.parser,
                   item: sanitizeItem(post) as IPostItem,
-                  site, // Will be removed in bufferItem parser
-                  configPath
+                  site, // Will be removed in bufferItem parser, replaced by PRSSConfig
+                  rootPath,
+                  vars: {
+                      ...(site.vars || {}),
+                      ...(post.vars || {})
+                  }
               } as IBufferItem)
             : null;
     });

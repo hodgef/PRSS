@@ -25,7 +25,7 @@ export const getParserHandler = parser => {
             break;
 
         default:
-            handler = async () => ({ html: '', js: '' });
+            handler = async () => [];
             break;
     }
 

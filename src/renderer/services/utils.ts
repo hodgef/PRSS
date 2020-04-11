@@ -35,6 +35,17 @@ export const normalize = (str: string) => {
         .replace(/-+$/, '');
 };
 
+export const camelCase = (str: string) => {
+    return str
+        .toString()
+        .replace(/[^\w]+/g, '')
+        .normalize('NFD')
+        .replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+            return index === 0 ? word.toLowerCase() : word.toUpperCase();
+        })
+        .replace(/\s+/g, '');
+};
+
 export const alert = (message: string, title?: string) => {
     modal.alert(message, title);
 };
@@ -157,7 +168,7 @@ export const sanitizeSite = siteObj => {
     /**
      * Remove site keys
      */
-    ['headHtml', 'footerHtml'].forEach(field => {
+    ['headHtml', 'footerHtml', 'vars'].forEach(field => {
         delete newObj[field];
     });
 
@@ -174,7 +185,7 @@ export const sanitizeSite = siteObj => {
 
 export const sanitizeItem = itemObj => {
     const newObj = JSON.parse(JSON.stringify(itemObj));
-    ['headHtml', 'footerHtml'].forEach(field => {
+    ['headHtml', 'footerHtml', 'vars'].forEach(field => {
         delete newObj[field];
     });
     return newObj;

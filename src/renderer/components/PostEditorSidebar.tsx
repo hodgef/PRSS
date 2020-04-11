@@ -24,6 +24,7 @@ interface IProps {
     onPublish?: noop;
     onChangePostTemplate?: (t: string) => void;
     onOpenRawHTMLOverlay?: noop;
+    onOpenVarEditorOverlay?: noop;
 }
 
 const PostEditorSidebar: FunctionComponent<IProps> = ({
@@ -41,7 +42,8 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
     onStartPreview = noop,
     onPublish = noop,
     onChangePostTemplate = t => {},
-    onOpenRawHTMLOverlay = noop
+    onOpenRawHTMLOverlay = noop,
+    onOpenVarEditorOverlay = noop
 }) => {
     const themeName = site.theme;
     const currentTemplate = item.template;
@@ -166,6 +168,13 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
                     >
                         <span className="material-icons">code</span>{' '}
                         <span>Add Raw HTML code</span>
+                    </li>
+                    <li
+                        className="clickable"
+                        onClick={() => onOpenVarEditorOverlay()}
+                    >
+                        <span className="material-icons">create</span>{' '}
+                        <span>Edit Variables</span>
                     </li>
                 </ul>
             )}

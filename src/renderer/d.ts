@@ -16,6 +16,11 @@ interface ISite {
     publishedAt: number | null;
     headHtml: string;
     footerHtml: string;
+    vars: ISiteVar;
+}
+
+interface ISiteVar {
+    key: string;
 }
 
 interface IStructureItem {
@@ -33,6 +38,7 @@ interface IPostItem {
     footerHtml: string;
     updatedAt: number | null;
     createdAt: number | null;
+    vars: ISiteVar;
 }
 
 interface ITemplateComponent {
@@ -72,7 +78,7 @@ interface IBufferItem {
     parser: string;
     item: IPostItem;
     site: ISite;
-    configPath?: string;
+    rootPath?: string;
 }
 
 interface IHosting extends hostingType {
@@ -102,11 +108,12 @@ type loadBufferType = (
 type handlerType = (
     templateId?: string,
     data?: any
-) => Promise<handlerTypeReturn>;
+) => Promise<handlerTypeReturn[]>;
 
 type handlerTypeReturn = {
-    js?: string;
-    html?: string;
+    name: string;
+    content: string;
+    path: string;
 };
 
 type hostingGithubType = {

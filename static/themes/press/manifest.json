@@ -1,7 +1,13 @@
 {
-    "title": "Press",
-    "author": "Francisco Hodge",
-    "url": "https://franciscohodge.com",
-    "type": "blog",
-    "parser": "react"
+  "name": "press",
+  "title": "Press",
+  "version": "1.0.0",
+  "author": "Francisco Hodge",
+  "homepage": "https://github.com/hodgef/js-library-boilerplate-basic",
+  "license": "MIT",
+  "type": "blog",
+  "parser": "react",
+  "siteVars": [
+    "headerImageUrl"
+  ]
 }

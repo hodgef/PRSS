@@ -5,23 +5,26 @@ import { useHistory, useParams, Link } from 'react-router-dom';
 
 import Footer from './Footer';
 import Header from './Header';
-import { get, set, setInt, getInt } from '../../common/utils';
-import { normalize } from '../services/utils';
+import { get, set, setInt, getInt, rem, remInt } from '../../common/utils';
+import { normalizeStrict } from '../services/utils';
 import { toast } from 'react-toastify';
 import HTMLEditorOverlay from './HTMLEditorOverlay';
 import { modal } from './Modal';
 import { getThemeList } from '../services/theme';
+import SiteVariablesEditorOverlay from './SiteVariablesEditorOverlay';
 
 const SiteSettings: FunctionComponent = () => {
     const { siteId: urlSiteId } = useParams();
     const site = get(`sites.${urlSiteId}`) as ISite;
+    const siteInt = getInt(`sites.${urlSiteId}`) as ISiteInternal;
+    const { title, id, headHtml, footerHtml, theme, url } = site;
     const {
         hosting: { name: hostingName = 'none' }
-    } = getInt(`sites.${urlSiteId}`) as ISiteInternal;
-    const { title, id, headHtml, footerHtml, theme, url } = site;
+    } = siteInt;
 
     const [siteTitle, setSiteTitle] = useState(title);
     const [siteId, setSiteId] = useState(id);
+    const [editedSiteId, setEditedSiteId] = useState(id);
     const [siteTheme, setSiteTheme] = useState(theme);
     const [siteUrl, setSiteUrl] = useState(url);
 
@@ -29,11 +32,16 @@ const SiteSettings: FunctionComponent = () => {
         false
     );
 
+    const [
+        showSiteVariablesEditorOverlay,
+        setShowSiteVariablesEditorOverlay
+    ] = useState(false);
+
     const themeList = getThemeList();
     const history = useHistory();
 
     const handleSubmit = async () => {
-        if (!siteId) {
+        if (!editedSiteId) {
             modal.alert('Your site must have an id');
             return;
         }
@@ -53,16 +61,33 @@ const SiteSettings: FunctionComponent = () => {
             return;
         }
 
+        const newSiteId = normalizeStrict(editedSiteId);
+
         const updatedSite = {
             ...site,
-            id: normalize(siteId),
+            id: newSiteId,
             title: siteTitle,
             theme: siteTheme,
             url: siteUrl
         };
 
-        await set(`sites.${siteId}`, updatedSite);
-        await setInt(`sites.${siteId}.publishSuggested`, true);
+        const updatedSiteInt = {
+            ...siteInt,
+            id: newSiteId,
+            publishSuggested: true
+        };
+
+        if (siteId !== newSiteId) {
+            await rem(`sites.${siteId}`);
+            await remInt(`sites.${siteInt.id}`);
+        }
+
+        await set(`sites.${newSiteId}`, updatedSite);
+        await setInt(`sites.${newSiteId}`, updatedSiteInt);
+
+        if (siteId !== newSiteId) {
+            history.replace(`/sites/${newSiteId}/settings`);
+        }
 
         toast.success(
             'Site updated! Please publish your changes from your Dashboard'
@@ -138,9 +163,15 @@ const SiteSettings: FunctionComponent = () => {
                                 <input
                                     type="text"
                                     className="form-control"
-                                    value={siteId}
-                                    onChange={e => setSiteId(e.target.value)}
-                                    onBlur={() => setSiteId(normalize(siteId))}
+                                    value={editedSiteId}
+                                    onChange={e =>
+                                        setEditedSiteId(e.target.value)
+                                    }
+                                    onBlur={() =>
+                                        setEditedSiteId(
+                                            normalizeStrict(editedSiteId)
+                                        )
+                                    }
                                 />
                             </div>
                         </div>
@@ -221,9 +252,30 @@ const SiteSettings: FunctionComponent = () => {
                                     }
                                 >
                                     <span className="material-icons mr-2">
-                                        create
+                                        language
                                     </span>
                                     <span>Change hosting</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <div className="input-group input-group-lg">
+                            <label className="col-sm-2 col-form-label">
+                                Site Variables
+                            </label>
+                            <div className="col-sm-10">
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-primary d-flex"
+                                    onClick={() =>
+                                        setShowSiteVariablesEditorOverlay(true)
+                                    }
+                                >
+                                    <span className="material-icons mr-2">
+                                        create
+                                    </span>
+                                    <span>Edit Variables</span>
                                 </button>
                             </div>
                         </div>
@@ -247,6 +299,12 @@ const SiteSettings: FunctionComponent = () => {
                     footerDefaultValue={footerHtml}
                     onSave={handleRawHTMLOverlaySave}
                     onClose={() => setShowRawHTMLEditorOverlay(false)}
+                />
+            )}
+            {showSiteVariablesEditorOverlay && (
+                <SiteVariablesEditorOverlay
+                    siteId={siteId}
+                    onClose={() => setShowSiteVariablesEditorOverlay(false)}
                 />
             )}
         </div>
