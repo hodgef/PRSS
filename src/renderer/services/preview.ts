@@ -5,7 +5,7 @@ export const previewServer = globalRequire('browser-sync').create('prss');
 
 export const bufferAndStartPreview = async (site, itemId) => {
     stopPreview();
-    const buildRes = await build(site, null, itemId);
+    const buildRes = await build(site, null /*, itemId*/); // Building all
 
     if (buildRes && buildRes.length) {
         const bufferItem = buildRes[0];

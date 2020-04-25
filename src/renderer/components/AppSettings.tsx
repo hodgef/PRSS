@@ -19,12 +19,17 @@ const AppSettings: FunctionComponent = () => {
     const handleSubmit = async () => {
         if (storePath) {
             const confirmationRes = await confirmation({
-                title: `
-                <p>You have modified the config file path.</p>
-                <p>Please ensure you have copied or moved the file to its new location.</p>
-                <p>PRSS will be restarted.</p>
-                <p>Continue?</p>
-                `
+                title: (
+                    <Fragment>
+                        <p>You have modified the config file path.</p>
+                        <p>
+                            Please ensure you have copied or moved the file to
+                            its new location.
+                        </p>
+                        <p>PRSS will be restarted.</p>
+                        <p>Continue?</p>
+                    </Fragment>
+                )
             });
 
             if (confirmationRes !== 0) {

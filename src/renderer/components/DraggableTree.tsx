@@ -14,6 +14,7 @@ interface IProps {
     selectedKeys?: string[];
     checkStrictly?: boolean;
     draggable?: boolean;
+    noRootParent?: boolean;
 }
 
 interface IState {
@@ -37,7 +38,7 @@ class DraggableTree extends React.Component<IProps, IState> {
         const { data } = this.props;
         if (nextProps.data !== data) {
             if (data) {
-                this.setState({ gData: nextProps.data });
+                this.setState({ gData: data });
             }
         }
     }
@@ -52,7 +53,7 @@ class DraggableTree extends React.Component<IProps, IState> {
         /**
          * Don't allow root level drop
          */
-        if (dropPos.length === 2) {
+        if (dropPos.length === 2 && !this.props.noRootParent) {
             return;
         }
 

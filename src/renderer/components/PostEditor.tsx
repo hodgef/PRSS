@@ -39,7 +39,7 @@ const PostEditor: FunctionComponent = () => {
     );
     const history = useHistory();
     const editorContent = useRef(post ? post.content : '');
-    const editorMode = useRef('');
+    const editorMode = useRef(post && post.isContentRaw ? 'html' : '');
     const itemIndex = postId ? items.findIndex(item => item.id === postId) : -1;
 
     const editorChangedContent = useRef('');
@@ -96,18 +96,9 @@ const PostEditor: FunctionComponent = () => {
     const handleSave = async (isAutosave = false) => {
         setBuildLoading(true);
 
-        if (editorMode.current === 'html') {
+        if (editorMode.current === 'html' && post && !post.isContentRaw) {
             modal.alert(getString('error_save_text_editor'));
             setBuildLoading(false);
-            return;
-        }
-
-        if (editorContent.current === post.content) {
-            setBuildLoading(false);
-            toast.success('No changes to save');
-
-            editorChangedContent.current = '';
-            setEditorChanged(false);
             return;
         }
 
@@ -133,11 +124,16 @@ const PostEditor: FunctionComponent = () => {
                 if (previewServer.active) {
                     await buildPost(postId);
                     previewServer.reload();
+
+                    toast.success(
+                        'Post saved. The page has been rebuilt and the preview reloaded.'
+                    );
+                } else {
+                    toast.success('Post saved!');
                 }
 
                 editorChangedContent.current = '';
                 setEditorChanged(false);
-                toast.success('Post saved!');
             }
         }
 
@@ -151,11 +147,29 @@ const PostEditor: FunctionComponent = () => {
         toast.success('Template changed successfully');
     };
 
+    const toggleRawHTMLOnly = async () => {
+        const isHTMLForced = !!post.isContentRaw;
+
+        await set(
+            `sites.${siteId}.items.${itemIndex}.isContentRaw`,
+            !isHTMLForced
+        );
+        toast.success(
+            'Raw HTML content flag changed successfully. Refreshing.'
+        );
+
+        if (isHTMLForced) {
+            stopPreview();
+            history.replace(`/sites/${siteId}/posts/editor`);
+            history.replace(`/sites/${siteId}/posts/editor/${post.id}`);
+        }
+    };
+
     const buildPost = async postId => {
         if (previewServer.active) {
             previewServer.pause();
         }
-        await build(siteId, null, postId);
+        await build(siteId, null /*, postId*/); // Build all
         if (previewServer.active) {
             previewServer.resume();
         }
@@ -164,7 +178,7 @@ const PostEditor: FunctionComponent = () => {
     const handleStartPreview = async () => {
         setPreviewLoading(true);
 
-        if (editorMode.current === 'html') {
+        if (editorMode.current === 'html' && post && !post.isContentRaw) {
             modal.alert(getString('error_preview_text_editor'));
             setPreviewLoading(false);
             return;
@@ -182,7 +196,7 @@ const PostEditor: FunctionComponent = () => {
     const handleStopPreview = () => {
         setPreviewLoading(true);
 
-        if (editorMode.current === 'html') {
+        if (editorMode.current === 'html' && post && !post.isContentRaw) {
             modal.alert(getString('error_preview_text_editor'));
             setPreviewLoading(false);
             return;
@@ -223,13 +237,6 @@ const PostEditor: FunctionComponent = () => {
         setDeployLoading(false);
     };
 
-    useEffect(
-        () => () => {
-            stopPreview();
-        },
-        []
-    );
-
     const openRawHTMLOverlay = () => {
         setShowRawHTMLEditorOverlay(true);
     };
@@ -238,12 +245,20 @@ const PostEditor: FunctionComponent = () => {
         setShowSiteVariablesEditorOverlay(true);
     };
 
-    const handleRawHTMLOverlaySave = async (headHtml, footerHtml) => {
+    const handleRawHTMLOverlaySave = async (
+        headHtml,
+        footerHtml,
+        sidebarHtml
+    ) => {
         if (itemIndex > -1) {
             await set(`sites.${siteId}.items.${itemIndex}.headHtml`, headHtml);
             await set(
                 `sites.${siteId}.items.${itemIndex}.footerHtml`,
                 footerHtml
+            );
+            await set(
+                `sites.${siteId}.items.${itemIndex}.sidebarHtml`,
+                sidebarHtml
             );
             toast.success('Post updated');
         }
@@ -295,15 +310,6 @@ const PostEditor: FunctionComponent = () => {
                         )}
                     </div>
                     <div className="right-align">
-                        {/*<button type="button" className="btn btn-outline-primary">
-                            <i className="material-icons">play_arrow</i>
-                            <span>Preview</span>
-                        </button>
-
-                        <button type="button" className="btn btn-primary">
-                            <i className="material-icons">publish</i>
-                            <span>Publish</span>
-                        </button>*/}
                         {post && (
                             <Fragment>
                                 <span className="slug-label mr-1">
@@ -340,6 +346,9 @@ const PostEditor: FunctionComponent = () => {
                             onEditModeChange={mode =>
                                 (editorMode.current = mode)
                             }
+                            forceMode={
+                                post && post.isContentRaw ? 'html' : null
+                            }
                         />
                     </div>
                     <div className="right-align">
@@ -353,6 +362,9 @@ const PostEditor: FunctionComponent = () => {
                             deployLoading={deployLoading}
                             publishSuggested={publishSuggested}
                             loadingStatus={loadingStatus}
+                            forceRawHTMLEditing={
+                                post ? post.isContentRaw : null
+                            }
                             onSave={handleSave}
                             onStopPreview={handleStopPreview}
                             onStartPreview={handleStartPreview}
@@ -360,6 +372,7 @@ const PostEditor: FunctionComponent = () => {
                             onChangePostTemplate={changePostTemplate}
                             onOpenRawHTMLOverlay={openRawHTMLOverlay}
                             onOpenVarEditorOverlay={openVariablesOverlay}
+                            onToggleRawHTMLOnly={toggleRawHTMLOnly}
                         />
                     </div>
                 </div>
@@ -371,6 +384,7 @@ const PostEditor: FunctionComponent = () => {
                         <HTMLEditorOverlay
                             headDefaultValue={post.headHtml}
                             footerDefaultValue={post.footerHtml}
+                            sidebarDefaultValue={post.sidebarHtml}
                             onSave={handleRawHTMLOverlaySave}
                             onClose={() => setShowRawHTMLEditorOverlay(false)}
                         />

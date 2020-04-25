@@ -1,6 +1,6 @@
 import './styles/SiteVariablesEditorOverlay.scss';
 
-import React, { FunctionComponent, useState, useRef } from 'react';
+import React, { FunctionComponent, useState, useRef, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 
 import { noop, camelCase } from '../services/utils';
@@ -101,14 +101,26 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
 
     const showInfo = () => {
         modal.alert(
-            `
-            <p>Site Variables are variables that your templates can use.</p>
-            <p>For example: <span class="code-dark-inline">headerImageUrl</span></p>
-            <p>This variable would be used by some templates as a header image url.</p>
-            <p>Each template generally documents the siteVars it uses.</p>
-            <p>Note: A variable defined at the post level will override one set at the site level.</p>
-            <p>Note 2: Variables are published to your site and therefore public. Do not store sensitive data in variables.</p>
-        `,
+            <Fragment>
+                <p>Site Variables are variables that your templates can use.</p>
+                <p>
+                    For example:{' '}
+                    <span className="code-dark-inline">headerImageUrl</span>
+                </p>
+                <p>
+                    This variable would be used by some templates as a header
+                    image url.
+                </p>
+                <p>Each template generally documents the siteVars it uses.</p>
+                <p>
+                    Note: A variable defined at the post level will override one
+                    set at the site level.
+                </p>
+                <p>
+                    Note 2: Variables are published to your site and therefore
+                    public. Do not store sensitive data in variables.
+                </p>
+            </Fragment>,
             null,
             'parameters-info-content',
             'parameters-info-inner-content'

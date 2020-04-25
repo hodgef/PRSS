@@ -1,8 +1,10 @@
 import Store from 'electron-store';
 import path from 'path';
 import { createContext } from 'react';
+import { getPackageJson } from './utils';
 
 const AppContext = createContext(null);
+const packageJson = getPackageJson();
 
 const defaults = {
     sites: {}
@@ -51,4 +53,4 @@ const initStore = () => {
     });
 };
 
-export { AppContext, initStore, store, storeInt };
+export { AppContext, initStore, store, storeInt, packageJson };

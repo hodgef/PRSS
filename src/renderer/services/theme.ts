@@ -14,6 +14,11 @@ export const getTemplate = async (templateId: string, extension: string) => {
     return fs.readFileSync(templatePath, 'utf8');
 };
 
+export const getThemeIndex = async (themeName: string) => {
+    const themeDir = path.join(getInt('paths.themes'), themeName, 'index.html');
+    return fs.readFileSync(themeDir, 'utf8');
+};
+
 export const getThemeListDetails = () => {
     const themeNameList = getThemeList();
 

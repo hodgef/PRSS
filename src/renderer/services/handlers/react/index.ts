@@ -1,5 +1,5 @@
 import minify from 'babel-minify';
-import { baseTemplate, getTemplate } from '../../theme';
+import { getTemplate, getThemeIndex } from '../../theme';
 import { globalRequire } from '../../../../common/utils';
 import { parseHtmlParams } from '..';
 import { sanitizeBufferItem } from '../../utils';
@@ -10,6 +10,7 @@ const htmlMinifier = globalRequire('html-minifier');
 const reactHandlerExtension = 'js';
 
 const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
+    const templateIndex = await getThemeIndex(data.site.theme);
     const templateJs = await getTemplate(templateId, reactHandlerExtension);
     const templateName = templateId.split('.')[1];
     const time = Date.now();
@@ -20,10 +21,12 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
         collapseWhitespace: true
     };
 
-    const siteHeadHtml = parseHtmlParams(data.site.headHtml, data);
-    const siteFooterHtml = parseHtmlParams(data.site.footerHtml, data);
-    const postHeadHtml = parseHtmlParams(data.item.headHtml, data);
-    const postFooterHtml = parseHtmlParams(data.item.footerHtml, data);
+    const headHtml = parseHtmlParams(data.headHtml, data);
+    const footerHtml = parseHtmlParams(data.footerHtml, data);
+    const sidebarHtml = htmlMinifier.minify(
+        parseHtmlParams(data.sidebarHtml, data),
+        minifierOptions
+    );
 
     const configPath = data.rootPath + configFileName;
     const baseTemplatePath = data.rootPath + 'templates/';
@@ -31,31 +34,52 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
         baseTemplatePath + `${templateName}.${reactHandlerExtension}`;
 
     const html = htmlMinifier.minify(
-        baseTemplate({
-            head: `
-                ${siteHeadHtml}
-                ${postHeadHtml}
-            `,
-            body: `
-                <div id="root"></div>
-                <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-                <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+        parseHtmlParams(templateIndex, data)
+            .replace(
+                '</head>',
+                `
+                ${headHtml}
+                </head>
+            `
+            )
+            .replace(
+                '</body>',
+                `
+                <script crossorigin src="https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js"></script>
+                <script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js"></script>
                 <script src="${templatePath}"></script>
                 <script src="${configPath}"></script>
                 <script src="index.js?v=${time}"></script>
-                ${siteFooterHtml}
-                ${postFooterHtml}
+                ${footerHtml}
+                </body>
             `
-        }),
+            )
+            .replace(
+                '<body>',
+                `
+                <body>
+                <div id="root"></div>
+            `
+            ),
         minifierOptions
     );
 
-    const js = minify(`
+    const sanitizedBufferItem = sanitizeBufferItem(data, {
+        sidebarHtml
+    });
+
+    const js = minify(
+        `
         var PRSSElement = React.createElement(PRSSComponent.default, Object.assign(${JSON.stringify(
-            sanitizeBufferItem(data)
+            sanitizedBufferItem
         )}, { site: PRSSConfig }));
         ReactDOM.render(PRSSElement, document.getElementById("root"));
-    `).code;
+    `,
+        {},
+        {
+            comments: false
+        }
+    ).code;
 
     return [
         { name: 'index.html', content: html, path: './' },

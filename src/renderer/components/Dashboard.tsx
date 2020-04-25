@@ -57,6 +57,17 @@ const Dashboard: FunctionComponent = () => {
             onClick: () => {
                 history.push(`/sites/${siteId}/settings`);
             }
+        },
+        {
+            id: 'menus',
+            title: getString('menus'),
+            description: getString('menus_description'),
+            icon: 'menu',
+            className: '',
+            tooltip: '',
+            onClick: () => {
+                history.push(`/sites/${siteId}/menus`);
+            }
         }
     ];
 

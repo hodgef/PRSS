@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, Fragment } from 'react';
 import { modal } from './Modal';
 
 interface IProps {
@@ -13,10 +13,10 @@ class ErrorBoundary extends React.Component<IProps> {
     onError = ({ reason }) => {
         console.error(reason);
         modal.alert(
-            `
-          <p>Error:</p>
-          <p class="code-dark">${reason.toString()}</p>
-        `,
+            <Fragment>
+                <p>Error:</p>
+                <p className="code-dark">${reason.toString()}</p>
+            </Fragment>,
             null,
             'error-alert-content'
         );

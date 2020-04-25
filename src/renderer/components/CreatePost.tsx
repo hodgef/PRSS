@@ -8,7 +8,7 @@ import Footer from './Footer';
 import Header from './Header';
 import { get, set } from '../../common/utils';
 import { normalize, error } from '../services/utils';
-import { formatStructure } from '../services/build';
+import { walkStructure } from '../services/build';
 import { toast } from 'react-toastify';
 import { isValidSlug } from '../services/hosting';
 
@@ -20,7 +20,7 @@ const CreatePost: FunctionComponent = () => {
     const [postParent, setPostParent] = useState('');
     const history = useHistory();
 
-    const formattedStructure = formatStructure(
+    const formattedStructure = walkStructure(
         siteId,
         structure,
         ({ title }) => ({ title })

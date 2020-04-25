@@ -17,7 +17,7 @@ const SiteSettings: FunctionComponent = () => {
     const { siteId: urlSiteId } = useParams();
     const site = get(`sites.${urlSiteId}`) as ISite;
     const siteInt = getInt(`sites.${urlSiteId}`) as ISiteInternal;
-    const { title, id, headHtml, footerHtml, theme, url } = site;
+    const { title, id, headHtml, footerHtml, sidebarHtml, theme, url } = site;
     const {
         hosting: { name: hostingName = 'none' }
     } = siteInt;
@@ -94,10 +94,15 @@ const SiteSettings: FunctionComponent = () => {
         );
     };
 
-    const handleRawHTMLOverlaySave = async (headHtml, footerHtml) => {
+    const handleRawHTMLOverlaySave = async (
+        headHtml,
+        footerHtml,
+        sidebarHtml
+    ) => {
         if (siteId) {
             await set(`sites.${siteId}.headHtml`, headHtml);
             await set(`sites.${siteId}.footerHtml`, footerHtml);
+            await set(`sites.${siteId}.sidebarHtml`, sidebarHtml);
             await setInt(`sites.${siteId}.publishSuggested`, true);
             toast.success(
                 'Site updated! Please publish your changes from your Dashboard'
@@ -297,6 +302,7 @@ const SiteSettings: FunctionComponent = () => {
                 <HTMLEditorOverlay
                     headDefaultValue={headHtml}
                     footerDefaultValue={footerHtml}
+                    sidebarDefaultValue={sidebarHtml}
                     onSave={handleRawHTMLOverlaySave}
                     onClose={() => setShowRawHTMLEditorOverlay(false)}
                 />

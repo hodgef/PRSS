@@ -16,6 +16,7 @@ import {
 import { confirmation, error } from '../utils';
 import { sequential } from './../utils';
 import { modal } from '../../components/Modal';
+import React from 'react';
 
 class GithubProvider {
     private readonly site: ISite;
@@ -35,22 +36,56 @@ class GithubProvider {
             {
                 name: 'token',
                 title: 'Github Token',
-                description: `
-                    <p>A Github token with "repo" permissions is required.</p>
-                    <p>Your token will be stored locally in your OS keychain (secure store).</p>
-                `,
+                description: [
+                    React.createElement(
+                        'p',
+                        { key: 'github-token-info-1' },
+                        getString('github_token_info_1')
+                    ),
+                    React.createElement(
+                        'p',
+                        { key: 'github-token-info-2' },
+                        getString('github_token_info_2')
+                    )
+                ],
                 type: 'password'
             },
             {
                 name: 'repository',
                 title: 'Github Repository Name (optional)',
-                description: `
-                    <p>If you'll be using your own repository to serve your site, enter the repository name.</p>
-                    <p>For example: <span class="code-dark-inline">myRepo</span>
-                    <p>If you're connecting to someone else's repository, use the username/repository syntax.</p>
-                    <p>For example: <span class="code-dark-inline">username/repoName</span>
-                    <p>Please ensure that you can access the repository locally through Git.</p>
-                `,
+                description: [
+                    React.createElement(
+                        'p',
+                        { key: 'github-repo-info-1' },
+                        getString('github_repo_info_1')
+                    ),
+                    React.createElement('p', { key: 'github-repo-info-1b' }, [
+                        React.createElement('span', null, 'For Example: '),
+                        React.createElement(
+                            'span',
+                            { className: 'code-dark-inline' },
+                            'myRepo'
+                        )
+                    ]),
+                    React.createElement(
+                        'p',
+                        { key: 'github-repo-info-2' },
+                        getString('github_repo_info_2')
+                    ),
+                    React.createElement('p', { key: 'github-repo-info-2b' }, [
+                        React.createElement('span', null, 'For Example: '),
+                        React.createElement(
+                            'span',
+                            { className: 'code-dark-inline' },
+                            'username/repoName'
+                        )
+                    ]),
+                    React.createElement(
+                        'p',
+                        { key: 'github-repo-info-3' },
+                        getString('github_repo_info_3')
+                    )
+                ],
                 type: 'text',
                 optional: true
             }

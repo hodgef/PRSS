@@ -18,6 +18,11 @@
         margin-top: 20px;
         display: flex;
         flex-flow: column;
+        overflow-y: auto !important;
+
+        .ace_editor {
+            min-height: 150px;
+        }
 
         h2 {
             display: flex;

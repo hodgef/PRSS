@@ -18,6 +18,8 @@ import SiteSettings from './SiteSettings';
 import AppSettings from './AppSettings';
 import ThemeManager from './ThemeManager';
 import SiteHostingSwitcher from './SiteHostingSwitcher';
+import ListMenus from './ListMenus';
+import MenuEditor from './MenuEditor';
 
 const App: FunctionComponent = () => {
     return (
@@ -44,6 +46,18 @@ const App: FunctionComponent = () => {
                         exact
                         path="/sites/:siteId/settings"
                         component={SiteSettings}
+                    />
+
+                    <Route
+                        exact
+                        path="/sites/:siteId/menus"
+                        component={ListMenus}
+                    />
+
+                    <Route
+                        exact
+                        path="/sites/:siteId/menus/:menuId"
+                        component={MenuEditor}
                     />
 
                     <Route
@@ -88,7 +102,7 @@ const App: FunctionComponent = () => {
             <ToastContainer
                 className="toast-container"
                 hideProgressBar
-                position={toast.POSITION.BOTTOM_RIGHT}
+                position={toast.POSITION.TOP_RIGHT}
             />
         </AppContext.Provider>
     );

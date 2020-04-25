@@ -6,7 +6,7 @@ import path from 'path';
 
 import { get, getString, getInt } from '../../common/utils';
 import { getPostItem } from './hosting';
-import { sequential, sanitizeSite, sanitizeItem, error } from './utils';
+import { sequential, sanitizeSite, sanitizeItem, error, objGet } from './utils';
 import { modal } from '../components/Modal';
 import { getThemeManifest } from './theme';
 
@@ -204,13 +204,14 @@ export const buildBufferItem = async (bufferItem: IBufferItem) => {
 export const getBufferItems = (site): IBufferItem[] => {
     const structurePaths = getStructurePaths(site.structure);
     const themeManifest = getThemeManifest(site.theme);
+    const bufferItems = [];
 
     if (!themeManifest) {
         modal.alert('Could not find theme manifest.');
         throw 'Could not find theme manifest.';
     }
 
-    const bufferItems = structurePaths.map(item => {
+    structurePaths.forEach(item => {
         const path = item.split('/');
         let post;
 
@@ -224,29 +225,102 @@ export const getBufferItems = (site): IBufferItem[] => {
             return post.slug;
         });
 
-        const basePostPathArr = mappedPath.slice(2);
+        /**
+         * Parent Ids
+         */
+        const parentIds = path.slice(
+            1,
+            bufferItems.indexOf(path[path.length - 1])
+        );
+
+        /**
+         * Aggregate data
+         */
+        const vars = {
+            ...(site.vars || {}),
+            ...(getAggregateItemPropValues('vars', parentIds, bufferItems) ||
+                {}),
+            ...(post.vars || {})
+        };
+
+        const headHtml =
+            (site.headHtml || '') +
+            (getAggregateItemPropValues('headHtml', parentIds, bufferItems) ||
+                '') +
+            (post.headHtml || '');
+
+        const footerHtml =
+            (site.footerHtml || '') +
+            (getAggregateItemPropValues('footerHtml', parentIds, bufferItems) ||
+                '') +
+            (post.footerHtml || '');
+
+        const sidebarHtml =
+            (site.sidebarHtml || '') +
+            (getAggregateItemPropValues(
+                'sidebarHtml',
+                parentIds,
+                bufferItems
+            ) || '') +
+            (post.sidebarHtml || '');
+
+        /**
+         * Paths
+         */
+        const basePostPathArr = mappedPath.slice(2); // Relative to root post
         const postPath = basePostPathArr.join('/');
         const rootPath = basePostPathArr.length
             ? basePostPathArr.map(() => '../').join('')
             : '';
 
-        return post
-            ? ({
-                  path: '/' + postPath,
-                  templateId: `${site.theme}.${post.template}`,
-                  parser: themeManifest.parser,
-                  item: sanitizeItem(post) as IPostItem,
-                  site, // Will be removed in bufferItem parser, replaced by PRSSConfig
-                  rootPath,
-                  vars: {
-                      ...(site.vars || {}),
-                      ...(post.vars || {})
-                  }
-              } as IBufferItem)
-            : null;
+        if (post) {
+            bufferItems.push({
+                path: '/' + postPath,
+                templateId: `${site.theme}.${post.template}`,
+                parser: themeManifest.parser,
+                item: sanitizeItem(post) as IPostItem,
+                site: sanitizeSite(site), // Will be removed in bufferItem parser, replaced by PRSSConfig
+                rootPath,
+                headHtml,
+                footerHtml,
+                sidebarHtml,
+                vars
+            } as IBufferItem);
+        }
     });
 
     return bufferItems;
+};
+
+export const getAggregateItemPropValues = (
+    propQuery: string,
+    itemsIds: string[],
+    bufferItems: IBufferItem[]
+) => {
+    let aggregate = null;
+
+    itemsIds.forEach(itemId => {
+        const bufferItem = bufferItems.find(bItem => bItem.item.id === itemId);
+        const itemPropValue = objGet(propQuery, bufferItem);
+
+        if (!itemPropValue) return;
+
+        if (typeof itemPropValue === 'string') {
+            aggregate += objGet(propQuery, bufferItem) || '';
+        } else if (Array.isArray(itemPropValue)) {
+            aggregate = [
+                ...aggregate,
+                ...(objGet(propQuery, bufferItem) || [])
+            ];
+        } else if (typeof itemPropValue === 'object') {
+            aggregate = {
+                ...aggregate,
+                ...(objGet(propQuery, bufferItem) || {})
+            };
+        }
+    });
+
+    return aggregate;
 };
 
 export const getStructurePaths = (nodes, prefix = '', store = []) => {
@@ -264,8 +338,8 @@ export const getStructurePaths = (nodes, prefix = '', store = []) => {
     return store;
 };
 
-export const formatStructure = (siteId, nodes, parseItem?) => {
-    let outputNodes = nodes;
+export const walkStructure = (siteId, nodes, itemCb?) => {
+    let outputNodes = [...nodes];
     const site = get(`sites.${siteId}`);
 
     const parseNodes = obj => {
@@ -274,14 +348,32 @@ export const formatStructure = (siteId, nodes, parseItem?) => {
 
         if (!post) return obj;
 
-        return {
+        const parsedNode = {
             key,
-            ...(parseItem ? parseItem(post) : {}),
+            ...(itemCb ? itemCb(post) : {}),
             children: children.map(parseNodes)
         };
+
+        return parsedNode;
     };
 
     outputNodes = outputNodes.map(node => parseNodes(node));
 
     return outputNodes;
+};
+
+export const findInStructure = (
+    siteId: string,
+    key: string,
+    nodes: IStructureItem
+) => {
+    let found = false;
+
+    walkStructure(siteId, nodes, item => {
+        if (item.id === key) {
+            found = true;
+        }
+    });
+
+    return found;
 };

@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 
 import { store, storeInt } from './Store';
 import strings from './strings.json';
@@ -69,4 +70,17 @@ export const keychainRetreive = (service: string, username: string) => {
 export const keychainRemove = (service: string, username: string) => {
     const keytar = globalRequire('keytar');
     return keytar.deletePassword(service, username);
+};
+
+export const getPackageJson = function(...args) {
+    const packageJSON = JSON.parse(
+        fs.readFileSync(path.join(__dirname, '../../package.json')).toString()
+    );
+    if (!args.length) {
+        return packageJSON;
+    }
+    return args.reduce((out, key) => {
+        out[key] = packageJSON[key];
+        return out;
+    }, {});
 };

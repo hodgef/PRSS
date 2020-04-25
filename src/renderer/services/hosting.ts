@@ -173,6 +173,29 @@ export const deleteSites = async (siteIds: string[]) => {
     return true;
 };
 
+export const deleteMenus = async (menuNames: string[]) => {
+    const confRes = await confirmation({
+        title: getString('warn_delete_menus')
+    });
+
+    if (confRes !== 0) {
+        return false;
+    }
+
+    const delPromises = [];
+
+    menuNames.forEach(menuToDelete => {
+        if (['header', 'sidebar', 'footer'].includes(menuToDelete)) {
+            return;
+        }
+
+        delPromises.push(rem(`sites.${menuToDelete}.menus.${menuToDelete}`));
+    });
+
+    await Promise.all(delPromises);
+    return true;
+};
+
 export const deletePosts = async (siteId: string, postIds: string[]) => {
     const site = get(`sites.${siteId}`);
 
@@ -226,15 +249,50 @@ export const deletePosts = async (siteId: string, postIds: string[]) => {
     );
 
     /**
+     * Filter out deleted items from menus
+     */
+    const siteMenus = site.menus || {};
+    const filteredMenus = {};
+
+    Object.keys(siteMenus).forEach(menuName => {
+        filteredMenus[menuName] = filterItemsFromNodes(
+            siteId,
+            siteMenus[menuName],
+            postIds
+        );
+    });
+
+    /**
      * Saving changes
      */
     site.items = filteredItems;
     site.structure = filteredStructure;
+    site.menus = filteredMenus;
     site.updatedAt = Date.now();
 
     set(`sites.${siteId}`, site);
 
     return site;
+};
+
+export const deleteMenuEntries = async (
+    siteId: string,
+    menuId: string,
+    postIds: string[]
+) => {
+    const menu = await get(`sites.${siteId}.menus.${menuId}`);
+
+    /**
+     * Filter out deleted items from site structure
+     */
+    const filteredStructure = filterItemsFromNodes(siteId, menu, postIds);
+
+    /**
+     * Saving changes
+     */
+    await set(`sites.${siteId}.menus.${menuId}`, filteredStructure);
+    await setInt(`sites.${siteId}.publishSuggested`, true);
+    return menu;
 };
 
 export const getPostItem = (site, postId) => {
@@ -261,16 +319,22 @@ export const filterItemsFromNodes = (siteId, nodes, itemIds = []) => {
         const post = getPostItem(site, key);
 
         if (!post) return obj;
+        if (itemIds.includes(key)) {
+            return null;
+        }
 
         return {
             key,
             children: children
                 .filter(node => !itemIds.includes(node.key))
                 .map(parseNodes)
+                .filter(resNode => !!resNode)
         };
     };
 
-    outputNodes = outputNodes.map(node => parseNodes(node));
+    outputNodes = outputNodes
+        .map(node => parseNodes(node))
+        .filter(resNode => !!resNode);
 
     return outputNodes;
 };

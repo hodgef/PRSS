@@ -19,12 +19,14 @@ interface IProps {
     value: string;
     onChange?: any;
     onEditModeChange?: any;
+    forceMode?: string | null;
 }
 
 const StandardEditor: FunctionComponent<IProps> = ({
     value,
     onChange,
-    onEditModeChange
+    onEditModeChange,
+    forceMode
 }) => {
     const htmlToEditorState = html => {
         let output = EditorState.createEmpty();
@@ -45,18 +47,28 @@ const StandardEditor: FunctionComponent<IProps> = ({
 
     const initialEditorState = htmlToEditorState(value);
     const [editorState, setEditorState] = useState(initialEditorState);
-    const [editHTMLEnabled, setEditHTMLEnabled] = useState(false);
-    const htmlState = useRef('');
-
-    const EditHTMLButton = ({ onClick, title }: any) => (
-        <div
-            className="edit-html-button clickable"
-            onClick={() => (onClick ? onClick() : toggleEditMode())}
-        >
-            <i className="material-icons">code</i>
-            {title && <span>{title}</span>}
-        </div>
+    const [editHTMLEnabled, setEditHTMLEnabled] = useState(
+        forceMode === 'html'
     );
+    const htmlState = useRef(
+        forceMode === 'html'
+            ? value
+            : draftToHtml(convertToRaw(initialEditorState.getCurrentContent()))
+    );
+
+    const EditHTMLButton = ({ onClick, title }: any) => {
+        if (forceMode) return null;
+
+        return (
+            <div
+                className="edit-html-button clickable"
+                onClick={() => (onClick ? onClick() : toggleEditMode())}
+            >
+                <i className="material-icons">code</i>
+                {title && <span>{title}</span>}
+            </div>
+        );
+    };
 
     const updateEditorState = state => {
         setEditorState(state);
@@ -78,31 +90,38 @@ const StandardEditor: FunctionComponent<IProps> = ({
     };
 
     const toggleEditMode = () => {
-        const isEditHTMLEnabled = !editHTMLEnabled;
-        setEditHTMLEnabled(isEditHTMLEnabled);
-        onEditModeChange &&
-            onEditModeChange(isEditHTMLEnabled ? 'html' : 'text');
+        if (forceMode) {
+            return;
+        } else {
+            const isEditHTMLEnabled = !editHTMLEnabled;
+            setEditHTMLEnabled(isEditHTMLEnabled);
+            onEditModeChange &&
+                onEditModeChange(isEditHTMLEnabled ? 'html' : 'text');
+        }
     };
 
     return (
         <div className="standard-editor">
-            {editHTMLEnabled ? (
+            {editHTMLEnabled || forceMode === 'html' ? (
                 <div className="html-editor">
-                    <div className="html-editor-toolbar rdw-editor-toolbar">
-                        <div className="html-editor-toolbar-item">
-                            <EditHTMLButton
-                                title="Close HTML Editor"
-                                onClick={() => {
-                                    const editorVal = htmlToEditorState(
-                                        htmlState.current
-                                    );
-                                    updateEditorState(editorVal);
-                                    toggleEditMode();
-                                    htmlState.current = '';
-                                }}
-                            />
+                    {!forceMode && (
+                        <div className="html-editor-toolbar rdw-editor-toolbar">
+                            <div className="html-editor-toolbar-item">
+                                <EditHTMLButton
+                                    title="Close HTML Editor"
+                                    onClick={() => {
+                                        const editorVal = htmlToEditorState(
+                                            htmlState.current
+                                        );
+                                        updateEditorState(editorVal);
+                                        toggleEditMode();
+                                        htmlState.current = '';
+                                    }}
+                                />
+                            </div>
                         </div>
-                    </div>
+                    )}
+
                     <div className="html-editor-content">
                         <AceEditor
                             mode="html"
@@ -112,9 +131,22 @@ const StandardEditor: FunctionComponent<IProps> = ({
                             showPrintMargin={false}
                             showGutter
                             fontSize={17}
-                            defaultValue={getDraftHTMLState()}
+                            defaultValue={
+                                forceMode === 'html'
+                                    ? undefined
+                                    : getDraftHTMLState()
+                            }
+                            value={
+                                forceMode === 'html'
+                                    ? htmlState.current
+                                    : undefined
+                            }
                             onChange={html => {
                                 htmlState.current = html;
+
+                                if (forceMode === 'html') {
+                                    onChange && onChange(htmlState.current);
+                                }
                             }}
                             name="html-editor-component"
                             editorProps={{ $blockScrolling: true }}

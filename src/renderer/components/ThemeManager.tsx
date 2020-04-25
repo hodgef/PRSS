@@ -39,6 +39,35 @@ const ThemeManager: FunctionComponent = () => {
 
     const history = useHistory();
 
+    const showThemeDetails = theme => {
+        modal.alert(
+            <Fragment>
+                <p>
+                    <strong>Author:</strong> {theme.author}
+                </p>
+                <p>
+                    <strong>Homepage:</strong>{' '}
+                    <a
+                        href={theme.homepage}
+                        target="_blank"
+                        title={theme.homepage}
+                        rel="noopener noreferrer"
+                    >
+                        {theme.homepage}
+                    </a>
+                </p>
+                <p>
+                    <strong>Parser:</strong> {theme.parser}
+                </p>
+                <p>
+                    <strong>License:</strong> {theme.license}
+                </p>
+            </Fragment>,
+            `${theme.title} v${theme.version}`,
+            'theme-details-content'
+        );
+    };
+
     const handleSubmit = async themeName => {
         if (!themeName) {
             modal.alert('Your site must have a theme');
@@ -59,13 +88,28 @@ const ThemeManager: FunctionComponent = () => {
 
     const addTheme = async () => {
         const confirmationRes = await confirmation({
-            title: `
-            <p>The PRSS theme directory will be opened.</p>
-            <p>You will need to add any theme files to that directory.</p>
-            <p>Please ensure you get themes from trusted sources,
-             such as the <a href="https://prss.io/themes" title="https://prss.io/themes" target="_blank" rel="noopener noreferrer"><u>PRSS Themes</u></a> page.</p>
-            <p>Continue?</p>
-            `
+            title: (
+                <Fragment>
+                    <p>The PRSS theme directory will be opened.</p>
+                    <p>
+                        You will need to add any theme files to that directory.
+                    </p>
+                    <p>
+                        Please ensure you get themes from trusted sources, such
+                        as the{' '}
+                        <a
+                            href="https://prss.io/themes"
+                            title="https://prss.io/themes"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <u>PRSS Themes</u>
+                        </a>{' '}
+                        page.
+                    </p>
+                    <p>Continue?</p>
+                </Fragment>
+            )
         });
 
         if (confirmationRes !== 0) {
@@ -117,74 +161,84 @@ const ThemeManager: FunctionComponent = () => {
                 </h1>
 
                 <div className="theme-list">
-                    {themeList.map(
-                        ({ name, title, author, url, type, themeDir }) => {
-                            let image = defaultThumbnail;
+                    {themeList.map(theme => {
+                        const {
+                            name,
+                            title,
+                            author,
+                            url,
+                            type,
+                            themeDir
+                        } = theme;
+                        let image = defaultThumbnail;
 
-                            try {
-                                image =
-                                    'data:image/png;base64,' +
-                                    fs.readFileSync(
-                                        path.join(themeDir, 'thumbnail.png'),
-                                        { encoding: 'base64' }
-                                    );
-                            } catch (e) {
-                                console.error(e);
-                            }
+                        try {
+                            image =
+                                'data:image/png;base64,' +
+                                fs.readFileSync(
+                                    path.join(themeDir, 'thumbnail.png'),
+                                    { encoding: 'base64' }
+                                );
+                        } catch (e) {
+                            console.error(e);
+                        }
 
-                            return (
+                        return (
+                            <div
+                                className={cx('theme-list-item', {
+                                    'selected-theme': name === siteTheme
+                                })}
+                                key={`option-${name}`}
+                            >
                                 <div
-                                    className={cx('theme-list-item', {
-                                        'selected-theme': name === siteTheme
-                                    })}
-                                    key={`option-${name}`}
-                                >
-                                    <div
-                                        onClick={() => handleSubmit(name)}
-                                        className="theme-list-item-image clickable"
-                                        style={{
-                                            backgroundImage: `url(${image})`
-                                        }}
-                                    ></div>
-                                    <div className="theme-list-item-desc">
-                                        <div className="theme-name">
+                                    onClick={() =>
+                                        name === siteTheme
+                                            ? showThemeDetails(theme)
+                                            : handleSubmit(name)
+                                    }
+                                    className="theme-list-item-image clickable"
+                                    style={{
+                                        backgroundImage: `url(${image})`
+                                    }}
+                                ></div>
+                                <div className="theme-list-item-desc">
+                                    <div className="theme-name">
+                                        <div className="left-align">
+                                            <span>{title || name}</span>
+                                        </div>
+                                        <div className="right-align">
+                                            {['blog', 'docs'].includes(
+                                                type
+                                            ) && (
+                                                <div className="text-tag">
+                                                    {type}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {author && (
+                                        <div className="theme-author">
                                             <div className="left-align">
-                                                <span>{title || name}</span>
-                                            </div>
-                                            <div className="right-align">
-                                                {['blog', 'docs'].includes(
-                                                    type
-                                                ) && (
-                                                    <div className="text-tag">
-                                                        {type}
-                                                    </div>
+                                                {url ? (
+                                                    <a
+                                                        href={url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        title={url}
+                                                    >
+                                                        {author}
+                                                    </a>
+                                                ) : (
+                                                    <span>{author}</span>
                                                 )}
                                             </div>
+                                            <div className="right-align"></div>
                                         </div>
-                                        {author && (
-                                            <div className="theme-author">
-                                                <div className="left-align">
-                                                    {url ? (
-                                                        <a
-                                                            href={url}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            title={url}
-                                                        >
-                                                            {author}
-                                                        </a>
-                                                    ) : (
-                                                        <span>{author}</span>
-                                                    )}
-                                                </div>
-                                                <div className="right-align"></div>
-                                            </div>
-                                        )}
-                                    </div>
+                                    )}
                                 </div>
-                            );
-                        }
-                    )}
+                            </div>
+                        );
+                    })}
                     <div
                         className="theme-list-item add-new-theme-btn clickable"
                         onClick={() => addTheme()}

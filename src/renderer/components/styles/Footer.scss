@@ -1,7 +1,30 @@
-footer {
+#app footer {
     padding: 20px;
     box-sizing: border-box;
-    // background: #f7f7f7;
+    display: flex;
+
+    .left-align,
+    .right-align {
+        display: flex;
+        flex: 1;
+    }
+
+    .left-align {
+        justify-content: flex-start;
+    }
+
+    .right-align {
+        justify-content: flex-end;
+
+        .version-tag {
+            opacity: 0.3;
+            text-transform: none;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
 
     .credit {
         opacity: 0.3;

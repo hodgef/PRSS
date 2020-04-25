@@ -88,6 +88,40 @@ export const confirmation = ({
     });
 };
 
+export const ask = ({
+    title,
+    message,
+    buttons,
+    showCancel = false,
+    renderInput = null
+}) => {
+    return new Promise(resolve => {
+        const mappedButtons = buttons.map(
+            ({ label, action = (res?) => {} }) => {
+                return {
+                    label,
+                    action: res => {
+                        action(res);
+                        resolve(res);
+                        modal.close();
+                    }
+                };
+            }
+        );
+
+        modal.prompt({
+            title,
+            message,
+            buttons: mappedButtons,
+            showCancel,
+            onCancel: () => {
+                resolve(-1);
+            },
+            renderInput
+        });
+    });
+};
+
 export const stringReplace = (str = '', replaceWith = {}) => {
     Object.keys(replaceWith).forEach(key => {
         str = str.replace(`{{${key}}}`, replaceWith[key]);
@@ -168,7 +202,7 @@ export const sanitizeSite = siteObj => {
     /**
      * Remove site keys
      */
-    ['headHtml', 'footerHtml', 'vars'].forEach(field => {
+    ['headHtml', 'footerHtml', 'sidebarHtml', 'vars'].forEach(field => {
         delete newObj[field];
     });
 
@@ -185,14 +219,14 @@ export const sanitizeSite = siteObj => {
 
 export const sanitizeItem = itemObj => {
     const newObj = JSON.parse(JSON.stringify(itemObj));
-    ['headHtml', 'footerHtml', 'vars'].forEach(field => {
+    ['headHtml', 'footerHtml', 'sidebarHtml', 'vars'].forEach(field => {
         delete newObj[field];
     });
     return newObj;
 };
 
-export const sanitizeBufferItem = itemObj => {
-    const newObj = JSON.parse(JSON.stringify(itemObj));
+export const sanitizeBufferItem = (itemObj, mergeObj = {}) => {
+    const newObj = { ...JSON.parse(JSON.stringify(itemObj)), ...mergeObj };
     delete newObj.site;
     return newObj;
 };

@@ -16,11 +16,17 @@ interface ISite {
     publishedAt: number | null;
     headHtml: string;
     footerHtml: string;
+    sidebarHtml: string;
     vars: ISiteVar;
+    menus: ISiteMenus;
 }
 
 interface ISiteVar {
     key: string;
+}
+
+interface ISiteMenus {
+    [name: string]: IStructureItem[];
 }
 
 interface IStructureItem {
@@ -34,8 +40,10 @@ interface IPostItem {
     title: string;
     template: string;
     content: string;
+    isContentRaw?: boolean;
     headHtml: string;
     footerHtml: string;
+    sidebarHtml: string;
     updatedAt: number | null;
     createdAt: number | null;
     vars: ISiteVar;
@@ -79,6 +87,9 @@ interface IBufferItem {
     item: IPostItem;
     site: ISite;
     rootPath?: string;
+    headHtml?: string;
+    footerHtml?: string;
+    sidebarHtml?: string;
 }
 
 interface IHosting extends hostingType {
