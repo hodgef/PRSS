@@ -52,7 +52,7 @@ const StandardEditor: FunctionComponent<IProps> = ({
     );
     const htmlState = useRef(
         forceMode === 'html'
-            ? value
+            ? pretty(value, { ocd: true })
             : draftToHtml(convertToRaw(initialEditorState.getCurrentContent()))
     );
 
@@ -83,7 +83,8 @@ const StandardEditor: FunctionComponent<IProps> = ({
 
     const getDraftHTMLState = () => {
         const html = pretty(
-            draftToHtml(convertToRaw(editorState.getCurrentContent()))
+            draftToHtml(convertToRaw(editorState.getCurrentContent())),
+            { ocd: true }
         );
         htmlState.current = html;
         return html;

@@ -292,7 +292,7 @@ export const deleteMenuEntries = async (
      */
     await set(`sites.${siteId}.menus.${menuId}`, filteredStructure);
     await setInt(`sites.${siteId}.publishSuggested`, true);
-    return menu;
+    return filteredStructure;
 };
 
 export const getPostItem = (site, postId) => {

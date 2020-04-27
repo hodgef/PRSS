@@ -219,7 +219,13 @@ export const sanitizeSite = siteObj => {
 
 export const sanitizeItem = itemObj => {
     const newObj = JSON.parse(JSON.stringify(itemObj));
-    ['headHtml', 'footerHtml', 'sidebarHtml', 'vars'].forEach(field => {
+    [
+        'headHtml',
+        'footerHtml',
+        'sidebarHtml',
+        //'vars',
+        'exclusiveVariables'
+    ].forEach(field => {
         delete newObj[field];
     });
     return newObj;
@@ -227,6 +233,7 @@ export const sanitizeItem = itemObj => {
 
 export const sanitizeBufferItem = (itemObj, mergeObj = {}) => {
     const newObj = { ...JSON.parse(JSON.stringify(itemObj)), ...mergeObj };
+    newObj.item = sanitizeItem(newObj.item);
     delete newObj.site;
     return newObj;
 };

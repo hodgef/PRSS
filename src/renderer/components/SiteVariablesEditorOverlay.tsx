@@ -2,6 +2,7 @@ import './styles/SiteVariablesEditorOverlay.scss';
 
 import React, { FunctionComponent, useState, useRef, Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import cx from 'classnames';
 
 import { noop, camelCase } from '../services/utils';
 
@@ -12,6 +13,7 @@ import { toast } from 'react-toastify';
 import { modal } from './Modal';
 import { get, set } from '../../common/utils';
 import { getPostItem, siteVarToArray } from '../services/hosting';
+import { getBufferItems } from '../services/build';
 
 interface IProps {
     siteId: string;
@@ -36,10 +38,19 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
         }
     );
 
-    const parsedInheritedVariables = post ? siteVarToArray(site.vars) : [];
+    const bufferItems = getBufferItems(site).find(
+        data => data.item.id === postId
+    );
+
+    const parsedInheritedVariables = post
+        ? siteVarToArray(bufferItems.vars)
+        : [];
 
     const variablesBuffer = useRef(parsedVariables);
     const [variables, setVariables] = useState(parsedVariables);
+    const [exclusiveVariables, setExclusiveVariables] = useState(
+        post ? post.exclusiveVars || [] : []
+    );
 
     const addNew = () => {
         setVariables(prevVars => [...prevVars, { name: '', content: '' }]);
@@ -73,11 +84,54 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
         return setVariables([...newVars.filter(variable => !!variable)]);
     };
 
+    const preventVarToggle = (varIndex: number) => {
+        const newVars = [...variables];
+
+        if (!newVars[varIndex]) return false;
+        const selectedVariableName = newVars[varIndex].name;
+
+        if (exclusiveVariables.includes(selectedVariableName)) {
+            /**
+             * Remove
+             */
+            return setExclusiveVariables([
+                ...exclusiveVariables.filter(
+                    variable => variable !== selectedVariableName
+                )
+            ]);
+        } else {
+            return setExclusiveVariables([
+                ...exclusiveVariables,
+                newVars[varIndex].name
+            ]);
+        }
+    };
+
     const handleSave = () => {
         /**
          * Removing empty vars
          */
         const varsArray = variables.filter(varItem => !!varItem.name.trim());
+
+        /**
+         * Removing orphan exclusiveVars or duplicated
+         */
+        const newExclusiveVarsArr = exclusiveVariables.filter(
+            (varName, index) => {
+                /**
+                 * If duplicate, filter out
+                 */
+                if (exclusiveVariables.indexOf(varName) < index) {
+                    return false;
+                }
+
+                /**
+                 * Filter orphans
+                 */
+                return varsArray.some(varItem => varItem.name === varName);
+            }
+        );
+
         const varObj = {};
 
         varsArray.forEach(varItem => {
@@ -89,6 +143,11 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
          */
         if (postIndex > -1) {
             set(`sites.${siteId}.items.${postIndex}.vars`, varObj);
+            set(
+                `sites.${siteId}.items.${postIndex}.exclusiveVars`,
+                newExclusiveVarsArr
+            );
+
             toast.success('Post variables saved!');
         } else {
             /**
@@ -177,10 +236,21 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                 <div className="variable-list mt-2">
                     <ul>
                         {variables.map((variable, index) => {
+                            const isRestricted = exclusiveVariables.includes(
+                                variable.name
+                            );
+
+                            console.log(
+                                'exclusiveVariables',
+                                exclusiveVariables
+                            );
+
                             return (
                                 <li
                                     key={`${variable}-${index}`}
-                                    className="mb-2"
+                                    className={cx('mb-2', {
+                                        'restricted-var': isRestricted
+                                    })}
                                 >
                                     <div className="input-group input-group-lg">
                                         <input
@@ -205,7 +275,27 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                                                 setVar(e, index, 'content')
                                             }
                                         />
+                                        {postIndex > -1 && (
+                                            <button
+                                                title="Prevent children from inheriting this variable"
+                                                type="button"
+                                                className={cx(
+                                                    'btn btn-outline-primary ml-2 restrict-btn',
+                                                    {
+                                                        'bg-dark text-white': isRestricted
+                                                    }
+                                                )}
+                                                onClick={() =>
+                                                    preventVarToggle(index)
+                                                }
+                                            >
+                                                <span className="material-icons">
+                                                    block
+                                                </span>
+                                            </button>
+                                        )}
                                         <button
+                                            title="Delete Variable"
                                             type="button"
                                             className="btn btn-outline-primary ml-2"
                                             onClick={() => delVar(index)}
@@ -223,13 +313,13 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
 
                 {post && !!parsedInheritedVariables.length && (
                     <div className="inherited-variable-list mt-5">
-                        <h2>INHERITED VARIABLES</h2>
+                        <h2>EFFECTIVE VARIABLES</h2>
                         <p>
-                            To edit inherited variables. Go to your{' '}
+                            This includes global variables from{' '}
                             <Link to={`/sites/${siteId}/settings`}>
                                 Site Settings
-                            </Link>
-                            . You can also override them above.
+                            </Link>{' '}
+                            as well as parent variables.
                         </p>
                         <ul>
                             {parsedInheritedVariables.map((variable, index) => {

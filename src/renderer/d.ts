@@ -47,6 +47,7 @@ interface IPostItem {
     updatedAt: number | null;
     createdAt: number | null;
     vars: ISiteVar;
+    exclusiveVars?: string[];
 }
 
 interface ITemplateComponent {
@@ -90,6 +91,7 @@ interface IBufferItem {
     headHtml?: string;
     footerHtml?: string;
     sidebarHtml?: string;
+    vars?: ISiteVar;
 }
 
 interface IHosting extends hostingType {

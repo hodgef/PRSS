@@ -238,27 +238,36 @@ export const getBufferItems = (site): IBufferItem[] => {
          */
         const vars = {
             ...(site.vars || {}),
-            ...(getAggregateItemPropValues('vars', parentIds, bufferItems) ||
-                {}),
+            ...(getAggregateItemPropValues(
+                'item.vars',
+                parentIds,
+                bufferItems
+            ) || {}),
             ...(post.vars || {})
         };
 
         const headHtml =
             (site.headHtml || '') +
-            (getAggregateItemPropValues('headHtml', parentIds, bufferItems) ||
-                '') +
+            (getAggregateItemPropValues(
+                'item.headHtml',
+                parentIds,
+                bufferItems
+            ) || '') +
             (post.headHtml || '');
 
         const footerHtml =
             (site.footerHtml || '') +
-            (getAggregateItemPropValues('footerHtml', parentIds, bufferItems) ||
-                '') +
+            (getAggregateItemPropValues(
+                'item.footerHtml',
+                parentIds,
+                bufferItems
+            ) || '') +
             (post.footerHtml || '');
 
         const sidebarHtml =
             (site.sidebarHtml || '') +
             (getAggregateItemPropValues(
-                'sidebarHtml',
+                'item.sidebarHtml',
                 parentIds,
                 bufferItems
             ) || '') +
@@ -278,8 +287,8 @@ export const getBufferItems = (site): IBufferItem[] => {
                 path: '/' + postPath,
                 templateId: `${site.theme}.${post.template}`,
                 parser: themeManifest.parser,
-                item: sanitizeItem(post) as IPostItem,
-                site: sanitizeSite(site), // Will be removed in bufferItem parser, replaced by PRSSConfig
+                item: post as IPostItem,
+                site: site as ISite, // Will be removed in bufferItem parser, replaced by PRSSConfig
                 rootPath,
                 headHtml,
                 footerHtml,
@@ -297,24 +306,39 @@ export const getAggregateItemPropValues = (
     itemsIds: string[],
     bufferItems: IBufferItem[]
 ) => {
-    let aggregate = null;
+    let aggregate;
 
     itemsIds.forEach(itemId => {
         const bufferItem = bufferItems.find(bItem => bItem.item.id === itemId);
         const itemPropValue = objGet(propQuery, bufferItem);
 
-        if (!itemPropValue) return;
+        /**
+         * Filter excluded vars
+         */
+        if (
+            propQuery === 'item.vars' &&
+            Array.isArray(bufferItem.item.exclusiveVars) &&
+            bufferItem.item.exclusiveVars.length
+        ) {
+            bufferItem.item.exclusiveVars.forEach(excludedVar => {
+                !!excludedVar && delete itemPropValue[excludedVar];
+            });
+        }
 
         if (typeof itemPropValue === 'string') {
+            if (!aggregate) aggregate = '';
+
             aggregate += objGet(propQuery, bufferItem) || '';
         } else if (Array.isArray(itemPropValue)) {
+            if (!aggregate) aggregate = [];
             aggregate = [
-                ...aggregate,
+                ...(aggregate || []),
                 ...(objGet(propQuery, bufferItem) || [])
             ];
         } else if (typeof itemPropValue === 'object') {
+            if (!aggregate) aggregate = {};
             aggregate = {
-                ...aggregate,
+                ...(aggregate || {}),
                 ...(objGet(propQuery, bufferItem) || {})
             };
         }

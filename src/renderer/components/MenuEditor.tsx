@@ -29,16 +29,17 @@ const MenuEditor: FunctionComponent = () => {
     const toggleSelectEnabled = () => setSelectEnabled(!selectEnabled);
 
     const deleteSelectedMenuEntries = async () => {
-        const deleteSuccess = await deleteMenuEntries(
+        const deleteRes = await deleteMenuEntries(
             siteId,
-            menuState,
+            menuId,
             selectedItems
         );
 
-        if (deleteSuccess) {
+        if (deleteRes) {
             toast.success('Menu entries deleted!');
             setSelectedItems([]);
             setSelectEnabled(false);
+            setMenuState(deleteRes);
         } else {
             toast.error('No deletion made');
         }
@@ -121,6 +122,7 @@ const MenuEditor: FunctionComponent = () => {
 
         setMenuState(newMenuState);
         setMenuChanged(true);
+        setSelectedItems([]);
     };
 
     const handleSave = async () => {
