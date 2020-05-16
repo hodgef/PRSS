@@ -1,12 +1,10 @@
 import './styles/App.scss';
 import 'react-toastify/dist/ReactToastify.css';
 
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, Fragment } from 'react';
 import { HashRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 
-import { AppContext } from '../../common/Store';
-import { get } from '../../common/utils';
 import CreateSite from './CreateSite';
 import Dashboard from './Dashboard';
 import ListPosts from './ListPosts';
@@ -20,10 +18,11 @@ import ThemeManager from './ThemeManager';
 import SiteHostingSwitcher from './SiteHostingSwitcher';
 import ListMenus from './ListMenus';
 import MenuEditor from './MenuEditor';
+import { configGet } from '../../common/utils';
 
 const App: FunctionComponent = () => {
     return (
-        <AppContext.Provider value={{}}>
+        <Fragment>
             <HashRouter>
                 <Switch>
                     <Route exact path="/sites" component={ListSites} />
@@ -83,8 +82,8 @@ const App: FunctionComponent = () => {
                     <Route
                         exact
                         path="/"
-                        render={props => {
-                            const sites = get('sites');
+                        render={() => {
+                            const sites = configGet('sites');
                             return Object.keys(sites) &&
                                 Object.keys(sites).length ? (
                                 <Redirect to="/sites" />
@@ -104,7 +103,7 @@ const App: FunctionComponent = () => {
                 hideProgressBar
                 position={toast.POSITION.TOP_RIGHT}
             />
-        </AppContext.Provider>
+        </Fragment>
     );
 };
 

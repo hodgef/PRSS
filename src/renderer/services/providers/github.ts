@@ -1,4 +1,5 @@
-import { keychainRetreive, getInt } from './../../../common/utils';
+import { updateSite } from './../db';
+import { keychainRetreive, configGet } from './../../../common/utils';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
@@ -17,9 +18,10 @@ import { confirmation, error } from '../utils';
 import { sequential } from './../utils';
 import { modal } from '../../components/Modal';
 import React from 'react';
+import { getSite } from '../db';
 
 class GithubProvider {
-    private readonly site: ISite;
+    private readonly siteUUID: string;
     public readonly vars = {
         baseUrl: () => 'github.com',
         baseApiUrl: () => 'api.github.com'
@@ -92,17 +94,26 @@ class GithubProvider {
         ]
     };
 
-    constructor(site: ISite) {
-        this.site = site;
+    constructor(siteUUID: string) {
+        this.siteUUID = siteUUID;
     }
+
+    fetchSite = () => {
+        return getSite(this.siteUUID);
+    };
+
+    fetchSiteConfig = () => {
+        return configGet(`sites.${this.siteUUID}`);
+    };
 
     setup = async onUpdate => {
         /**
          * Creating repo
          */
-        const { hosting } = getInt(`sites.${this.site.id}`);
+        const { hosting } = await this.fetchSiteConfig();
+        const username = await this.getUsername();
 
-        if (this.getUsername() === hosting.username) {
+        if (username === hosting.username) {
             onUpdate(getString('creating_repository'));
             const createRepoRes = await this.createRepo();
 
@@ -126,14 +137,18 @@ class GithubProvider {
             return false;
         }
 
-        return {
-            ...this.site,
+        /**
+         * Save site url
+         */
+        await updateSite(this.siteUUID, {
             url: siteUrl
-        };
+        });
+
+        return true;
     };
 
-    getUsername = () => {
-        const { hosting } = getInt(`sites.${this.site.id}`);
+    getUsername = async () => {
+        const { hosting } = await this.fetchSiteConfig();
         const { username, repository } = hosting;
 
         if (repository && repository.includes('/')) {
@@ -143,12 +158,11 @@ class GithubProvider {
         }
     };
 
-    getRepositoryName = () => {
-        const { id } = this.site;
-
+    getRepositoryName = async () => {
         const {
+            name,
             hosting: { repository }
-        } = getInt(`sites.${this.site.id}`);
+        } = await this.fetchSiteConfig();
 
         if (repository) {
             if (repository.includes('/')) {
@@ -157,15 +171,19 @@ class GithubProvider {
                 return repository;
             }
         } else {
-            return id;
+            return name;
         }
     };
 
-    getRepositoryUrl = () => {
-        return `https://${this.vars.baseUrl()}/${this.getUsername()}/${this.getRepositoryName()}`;
+    getRepositoryUrl = async () => {
+        const repositoryName = await this.getRepositoryName();
+        const username = await this.getUsername();
+        return `https://${this.vars.baseUrl()}/${username}/${repositoryName}`;
     };
 
     deploy = async (onUpdate = s => {}, itemIdToDeploy?, clearRemote?) => {
+        const repositoryUrl = await this.getRepositoryUrl();
+
         /**
          * Clearing buffer
          */
@@ -175,15 +193,13 @@ class GithubProvider {
          * Creating git repo in buffer
          */
         try {
-            const bufferDir = getInt('paths.buffer');
+            const bufferDir = configGet('paths.buffer');
             const execSync = require('child_process').execSync;
 
-            execSync(
-                `cd "${bufferDir}" && git clone "${this.getRepositoryUrl()}" .`
-            );
+            execSync(`cd "${bufferDir}" && git clone "${repositoryUrl}" .`);
 
             const buildRes = await build(
-                this.site,
+                this.siteUUID,
                 onUpdate,
                 itemIdToDeploy,
                 !clearRemote
@@ -214,17 +230,18 @@ class GithubProvider {
             console.error(e);
         }
 
-        await clearBuffer(true);
+        // TODO: Re-enable if it's needed
+        //await clearBuffer(true);
         return true;
     };
 
     deployWithAPI = async (onUpdate?, itemIdToDeploy?) => {
-        const { itemsToLoad } = getFilteredBufferItems(
-            this.site,
+        const { itemsToLoad } = await getFilteredBufferItems(
+            this.siteUUID,
             itemIdToDeploy
         );
 
-        const bufferDir = getInt('paths.buffer');
+        const bufferDir = configGet('paths.buffer');
 
         const siteConfigFilePath = path.join(bufferDir, configFileName);
 
@@ -256,7 +273,7 @@ class GithubProvider {
      * will probably deplete the request quota
      */
     wipe = async (onUpdate?) => {
-        const repoUrl = this.getRepositoryUrl();
+        const repoUrl = await this.getRepositoryUrl();
         const confirmationRes = await confirmation({
             title: `This operation requires clearing all files in "${repoUrl}". Continue?`
         });
@@ -277,12 +294,10 @@ class GithubProvider {
          * Creating git repo in buffer
          */
         try {
-            const bufferDir = getInt('paths.buffer');
+            const bufferDir = configGet('paths.buffer');
             const execSync = require('child_process').execSync;
 
-            execSync(
-                `cd "${bufferDir}" && git clone "${this.getRepositoryUrl()}" .`
-            );
+            execSync(`cd "${bufferDir}" && git clone "${repoUrl}" .`);
 
             if (bufferDir && bufferDir.includes('buffer')) {
                 await del([path.join(bufferDir, '*'), '!.git']);
@@ -301,7 +316,10 @@ class GithubProvider {
     };
 
     enablePagesSite = async () => {
-        const endpoint = `repos/${this.getUsername()}/${this.getRepositoryName()}/pages`;
+        const repositoryName = await this.getRepositoryName();
+        const username = await this.getUsername();
+
+        const endpoint = `repos/${username}/${repositoryName}/pages`;
         const existingSite = await this.request('GET', endpoint);
 
         if (existingSite && existingSite.html_url) {
@@ -327,6 +345,9 @@ class GithubProvider {
     deleteFiles = async (filePaths = [], basePath = '', onUpdate?) => {
         if (!filePaths.length) return;
 
+        const repositoryName = await this.getRepositoryName();
+        const username = await this.getUsername();
+
         const fileRequests = filePaths.map(filePath => {
             const normalizedBasePath = slash(basePath);
             const normalizedFilePath = slash(filePath);
@@ -337,7 +358,7 @@ class GithubProvider {
 
             return [
                 'DELETE',
-                `repos/${this.getUsername()}/${this.getRepositoryName()}/contents/${remoteFilePath}`,
+                `repos/${username}/${repositoryName}/contents/${remoteFilePath}`,
                 {
                     message: `Added ${remoteFilePath}`
                 }
@@ -350,6 +371,9 @@ class GithubProvider {
     uploadFiles = async (filePaths = [], basePath = '', onUpdate?) => {
         if (!filePaths.length) return;
 
+        const repositoryName = await this.getRepositoryName();
+        const username = await this.getUsername();
+
         const fileRequests = filePaths.map(filePath => {
             const normalizedBasePath = slash(basePath);
             const normalizedFilePath = slash(filePath);
@@ -360,7 +384,7 @@ class GithubProvider {
 
             return [
                 'PUT',
-                `repos/${this.getUsername()}/${this.getRepositoryName()}/contents/${remoteFilePath}`,
+                `repos/${username}/${repositoryName}/contents/${remoteFilePath}`,
                 {
                     message: `Added ${remoteFilePath}`,
                     content: btoa(fs.readFileSync(filePath, 'utf8'))
@@ -405,9 +429,12 @@ class GithubProvider {
     };
 
     createFile = async (path: string, content = '') => {
+        const repositoryName = await this.getRepositoryName();
+        const username = await this.getUsername();
+
         return this.fileRequest(
             'PUT',
-            `repos/${this.getUsername()}/${this.getRepositoryName()}/contents/${path}`,
+            `repos/${username}/${repositoryName}/contents/${path}`,
             {
                 message: `Added ${path}`,
                 content: btoa(content)
@@ -432,9 +459,11 @@ class GithubProvider {
             }
         }
 
+        const repositoryName = await this.getRepositoryName();
+
         const { created_at } =
             (await this.request('POST', 'user/repos', {
-                name: this.getRepositoryName(),
+                name: repositoryName,
                 description: getString('created_with'),
                 homepage: getString('prss_domain'),
                 auto_init: true
@@ -449,16 +478,18 @@ class GithubProvider {
     };
 
     getRepo = async () => {
+        const username = await this.getUsername();
+
         const repos =
-            (await this.request('GET', `users/${this.getUsername()}/repos`)) ||
-            [];
+            (await this.request('GET', `users/${username}/repos`)) || [];
 
         if (!Array.isArray(repos)) {
             error();
             return false;
         }
 
-        const repo = repos.find(item => item.name === this.getRepositoryName());
+        const repositoryName = await this.getRepositoryName();
+        const repo = repos.find(item => item.name === repositoryName);
         return repo;
     };
 
@@ -469,7 +500,7 @@ class GithubProvider {
         headers = {}
     ) => {
         const url = `https://${this.vars.baseApiUrl()}/${endpoint}`;
-        const { hosting } = getInt(`sites.${this.site.id}`);
+        const { hosting } = configGet(`sites.${this.siteUUID}`);
         const { name, username } = hosting;
         const password = await keychainRetreive(name, username);
 

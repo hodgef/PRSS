@@ -11,7 +11,7 @@ import React, {
 import { useHistory } from 'react-router-dom';
 
 import PRSSLogo from '../images/PRSS.png';
-import { getInt } from '../../common/utils';
+import { configGet } from '../../common/utils';
 
 interface IProps {
     undertitle?: ReactNode;
@@ -22,7 +22,7 @@ const Header: FunctionComponent<IProps> = ({ undertitle }) => {
 
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const headerMore = useRef(null);
-    const hasSites = getInt('sites') || {};
+    const hasSites = configGet('sites') || {};
 
     const handleDOMClick = e => {
         if (headerMore.current && headerMore.current.contains(e.target)) {

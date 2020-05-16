@@ -1,30 +1,49 @@
 import './styles/CreatePost.scss';
 
-import React, { FunctionComponent, Fragment, useState } from 'react';
+import React, { FunctionComponent, Fragment, useState, useEffect } from 'react';
 import { useHistory, useParams, Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
 import Footer from './Footer';
 import Header from './Header';
-import { get, set } from '../../common/utils';
 import { normalize, error } from '../services/utils';
 import { walkStructure } from '../services/build';
 import { toast } from 'react-toastify';
 import { isValidSlug } from '../services/hosting';
+import { getSite, getItems, updateSite, createItems } from '../services/db';
 
 const CreatePost: FunctionComponent = () => {
     const { siteId } = useParams();
-    const { items, title, structure } = get(`sites.${siteId}`);
+
+    const [site, setSite] = useState(null);
+    const [items, setItems] = useState(null);
+    const { title, structure } = (site as ISite) || {};
+
+    const [formattedStructure, setFormattedStructure] = useState(structure);
     const [postTitle, setPostTitle] = useState('');
     const [postSlug, setPostSlug] = useState('');
     const [postParent, setPostParent] = useState('');
     const history = useHistory();
 
-    const formattedStructure = walkStructure(
-        siteId,
-        structure,
-        ({ title }) => ({ title })
-    );
+    useEffect(() => {
+        const getData = async () => {
+            const siteRes = await getSite(siteId);
+            const itemsRes = await getItems(siteId);
+            setFormattedStructure(
+                await walkStructure(siteId, siteRes.structure, ({ title }) => ({
+                    title
+                }))
+            );
+
+            setSite(siteRes);
+            setItems(itemsRes);
+        };
+        getData();
+    }, []);
+
+    if (!site || !items) {
+        return null;
+    }
 
     const formatStructureOptions = (node, options = [], parents = []) => {
         const indent = parents.map(() => '--').join('') + ' ';
@@ -66,7 +85,7 @@ const CreatePost: FunctionComponent = () => {
         return node;
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!postTitle) {
             error('You must provide a title');
             return;
@@ -76,31 +95,27 @@ const CreatePost: FunctionComponent = () => {
 
         let normalizedSlug = normalize(postSlug || postTitle);
 
-        if (!isValidSlug(normalizedSlug, siteId)) {
+        if (!(await isValidSlug(normalizedSlug, siteId))) {
             const randomString = postId.substring(0, 5);
             normalizedSlug += `-${randomString}`;
         }
 
-        const item = {
-            id: postId,
-            title: postTitle,
+        const newItem = {
+            uuid: postId,
+            title: postTitle.trim(),
             slug: normalizedSlug,
+            siteId: siteId,
             content: '',
             template: 'post',
             updatedAt: null,
-            createdAt: Date.now()
+            createdAt: Date.now(),
+            vars: {}
         };
 
         const structureItem = {
             key: postId,
             children: []
         };
-
-        /**
-         * Insert post in items
-         */
-        items.push(item);
-        const newItems = [...items];
 
         /**
          * Insert post in structure
@@ -118,8 +133,11 @@ const CreatePost: FunctionComponent = () => {
         /**
          * Saving
          */
-        set(`sites.${siteId}.items`, newItems);
-        set(`sites.${siteId}.structure`, newStructure);
+        await updateSite(siteId, {
+            structure: newStructure
+        });
+
+        await createItems([newItem]);
 
         history.push(`/sites/${siteId}/posts/editor/${postId}`);
         toast.success('Post Created! You can now edit its content');

@@ -1,7 +1,8 @@
 import './styles/Footer.scss';
 
 import React, { FunctionComponent } from 'react';
-import { packageJson } from '../../common/Store';
+import { getPackageJson } from '../../common/utils';
+const packageJson = getPackageJson();
 
 const Footer: FunctionComponent = () => {
     const { version } = packageJson;

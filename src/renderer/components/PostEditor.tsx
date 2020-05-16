@@ -8,8 +8,7 @@ import React, {
     useEffect
 } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
-
-import { get, getString, set, getInt, setInt } from '../../common/utils';
+import { getString, configGet, configSet } from '../../common/utils';
 import StandardEditor from './Editor';
 import Footer from './Footer';
 import Header from './Header';
@@ -21,26 +20,28 @@ import {
     bufferAndStartPreview
 } from '../services/preview';
 import { build } from '../services/build';
-import { store } from '../../common/Store';
 import { buildAndDeploy } from '../services/hosting';
 import SlugEditor from './SlugEditor';
 import TitleEditor from './TitleEditor';
 import PostEditorSidebar from './PostEditorSidebar';
 import HTMLEditorOverlay from './HTMLEditorOverlay';
 import SiteVariablesEditorOverlay from './SiteVariablesEditorOverlay';
+import { getSite, getItems, updateItem, updateSite } from '../services/db';
 
 const PostEditor: FunctionComponent = () => {
     const { siteId, postId } = useParams();
-    const [site, setSite] = useState(get(`sites.${siteId}`));
-    const { title, url, items } = site;
-    const { publishSuggested } = getInt(`sites.${siteId}`);
-    const [post, setPost] = useState(
-        postId ? items.find(item => item.id === postId) : null
-    );
+    const [publishSuggested, setPublishSuggested] = useState(null);
+
+    const [site, setSite] = useState(null);
+    const [items, setItems] = useState(null);
+    const { title, url } = (site as ISite) || {};
+
+    const [post, setPost] = useState(null);
+
     const history = useHistory();
-    const editorContent = useRef(post ? post.content : '');
-    const editorMode = useRef(post && post.isContentRaw ? 'html' : '');
-    const itemIndex = postId ? items.findIndex(item => item.id === postId) : -1;
+    const editorContent = useRef('');
+    const editorMode = useRef('');
+    const itemIndex = post ? items.findIndex(item => item.uuid === postId) : -1;
 
     const editorChangedContent = useRef('');
 
@@ -60,41 +61,32 @@ const PostEditor: FunctionComponent = () => {
     const [deployLoading, setDeployLoading] = useState(false);
     const [loadingStatus, setLoadingStatus] = useState('');
 
-    // const autosaveInterval = useRef(null);
-    // const autosaveMs = 600000; // 10 mins
+    useEffect(() => {
+        const getData = async () => {
+            const siteRes = await getSite(siteId);
+            const itemsRes = await getItems(siteId);
+            setSite(siteRes);
+            setItems(itemsRes);
+            const post = itemsRes.find(item => item.uuid === postId);
 
-    /**
-     * Check for item changes
-     */
-    const unsubscribeWatchers = [];
+            setPost(post);
 
-    unsubscribeWatchers.push(
-        store.onDidChange(`sites.${siteId}` as any, newValue => {
-            setSite({ ...newValue });
-        })
-    );
+            const { publishSuggested } = configGet(`sites.${siteId}`);
+            setPublishSuggested(publishSuggested);
+            editorContent.current = post.content || '';
+            editorMode.current = post.isContentRaw ? 'html' : '';
+        };
+        getData();
+    }, []);
 
-    {
-        post &&
-            unsubscribeWatchers.push(
-                store.onDidChange(
-                    `sites.${siteId}.items.${itemIndex}` as any,
-                    newValue => {
-                        setPost({ ...newValue });
-                    }
-                )
-            );
+    if (!site || !items || !post) {
+        return null;
     }
-
-    useEffect(
-        () => () => {
-            unsubscribeWatchers.forEach(unsubscribe => unsubscribe());
-        },
-        []
-    );
 
     const handleSave = async (isAutosave = false) => {
         setBuildLoading(true);
+
+        const prevContent = post.content;
 
         if (editorMode.current === 'html' && post && !post.isContentRaw) {
             modal.alert(getString('error_save_text_editor'));
@@ -103,20 +95,36 @@ const PostEditor: FunctionComponent = () => {
         }
 
         const content = editorContent.current;
-        const msTime = Date.now();
+
+        /**
+         * Warn if deleting content
+         */
+        if (prevContent !== content && !content.length) {
+            console.warn('All content deleted');
+        }
 
         if (itemIndex > -1) {
-            const updatedItem = { ...post, content, updatedAt: msTime };
+            const updatedAt = Date.now();
+            const updatedItem = { ...post, content, updatedAt };
+            const updatedSite = { ...site, updatedAt };
 
             /**
-             *  Update items
+             *  Update item
              */
-            set(`sites.${siteId}.items.${itemIndex}`, updatedItem);
+            await updateItem(siteId, postId, {
+                content,
+                updatedAt
+            });
 
             /**
              * Update site updatedAt
              */
-            set(`sites.${siteId}.updatedAt`, msTime);
+            await updateSite(siteId, {
+                updatedAt
+            });
+
+            setPost(updatedItem);
+            setSite(updatedSite);
 
             if (isAutosave) {
                 toast.success('Post autosaved');
@@ -140,20 +148,74 @@ const PostEditor: FunctionComponent = () => {
         setBuildLoading(false);
     };
 
-    const changePostTemplate = template => {
+    const handleSaveTitle = async title => {
+        const updatedAt = Date.now();
+        const updatedItem = { ...post, title, updatedAt };
+
+        /**
+         *  Update item
+         */
+        await updateItem(siteId, postId, {
+            title,
+            updatedAt
+        });
+
+        setPost(updatedItem);
+
+        configSet(`sites.${siteId}.publishSuggested`, true);
+        setPublishSuggested(true);
+        toast.success('Title saved');
+    };
+
+    const handleSaveSlug = async slug => {
+        const updatedAt = Date.now();
+        const updatedItem = { ...post, slug, updatedAt };
+
+        /**
+         *  Update item
+         */
+        await updateItem(siteId, postId, {
+            slug,
+            updatedAt
+        });
+
+        setPost(updatedItem);
+
+        configSet(`sites.${siteId}.publishSuggested`, true);
+        setPublishSuggested(true);
+        toast.success('Slug saved');
+    };
+
+    const changePostTemplate = async template => {
         if (!template || itemIndex === -1) return;
-        set(`sites.${siteId}.items.${itemIndex}.template`, template);
-        setInt(`sites.${siteId}.publishSuggested`, true);
+        const updatedItem = { ...post, template };
+        const updatedAt = Date.now();
+
+        /**
+         *  Update item
+         */
+        await updateItem(siteId, postId, { template, updatedAt });
+        setPost(updatedItem);
+
+        configSet(`sites.${siteId}.publishSuggested`, true);
+        setPublishSuggested(true);
         toast.success('Template changed successfully');
     };
 
     const toggleRawHTMLOnly = async () => {
         const isHTMLForced = !!post.isContentRaw;
+        const isContentRaw = !isHTMLForced;
+        const updatedAt = Date.now();
 
-        await set(
-            `sites.${siteId}.items.${itemIndex}.isContentRaw`,
-            !isHTMLForced
-        );
+        const updatedItem = { ...post, isContentRaw };
+
+        /**
+         *  Update item
+         */
+        await updateItem(siteId, postId, { isContentRaw, updatedAt });
+
+        setPost(updatedItem);
+
         toast.success(
             'Raw HTML content flag changed successfully. Refreshing.'
         );
@@ -161,7 +223,7 @@ const PostEditor: FunctionComponent = () => {
         if (isHTMLForced) {
             stopPreview();
             history.replace(`/sites/${siteId}/posts/editor`);
-            history.replace(`/sites/${siteId}/posts/editor/${post.id}`);
+            history.replace(`/sites/${siteId}/posts/editor/${post.uuid}`);
         }
     };
 
@@ -184,7 +246,7 @@ const PostEditor: FunctionComponent = () => {
             return;
         }
 
-        const previewRes = await bufferAndStartPreview(site, postId);
+        const previewRes = await bufferAndStartPreview(siteId);
 
         if (previewRes) {
             setPreviewStarted(true);
@@ -209,13 +271,9 @@ const PostEditor: FunctionComponent = () => {
 
     const handlePublish = async () => {
         setDeployLoading(true);
-        const curSite = get(`sites.${siteId}`);
-        const curSiteInt = getInt(`sites.${siteId}`);
-
-        const publishSuggested = curSiteInt.publishSuggested;
 
         const deployRes = await buildAndDeploy(
-            curSite,
+            siteId,
             setLoadingStatus,
             postId
         );
@@ -231,7 +289,8 @@ const PostEditor: FunctionComponent = () => {
         }
 
         if (publishSuggested) {
-            setInt(`sites.${siteId}.publishSuggested`, false);
+            configSet(`sites.${siteId}.publishSuggested`, false);
+            setPublishSuggested(false);
         }
 
         setDeployLoading(false);
@@ -250,16 +309,28 @@ const PostEditor: FunctionComponent = () => {
         footerHtml,
         sidebarHtml
     ) => {
+        const updatedAt = Date.now();
+
         if (itemIndex > -1) {
-            await set(`sites.${siteId}.items.${itemIndex}.headHtml`, headHtml);
-            await set(
-                `sites.${siteId}.items.${itemIndex}.footerHtml`,
-                footerHtml
-            );
-            await set(
-                `sites.${siteId}.items.${itemIndex}.sidebarHtml`,
+            const updatedItem = {
+                ...post,
+                headHtml,
+                footerHtml,
                 sidebarHtml
-            );
+            };
+
+            /**
+             *  Update item
+             */
+            await updateItem(siteId, postId, {
+                headHtml,
+                footerHtml,
+                sidebarHtml,
+                updatedAt
+            });
+
+            setPost(updatedItem);
+
             toast.success('Post updated');
         }
     };
@@ -302,8 +373,9 @@ const PostEditor: FunctionComponent = () => {
                         {post ? (
                             <TitleEditor
                                 siteId={siteId}
-                                postIndex={itemIndex}
+                                postId={postId}
                                 initValue={post ? post.title : null}
+                                onSave={handleSaveTitle}
                             />
                         ) : (
                             <span>Post Editor</span>
@@ -317,9 +389,10 @@ const PostEditor: FunctionComponent = () => {
                                 </span>
                                 <SlugEditor
                                     siteId={siteId}
-                                    postIndex={itemIndex}
+                                    postId={postId}
                                     url={url}
                                     initValue={post ? post.slug : null}
+                                    onSave={handleSaveSlug}
                                 />
                             </Fragment>
                         )}

@@ -1,11 +1,11 @@
-import { globalRequire, getInt } from './../../common/utils';
+import { globalRequire, configGet } from './../../common/utils';
 import { build } from './build';
 
 export const previewServer = globalRequire('browser-sync').create('prss');
 
-export const bufferAndStartPreview = async (site, itemId) => {
+export const bufferAndStartPreview = async (siteUUID: string) => {
     stopPreview();
-    const buildRes = await build(site, null /*, itemId*/); // Building all
+    const buildRes = await build(siteUUID, null /*, itemId*/); // Building all
 
     if (buildRes && buildRes.length) {
         const bufferItem = buildRes[0];
@@ -19,7 +19,7 @@ export const startPreview = (startPath = '/') => {
     stopPreview();
 
     if (!previewServer.active) {
-        const bufferDir = getInt('paths.buffer');
+        const bufferDir = configGet('paths.buffer');
         previewServer.init({
             server: bufferDir,
             startPath

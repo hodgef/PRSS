@@ -5,12 +5,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import App from './components/App';
-import { initStore } from '../common/Store';
+import { init } from '../common/Store';
 import { checkDirs } from './services/utils';
 import ErrorBoundary from './components/ErrorBoundary';
 
-const init = async () => {
-    await initStore();
+const initApp = async () => {
+    await init();
     await checkDirs();
 
     const PRSS = () => (
@@ -22,4 +22,4 @@ const init = async () => {
     ReactDOM.render(<PRSS />, document.getElementById('app'));
 };
 
-init();
+initApp();

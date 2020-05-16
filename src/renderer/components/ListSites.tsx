@@ -1,21 +1,35 @@
 import './styles/ListSites.scss';
 
-import React, { FunctionComponent, useState, Fragment } from 'react';
+import React, { FunctionComponent, useState, Fragment, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { get } from '../../common/utils';
 import Footer from './Footer';
 import Header from './Header';
 import { toast } from 'react-toastify';
 import { deleteSites } from '../services/hosting';
 import DraggableTree from './DraggableTree';
+import { configGet } from '../../common/utils';
+import { getSites } from '../services/db';
 
 const ListSites: FunctionComponent = () => {
-    const sites = get('sites');
     const history = useHistory();
 
     const [selectEnabled, setSelectEnabled] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
+
+    const [sites, setSites] = useState(null);
+
+    useEffect(() => {
+        const getData = async () => {
+            const res = await getSites();
+            setSites(res);
+        };
+        getData();
+    }, []);
+
+    if (!sites) {
+        return null;
+    }
 
     const toggleSelectEnabled = () => setSelectEnabled(!selectEnabled);
 
@@ -33,7 +47,7 @@ const ListSites: FunctionComponent = () => {
         /**
          * If there's no sites, redirect to create
          */
-        const newSites = get('sites');
+        const newSites = configGet('sites');
         if (!Object.keys(newSites).length) {
             history.push('/sites/create');
         }
@@ -56,8 +70,11 @@ const ListSites: FunctionComponent = () => {
         }));
     };
 
-    const onItemClick = itemId => {
-        history.push(`/sites/${itemId}`);
+    const onItemClick = async itemId => {
+        const item = await getSites()
+            .where('id', itemId)
+            .first();
+        history.push(`/sites/${item.uuid}`);
     };
 
     return (

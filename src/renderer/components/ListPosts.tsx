@@ -3,9 +3,6 @@ import './styles/ListPosts.scss';
 import React, { Fragment, FunctionComponent, useEffect, useState } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
-import { store, storeInt } from '../../common/Store';
-import { get, getInt, setInt } from '../../common/utils';
 import { walkStructure } from '../services/build';
 import {
     deletePosts,
@@ -16,61 +13,66 @@ import DraggableTree from './DraggableTree';
 import Footer from './Footer';
 import Header from './Header';
 import Loading from './Loading';
+import { getSite, getItems } from '../services/db';
+import { configGet, configSet } from '../../common/utils';
 
 const ListPosts: FunctionComponent = () => {
     const { siteId } = useParams();
-    const { items, title, structure } = get(`sites.${siteId}`);
-    const { hosting, publishSuggested } = getInt(`sites.${siteId}`);
-    const [structureState, setStructureState] = useState(structure);
+
+    const [site, setSite] = useState(null);
+    const [items, setItems] = useState(null);
+    const { title } = (site as ISite) || {};
+
+    const { hosting, publishSuggested } = configGet(`sites.${siteId}`);
+    const [structureState, setStructureState] = useState(null);
     const history = useHistory();
     const [selectEnabled, setSelectEnabled] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingStatus, setLoadingStatus] = useState('');
-    const [showPublishButton, setShowPublishButton] = useState(
-        publishSuggested
-    );
+    const [showPublishButton] = useState(publishSuggested);
 
-    const unsubscribeWatchers = [];
+    const renderItem = ({ title }) => ({
+        title
+    });
 
-    /**
-     * Check for structure changes
-     */
-    unsubscribeWatchers.push(
-        store.onDidChange(`sites.${siteId}.structure` as any, newValue => {
-            setStructureState([...newValue]);
-        })
-    );
+    useEffect(() => {
+        const getData = async () => {
+            const siteRes = await getSite(siteId);
+            const itemsRes = await getItems(siteId);
+            const draggableRes = await walkStructure(
+                siteId,
+                siteRes.structure,
+                renderItem
+            );
+            setSite(siteRes);
+            setItems(itemsRes);
+            setStructureState(draggableRes);
+        };
+        getData();
+    }, []);
 
-    unsubscribeWatchers.push(
-        storeInt.onDidChange(
-            `sites.${siteId}.publishSuggested` as any,
-            newValue => {
-                if (newValue) {
-                    setShowPublishButton(true);
-                } else {
-                    setShowPublishButton(false);
-                }
-            }
-        )
-    );
-
-    useEffect(
-        () => () => {
-            unsubscribeWatchers.forEach(unsubscribe => unsubscribe());
-        },
-        []
-    );
+    if (!site || !items || !structureState) {
+        return null;
+    }
 
     const toggleSelectEnabled = () => setSelectEnabled(!selectEnabled);
 
     const deleteSelectedPosts = async () => {
-        const deleteSuccess = await deletePosts(siteId, selectedItems);
+        const { structure, items } = await deletePosts(siteId, selectedItems);
 
-        if (deleteSuccess) {
+        if (structure && items) {
             toast.success('Posts deleted!');
             setSelectedItems([]);
             setSelectEnabled(false);
+            setItems(items);
+
+            const draggableRes = await walkStructure(
+                siteId,
+                structure,
+                renderItem
+            );
+            setStructureState(draggableRes);
         } else {
             toast.error('No deletion made');
         }
@@ -80,21 +82,21 @@ const ListPosts: FunctionComponent = () => {
         history.push(`/sites/${siteId}/posts/editor/${itemId}`);
     };
 
-    const renderItem = ({ title }) => ({
-        title
-    });
-
-    const onStructureUpdate = data => {
-        const updatedStructure = walkStructure(siteId, data);
+    const onStructureUpdate = async data => {
+        const updatedStructure = await walkStructure(siteId, data);
         updateSiteStructure(siteId, updatedStructure);
+        setStructureState(
+            await walkStructure(siteId, updatedStructure, renderItem)
+        );
         toast.success('Changes saved');
     };
 
     const publishSite = async () => {
         setLoading(true);
-        const site = get(`sites.${siteId}`);
+
+        const site = await getSite(siteId);
         const publishRes = await buildAndDeploy(site, setLoadingStatus);
-        setInt(`sites.${siteId}.publishSuggested`, false);
+        configSet(`sites.${siteId}.publishSuggested`, false);
         toast.success('Publish complete');
         if (typeof publishRes === 'object') {
             if (publishRes.type === 'redirect') {
@@ -178,8 +180,10 @@ const ListPosts: FunctionComponent = () => {
                 <div className="items">
                     <DraggableTree
                         checkable={selectEnabled}
-                        data={walkStructure(siteId, structureState, renderItem)}
-                        onUpdate={onStructureUpdate}
+                        data={structureState}
+                        onUpdate={data => {
+                            onStructureUpdate(data);
+                        }}
                         onSelect={items => items[0] && onItemClick(items[0])}
                         selectedKeys={selectedItems}
                         onCheck={setSelectedItems}

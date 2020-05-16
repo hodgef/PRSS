@@ -1,33 +1,42 @@
-import { getString, getInt } from '../../../common/utils';
+import { getString, configGet } from '../../../common/utils';
 import { build } from '../build';
 import { error, confirmation } from '../utils';
 import path from 'path';
 import { shell } from 'electron';
+import { getSite } from '../db';
 
 class FallbackProvider {
-    private readonly site: ISite;
+    private readonly siteUUID: string;
     public readonly vars = {};
     public static hostingTypeDef = {
         title: 'None (Manual deployment)',
         fields: []
     };
 
-    constructor(site: ISite) {
-        this.site = site;
+    constructor(siteUUID: string) {
+        this.siteUUID = siteUUID;
     }
+
+    fetchSite = () => {
+        return getSite(this.siteUUID);
+    };
+
+    fetchSiteConfig = () => {
+        return configGet(`sites.${this.siteUUID}`);
+    };
 
     setup = async onUpdate => {
         /**
          * Build project
          */
-        const buildRes = await build(this.site, onUpdate);
+        const buildRes = await build(this.siteUUID, onUpdate);
 
         if (!buildRes) {
             error(getString('error_buffer'));
             return false;
         }
 
-        return this.site;
+        return true;
     };
 
     deploy = async (onUpdate?, providedBufferItems?: IBufferItem[]) => {
@@ -50,12 +59,12 @@ class FallbackProvider {
         if (confirmationRes === 0) {
             return {
                 type: 'redirect',
-                value: `/sites/${this.site.id}/hosting`
+                value: `/sites/${this.siteUUID}/hosting`
             };
         }
 
         if (confirmationRes === 1) {
-            const bufferDir = getInt('paths.buffer');
+            const bufferDir = configGet('paths.buffer');
 
             if (providedBufferItems && providedBufferItems.length) {
                 if (providedBufferItems.length > 1) {

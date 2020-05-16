@@ -8,24 +8,35 @@ import cx from 'classnames';
 
 import Footer from './Footer';
 import Header from './Header';
-import { get, set, setInt, getInt } from '../../common/utils';
 import { confirmation } from '../services/utils';
 import { toast } from 'react-toastify';
 import { modal } from './Modal';
 import { shell } from 'electron';
 import { getThemeListDetails } from '../services/theme';
 import defaultThumbnail from '../images/defaultThemeThumbnail.png';
+import { getSite, updateSite } from '../services/db';
+import { configSet, configGet } from '../../common/utils';
 
 const ThemeManager: FunctionComponent = () => {
     const { siteId } = useParams();
-    const site = get(`sites.${siteId}`) as ISite;
-    const { title, theme } = site;
 
-    const [siteTheme, setSiteTheme] = useState(theme);
+    const [site, setSite] = useState(null);
+    const { title } = (site as ISite) || {};
+
+    const [siteTheme, setSiteTheme] = useState(null);
     const [themeList, setThemeList] = useState([]);
 
-    const getThemes = (noToast?) => {
-        const themes = getThemeListDetails();
+    useEffect(() => {
+        const getData = async () => {
+            const siteRes = await getSite(siteId);
+            setSite(siteRes);
+            setSiteTheme(siteRes.theme);
+        };
+        getData();
+    }, []);
+
+    const getThemes = async (noToast?) => {
+        const themes = await getThemeListDetails();
         setThemeList(themes);
 
         if (!noToast) {
@@ -38,6 +49,10 @@ const ThemeManager: FunctionComponent = () => {
     }, []);
 
     const history = useHistory();
+
+    if (!site || !siteTheme) {
+        return null;
+    }
 
     const showThemeDetails = theme => {
         modal.alert(
@@ -73,14 +88,25 @@ const ThemeManager: FunctionComponent = () => {
             modal.alert('Your site must have a theme');
             return;
         }
+
+        const updatedAt = Date.now();
         setSiteTheme(themeName);
 
         const updatedSite = {
             ...site,
-            theme: themeName
+            theme: themeName,
+            updatedAt
         };
-        await set(`sites.${siteId}`, updatedSite);
-        await setInt(`sites.${siteId}.publishSuggested`, true);
+
+        await updateSite(siteId, {
+            theme: themeName,
+            updatedAt
+        });
+
+        await configSet(`sites.${siteId}.publishSuggested`, true);
+
+        setSite(updatedSite);
+
         toast.success(
             'Site updated! Please publish your changes from your Dashboard'
         );
@@ -116,7 +142,7 @@ const ThemeManager: FunctionComponent = () => {
             return;
         }
 
-        const themesDir = getInt('paths.themes');
+        const themesDir = configGet('paths.themes');
         shell.openItem(themesDir);
     };
 

@@ -1,29 +1,41 @@
 import './styles/TitleEditor.scss';
 
-import React, { FunctionComponent, useState, Fragment } from 'react';
+import React, { FunctionComponent, useState, Fragment, useEffect } from 'react';
 
-import { get, set } from '../../common/utils';
 import { error } from '../services/utils';
-import { toast } from 'react-toastify';
 import cx from 'classnames';
+import { getItem } from '../services/db';
 
 interface IProps {
     siteId: string;
-    postIndex: number;
+    postId: string;
     initValue: string;
+    onSave: (s: string) => any;
 }
 
 const TitleEditor: FunctionComponent<IProps> = ({
     siteId,
-    postIndex = -1,
-    initValue = ''
+    postId,
+    initValue = '',
+    onSave
 }) => {
     const [editing, setEditing] = useState(false);
     const [value, setValue] = useState(initValue);
-    const post =
-        postIndex > -1 ? get(`sites.${siteId}.items.${postIndex}`) : null;
+    const [post, setPost] = useState(null);
 
-    const save = () => {
+    useEffect(() => {
+        const getData = async () => {
+            const item = await getItem(siteId, postId);
+            setPost(item);
+        };
+        getData();
+    }, []);
+
+    if (!post) {
+        return null;
+    }
+
+    const save = async () => {
         if (!value.trim()) {
             error('The title must have a value');
             return;
@@ -33,9 +45,8 @@ const TitleEditor: FunctionComponent<IProps> = ({
             return;
         }
 
-        set(`sites.${siteId}.items.${postIndex}.title`, value);
-
-        toast.success('Title saved');
+        await onSave(value);
+        setPost({ ...post, title: value });
         setEditing(false);
     };
 

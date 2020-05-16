@@ -63,7 +63,7 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
                 </p>
                 <p>Here are the available parameters (with sample data):</p>
                 <div className="code-dark">
-                    ${JSON.stringify(bufferItemMockJson, null, 2)}
+                    {JSON.stringify(bufferItemMockJson, null, 2)}
                 </div>
             </Fragment>,
             null,

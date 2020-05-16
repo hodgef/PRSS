@@ -1,6 +1,6 @@
 import './styles/PostEditorSidebar.scss';
 
-import React, { FunctionComponent, useState, Fragment } from 'react';
+import React, { FunctionComponent, useState, Fragment, useEffect } from 'react';
 import cx from 'classnames';
 import { noop, confirmation, error } from '../services/utils';
 import Loading from './Loading';
@@ -40,7 +40,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
     deployLoading,
     publishSuggested,
     loadingStatus,
-    forceRawHTMLEditing,
+    forceRawHTMLEditing = false,
     onSave = noop,
     onStopPreview = noop,
     onStartPreview = noop,
@@ -54,7 +54,17 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
     const currentTemplate = item.template;
     const [showMoreOptions, setShowMoreOptions] = useState(false);
 
-    const templateList = getTemplateList(themeName);
+    const [templateList, setTemplateList] = useState(null);
+
+    useEffect(() => {
+        getTemplateList(themeName).then(res => {
+            setTemplateList(res);
+        });
+    }, []);
+
+    if (!templateList) {
+        return null;
+    }
 
     const toggleForceRawHTML = async () => {
         if (forceRawHTMLEditing) {

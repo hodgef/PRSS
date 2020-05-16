@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { getString, getInt } from '../../common/utils';
+import { getString, configGet } from '../../common/utils';
 import { modal } from '../components/Modal';
 
 export const merge = (var1, var2) => {
@@ -134,13 +134,70 @@ export const checkDirs = async () => {
     /**
      * Ensure buffer exists
      */
-    const bufferDir = getInt('paths.buffer');
+    const bufferDir = configGet('paths.buffer');
     if (!fs.existsSync(bufferDir)) {
         fs.mkdirSync(bufferDir);
     }
 };
 
 export const noop = () => {};
+
+export const toJson = o => JSON.stringify(o);
+export const fromJson = (s: string) => JSON.parse(s);
+
+export const valuesToJson = input => {
+    let out;
+
+    if (Array.isArray(input)) {
+        out = input.map(i => valuesToJson(i));
+    } else if (typeof input === 'object') {
+        out = {};
+        Object.keys(input).forEach(key => {
+            out[key] = input[key] ? toJson(input[key]) : input[key];
+        });
+    } else {
+        return input;
+    }
+
+    return out;
+};
+
+export const valuesFromJson = input => {
+    let out;
+
+    if (Array.isArray(input)) {
+        out = input.map(i => valuesFromJson(i));
+    } else if (typeof input === 'object') {
+        out = {};
+        Object.keys(input).forEach(key => {
+            out[key] = input[key] ? valuesFromJson(input[key]) : input[key];
+        });
+    } else {
+        return fromJson(input);
+    }
+
+    return out;
+};
+
+export const mapFieldsFromJSON = (fields = [], obj) => {
+    const newObj = { ...obj };
+    fields.forEach(field => {
+        if (newObj[field]) {
+            newObj[field] = JSON.parse(newObj[field]);
+        }
+    });
+    return newObj;
+};
+
+export const mapFieldsToJSON = (fields = [], obj) => {
+    const newObj = { ...obj };
+    fields.forEach(field => {
+        if (newObj[field]) {
+            newObj[field] = JSON.stringify(newObj[field]);
+        }
+    });
+    return newObj;
+};
 
 export const sequential = (
     arr: any[],
@@ -202,29 +259,42 @@ export const sanitizeSite = siteObj => {
     /**
      * Remove site keys
      */
-    ['headHtml', 'footerHtml', 'sidebarHtml', 'vars'].forEach(field => {
+    [
+        'uuid',
+        'name',
+        'theme',
+        'publishedAt',
+        'headHtml',
+        'footerHtml',
+        'sidebarHtml',
+        'vars'
+    ].forEach(field => {
         delete newObj[field];
-    });
-
-    /**
-     * Update items
-     */
-    newObj.items = newObj.items.map(item => {
-        item.content = truncateString(stripTags(item.content));
-        return sanitizeItem(item);
     });
 
     return newObj;
 };
 
+export const sanitizeSiteItems = items => {
+    /**
+     * Update items
+     */
+    return items.map(item => {
+        item.content = truncateString(stripTags(item.content));
+        return sanitizeItem(item);
+    });
+};
+
 export const sanitizeItem = itemObj => {
     const newObj = JSON.parse(JSON.stringify(itemObj));
     [
+        'id',
         'headHtml',
         'footerHtml',
         'sidebarHtml',
-        //'vars',
-        'exclusiveVariables'
+        'exclusiveVars',
+        'isContentRaw',
+        'siteId'
     ].forEach(field => {
         delete newObj[field];
     });

@@ -1,36 +1,20 @@
 import path from 'path';
 import fs from 'fs';
 
-import { store, storeInt } from './Store';
+import { store } from './Store';
 import strings from './strings.json';
 
 /**
  * Store
  */
-export const set = (...params) =>
+export const configSet = (...params) =>
     typeof params[0] === 'object'
         ? store.set(params[0])
         : store.set(params[0], params[1]);
-export const get = (param: any) => store.get(param);
-export const rem = (param: any) => store.delete(param);
-
-/**
- * Store int
- */
-export const setInt = (...params) =>
-    typeof params[0] === 'object'
-        ? storeInt.set(params[0])
-        : storeInt.set(params[0], params[1]);
-export const getInt = (param: any) => storeInt.get(param);
-export const remInt = (param: any) => storeInt.delete(param);
+export const configGet = (param: any) => store.get(param);
+export const configRem = (param: any) => store.delete(param);
 
 export const globalRequire = __non_webpack_require__;
-
-export const vendorModulePath = pathName => {
-    const vendorDir = getInt('paths.vendor');
-    const vendorModulesDir = path.join(vendorDir, 'node_modules', pathName);
-    return vendorModulesDir;
-};
 
 export const getString = (id: string, replaceWith: string[] = []) => {
     let str = strings[id] || '';

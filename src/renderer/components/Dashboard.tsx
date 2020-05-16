@@ -1,28 +1,49 @@
 import './styles/Dashboard.scss';
 
-import React, { Fragment, FunctionComponent, useState } from 'react';
+import React, { Fragment, FunctionComponent, useState, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import cx from 'classnames';
 
-import { get, getString, getInt, setInt } from '../../common/utils';
+import { getString, configGet, configSet } from '../../common/utils';
 import Footer from './Footer';
 import Header from './Header';
 import { buildAndDeploy, getRepositoryUrl } from '../services/hosting';
 import { toast } from 'react-toastify';
 import Loading from './Loading';
+import { getSite } from '../services/db';
 
 const Dashboard: FunctionComponent = () => {
     const { siteId } = useParams();
-    const site = get(`sites.${siteId}`) as ISite;
-    const { title, url } = site;
-    const { publishSuggested } = getInt(`sites.${siteId}`) as ISiteInternal;
-    const repositoryUrl = getRepositoryUrl(site);
+
+    const [site, setSite] = useState(null);
+    const [publishSuggested, setPublishSuggested] = useState(null);
     const [loading, setLoading] = useState(null);
+    const [repositoryUrl, setRepositoryUrl] = useState(null);
     const [publishDescription, setPublishDescription] = useState(
         'You have unpublished changes'
     );
 
     const history = useHistory();
+    const { title, url } = (site as ISite) || {};
+
+    useEffect(() => {
+        const getData = async () => {
+            const res = await getSite(siteId);
+            const repositoryUrl = await getRepositoryUrl(siteId);
+            const siteConf =
+                ((await configGet(`sites.${siteId}`)) as ISiteInternal) ||
+                ({} as never);
+
+            setSite(res);
+            setRepositoryUrl(repositoryUrl);
+            setPublishSuggested(siteConf.publishSuggested);
+        };
+        getData();
+    }, []);
+
+    if (!site) {
+        return null;
+    }
 
     const features = [
         {
@@ -109,12 +130,13 @@ const Dashboard: FunctionComponent = () => {
             icon: 'publish',
             onClick: async () => {
                 setLoading('publish');
-                const site = await get(`sites.${siteId}`);
                 const publishRes = await buildAndDeploy(
-                    site,
+                    siteId,
                     setPublishDescription
                 );
-                setInt(`sites.${siteId}.publishSuggested`, false);
+
+                configSet(`sites.${siteId}.publishSuggested`, false);
+                setPublishSuggested(false);
 
                 toast.success('Publish complete');
 

@@ -1,23 +1,40 @@
 import './styles/ListMenus.scss';
 
-import React, { FunctionComponent, useState, Fragment } from 'react';
+import React, { FunctionComponent, useState, Fragment, useEffect } from 'react';
 import { useHistory, useParams, Link } from 'react-router-dom';
 
-import { get, set } from '../../common/utils';
 import Footer from './Footer';
 import Header from './Header';
 import { toast } from 'react-toastify';
 import { deleteMenus } from '../services/hosting';
 import DraggableTree from './DraggableTree';
 import { ask, normalizeStrict } from '../services/utils';
+import { getSite, updateSite } from '../services/db';
 
 const ListMenus: FunctionComponent = () => {
     const { siteId } = useParams();
-    const { title, menus, items } = get(`sites.${siteId}`);
+
+    const [site, setSite] = useState(null);
+    const [menus, setMenus] = useState(null);
+    const { title } = (site as ISite) || {};
+
     const history = useHistory();
 
     const [selectEnabled, setSelectEnabled] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
+
+    useEffect(() => {
+        const getData = async () => {
+            const siteRes = await getSite(siteId);
+            setSite(siteRes);
+            setMenus(siteRes.menus);
+        };
+        getData();
+    }, []);
+
+    if (!site || !menus) {
+        return null;
+    }
 
     const toggleSelectEnabled = () => setSelectEnabled(!selectEnabled);
 
@@ -36,12 +53,13 @@ const ListMenus: FunctionComponent = () => {
             return;
         }
 
-        const deleteSuccess = await deleteMenus(selectedItems);
+        const deleteRes = await deleteMenus(siteId, selectedItems);
 
-        if (deleteSuccess) {
+        if (deleteRes) {
             toast.success('Menus deleted!');
             setSelectedItems([]);
             setSelectEnabled(false);
+            setMenus(deleteRes);
         } else {
             toast.error('No deletion made');
         }
@@ -64,9 +82,7 @@ const ListMenus: FunctionComponent = () => {
         /**
          * Ensure menu doesn't already exist
          */
-        const existingMenu = await get(
-            `sites.${siteId}.menus.${sanitizedMenuName}`
-        );
+        const existingMenu = menus[sanitizedMenuName];
 
         if (existingMenu) {
             /**
@@ -81,7 +97,16 @@ const ListMenus: FunctionComponent = () => {
         /**
          * Create menu
          */
-        await set(`sites.${siteId}.menus.${sanitizedMenuName}`, []);
+        const updatedAt = Date.now();
+        const updatedMenus = { ...menus, [sanitizedMenuName]: [] };
+
+        /**
+         * Update site updatedAt
+         */
+        await updateSite(siteId, {
+            menus: updatedMenus,
+            updatedAt
+        });
 
         /**
          * Redirect to menu editor

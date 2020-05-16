@@ -1,6 +1,12 @@
 import './styles/SiteVariablesEditorOverlay.scss';
 
-import React, { FunctionComponent, useState, useRef, Fragment } from 'react';
+import React, {
+    FunctionComponent,
+    useState,
+    useRef,
+    Fragment,
+    useEffect
+} from 'react';
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 
@@ -11,9 +17,9 @@ import 'ace-builds/src-noconflict/mode-html';
 import 'ace-builds/src-noconflict/theme-github';
 import { toast } from 'react-toastify';
 import { modal } from './Modal';
-import { get, set } from '../../common/utils';
-import { getPostItem, siteVarToArray } from '../services/hosting';
+import { siteVarToArray } from '../services/hosting';
 import { getBufferItems } from '../services/build';
+import { getSite, getItems, updateSite, updateItem } from '../services/db';
 
 interface IProps {
     siteId: string;
@@ -26,31 +32,73 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
     postId,
     onClose = noop
 }) => {
-    const site = get(`sites.${siteId}`);
-    const post = postId ? getPostItem(site, postId) : null;
-    const postIndex = post
-        ? site.items.findIndex(item => item.id === postId)
-        : -1;
+    const [site, setSite] = useState(null);
+    const [items, setItems] = useState(null);
+    const [post, setPost] = useState(null);
 
-    const parsedVariables = siteVarToArray(
-        (post ? post.vars : site.vars) || {
-            '': ''
-        }
+    const [bufferItem, setBufferItem] = useState(null);
+
+    const [parsedVariables, setParsedVariables] = useState([]);
+    const [parsedInheritedVariables, setParsedInheritedVariables] = useState(
+        []
     );
 
-    const bufferItems = getBufferItems(site).find(
-        data => data.item.id === postId
-    );
-
-    const parsedInheritedVariables = post
-        ? siteVarToArray(bufferItems.vars)
-        : [];
-
-    const variablesBuffer = useRef(parsedVariables);
     const [variables, setVariables] = useState(parsedVariables);
-    const [exclusiveVariables, setExclusiveVariables] = useState(
-        post ? post.exclusiveVars || [] : []
-    );
+    const [exclusiveVariables, setExclusiveVariables] = useState([]);
+
+    const variablesBuffer = useRef(parsedVariables) as any;
+
+    useEffect(() => {
+        const getData = async () => {
+            const siteRes = await getSite(siteId);
+            const itemsRes = await getItems(siteId);
+
+            setSite(siteRes);
+            setItems(itemsRes);
+
+            const bufferItems = await getBufferItems(siteRes);
+
+            const post = postId
+                ? itemsRes.find(item => item.uuid === postId)
+                : null;
+            setPost(post);
+
+            const bufferItem =
+                bufferItems && post
+                    ? bufferItems.find(
+                          bufferItem => bufferItem.item.uuid === post.uuid
+                      )
+                    : null;
+
+            setBufferItem(bufferItem);
+
+            const baseVars = post ? post.vars || {} : siteRes.vars || {};
+
+            const parsedVariables = siteVarToArray(
+                Object.keys(baseVars).length ? baseVars : { '': '' }
+            );
+
+            setParsedVariables(parsedVariables);
+            setVariables(parsedVariables);
+
+            const exclusiveVariables = post ? post.exclusiveVars || [] : [];
+            setExclusiveVariables(exclusiveVariables);
+
+            variablesBuffer.current = variablesBuffer;
+            bufferItem &&
+                setParsedInheritedVariables(siteVarToArray(bufferItem.vars));
+        };
+        getData();
+    }, []);
+
+    if (
+        !site ||
+        !items ||
+        (postId && (!post || !bufferItem)) ||
+        !parsedVariables
+    ) {
+        return null;
+    }
 
     const addNew = () => {
         setVariables(prevVars => [...prevVars, { name: '', content: '' }]);
@@ -107,7 +155,9 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        const updatedAt = Date.now();
+
         /**
          * Removing empty vars
          */
@@ -141,19 +191,44 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
         /**
          * Save to post
          */
-        if (postIndex > -1) {
-            set(`sites.${siteId}.items.${postIndex}.vars`, varObj);
-            set(
-                `sites.${siteId}.items.${postIndex}.exclusiveVars`,
-                newExclusiveVarsArr
-            );
+        if (post) {
+            const updatedItem = {
+                ...post,
+                vars: varObj,
+                exclusiveVars: newExclusiveVarsArr,
+                updatedAt
+            };
 
+            /**
+             *  Update item
+             */
+            await updateItem(siteId, postId, {
+                vars: varObj,
+                exclusiveVars: newExclusiveVarsArr,
+                updatedAt
+            });
+
+            setPost(updatedItem);
             toast.success('Post variables saved!');
         } else {
             /**
              * Save to site
              */
-            set(`sites.${siteId}.vars`, varObj);
+            const updatedSite = {
+                ...site,
+                vars: varObj,
+                updatedAt
+            };
+
+            /**
+             * Update site updatedAt
+             */
+            await updateSite(siteId, {
+                vars: varObj,
+                updatedAt
+            });
+
+            setSite(updatedSite);
             toast.success('Site variables saved!');
         }
     };
@@ -240,11 +315,6 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                                 variable.name
                             );
 
-                            console.log(
-                                'exclusiveVariables',
-                                exclusiveVariables
-                            );
-
                             return (
                                 <li
                                     key={`${variable}-${index}`}
@@ -275,7 +345,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                                                 setVar(e, index, 'content')
                                             }
                                         />
-                                        {postIndex > -1 && (
+                                        {post && (
                                             <button
                                                 title="Prevent children from inheriting this variable"
                                                 type="button"

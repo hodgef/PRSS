@@ -1,13 +1,14 @@
 {
   "name": "prss",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "Powerful Blogging",
   "license": "MIT",
   "scripts": {
     "start": "electron-webpack dev",
     "build": "electron-webpack",
     "dist": "npm run build && electron-builder",
-    "dist:dir": "npm run dist --dir -c.compression=store -c.mac.identity=null"
+    "dist:dir": "npm run dist --dir -c.compression=store -c.mac.identity=null",
+    "rebuild": "electron-rebuild -f -w sqlite3"
   },
   "author": {
     "name": "Francisco Hodge",
@@ -15,11 +16,13 @@
     "url": "https://github.com/hodgef"
   },
   "dependencies": {
-    "electron-store": "^5.1.1",
-    "source-map-support": "^0.5.12",
     "browser-sync": "^2.26.7",
+    "electron-store": "^5.1.1",
     "html-minifier": "^4.0.0",
-    "keytar": "^5.4.0"
+    "keytar": "^5.4.0",
+    "knex": "^0.21.1",
+    "source-map-support": "^0.5.12",
+    "sqlite3": "^4.2.0"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.8.3",

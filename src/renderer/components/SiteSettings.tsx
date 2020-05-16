@@ -1,32 +1,34 @@
 import './styles/SiteSettings.scss';
 
-import React, { FunctionComponent, Fragment, useState } from 'react';
+import React, { FunctionComponent, Fragment, useState, useEffect } from 'react';
 import { useHistory, useParams, Link } from 'react-router-dom';
 
 import Footer from './Footer';
 import Header from './Header';
-import { get, set, setInt, getInt, rem, remInt } from '../../common/utils';
 import { normalizeStrict } from '../services/utils';
 import { toast } from 'react-toastify';
 import HTMLEditorOverlay from './HTMLEditorOverlay';
 import { modal } from './Modal';
 import { getThemeList } from '../services/theme';
 import SiteVariablesEditorOverlay from './SiteVariablesEditorOverlay';
+import { configGet, configSet } from '../../common/utils';
+import { getSite, updateSite } from '../services/db';
 
 const SiteSettings: FunctionComponent = () => {
-    const { siteId: urlSiteId } = useParams();
-    const site = get(`sites.${urlSiteId}`) as ISite;
-    const siteInt = getInt(`sites.${urlSiteId}`) as ISiteInternal;
-    const { title, id, headHtml, footerHtml, sidebarHtml, theme, url } = site;
+    const { siteId } = useParams();
+
+    const siteInt = configGet(`sites.${siteId}`) as ISiteInternal;
     const {
         hosting: { name: hostingName = 'none' }
     } = siteInt;
 
-    const [siteTitle, setSiteTitle] = useState(title);
-    const [siteId, setSiteId] = useState(id);
-    const [editedSiteId, setEditedSiteId] = useState(id);
-    const [siteTheme, setSiteTheme] = useState(theme);
-    const [siteUrl, setSiteUrl] = useState(url);
+    const [site, setSite] = useState(null);
+    const { title, headHtml, footerHtml, sidebarHtml } = (site as ISite) || {};
+
+    const [siteTitle, setSiteTitle] = useState('');
+    const [editedSiteName, setEditedSiteName] = useState('');
+    const [siteTheme, setSiteTheme] = useState('');
+    const [siteUrl, setSiteUrl] = useState('');
 
     const [showRawHTMLEditorOverlay, setShowRawHTMLEditorOverlay] = useState(
         false
@@ -37,11 +39,30 @@ const SiteSettings: FunctionComponent = () => {
         setShowSiteVariablesEditorOverlay
     ] = useState(false);
 
-    const themeList = getThemeList();
+    const [themeList, setThemeList] = useState(null);
     const history = useHistory();
 
+    useEffect(() => {
+        const getData = async () => {
+            const siteRes = await getSite(siteId);
+            const { title, name, theme, url } = (siteRes as ISite) || {};
+            setSite(siteRes);
+            setSiteTitle(title);
+            setEditedSiteName(name);
+            setSiteTheme(theme);
+            setSiteUrl(url);
+
+            setThemeList(await getThemeList());
+        };
+        getData();
+    }, []);
+
+    if (!site || !themeList) {
+        return null;
+    }
+
     const handleSubmit = async () => {
-        if (!editedSiteId) {
+        if (!editedSiteName) {
             modal.alert('Your site must have an id');
             return;
         }
@@ -61,33 +82,37 @@ const SiteSettings: FunctionComponent = () => {
             return;
         }
 
-        const newSiteId = normalizeStrict(editedSiteId);
+        const updatedAt = Date.now();
+        const newSiteName = normalizeStrict(editedSiteName);
 
         const updatedSite = {
             ...site,
-            id: newSiteId,
+            name: newSiteName,
             title: siteTitle,
             theme: siteTheme,
-            url: siteUrl
+            url: siteUrl,
+            updatedAt
         };
 
         const updatedSiteInt = {
             ...siteInt,
-            id: newSiteId,
             publishSuggested: true
         };
 
-        if (siteId !== newSiteId) {
-            await rem(`sites.${siteId}`);
-            await remInt(`sites.${siteInt.id}`);
-        }
+        /**
+         * Update site updatedAt
+         */
+        await updateSite(siteId, {
+            name: newSiteName,
+            title: siteTitle,
+            theme: siteTheme,
+            url: siteUrl,
+            updatedAt
+        });
 
-        await set(`sites.${newSiteId}`, updatedSite);
-        await setInt(`sites.${newSiteId}`, updatedSiteInt);
+        await configSet(`sites.${siteId}`, updatedSiteInt);
 
-        if (siteId !== newSiteId) {
-            history.replace(`/sites/${newSiteId}/settings`);
-        }
+        setSite(updatedSite);
 
         toast.success(
             'Site updated! Please publish your changes from your Dashboard'
@@ -100,10 +125,30 @@ const SiteSettings: FunctionComponent = () => {
         sidebarHtml
     ) => {
         if (siteId) {
-            await set(`sites.${siteId}.headHtml`, headHtml);
-            await set(`sites.${siteId}.footerHtml`, footerHtml);
-            await set(`sites.${siteId}.sidebarHtml`, sidebarHtml);
-            await setInt(`sites.${siteId}.publishSuggested`, true);
+            const updatedAt = Date.now();
+
+            const updatedSite = {
+                ...site,
+                headHtml,
+                footerHtml,
+                sidebarHtml,
+                updatedAt
+            };
+
+            /**
+             *  Update item
+             */
+            await updateSite(siteId, {
+                headHtml,
+                footerHtml,
+                sidebarHtml,
+                updatedAt
+            });
+
+            await configSet(`sites.${siteId}.publishSuggested`, true);
+
+            setSite(updatedSite);
+
             toast.success(
                 'Site updated! Please publish your changes from your Dashboard'
             );
@@ -162,19 +207,19 @@ const SiteSettings: FunctionComponent = () => {
                     <div className="form-group row">
                         <div className="input-group input-group-lg">
                             <label className="col-sm-2 col-form-label">
-                                Site Id
+                                Site Name
                             </label>
                             <div className="col-sm-10">
                                 <input
                                     type="text"
                                     className="form-control"
-                                    value={editedSiteId}
+                                    value={editedSiteName}
                                     onChange={e =>
-                                        setEditedSiteId(e.target.value)
+                                        setEditedSiteName(e.target.value)
                                     }
                                     onBlur={() =>
-                                        setEditedSiteId(
-                                            normalizeStrict(editedSiteId)
+                                        setEditedSiteName(
+                                            normalizeStrict(editedSiteName)
                                         )
                                     }
                                 />

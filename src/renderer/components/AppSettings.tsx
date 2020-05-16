@@ -5,23 +5,22 @@ import { useHistory, Link } from 'react-router-dom';
 
 import Footer from './Footer';
 import Header from './Header';
-import { getString } from '../../common/utils';
+import { getString, configSet, configGet } from '../../common/utils';
 import { error, confirmation } from '../services/utils';
-import { store } from '../../common/Store';
 import { modal } from './Modal';
 const { app } = require('electron').remote;
 
 const AppSettings: FunctionComponent = () => {
     const history = useHistory();
 
-    const [storePath, setStorePath] = useState('');
+    const [storePath, setStorePath] = useState(configGet('paths.db'));
 
     const handleSubmit = async () => {
         if (storePath) {
             const confirmationRes = await confirmation({
                 title: (
                     <Fragment>
-                        <p>You have modified the config file path.</p>
+                        <p>You have modified the database file path.</p>
                         <p>
                             Please ensure you have copied or moved the file to
                             its new location.
@@ -37,7 +36,8 @@ const AppSettings: FunctionComponent = () => {
                 return;
             }
 
-            await localStorage.setItem('storePath', storePath);
+            await configSet('paths.db', storePath);
+
             modal.alert(
                 'Config path changed! PRSS will restart in 3 seconds...'
             );
@@ -79,16 +79,16 @@ const AppSettings: FunctionComponent = () => {
                         <div className="input-group input-group-lg">
                             <label
                                 htmlFor="siteTitle"
-                                className="col-sm-2 col-form-label"
+                                className="col-sm-3 col-form-label"
                             >
-                                Config location
+                                Database directory
                             </label>
-                            <div className="col-sm-10">
+                            <div className="col-sm-9">
                                 <input
                                     type="text"
                                     className="form-control"
                                     id="siteTitle"
-                                    value={storePath || store.path}
+                                    value={storePath || app.getPath('userData')}
                                     onChange={e => setStorePath(e.target.value)}
                                 />
                             </div>

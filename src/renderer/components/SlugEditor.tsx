@@ -1,40 +1,60 @@
 import './styles/SlugEditor.scss';
 
-import React, { FunctionComponent, useState, Fragment } from 'react';
+import React, { FunctionComponent, useState, Fragment, useEffect } from 'react';
 
-import { get, set, setInt, getString } from '../../common/utils';
+import { getString } from '../../common/utils';
 import { error, normalize } from '../services/utils';
-import { toast } from 'react-toastify';
 import cx from 'classnames';
 import { getBufferItems } from '../services/build';
 import { isValidSlug } from '../services/hosting';
 import { modal } from './Modal';
+import { getSite, getItems } from '../services/db';
 
 interface IProps {
     siteId: string;
-    postIndex: number;
+    postId: string;
     url?: string;
     initValue: string;
+    onSave: (s: string) => any;
 }
 
 const SlugEditor: FunctionComponent<IProps> = ({
     siteId,
-    postIndex = -1,
+    postId,
     url,
-    initValue = ''
+    initValue = '',
+    onSave
 }) => {
     const [editing, setEditing] = useState(false);
     const [value, setValue] = useState(initValue);
-    const site = get(`sites.${siteId}`);
-    const posts = get(`sites.${siteId}.items`);
-    const post =
-        postIndex > -1 ? get(`sites.${siteId}.items.${postIndex}`) : null;
-    const bufferItems = getBufferItems(site);
-    const bufferItem = post
-        ? bufferItems.find(bufferItem => bufferItem.item.id === post.id)
+
+    const [site, setSite] = useState(null);
+    const [items, setItems] = useState(null);
+    const [post, setPost] = useState(null);
+    const [bufferItems, setBufferItems] = useState(null);
+
+    useEffect(() => {
+        const getData = async () => {
+            const siteRes = await getSite(siteId);
+            const itemsRes = await getItems(siteId);
+            setSite(siteRes);
+            setItems(itemsRes);
+            setPost(itemsRes.find(item => item.uuid === postId));
+            const bufferItems = await getBufferItems(siteRes);
+            setBufferItems(bufferItems);
+        };
+        getData();
+    }, []);
+
+    const bufferItem = bufferItems
+        ? bufferItems.find(bufferItem => bufferItem.item.uuid === post.uuid)
         : null;
 
-    const save = () => {
+    if (!site || !items || !post || !bufferItem) {
+        return null;
+    }
+
+    const save = async () => {
         if (!value.trim()) {
             error('The slug must have a value');
             return;
@@ -46,7 +66,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
 
         const normalizedSlug = normalize(value);
 
-        if (!isValidSlug(normalizedSlug, siteId, post.id)) {
+        if (!(await isValidSlug(normalizedSlug, siteId, post.uuid))) {
             modal.alert(getString('error_invalid_slug'));
             return;
         }
@@ -54,7 +74,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
         /**
          * Ensure slug is unique
          */
-        const itemsWithSlug = posts.filter(
+        const itemsWithSlug = items.filter(
             item => item.slug === normalizedSlug
         );
 
@@ -63,15 +83,13 @@ const SlugEditor: FunctionComponent<IProps> = ({
             return;
         }
 
-        if (itemsWithSlug.length === 1 && itemsWithSlug[0].id !== post.id) {
+        if (itemsWithSlug.length === 1 && itemsWithSlug[0].uuid !== post.uuid) {
             error('You have an item with the same slug');
             return;
         }
 
-        set(`sites.${siteId}.items.${postIndex}.slug`, normalizedSlug);
-        setInt(`sites.${siteId}.publishSuggested`, true);
-
-        toast.success('Slug saved');
+        await onSave(normalizedSlug);
+        setPost({ ...post, slug: normalizedSlug });
         setEditing(false);
     };
 
@@ -101,7 +119,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
                 </Fragment>
             ) : (
                 <Fragment>
-                    {postIndex !== 0 ? (
+                    {bufferItem.path !== '/' ? (
                         <Fragment>
                             <a
                                 href={url + bufferItem.path.substring(1) + '/'}

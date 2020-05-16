@@ -3,24 +3,29 @@ import './styles/CreateSite.scss';
 import React, { Fragment, FunctionComponent, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 
-import { getString, remInt } from '../../common/utils';
+import { getString, configRem } from '../../common/utils';
 import {
     getSampleSiteStructure,
     getSampleSiteIntStructure
 } from '../services/site';
 import {
     getHostingTypes,
-    setSite,
     setupRemote,
     handleHostingFields,
-    setSiteInternal,
-    validateHostingFields
+    validateHostingFields,
+    setSiteConfig
 } from '../services/hosting';
 import { error, normalizeStrict } from '../services/utils';
 import Footer from './Footer';
 import Header from './Header';
 import Loading from './Loading';
 import { modal } from './Modal';
+import {
+    createSite,
+    deleteSite,
+    deleteAllSiteItems,
+    createItems
+} from '../services/db';
 
 const CreateSite: FunctionComponent = () => {
     const [loading, setLoading] = useState(false);
@@ -56,7 +61,7 @@ const CreateSite: FunctionComponent = () => {
         }
 
         setLoading(true);
-        const siteId = normalizeStrict(title);
+        const siteName = normalizeStrict(title);
 
         /**
          * Handle hosting fields
@@ -67,44 +72,60 @@ const CreateSite: FunctionComponent = () => {
             ...hostingFields
         });
 
-        const baseSite = {
-            ...getSampleSiteStructure(),
-            id: siteId,
+        const {
+            site: siteStructure,
+            items: siteItems
+        } = getSampleSiteStructure();
+        const siteUUID = siteStructure.uuid;
+
+        const baseSiteDB = {
+            ...siteStructure,
+            name: siteName,
             title
         } as ISite;
 
-        const baseSiteInternal = {
+        const baseSiteConfig = {
             ...getSampleSiteIntStructure(),
-            id: siteId,
+            uuid: siteStructure.uuid,
+            name: siteName,
             hosting: parsedHosting
         } as ISiteInternal;
 
-        await setSiteInternal(baseSiteInternal);
+        /**
+         * Save site in config
+         */
+        await setSiteConfig(baseSiteConfig);
+
+        /**
+         * Save site in db
+         */
+        await createSite(baseSiteDB);
+
+        /**
+         * Save site items in db
+         */
+        await createItems(siteItems);
 
         /**
          * Set up remote
          */
-        const site = await setupRemote(baseSite, setLoadingStatus);
-        if (!site) {
+        const setupRes = await setupRemote(siteUUID, setLoadingStatus);
+        if (!setupRes) {
             setLoading(false);
 
             /**
              * Rollback siteInt changes
              */
-            await remInt(`sites.${siteId}`);
-
+            await configRem(`sites.${siteUUID}`);
+            await deleteSite(siteUUID);
+            await deleteAllSiteItems(siteUUID);
             return;
         }
 
         /**
-         * Save site
-         */
-        setSite(site);
-
-        /**
          * Go to site preview
          */
-        history.push(`/sites/${site.id}`);
+        history.push(`/sites/${siteUUID}`);
     };
 
     return !loading ? (

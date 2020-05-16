@@ -1,30 +1,63 @@
 import './styles/MenuEditor.scss';
 
-import React, { Fragment, FunctionComponent, useState } from 'react';
+import React, { Fragment, FunctionComponent, useState, useEffect } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import { get, set } from '../../common/utils';
 import { walkStructure, findInStructure } from '../services/build';
 import { deleteMenuEntries } from '../services/hosting';
 import DraggableTree from './DraggableTree';
 import Footer from './Footer';
 import Header from './Header';
 import { ask } from '../services/utils';
+import { getSite, getItems, updateSite } from '../services/db';
 
 const MenuEditor: FunctionComponent = () => {
     const { siteId, menuId } = useParams();
-    const { items, title, structure } = get(`sites.${siteId}`);
 
-    const rawMenu = get(`sites.${siteId}.menus.${menuId}`);
-    const menu = rawMenu && rawMenu.length ? rawMenu : [];
+    const [site, setSite] = useState(null);
+    const [items, setItems] = useState(null);
+    const { title } = (site as ISite) || {};
+    const [formattedStructure, setFormattedStructure] = useState(null);
+    const [formattedMenuStructure, setFormattedMenuStructure] = useState(null);
 
-    const [menuState, setMenuState] = useState(menu);
+    const [menuState, setMenuState] = useState(null);
     const [menuChanged, setMenuChanged] = useState(false);
 
     const history = useHistory();
     const [selectEnabled, setSelectEnabled] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
+
+    useEffect(() => {
+        const getData = async () => {
+            const siteRes = await getSite(siteId);
+            const itemsRes = await getItems(siteId);
+            const menu = siteRes.menus[menuId];
+
+            setSite(siteRes);
+            setItems(itemsRes);
+            setFormattedStructure(
+                await walkStructure(siteId, siteRes.structure, ({ title }) => ({
+                    title
+                }))
+            );
+            handleMenuUpdate(menu);
+        };
+        getData();
+    }, []);
+
+    const handleMenuUpdate = async menuState => {
+        setMenuState(menuState);
+        setFormattedMenuStructure(
+            await walkStructure(siteId, menuState, ({ title }) => ({
+                title
+            }))
+        );
+    };
+
+    if (!site || !items || !menuState || !formattedStructure) {
+        return null;
+    }
 
     const toggleSelectEnabled = () => setSelectEnabled(!selectEnabled);
 
@@ -39,23 +72,13 @@ const MenuEditor: FunctionComponent = () => {
             toast.success('Menu entries deleted!');
             setSelectedItems([]);
             setSelectEnabled(false);
-            setMenuState(deleteRes);
+            handleMenuUpdate(deleteRes);
         } else {
             toast.error('No deletion made');
         }
     };
 
     const onItemClick = itemId => {};
-
-    const renderItem = item => ({
-        title: item.title
-    });
-
-    const formattedStructure = walkStructure(
-        siteId,
-        structure,
-        ({ title }) => ({ title })
-    );
 
     const formatStructureOptions = (node, options = [], parents = []) => {
         const indent = parents.map(() => '--').join('') + ' ';
@@ -64,7 +87,7 @@ const MenuEditor: FunctionComponent = () => {
             <option
                 value={node.key}
                 key={node.key}
-                disabled={findInStructure(siteId, node.key, menuState)}
+                disabled={findInStructure(node.key, menuState)}
             >
                 {indent}
                 {node.title}
@@ -83,9 +106,9 @@ const MenuEditor: FunctionComponent = () => {
         return options;
     };
 
-    const formattedStructureOptions = formatStructureOptions(
-        formattedStructure[0]
-    );
+    const formattedStructureOptions = formattedStructure.length
+        ? formatStructureOptions(formattedStructure[0])
+        : null;
 
     const addNew = async () => {
         const renderInput = onChange => {
@@ -120,19 +143,35 @@ const MenuEditor: FunctionComponent = () => {
             }
         ];
 
-        setMenuState(newMenuState);
+        handleMenuUpdate(newMenuState);
         setMenuChanged(true);
         setSelectedItems([]);
     };
 
     const handleSave = async () => {
-        const cleanedStructure = walkStructure(siteId, menuState);
-        await set(`sites.${siteId}.menus.${menuId}`, cleanedStructure);
+        const cleanedStructure = await walkStructure(siteId, menuState);
+        const { menus } = await getSite(siteId);
+
+        const updatedAt = Date.now();
+        const updatedMenus = { ...menus, [menuId]: cleanedStructure };
+        const updatedSite = { ...site, menus: updatedMenus, updatedAt };
+
+        /**
+         * Update site updatedAt
+         */
+        await updateSite(siteId, {
+            menus: updatedMenus,
+            updatedAt
+        });
+
+        setSite(updatedSite);
+        handleMenuUpdate(cleanedStructure);
+
         toast.success('Menu saved successfully');
     };
 
     const onMenuUpdate = data => {
-        setMenuState(data);
+        handleMenuUpdate(data);
         setMenuChanged(true);
     };
 
@@ -218,7 +257,7 @@ const MenuEditor: FunctionComponent = () => {
                 <div className="items">
                     <DraggableTree
                         checkable={selectEnabled}
-                        data={walkStructure(siteId, menuState, renderItem)}
+                        data={formattedMenuStructure}
                         onSelect={items => items[0] && onItemClick(items[0])}
                         onUpdate={onMenuUpdate}
                         selectedKeys={selectedItems}

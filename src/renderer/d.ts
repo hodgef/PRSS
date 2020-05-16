@@ -6,13 +6,15 @@ declare const __static: string;
  * Interfaces
  */
 interface ISite {
-    id: string;
+    uuid: string;
+    name: string;
     title: string;
     url: string;
     theme: string;
     items: IPostItem[];
     structure: IStructureItem[];
     updatedAt: number | null;
+    createdAt: number | null;
     publishedAt: number | null;
     headHtml: string;
     footerHtml: string;
@@ -22,7 +24,7 @@ interface ISite {
 }
 
 interface ISiteVar {
-    key: string;
+    key?: string;
 }
 
 interface ISiteMenus {
@@ -35,15 +37,16 @@ interface IStructureItem {
 }
 
 interface IPostItem {
-    id: string;
+    uuid: string;
+    siteId: string;
     slug: string;
     title: string;
     template: string;
     content: string;
     isContentRaw?: boolean;
-    headHtml: string;
-    footerHtml: string;
-    sidebarHtml: string;
+    headHtml?: string;
+    footerHtml?: string;
+    sidebarHtml?: string;
     updatedAt: number | null;
     createdAt: number | null;
     vars: ISiteVar;
@@ -76,7 +79,8 @@ interface IStoreInternal {
 }
 
 interface ISiteInternal {
-    id: string;
+    uuid: string;
+    name?: string;
     hosting?: IHosting;
     publishSuggested?: boolean;
 }

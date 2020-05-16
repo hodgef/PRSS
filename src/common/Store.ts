@@ -1,47 +1,108 @@
 import Store from 'electron-store';
 import path from 'path';
-import { createContext } from 'react';
-import { getPackageJson } from './utils';
+import fs from 'fs';
+import knex from 'knex';
+import { mapFieldsFromJSON } from '../renderer/services/utils';
 
-const AppContext = createContext(null);
-const packageJson = getPackageJson();
+const JSON_FIELDS = ['structure', 'menus', 'vars', 'exclusiveVars'];
+
+const { app } = require('electron').remote;
 
 const defaults = {
-    sites: {}
-} as IStore;
-
-const defaultsInt = {
     sites: {},
     paths: {}
-} as IStoreInternal;
+} as IStore;
 
 let store;
-let storeInt;
+let db;
+
+const initDb = async () => {
+    const storePath = await store.get('paths.db');
+    const dbFile = path.join(storePath || app.getPath('userData'), 'prss.db');
+    const dbExists = fs.existsSync(dbFile);
+
+    db = knex({
+        client: 'sqlite3',
+        connection: {
+            filename: dbFile
+        },
+        useNullAsDefault: true,
+        postProcessResponse: (result, queryContext) => {
+            if (Array.isArray(result)) {
+                if (result && typeof result[0] === 'object') {
+                    const output = result.map(res =>
+                        mapFieldsFromJSON(JSON_FIELDS, res)
+                    );
+                    return output;
+                } else {
+                    return result;
+                }
+            } else if (typeof result === 'object') {
+                const output = mapFieldsFromJSON(JSON_FIELDS, result);
+                return output;
+            } else {
+                return result;
+            }
+        }
+    });
+
+    if (!dbExists) {
+        return db.schema
+            .createTable('sites', table => {
+                table.increments('id');
+                table.string('uuid');
+                table.string('name');
+                table.string('title');
+                table.string('url');
+                table.string('theme');
+                table.integer('updatedAt');
+                table.integer('createdAt');
+                table.integer('publishedAt');
+                table.string('headHtml');
+                table.string('footerHtml');
+                table.string('sidebarHtml');
+                table.string('structure');
+                table.string('vars');
+                table.string('menus');
+            })
+            .createTable('items', table => {
+                table.increments('id');
+                table.string('uuid');
+                table.string('siteId');
+                table.string('slug');
+                table.string('title');
+                table.string('content');
+                table.string('template');
+                table.string('headHtml');
+                table.string('footerHtml');
+                table.string('sidebarHtml');
+                table.integer('updatedAt');
+                table.integer('createdAt');
+                table.string('vars');
+                table.string('isContentRaw');
+                table.string('exclusiveVars');
+            });
+    }
+
+    return db;
+};
 
 const initStore = () => {
     return new Promise(async resolve => {
-        if (store && storeInt) {
+        if (store) {
             resolve();
         }
 
-        const storePath = await localStorage.getItem('storePath');
-        const baseStorePath = storePath
-            ? storePath.replace('PRSS.json', '')
-            : null;
-
         store = new Store({
             name: 'PRSS',
-            defaults,
-            ...(baseStorePath ? { cwd: baseStorePath } : {})
+            defaults
         });
 
-        storeInt = new Store({
-            name: 'PRSS_Internal',
-            defaults: defaultsInt
-        });
+        const paths = (await store.get('paths')) || {};
 
-        storeInt.set({
+        store.set({
             paths: {
+                ...paths,
                 buffer: path.join(__static, 'buffer'),
                 public: path.join(__static, 'public'),
                 themes: path.join(__static, 'themes'),
@@ -53,4 +114,9 @@ const initStore = () => {
     });
 };
 
-export { AppContext, initStore, store, storeInt, packageJson };
+const init = async () => {
+    await initStore();
+    await initDb();
+};
+
+export { init, store, db, JSON_FIELDS };

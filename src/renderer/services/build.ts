@@ -4,29 +4,36 @@ import del from 'del';
 import fse from 'fs-extra';
 import path from 'path';
 
-import { get, getString, getInt } from '../../common/utils';
-import { getPostItem } from './hosting';
-import { sequential, sanitizeSite, sanitizeItem, error, objGet } from './utils';
+import { getString, configGet } from '../../common/utils';
+import {
+    sequential,
+    sanitizeSite,
+    error,
+    objGet,
+    sanitizeSiteItems,
+    toJson
+} from './utils';
 import { modal } from '../components/Modal';
 import { getThemeManifest } from './theme';
+import { getSite, getItems, getItem } from './db';
 
 export const bufferPathFileNames = ['index.html', 'index.js'];
 export const configFileName = 'config.js';
+export const itemsFileName = 'items.js';
 
 export const build = async (
-    siteIdOrSite,
+    siteUUID: string,
     onUpdate = (a?) => {},
     itemIdToLoad?,
     skipClear?
 ) => {
-    let site = {} as any;
-
-    if (typeof siteIdOrSite === 'object') {
-        site = siteIdOrSite;
-    } else if (siteIdOrSite) {
-        site = get(`sites.${siteIdOrSite}`);
-    } else {
+    if (!siteUUID) {
+        console.error('No UUID was provided to build()');
         return false;
+    }
+
+    if (typeof siteUUID !== 'string') {
+        throw new Error('build: siteUUID must be a string');
     }
 
     if (!skipClear) {
@@ -39,24 +46,32 @@ export const build = async (
     /**
      * Adding config file
      */
-    const buildBufferSiteConfigRes = buildBufferSiteConfig(site);
+    const buildBufferSiteConfigRes = await buildBufferSiteConfig(siteUUID);
+
+    /**
+     * Adding items file
+     */
+    const buildBufferItemsConfigRes = await buildBufferSiteItemsConfig(
+        siteUUID
+    );
 
     /**
      * Copying anything under static/public
      */
     copyPublicToBuffer();
 
-    if (!buildBufferSiteConfigRes) {
+    if (!buildBufferSiteConfigRes || !buildBufferItemsConfigRes) {
         return false;
     }
 
     /**
      * Buffer items
      */
-    const { itemsToLoad, mainBufferItem, bufferItems } = getFilteredBufferItems(
-        site,
-        itemIdToLoad
-    );
+    const {
+        itemsToLoad,
+        mainBufferItem,
+        bufferItems
+    } = await getFilteredBufferItems(siteUUID, itemIdToLoad);
 
     /**
      * Load buffer
@@ -73,19 +88,24 @@ export const build = async (
 };
 
 export const copyPublicToBuffer = () => {
-    const bufferDir = getInt('paths.buffer');
-    const publicDir = getInt('paths.public');
+    const bufferDir = configGet('paths.buffer');
+    const publicDir = configGet('paths.public');
     return fse.copy(publicDir, bufferDir);
 };
 
-export const getFilteredBufferItems = (site, itemIdToLoad?) => {
-    const bufferItems = getBufferItems(site);
+export const getFilteredBufferItems = async (
+    siteUUID: string,
+    itemIdToLoad?: string
+) => {
+    const site = await getSite(siteUUID);
+    const items = await getItems(siteUUID);
+    const bufferItems = await getBufferItems(site);
     let itemsToLoad = bufferItems;
     let mainBufferItem;
 
     if (itemIdToLoad) {
         mainBufferItem = bufferItems.find(
-            bufferItem => itemIdToLoad === bufferItem.item.id
+            bufferItem => itemIdToLoad === bufferItem.item.uuid
         );
 
         const itemSlugsToLoad = mainBufferItem.path
@@ -93,7 +113,7 @@ export const getFilteredBufferItems = (site, itemIdToLoad?) => {
             .replace(/^\/+|\/+$/g, '')
             .split('/');
 
-        const rootPostItemId = site.items[0].id;
+        const rootPostItemId = items[0].uuid;
         const itemIdsToLoad = [rootPostItemId];
 
         itemSlugsToLoad.forEach(itemSlug => {
@@ -102,12 +122,12 @@ export const getFilteredBufferItems = (site, itemIdToLoad?) => {
             );
 
             if (foundBufferItem) {
-                itemIdsToLoad.push(foundBufferItem.item.id);
+                itemIdsToLoad.push(foundBufferItem.item.uuid);
             }
         });
 
         itemsToLoad = bufferItems.filter(bufferItem =>
-            itemIdsToLoad.includes(bufferItem.item.id)
+            itemIdsToLoad.includes(bufferItem.item.uuid)
         );
     }
 
@@ -120,7 +140,7 @@ export const getFilteredBufferItems = (site, itemIdToLoad?) => {
 
 export const clearBuffer = (noExceptions = false) => {
     return new Promise(async resolve => {
-        const bufferDir = getInt('paths.buffer');
+        const bufferDir = configGet('paths.buffer');
 
         if (bufferDir && bufferDir.includes('buffer')) {
             if (noExceptions) {
@@ -149,8 +169,14 @@ export const loadBuffer: loadBufferType = (
     return sequential(bufferItems, buildBufferItem, 300, onUpdate, false);
 };
 
-export const buildBufferSiteConfig = site => {
-    const bufferDir = getInt('paths.buffer');
+export const buildBufferSiteConfig = async (siteUUID: string) => {
+    if (typeof siteUUID !== 'string') {
+        throw new Error('buildBufferSiteConfig: siteUUID must be a string');
+    }
+
+    const bufferDir = configGet('paths.buffer');
+    const site = await getSite(siteUUID);
+
     const { code } = minify(
         `var PRSSConfig = ${JSON.stringify(sanitizeSite(site))}`
     );
@@ -164,18 +190,34 @@ export const buildBufferSiteConfig = site => {
     return true;
 };
 
+export const buildBufferSiteItemsConfig = async (siteUUID: string) => {
+    const bufferDir = configGet('paths.buffer');
+    const items = await getItems(siteUUID);
+    const { code } = minify(
+        `var PRSSItems = ${JSON.stringify(sanitizeSiteItems(items))}`
+    );
+
+    try {
+        fse.outputFileSync(path.join(bufferDir, itemsFileName), code);
+    } catch (e) {
+        return false;
+    }
+
+    return true;
+};
+
 export const buildBufferItem = async (bufferItem: IBufferItem) => {
     const { templateId, path: itemPath, parser } = bufferItem;
     const handler = getParserHandler(parser);
 
     if (!handler) {
         modal.alert(
-            `There was an error parsing the template for post id (${bufferItem.item.id})`
+            `There was an error parsing the template for post id (${bufferItem.item.uuid})`
         );
         return false;
     }
 
-    const bufferDir = getInt('paths.buffer');
+    const bufferDir = configGet('paths.buffer');
     const itemDir = path.join(bufferDir, itemPath);
     const outputFiles = (await handler(
         templateId,
@@ -201,15 +243,23 @@ export const buildBufferItem = async (bufferItem: IBufferItem) => {
     return true;
 };
 
-export const getBufferItems = (site): IBufferItem[] => {
+export const getBufferItems = async (
+    siteUUIDOrSite
+): Promise<IBufferItem[]> => {
+    const site =
+        typeof siteUUIDOrSite === 'string'
+            ? await getSite(siteUUIDOrSite)
+            : siteUUIDOrSite;
     const structurePaths = getStructurePaths(site.structure);
-    const themeManifest = getThemeManifest(site.theme);
+    const themeManifest = await getThemeManifest(site.theme);
     const bufferItems = [];
 
     if (!themeManifest) {
         modal.alert('Could not find theme manifest.');
         throw 'Could not find theme manifest.';
     }
+
+    const posts = await structureToBufferItems(structurePaths, site.uuid);
 
     structurePaths.forEach(item => {
         const path = item.split('/');
@@ -220,7 +270,7 @@ export const getBufferItems = (site): IBufferItem[] => {
                 return '';
             }
 
-            post = getPostItem(site, postId);
+            post = posts[postId];
 
             return post.slug;
         });
@@ -301,6 +351,34 @@ export const getBufferItems = (site): IBufferItem[] => {
     return bufferItems;
 };
 
+export const structureToBufferItems = (structurePaths, siteUUID: string) => {
+    return new Promise(async resolve => {
+        const postIds = [];
+        const postPromises = [];
+
+        structurePaths.forEach(item => {
+            const path = item.split('/');
+            path.forEach(postId => {
+                if (!postId) {
+                    return;
+                }
+
+                postIds.push(postId);
+                postPromises.push(getItem(siteUUID, postId));
+            });
+        });
+
+        const values = await Promise.all(postPromises);
+        const output = {};
+
+        postIds.forEach((postId, index) => {
+            output[postId] = values[index];
+        });
+
+        resolve(output);
+    });
+};
+
 export const getAggregateItemPropValues = (
     propQuery: string,
     itemsIds: string[],
@@ -309,8 +387,10 @@ export const getAggregateItemPropValues = (
     let aggregate;
 
     itemsIds.forEach(itemId => {
-        const bufferItem = bufferItems.find(bItem => bItem.item.id === itemId);
-        const itemPropValue = objGet(propQuery, bufferItem);
+        const bufferItem = bufferItems.find(
+            bItem => bItem.item.uuid === itemId
+        );
+        const itemPropValue = objGet(propQuery, bufferItem) || '';
 
         /**
          * Filter excluded vars
@@ -362,13 +442,22 @@ export const getStructurePaths = (nodes, prefix = '', store = []) => {
     return store;
 };
 
-export const walkStructure = (siteId, nodes, itemCb?) => {
+export const walkStructure = async (
+    siteUUID: string,
+    nodes,
+    itemCb?
+): Promise<any> => {
+    if (!Array.isArray(nodes)) {
+        console.error('walkStructure: Nodes must be an array', nodes);
+        return false;
+    }
+
     let outputNodes = [...nodes];
-    const site = get(`sites.${siteId}`);
+    const posts = await getItems(siteUUID);
 
     const parseNodes = obj => {
         const { key, children = [] } = obj;
-        const post = getPostItem(site, key);
+        const post = posts.find(p => p.uuid === key && p.siteId === siteUUID);
 
         if (!post) return obj;
 
@@ -386,18 +475,6 @@ export const walkStructure = (siteId, nodes, itemCb?) => {
     return outputNodes;
 };
 
-export const findInStructure = (
-    siteId: string,
-    key: string,
-    nodes: IStructureItem
-) => {
-    let found = false;
-
-    walkStructure(siteId, nodes, item => {
-        if (item.id === key) {
-            found = true;
-        }
-    });
-
-    return found;
+export const findInStructure = (uuid: string, nodes: IStructureItem) => {
+    return toJson(nodes).includes(uuid);
 };

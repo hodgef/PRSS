@@ -1,55 +1,68 @@
-import { keychainStore, getInt, setInt, remInt } from './../../common/utils';
-import { get, getString, rem, set } from '../../common/utils';
+import {
+    keychainStore,
+    configGet,
+    configSet,
+    configRem
+} from './../../common/utils';
+import { getString } from '../../common/utils';
 import { getStructurePaths } from './build';
 import GithubProvider from './providers/github';
 import FallbackProvider from './providers/none';
 import { confirmation, error, merge } from './utils';
+import {
+    deleteSite,
+    getSite,
+    updateSite,
+    getItems,
+    deleteItem,
+    getSiteUUIDById
+} from './db';
 
 export const getHostingTypes = () => ({
     github: GithubProvider.hostingTypeDef,
     none: FallbackProvider.hostingTypeDef
 });
 
-export const setupRemote = (site: ISite, onUpdate: updaterType) => {
+export const setupRemote = (siteUUID: string, onUpdate: updaterType) => {
     const {
-        hosting: { name }
-    } = getInt(`sites.${site.id}`);
+        hosting: { name: hostingName }
+    } = configGet(`sites.${siteUUID}`);
 
-    switch (name) {
+    switch (hostingName) {
         case 'github':
-            const githubProvider = new GithubProvider(site);
+            const githubProvider = new GithubProvider(siteUUID);
             return githubProvider.setup(onUpdate);
 
         default:
-            const fallbackProvider = new FallbackProvider(site);
+            const fallbackProvider = new FallbackProvider(siteUUID);
             return fallbackProvider.setup(onUpdate);
     }
 };
 
-export const deploy = (site: ISite, params = []) => {
+export const deploy = (siteUUID: string, params = []) => {
     const {
-        hosting: { name }
-    } = getInt(`sites.${site.id}`);
+        hosting: { name: hostingName }
+    } = configGet(`sites.${siteUUID}`);
 
-    switch (name) {
+    switch (hostingName) {
         case 'github':
-            const githubProvider = new GithubProvider(site);
+            const githubProvider = new GithubProvider(siteUUID);
             return githubProvider.deploy(...params);
 
         default:
-            const fallbackProvider = new FallbackProvider(site);
+            const fallbackProvider = new FallbackProvider(siteUUID);
             return fallbackProvider.deploy(...params);
     }
 };
 
-export const getRepositoryUrl = (site: ISite) => {
+export const getRepositoryUrl = async (siteUUID: string) => {
     const {
-        hosting: { name }
-    } = getInt(`sites.${site.id}`);
+        hosting: { name: hostingName }
+    } = configGet(`sites.${siteUUID}`);
 
-    switch (name) {
+    switch (hostingName) {
         case 'github':
-            const githubProvider = new GithubProvider(site);
+            const githubProvider = new GithubProvider(siteUUID);
             return githubProvider.getRepositoryUrl();
 
         default:
@@ -60,14 +73,14 @@ export const getRepositoryUrl = (site: ISite) => {
 /**
  * Delete all files in remote
  */
-export const wipe = (site: ISite, onUpdate?) => {
+export const wipe = (siteUUID: string, onUpdate?) => {
     const {
-        hosting: { name }
-    } = getInt(`sites.${site.id}`);
+        hosting: { name: hostingName }
+    } = configGet(`sites.${siteUUID}`);
 
-    switch (name) {
+    switch (hostingName) {
         case 'github':
-            const githubProvider = new GithubProvider(site);
+            const githubProvider = new GithubProvider(siteUUID);
             return githubProvider.wipe(onUpdate);
 
         default:
@@ -76,21 +89,25 @@ export const wipe = (site: ISite, onUpdate?) => {
 };
 
 export const buildAndDeploy = (
-    site: ISite,
+    siteUUID: string,
     onUpdate?: updaterType,
     itemId?: string
 ) => {
-    return deploy(site, [onUpdate, itemId]);
+    if (typeof siteUUID !== 'string') {
+        throw new Error('buildAndDeploy: siteUUID must be a string');
+    }
+
+    return deploy(siteUUID, [onUpdate, itemId]);
 };
 
-export const deleteRemoteItems = (filesToDeleteArr, site: ISite) => {
+export const deleteRemoteItems = (filesToDeleteArr, siteUUID: string) => {
     const {
-        hosting: { name }
-    } = getInt(`sites.${site.id}`);
+        hosting: { name: hostingName }
+    } = configGet(`sites.${siteUUID}`);
 
-    switch (name) {
+    switch (hostingName) {
         case 'github':
-            const githubProvider = new GithubProvider(site);
+            const githubProvider = new GithubProvider(siteUUID);
             return githubProvider.deleteFiles(filesToDeleteArr);
 
         default:
@@ -98,37 +115,14 @@ export const deleteRemoteItems = (filesToDeleteArr, site: ISite) => {
     }
 };
 
-export const setSite = (data: ISite) => {
-    const { id: siteId } = data;
-    const sites = get('sites');
+export const setSiteConfig = (data: ISiteInternal) => {
+    const { uuid } = data;
+    const sites = configGet('sites');
 
-    return set({
-        sites: merge(sites, { [siteId]: { id: siteId, ...data } })
+    return configSet({
+        sites: merge(sites, { [uuid]: { uuid: uuid, ...data } })
     });
 };
-
-export const setSiteInternal = async (data: ISiteInternal) => {
-    const { id: siteId } = data;
-    const sites = await getInt('sites');
-
-    return setInt({
-        sites: merge(sites, { [siteId]: { id: siteId, ...data } })
-    });
-};
-
-// export const uploadConfig = (siteId: string) => {
-//     const site = get(`sites.${siteId}`);
-//     const hostingName = site.hosting.name;
-
-//     switch (hostingName) {
-//         case 'github':
-//             const githubProvider = new GithubProvider(site);
-//             return githubProvider.uploadConfig();
-
-//         default:
-//             return Promise.resolve();
-//     }
-// }
 
 export const checkIfPostsHaveChildren = (site, postIds = []) => {
     const { structure } = site;
@@ -156,24 +150,30 @@ export const deleteSites = async (siteIds: string[]) => {
         title: getString('warn_delete_sites')
     });
 
+    const delSite = async siteId => {
+        const siteUUID = await getSiteUUIDById(siteId);
+        await deleteSite(siteUUID);
+        await configRem(`sites.${siteUUID}`);
+    };
+
     if (confRes !== 0) {
         return false;
     }
 
     const delPromises = [];
 
-    siteIds.forEach(siteIdToDelete => {
-        delPromises.push(
-            rem(`sites.${siteIdToDelete}`),
-            remInt(`sites.${siteIdToDelete}`)
-        );
+    siteIds.forEach((siteIdToDelete: string) => {
+        delPromises.push(delSite(siteIdToDelete));
     });
 
     await Promise.all(delPromises);
     return true;
 };
 
-export const deleteMenus = async (menuNames: string[]) => {
+export const deleteMenus = async (siteUUID: string, menuNames: string[]) => {
+    const site = await getSite(siteUUID);
+    const updatedAt = Date.now();
+
     const confRes = await confirmation({
         title: getString('warn_delete_menus')
     });
@@ -182,29 +182,37 @@ export const deleteMenus = async (menuNames: string[]) => {
         return false;
     }
 
-    const delPromises = [];
+    const updatedMenus = { ...site.menus };
 
     menuNames.forEach(menuToDelete => {
         if (['header', 'sidebar', 'footer'].includes(menuToDelete)) {
             return;
         }
 
-        delPromises.push(rem(`sites.${menuToDelete}.menus.${menuToDelete}`));
+        delete updatedMenus[menuToDelete];
     });
 
-    await Promise.all(delPromises);
-    return true;
+    /**
+     * Update site updatedAt
+     */
+    await updateSite(siteUUID, {
+        menus: updatedMenus,
+        updatedAt
+    });
+
+    return updatedMenus;
 };
 
-export const deletePosts = async (siteId: string, postIds: string[]) => {
-    const site = get(`sites.${siteId}`);
+export const deletePosts = async (siteUUID: string, postIds: string[]) => {
+    const site = await getSite(siteUUID);
+    const items = await getItems(siteUUID);
 
     /**
      * Can't delete only post
      */
-    if (site.items.length === 1) {
+    if (items.length === 1) {
         error(getString('error_delete_single_post'));
-        return;
+        return {};
     }
 
     /**
@@ -214,7 +222,7 @@ export const deletePosts = async (siteId: string, postIds: string[]) => {
 
     if (postIds.includes(rootPost)) {
         error(getString('error_delete_root_post'));
-        return;
+        return {};
     }
 
     /**
@@ -231,19 +239,19 @@ export const deletePosts = async (siteId: string, postIds: string[]) => {
     });
 
     if (confRes !== 0) {
-        return;
+        return {};
     }
 
     /**
      * Filter out deleted items from item list
      */
-    const filteredItems = site.items.filter(item => !postIds.includes(item.id));
+    const filteredItems = items.filter(item => !postIds.includes(item.uuid));
 
     /**
      * Filter out deleted items from site structure
      */
-    const filteredStructure = filterItemsFromNodes(
-        siteId,
+    const filteredStructure = await filterItemsFromNodes(
+        siteUUID,
         site.structure,
         postIds
     );
@@ -252,71 +260,96 @@ export const deletePosts = async (siteId: string, postIds: string[]) => {
      * Filter out deleted items from menus
      */
     const siteMenus = site.menus || {};
-    const filteredMenus = {};
+    const filteredMenuPromises = [];
 
     Object.keys(siteMenus).forEach(menuName => {
-        filteredMenus[menuName] = filterItemsFromNodes(
-            siteId,
-            siteMenus[menuName],
-            postIds
+        filteredMenuPromises.push(
+            filterItemsFromNodes(siteUUID, siteMenus[menuName], postIds)
         );
+    });
+
+    const filteredMenuValues = await Promise.all(filteredMenuPromises);
+    const filteredMenus = {};
+
+    Object.keys(siteMenus).forEach((menuName, index) => {
+        filteredMenus[menuName] = filteredMenuValues[index];
     });
 
     /**
      * Saving changes
      */
-    site.items = filteredItems;
-    site.structure = filteredStructure;
-    site.menus = filteredMenus;
-    site.updatedAt = Date.now();
+    updateSite(siteUUID, {
+        structure: filteredStructure,
+        menus: filteredMenus,
+        updatedAt: Date.now()
+    });
+    await Promise.all(postIds.map(postId => deleteItem(siteUUID, postId)));
 
-    set(`sites.${siteId}`, site);
-
-    return site;
+    return {
+        structure: filteredStructure,
+        items: filteredItems
+    };
 };
 
 export const deleteMenuEntries = async (
-    siteId: string,
+    siteUUID: string,
     menuId: string,
     postIds: string[]
 ) => {
-    const menu = await get(`sites.${siteId}.menus.${menuId}`);
+    const updatedAt = Date.now();
+    const { menus } = await getSite(siteUUID);
+    const menu = menus[menuId];
 
     /**
      * Filter out deleted items from site structure
      */
-    const filteredStructure = filterItemsFromNodes(siteId, menu, postIds);
+    const filteredStructure = await filterItemsFromNodes(
+        siteUUID,
+        menu,
+        postIds
+    );
 
     /**
      * Saving changes
      */
-    await set(`sites.${siteId}.menus.${menuId}`, filteredStructure);
-    await setInt(`sites.${siteId}.publishSuggested`, true);
+    const updatedMenus = {
+        ...menus,
+        [menuId]: filteredStructure
+    };
+
+    await updateSite(siteUUID, {
+        menus: updatedMenus,
+        updatedAt
+    });
+
+    await configSet(`sites.${siteUUID}.publishSuggested`, true);
     return filteredStructure;
 };
 
-export const getPostItem = (site, postId) => {
-    return site.items.find(siteItem => {
-        return siteItem.id === postId;
-    });
-};
+export const updateSiteStructure = async (siteUUID: string, newStructure) => {
+    const site = await getSite(siteUUID);
 
-export const updateSiteStructure = (siteId, newStructure) => {
-    const site = get(`sites.${siteId}`);
     if (site) {
-        set(`sites.${site.id}.structure`, newStructure);
-        set(`sites.${site.id}.updatedAt`, Date.now());
-        setInt(`sites.${site.id}.publishSuggested`, true);
+        await updateSite(siteUUID, {
+            structure: newStructure,
+            updatedAt: Date.now()
+        });
+
+        await configSet(`sites.${site.uuid}.publishSuggested`, true);
     }
 };
 
-export const filterItemsFromNodes = (siteId, nodes, itemIds = []) => {
+export const filterItemsFromNodes = async (
+    siteUUID: string,
+    nodes,
+    itemIds = []
+): Promise<IStructureItem[]> => {
     let outputNodes = nodes;
-    const site = get(`sites.${siteId}`);
+    const posts = await getItems(siteUUID);
 
     const parseNodes = obj => {
         const { key, children = [] } = obj;
-        const post = getPostItem(site, key);
+        const post = posts.find(p => p.uuid === key && p.siteId === siteUUID);
 
         if (!post) return obj;
         if (itemIds.includes(key)) {
@@ -378,9 +411,13 @@ export const validateHostingFields = (
     });
 };
 
-export const isValidSlug = (slug: string, siteId: string, postId?: string) => {
-    const site = get(`sites.${siteId}`);
-    return !site.items.some(item => slug === item.slug && item.id !== postId);
+export const isValidSlug = async (
+    slug: string,
+    siteUUID: string,
+    postId?: string
+) => {
+    const items = await getItems(siteUUID);
+    return !items.some(item => slug === item.slug && item.uuid !== postId);
 };
 
 export const siteVarToArray = (siteVars: ISiteVar) => {

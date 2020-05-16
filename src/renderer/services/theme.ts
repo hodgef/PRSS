@@ -1,48 +1,64 @@
 import fs from 'fs';
 import path from 'path';
 
-import { getInt } from '../../common/utils';
 import { getFilePaths, getDirPaths } from './files';
 import { getParserTemplateExtension } from './handlers';
+import { configGet } from '../../common/utils';
 
 export const getTemplate = async (templateId: string, extension: string) => {
     const templateRelPath = templateId.split('.').join('/');
     const templatePathName = `${templateRelPath}.${extension}`;
 
-    const templatePath = path.join(getInt('paths.themes'), templatePathName);
+    const templatePath = path.join(
+        await configGet('paths.themes'),
+        templatePathName
+    );
 
     return fs.readFileSync(templatePath, 'utf8');
 };
 
 export const getThemeIndex = async (themeName: string) => {
-    const themeDir = path.join(getInt('paths.themes'), themeName, 'index.html');
+    const themeDir = path.join(
+        await configGet('paths.themes'),
+        themeName,
+        'index.html'
+    );
     return fs.readFileSync(themeDir, 'utf8');
 };
 
-export const getThemeListDetails = () => {
-    const themeNameList = getThemeList();
+export const getThemeListDetails = async () => {
+    const themeNameList = await getThemeList();
+    const themePath = await configGet('paths.themes');
 
-    return themeNameList.map(themeName => {
-        const themeDir = path.join(getInt('paths.themes'), themeName);
+    const manifestPromises = [];
+
+    themeNameList.forEach(themeName => {
+        manifestPromises.push(getThemeManifest(themeName));
+    });
+
+    const promiseValues = await Promise.all(manifestPromises);
+
+    return themeNameList.map((themeName, index) => {
+        const themeDir = path.join(themePath, themeName);
         return {
-            ...(getThemeManifest(themeName) || {}),
+            ...(promiseValues[index] || {}),
             name: themeName,
             themeDir: themeDir
         };
     });
 };
 
-export const getThemeList = () => {
-    const themeDir = path.join(getInt('paths.themes'));
+export const getThemeList = async () => {
+    const themeDir = path.join(await configGet('paths.themes'));
     const templateList = getDirPaths(themeDir).map(filePath =>
         path.basename(filePath)
     );
     return templateList;
 };
 
-export const getTemplateList = themeName => {
-    const themeDir = path.join(getInt('paths.themes'), themeName);
-    const themeManifest = getThemeManifest(themeName) || {};
+export const getTemplateList = async themeName => {
+    const themeDir = path.join(await configGet('paths.themes'), themeName);
+    const themeManifest = (await getThemeManifest(themeName)) || {};
     const templateExtension = getParserTemplateExtension(themeManifest.parser);
 
     const templateList = getFilePaths(themeDir)
@@ -55,13 +71,13 @@ export const getTemplateList = themeName => {
     return templateList;
 };
 
-export const getThemeManifest = (theme: string) => {
+export const getThemeManifest = async (theme: string) => {
     if (!theme) {
         return false;
     }
 
     const manifestPath = path.join(
-        getInt('paths.themes'),
+        await configGet('paths.themes'),
         theme,
         'manifest.json'
     );

@@ -134,7 +134,7 @@ const StandardEditor: FunctionComponent<IProps> = ({
                             fontSize={17}
                             defaultValue={
                                 forceMode === 'html'
-                                    ? undefined
+                                    ? htmlState.current
                                     : getDraftHTMLState()
                             }
                             value={

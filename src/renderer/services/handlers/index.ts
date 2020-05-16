@@ -9,7 +9,8 @@ export const parseHtmlParams = (html: string = '', bufferItem: IBufferItem) => {
         matches.forEach((match: string) => {
             const param = match.replace(/%/g, '');
             const value = objGet(param, bufferItem);
-            if (value) {
+
+            if (typeof value !== 'undefined') {
                 output = output.split(match).join(value);
             }
         });

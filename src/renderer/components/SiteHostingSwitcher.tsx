@@ -1,15 +1,13 @@
 import './styles/SiteHostingSwitcher.scss';
 
-import React, { Fragment, FunctionComponent, useState } from 'react';
+import React, { Fragment, FunctionComponent, useState, useEffect } from 'react';
 import { useHistory, useParams, Link } from 'react-router-dom';
 
-import { getString, get, getInt } from '../../common/utils';
+import { getString, configGet, configSet } from '../../common/utils';
 import {
     getHostingTypes,
-    setSite,
     setupRemote,
     handleHostingFields,
-    setSiteInternal,
     validateHostingFields
 } from '../services/hosting';
 import { error } from '../services/utils';
@@ -18,11 +16,12 @@ import Header from './Header';
 import Loading from './Loading';
 import { modal } from './Modal';
 import { toast } from 'react-toastify';
+import { getSite } from '../services/db';
 
 const SiteHostingSwitcher: FunctionComponent = () => {
     const { siteId } = useParams();
-    const site = get(`sites.${siteId}`);
-    const siteInt = getInt(`sites.${siteId}`);
+
+    const [site, setSite] = useState(null);
 
     const [loading, setLoading] = useState(false);
     const [loadingStatus, setLoadingStatus] = useState('');
@@ -31,6 +30,18 @@ const SiteHostingSwitcher: FunctionComponent = () => {
     const hostingTypes = getHostingTypes();
     const history = useHistory();
 
+    useEffect(() => {
+        const getData = async () => {
+            const siteRes = await getSite(siteId);
+            setSite(siteRes);
+        };
+        getData();
+    }, []);
+
+    if (!site) {
+        return null;
+    }
+
     const handleSubmit = async () => {
         if (!hostingTypes[hosting]) {
             error(
@@ -38,6 +49,8 @@ const SiteHostingSwitcher: FunctionComponent = () => {
             );
             return;
         }
+
+        const siteInt = await configGet(`sites.${siteId}`);
 
         const isValid = validateHostingFields(
             hostingFields,
@@ -65,34 +78,29 @@ const SiteHostingSwitcher: FunctionComponent = () => {
             hosting: parsedHosting
         } as ISiteInternal;
 
-        await setSiteInternal(baseSiteInternal);
+        await configSet(`sites.${siteId}`, baseSiteInternal);
 
         /**
          * Set up remote
          */
-        const newSite = await setupRemote(site, setLoadingStatus);
+        const newSite = await setupRemote(siteId, setLoadingStatus);
         if (!newSite) {
             setLoading(false);
 
             /**
              * Rollback siteInt changes
              */
-            await setSiteInternal(siteInt);
+            await configSet(`sites.${siteId}`, siteInt);
 
             return;
         }
-
-        /**
-         * Save site
-         */
-        setSite(site);
 
         toast.success('Hosting saved!');
 
         /**
          * Go to site preview
          */
-        history.push(`/sites/${site.id}/settings`);
+        history.push(`/sites/${siteId}/settings`);
     };
 
     return !loading ? (

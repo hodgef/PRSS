@@ -10,26 +10,34 @@ class ErrorBoundary extends React.Component<IProps> {
         super(props);
     }
 
-    onError = ({ reason }) => {
-        console.error(reason);
-        modal.alert(
-            <Fragment>
-                <p>Error:</p>
-                <p className="code-dark">${reason.toString()}</p>
-            </Fragment>,
-            null,
-            'error-alert-content'
-        );
+    onError = error => {
+        console.error(error);
+        modal &&
+            error &&
+            error.reason &&
+            modal.alert(
+                <Fragment>
+                    <p>Error:</p>
+                    <p className="code-dark">${error.reason.toString()}</p>
+                </Fragment>,
+                null,
+                'error-alert-content'
+            );
     };
 
     componentDidMount() {
         window.onunhandledrejection = error => {
-            this.onError(error);
+            error && this.onError(error);
         };
     }
 
+    static getDerivedStateFromError(error) {
+        console.error('PRSS FATAL', error);
+        return;
+    }
+
     componentDidCatch(error) {
-        this.onError(error);
+        error && this.onError(error);
     }
 
     render() {

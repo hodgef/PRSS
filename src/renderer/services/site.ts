@@ -1,70 +1,90 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export const getSampleSiteStructure = () => {
-    const [item1, item2] = getSampleSiteItems(2);
+export const getSampleSiteStructure = (): {
+    site: ISite;
+    items: IPostItem[];
+} => {
+    const siteUUID = uuidv4();
+    const { home, blog, post } = getSampleSiteItems(siteUUID);
 
     return {
-        id: '',
-        title: '',
-        url: '',
-        theme: 'press',
-        updatedAt: null,
-        publishedAt: null,
-        items: [item1, item2],
-        headHtml: '<title>%item.title% - %site.title%</title>',
-        footerHtml: '',
-        sidebarHtml: '',
-        structure: [
-            {
-                key: item1.id,
-                children: [
-                    {
-                        key: item2.id,
-                        children: []
-                    }
-                ]
-            }
-        ],
-        vars: {},
-        menus: {
-            header: [],
-            footer: [],
-            sidebar: []
-        } as ISiteMenus
-    } as ISite;
+        site: {
+            uuid: siteUUID,
+            title: '',
+            url: '',
+            theme: 'press',
+            updatedAt: null,
+            createdAt: Date.now(),
+            publishedAt: null,
+            headHtml: '<title>%item.title% - %site.title%</title>',
+            footerHtml: '',
+            sidebarHtml: '',
+            structure: [
+                {
+                    key: home.uuid,
+                    children: [
+                        {
+                            key: blog.uuid,
+                            children: [
+                                {
+                                    key: post.uuid,
+                                    children: []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            vars: {},
+            menus: {
+                header: [],
+                footer: [],
+                sidebar: []
+            } as ISiteMenus
+        } as ISite,
+        items: [home, blog, post]
+    };
 };
 
-export const getSampleSiteItems = (nbItems = 1) => {
-    const items = [
-        {
-            id: uuidv4(),
+export const getSampleSiteItems = (siteUUID: string) => {
+    const commonProps = {
+        headHtml: null,
+        footerHtml: null,
+        sidebarHtml: null,
+        updatedAt: null,
+        createdAt: Date.now(),
+        vars: {}
+    };
+
+    return {
+        home: {
+            uuid: uuidv4(),
+            siteId: siteUUID,
             slug: 'home',
             title: 'Home',
             content: 'This is the beginning of something great.',
             template: 'home',
-            headHtml: null,
-            footerHtml: null,
-            sidebarHtml: null,
-            updatedAt: null,
-            createdAt: Date.now(),
-            vars: {}
+            ...commonProps
         },
-        {
-            id: uuidv4(),
+        blog: {
+            uuid: uuidv4(),
+            siteId: siteUUID,
+            slug: 'blog',
+            title: 'Blog',
+            content: 'Explore the latest posts',
+            template: 'blog',
+            ...commonProps
+        },
+        post: {
+            uuid: uuidv4(),
+            siteId: siteUUID,
             slug: 'my-post',
             title: 'My Post',
             content: 'This is my first post.',
             template: 'post',
-            headHtml: null,
-            footerHtml: null,
-            sidebarHtml: null,
-            updatedAt: null,
-            createdAt: Date.now(),
-            vars: {}
+            ...commonProps
         }
-    ];
-
-    return items.slice(0, nbItems);
+    };
 };
 
 export const getSampleSiteIntStructure = () => {
