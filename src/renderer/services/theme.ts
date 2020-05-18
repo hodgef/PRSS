@@ -26,6 +26,12 @@ export const getThemeIndex = async (themeName: string) => {
     return fs.readFileSync(themeDir, 'utf8');
 };
 
+export const getDefaultReadme = () => {
+    const assetsDir = configGet('paths.assets');
+    const readmePath = path.join(assetsDir, 'README.md');
+    return fs.readFileSync(readmePath, 'utf8');
+};
+
 export const getThemeListDetails = async () => {
     const themeNameList = await getThemeList();
     const themePath = await configGet('paths.themes');

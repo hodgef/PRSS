@@ -3,6 +3,7 @@ import minify from 'babel-minify';
 import del from 'del';
 import fse from 'fs-extra';
 import path from 'path';
+import fs from 'fs';
 
 import { getString, configGet } from '../../common/utils';
 import {
@@ -14,7 +15,7 @@ import {
     toJson
 } from './utils';
 import { modal } from '../components/Modal';
-import { getThemeManifest } from './theme';
+import { getThemeManifest, getDefaultReadme } from './theme';
 import { getSite, getItems, getItem } from './db';
 
 export const bufferPathFileNames = ['index.html', 'index.js'];
@@ -43,6 +44,8 @@ export const build = async (
         await clearBuffer();
     }
 
+    const { name: siteName } = await getSite(siteUUID);
+
     /**
      * Adding config file
      */
@@ -58,7 +61,7 @@ export const build = async (
     /**
      * Copying anything under static/public
      */
-    copyPublicToBuffer();
+    copyPublicToBuffer(siteName);
 
     if (!buildBufferSiteConfigRes || !buildBufferItemsConfigRes) {
         return false;
@@ -87,9 +90,39 @@ export const build = async (
     return mainBufferItem ? [mainBufferItem] : bufferItems;
 };
 
-export const copyPublicToBuffer = () => {
+export const createPublicDir = (dirPath: string) => {
+    const assetsDir = configGet('paths.assets');
+
+    try {
+        if (!fs.existsSync(assetsDir)) {
+            fs.mkdirSync(assetsDir);
+        }
+
+        if (!fs.existsSync(dirPath)) {
+            fs.mkdirSync(dirPath);
+        }
+
+        const readmePath = path.join(dirPath, 'README.md');
+
+        if (!fs.existsSync(readmePath)) {
+            fse.outputFileSync(
+                path.join(dirPath, 'README.md'),
+                getDefaultReadme()
+            );
+        }
+    } catch (e) {
+        return;
+    }
+};
+
+export const copyPublicToBuffer = siteName => {
     const bufferDir = configGet('paths.buffer');
-    const publicDir = configGet('paths.public');
+    const publicDir = path.join(configGet('paths.public'), siteName);
+
+    if (!fs.existsSync(publicDir)) {
+        createPublicDir(publicDir);
+    }
+
     return fse.copy(publicDir, bufferDir);
 };
 
@@ -463,7 +496,8 @@ export const walkStructure = async (
 
         const parsedNode = {
             key,
-            ...(itemCb ? itemCb(post) : {}),
+            ...(obj.title ? { title: obj.title } : {}),
+            ...(itemCb ? itemCb(post, obj) : {}),
             children: children.map(parseNodes)
         };
 
@@ -475,6 +509,22 @@ export const walkStructure = async (
     return outputNodes;
 };
 
-export const findInStructure = (uuid: string, nodes: IStructureItem) => {
+export const structureHasItem = (uuid: string, nodes: IStructureItem) => {
     return toJson(nodes).includes(uuid);
+};
+
+export const findInStructure = (uuid: string, nodes: IStructureItem[]) => {
+    let foundItem;
+
+    const checkNode = node => {
+        if (node.key === uuid) {
+            foundItem = node;
+            return true;
+        } else {
+            return node.children ? node.children.some(checkNode) : false;
+        }
+    };
+
+    nodes.some(checkNode);
+    return foundItem;
 };

@@ -116,7 +116,7 @@ const ListMenus: FunctionComponent = () => {
         toast.success(`Menu "${sanitizedMenuName}" created!`);
     };
 
-    const formatMenus = rawMenusObj => {
+    const formatMenus = (rawMenusObj: any) => {
         const keys = Object.keys(rawMenusObj) as [];
         return keys.map(name => ({
             key: name,
@@ -191,7 +191,7 @@ const ListMenus: FunctionComponent = () => {
                 <div className="items">
                     <DraggableTree
                         checkable={selectEnabled}
-                        data={formatMenus(menus)}
+                        data={formatMenus(menus) as any}
                         onSelect={items => items[0] && onItemClick(items[0])}
                         selectedKeys={selectedItems}
                         onCheck={setSelectedItems}

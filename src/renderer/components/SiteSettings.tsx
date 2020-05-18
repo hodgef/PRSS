@@ -5,7 +5,7 @@ import { useHistory, useParams, Link } from 'react-router-dom';
 
 import Footer from './Footer';
 import Header from './Header';
-import { normalizeStrict } from '../services/utils';
+import { normalizeStrict, error } from '../services/utils';
 import { toast } from 'react-toastify';
 import HTMLEditorOverlay from './HTMLEditorOverlay';
 import { modal } from './Modal';
@@ -13,6 +13,9 @@ import { getThemeList } from '../services/theme';
 import SiteVariablesEditorOverlay from './SiteVariablesEditorOverlay';
 import { configGet, configSet } from '../../common/utils';
 import { getSite, updateSite } from '../services/db';
+import { shell } from 'electron';
+import path from 'path';
+import fs from 'fs';
 
 const SiteSettings: FunctionComponent = () => {
     const { siteId } = useParams();
@@ -60,6 +63,19 @@ const SiteSettings: FunctionComponent = () => {
     if (!site || !themeList) {
         return null;
     }
+
+    const openPublicDir = async () => {
+        const { name: siteName } = site;
+        const publicDir = path.join(configGet('paths.public'), siteName);
+
+        if (fs.existsSync(publicDir)) {
+            shell.openItem(publicDir);
+        } else {
+            error(
+                'The directory does not exist yet. Please preview or deploy your site'
+            );
+        }
+    };
 
     const handleSubmit = async () => {
         if (!editedSiteName) {
@@ -326,6 +342,25 @@ const SiteSettings: FunctionComponent = () => {
                                         create
                                     </span>
                                     <span>Edit Variables</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <div className="input-group input-group-lg">
+                            <label className="col-sm-2 col-form-label">
+                                Public Folder
+                            </label>
+                            <div className="col-sm-10">
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-primary d-flex"
+                                    onClick={() => openPublicDir()}
+                                >
+                                    <span className="material-icons mr-2">
+                                        folder
+                                    </span>
+                                    <span>Open Public Dir</span>
                                 </button>
                             </div>
                         </div>

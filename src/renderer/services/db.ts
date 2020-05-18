@@ -1,6 +1,9 @@
 import { db } from '../../common/Store';
 import { mapFieldsToJSON } from './utils';
 import { JSON_FIELDS } from '../../common/Store';
+// import path from 'path';
+// import { configGet } from '../../common/utils';
+// import fs from 'fs';
 
 /**
  * Sites
@@ -35,10 +38,20 @@ export const updateSite = async (siteUUID: string, fields: Partial<ISite>) => {
 };
 
 export const deleteSite = async (siteUUID: string) => {
+    //const { name: siteName } = await getSite(siteUUID);
     await getSites()
         .where('uuid', siteUUID)
         .del();
     await deleteAllSiteItems(siteUUID);
+
+    /**
+     * Delete public folder
+     */
+    // const publicDir = path.join(configGet('paths.public'), siteName);
+
+    // if (!fs.existsSync(publicDir)) {
+    //     fs.mkdirSync(publicDir);
+    // }
 };
 
 /**

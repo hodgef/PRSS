@@ -34,6 +34,7 @@ interface ISiteMenus {
 interface IStructureItem {
     key: string;
     children: IStructureItem[];
+    title?: any;
 }
 
 interface IPostItem {

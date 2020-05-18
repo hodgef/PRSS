@@ -357,6 +357,7 @@ export const filterItemsFromNodes = async (
         }
 
         return {
+            ...obj,
             key,
             children: children
                 .filter(node => !itemIds.includes(node.key))

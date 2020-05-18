@@ -103,6 +103,7 @@ const initStore = () => {
         store.set({
             paths: {
                 ...paths,
+                assets: path.join(__static, 'assets'),
                 buffer: path.join(__static, 'buffer'),
                 public: path.join(__static, 'public'),
                 themes: path.join(__static, 'themes'),

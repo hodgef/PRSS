@@ -314,8 +314,14 @@ export const truncateString = (string, maxLength = 50) => {
     return `${string.substring(0, maxLength)}...`;
 };
 
+export const removeTagsFromElem = (doc, tags) =>
+    tags.forEach(tag =>
+        doc.querySelectorAll(tag).forEach(elem => (elem.innerHTML = ''))
+    );
+
 export const stripTags = html => {
     const doc = new DOMParser().parseFromString(html, 'text/html');
+    removeTagsFromElem(doc, ['pre']);
     return doc.body.textContent || '';
 };
 

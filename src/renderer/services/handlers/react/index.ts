@@ -64,7 +64,15 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
         minifierOptions
     );
 
-    const sanitizedBufferItem = sanitizeBufferItem(data, {
+    const parsedData = {
+        ...data,
+        item: {
+            ...data.item,
+            content: parseHtmlParams(data.item.content, data)
+        }
+    };
+
+    const sanitizedBufferItem = sanitizeBufferItem(parsedData, {
         sidebarHtml
     });
 

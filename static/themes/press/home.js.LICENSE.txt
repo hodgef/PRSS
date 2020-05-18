@@ -6,7 +6,7 @@
 
 /*!
  *
- *   prss v1.0.2
+ *   prss v1.1.0
  *   https://github.com/prss-io/prss-client
  *
  *   Copyright (c) Francisco Hodge (https://github.com/hodgef)

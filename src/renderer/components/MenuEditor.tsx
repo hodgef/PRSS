@@ -4,13 +4,17 @@ import React, { Fragment, FunctionComponent, useState, useEffect } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import { walkStructure, findInStructure } from '../services/build';
+import {
+    walkStructure,
+    structureHasItem,
+    findInStructure
+} from '../services/build';
 import { deleteMenuEntries } from '../services/hosting';
 import DraggableTree from './DraggableTree';
 import Footer from './Footer';
 import Header from './Header';
 import { ask } from '../services/utils';
-import { getSite, getItems, updateSite } from '../services/db';
+import { getSite, getItems, updateSite, getItem } from '../services/db';
 
 const MenuEditor: FunctionComponent = () => {
     const { siteId, menuId } = useParams();
@@ -49,9 +53,13 @@ const MenuEditor: FunctionComponent = () => {
     const handleMenuUpdate = async menuState => {
         setMenuState(menuState);
         setFormattedMenuStructure(
-            await walkStructure(siteId, menuState, ({ title }) => ({
-                title
-            }))
+            await walkStructure(
+                siteId,
+                menuState,
+                ({ title }, { title: nodeTitle }) => ({
+                    title: nodeTitle || title
+                })
+            )
         );
     };
 
@@ -78,7 +86,52 @@ const MenuEditor: FunctionComponent = () => {
         }
     };
 
-    const onItemClick = itemId => {};
+    const onItemClick = async itemId => {
+        const structureItem = await findInStructure(itemId, menuState);
+        const post = await getItem(siteId, itemId);
+
+        if (!structureItem || !post) return;
+
+        const renderInput = onChange => (
+            <div>
+                <label>Display Name:</label>
+                <input
+                    style={{ width: '100%' }}
+                    onChange={onChange}
+                    defaultValue={structureItem.title || post.title}
+                />
+            </div>
+        );
+
+        const itemTitleRes = await ask({
+            title: 'Edit Menu Entry',
+            message: '',
+            buttons: [{ label: 'Change' }],
+            renderInput
+        });
+
+        if (!itemTitleRes) return;
+
+        const newMenuStructure = await walkStructure(
+            siteId,
+            menuState,
+            ({ title: postTitle }, { key, title: nodeTitle = '' }) => {
+                if (key === itemId) {
+                    return {
+                        title: itemTitleRes
+                    };
+                } else {
+                    return {
+                        title: nodeTitle
+                    };
+                }
+            }
+        );
+
+        handleMenuUpdate(newMenuStructure);
+        setMenuChanged(true);
+        setSelectedItems([]);
+    };
 
     const formatStructureOptions = (node, options = [], parents = []) => {
         const indent = parents.map(() => '--').join('') + ' ';
@@ -87,7 +140,7 @@ const MenuEditor: FunctionComponent = () => {
             <option
                 value={node.key}
                 key={node.key}
-                disabled={findInStructure(node.key, menuState)}
+                disabled={structureHasItem(node.key, menuState)}
             >
                 {indent}
                 {node.title}
@@ -166,6 +219,7 @@ const MenuEditor: FunctionComponent = () => {
 
         setSite(updatedSite);
         handleMenuUpdate(cleanedStructure);
+        setMenuChanged(false);
 
         toast.success('Menu saved successfully');
     };

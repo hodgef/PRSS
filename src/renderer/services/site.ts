@@ -62,7 +62,7 @@ export const getSampleSiteItems = (siteUUID: string) => {
             siteId: siteUUID,
             slug: 'home',
             title: 'Home',
-            content: 'This is the beginning of something great.',
+            content: '<p>This is the beginning of something great.</p>',
             template: 'home',
             ...commonProps
         },
@@ -71,7 +71,7 @@ export const getSampleSiteItems = (siteUUID: string) => {
             siteId: siteUUID,
             slug: 'blog',
             title: 'Blog',
-            content: 'Explore the latest posts',
+            content: '<p>Explore the latest posts</p>',
             template: 'blog',
             ...commonProps
         },
@@ -80,7 +80,7 @@ export const getSampleSiteItems = (siteUUID: string) => {
             siteId: siteUUID,
             slug: 'my-post',
             title: 'My Post',
-            content: 'This is my first post.',
+            content: '<p>This is my first post.</p>',
             template: 'post',
             ...commonProps
         }
