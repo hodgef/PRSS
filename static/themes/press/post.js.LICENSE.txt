@@ -5,13 +5,13 @@
 */
 
 /*!
- *
- *   prss v1.1.0
+ * 
+ *   prss v1.1.1
  *   https://github.com/prss-io/prss-client
- *
+ * 
  *   Copyright (c) Francisco Hodge (https://github.com/hodgef)
- *
+ * 
  *   This source code is licensed under the MIT license found in the
  *   LICENSE file in the root directory of this source tree.
- *
+ * 
  */
