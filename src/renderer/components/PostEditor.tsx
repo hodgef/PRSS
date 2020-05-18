@@ -274,8 +274,8 @@ const PostEditor: FunctionComponent = () => {
 
         const deployRes = await buildAndDeploy(
             siteId,
-            setLoadingStatus,
-            postId
+            setLoadingStatus
+            //postId
         );
 
         if (deployRes) {
