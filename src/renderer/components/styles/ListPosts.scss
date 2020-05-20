@@ -28,4 +28,9 @@
         text-transform: uppercase;
         font-size: 12px;
     }
+
+    .items {
+        flex: 1;
+        overflow-y: auto;
+    }
 }

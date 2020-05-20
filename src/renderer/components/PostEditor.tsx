@@ -130,7 +130,7 @@ const PostEditor: FunctionComponent = () => {
                 toast.success('Post autosaved');
             } else {
                 if (previewServer.active) {
-                    await buildPost(postId);
+                    await buildPost(postId, setLoadingStatus);
                     previewServer.reload();
 
                     toast.success(
@@ -227,11 +227,11 @@ const PostEditor: FunctionComponent = () => {
         }
     };
 
-    const buildPost = async postId => {
+    const buildPost = async (postId, onUpdate = null) => {
         if (previewServer.active) {
             previewServer.pause();
         }
-        await build(siteId, null /*, postId*/); // Build all
+        await build(siteId, onUpdate /*, postId*/); // Build all
         if (previewServer.active) {
             previewServer.resume();
         }

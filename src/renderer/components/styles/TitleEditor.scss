@@ -1,6 +1,6 @@
 .title-editor {
     display: flex;
-    width: 80%;
+    width: 100%;
 
     &:not(.editing) {
         align-items: center;
@@ -8,6 +8,10 @@
 
     span {
         margin-right: 10px;
+        max-width: 670px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     input {

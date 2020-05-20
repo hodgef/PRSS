@@ -7,7 +7,8 @@ import { walkStructure } from '../services/build';
 import {
     deletePosts,
     updateSiteStructure,
-    buildAndDeploy
+    buildAndDeploy,
+    clonePosts
 } from '../services/hosting';
 import DraggableTree from './DraggableTree';
 import Footer from './Footer';
@@ -75,6 +76,29 @@ const ListPosts: FunctionComponent = () => {
             setStructureState(draggableRes);
         } else {
             toast.error('No deletion made');
+        }
+    };
+
+    const cloneSelectedPosts = async () => {
+        const { updatedStructure, updatedItems } = await clonePosts(
+            siteId,
+            selectedItems
+        );
+
+        if (updatedStructure && updatedItems) {
+            toast.success('Posts cloned!');
+            setSelectedItems([]);
+            setSelectEnabled(false);
+            setItems(updatedItems);
+
+            const draggableRes = await walkStructure(
+                siteId,
+                updatedStructure,
+                renderItem
+            );
+            setStructureState(draggableRes);
+        } else {
+            toast.error('Action cancelled');
         }
     };
 
@@ -147,13 +171,24 @@ const ListPosts: FunctionComponent = () => {
                         )}
 
                         {!!selectedItems.length && (
-                            <button
-                                type="button"
-                                className="btn btn-outline-danger"
-                                onClick={() => deleteSelectedPosts()}
-                            >
-                                <i className="material-icons">delete</i>
-                            </button>
+                            <Fragment>
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-primary"
+                                    onClick={() => cloneSelectedPosts()}
+                                    title="Clone Selected Posts"
+                                >
+                                    <i className="material-icons">file_copy</i>
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-danger"
+                                    onClick={() => deleteSelectedPosts()}
+                                    title="Delete Selected Posts"
+                                >
+                                    <i className="material-icons">delete</i>
+                                </button>
+                            </Fragment>
                         )}
                         <button
                             type="button"

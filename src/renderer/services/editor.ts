@@ -1,4 +1,6 @@
-export const imageUploadCallback = file =>
+import draftToHtml from 'draftjs-to-html';
+
+export const imageUploadCallback = file => {
     new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -57,3 +59,44 @@ export const imageUploadCallback = file =>
             // }, 'image/jpeg', 0.92)
         };
     });
+};
+
+const convertImages = htmlText => {
+    const regex = /<img\s[^>]*?style\s*=\s*['\"]float([^'\"]*?)['\"][^>]*?>/g;
+    let m;
+    while ((m = regex.exec(htmlText)) !== null) {
+        if (m.index === regex.lastIndex) regex.lastIndex++;
+        let repl = null,
+            type = null;
+        m.forEach((match, groupIndex) => {
+            if (groupIndex == 0) repl = match;
+            if (groupIndex == 1) type = match;
+            if (repl && type) {
+                if (type.includes('none'))
+                    htmlText = htmlText.replace(
+                        repl,
+                        '<div style="text-align: center;width: 100%;">' +
+                            repl +
+                            '</div>'
+                    );
+                else
+                    htmlText = htmlText.replace(
+                        repl,
+                        `<div style="text-align ${type}; width: 100%;">` +
+                            repl +
+                            '</div>'
+                    );
+                repl = null;
+                type = null;
+            }
+        });
+    }
+    return htmlText;
+};
+
+export const handleDraftToHtml = editorState => {
+    const htmlText = draftToHtml(editorState);
+    const htmlConverted = convertImages(htmlText); //here I call the function that converts the <img/> to <div><img/></div>.
+
+    return htmlConverted;
+};

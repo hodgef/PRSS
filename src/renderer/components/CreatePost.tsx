@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Footer from './Footer';
 import Header from './Header';
 import { normalize, error } from '../services/utils';
-import { walkStructure } from '../services/build';
+import { walkStructure, insertStructureChildren } from '../services/build';
 import { toast } from 'react-toastify';
 import { isValidSlug } from '../services/hosting';
 import { getSite, getItems, updateSite, createItems } from '../services/db';
@@ -70,20 +70,6 @@ const CreatePost: FunctionComponent = () => {
     const formattedStructureOptions = formatStructureOptions(
         formattedStructure[0]
     );
-
-    const insertStructureChildren = (node, item, postId) => {
-        if (node.key === postId) {
-            const newChildren = node.children || [];
-            newChildren.push(item);
-            node.children = newChildren;
-        } else {
-            node.children = node.children.map(nodeChild =>
-                insertStructureChildren(nodeChild, item, postId)
-            );
-        }
-
-        return node;
-    };
 
     const handleSubmit = async () => {
         if (!postTitle) {

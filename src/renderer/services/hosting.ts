@@ -5,17 +5,23 @@ import {
     configRem
 } from './../../common/utils';
 import { getString } from '../../common/utils';
-import { getStructurePaths } from './build';
+import {
+    getStructurePaths,
+    findParentInStructure,
+    insertStructureChildren
+} from './build';
 import GithubProvider from './providers/github';
 import FallbackProvider from './providers/none';
 import { confirmation, error, merge } from './utils';
+import { v4 as uuidv4 } from 'uuid';
 import {
     deleteSite,
     getSite,
     updateSite,
     getItems,
     deleteItem,
-    getSiteUUIDById
+    getSiteUUIDById,
+    createItems
 } from './db';
 
 export const getHostingTypes = () => ({
@@ -278,7 +284,7 @@ export const deletePosts = async (siteUUID: string, postIds: string[]) => {
     /**
      * Saving changes
      */
-    updateSite(siteUUID, {
+    await updateSite(siteUUID, {
         structure: filteredStructure,
         menus: filteredMenus,
         updatedAt: Date.now()
@@ -289,6 +295,68 @@ export const deletePosts = async (siteUUID: string, postIds: string[]) => {
         structure: filteredStructure,
         items: filteredItems
     };
+};
+
+export const clonePosts = async (siteUUID: string, postIds: string[]) => {
+    const { structure } = await getSite(siteUUID);
+    const items = await getItems(siteUUID);
+
+    /**
+     * Warn about deleting posts with children
+     */
+    const confRes = await confirmation({
+        title: `Are you sure you want to clone ${
+            postIds.length > 1 ? 'these' : 'this'
+        } ${postIds.length} ${postIds.length > 1 ? 'posts' : 'post'}?`
+    });
+
+    if (confRes !== 0) {
+        return {};
+    }
+
+    const newItems = [];
+    let updatedStructure = [...structure];
+
+    postIds.forEach(postId => {
+        const postToBeCloned = items.find(item => item.uuid === postId);
+        const nodeParent = findParentInStructure(postId, structure);
+        const cloneId = uuidv4();
+        const randomString = cloneId.substring(0, 5);
+        const cloneItem = {
+            ...postToBeCloned,
+            uuid: cloneId,
+            createdAt: Date.now(),
+            updatedAt: null,
+            title: '[CLONE] ' + postToBeCloned.title,
+            slug: postToBeCloned.slug + `-${randomString}`
+        };
+        delete cloneItem.id;
+        const cloneStructureItem = {
+            key: cloneId,
+            children: []
+        };
+
+        updatedStructure = updatedStructure.map(node =>
+            insertStructureChildren(node, cloneStructureItem, nodeParent.key)
+        );
+        newItems.push(cloneItem);
+    });
+
+    const updatedItems = [...items, ...newItems];
+
+    /**
+     * Update structure
+     */
+    await updateSite(siteUUID, {
+        structure: updatedStructure,
+        updatedAt: Date.now()
+    });
+
+    /**
+     * Add items
+     */
+    await createItems(newItems);
+    return { updatedStructure, updatedItems };
 };
 
 export const deleteMenuEntries = async (

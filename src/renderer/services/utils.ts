@@ -260,6 +260,7 @@ export const sanitizeSite = siteObj => {
      * Remove site keys
      */
     [
+        'id',
         'uuid',
         'name',
         'theme',

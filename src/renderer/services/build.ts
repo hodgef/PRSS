@@ -92,12 +92,26 @@ export const build = async (
 
 export const createPublicDir = (dirPath: string) => {
     const assetsDir = configGet('paths.assets');
+    const publicDir = configGet('paths.public');
 
     try {
+        /**
+         * Assets
+         */
         if (!fs.existsSync(assetsDir)) {
             fs.mkdirSync(assetsDir);
         }
 
+        /**
+         * Public
+         */
+        if (!fs.existsSync(publicDir)) {
+            fs.mkdirSync(publicDir);
+        }
+
+        /**
+         * Site Public
+         */
         if (!fs.existsSync(dirPath)) {
             fs.mkdirSync(dirPath);
         }
@@ -527,4 +541,48 @@ export const findInStructure = (uuid: string, nodes: IStructureItem[]) => {
 
     nodes.some(checkNode);
     return foundItem;
+};
+
+export const findParentInStructure = (
+    uuid: string,
+    nodes: IStructureItem[]
+) => {
+    let foundItem;
+
+    const checkNode = node => {
+        if (node.children && node.children.some(nItem => nItem.key === uuid)) {
+            foundItem = node;
+            return true;
+        } else {
+            return node.children ? node.children.some(checkNode) : false;
+        }
+    };
+
+    nodes.some(checkNode);
+    return foundItem;
+};
+
+export const insertStructureChildren = (
+    structureItemIn: IStructureItem,
+    itemToInsert,
+    parentPostId: string
+) => {
+    const structureItem = { ...structureItemIn };
+    if (structureItem.key === parentPostId) {
+        const newChildren = structureItem.children || [];
+
+        if (Array.isArray(itemToInsert)) {
+            newChildren.push(...itemToInsert);
+        } else {
+            newChildren.push(itemToInsert);
+        }
+
+        structureItem.children = newChildren;
+    } else {
+        structureItem.children = structureItem.children.map(nodeChild =>
+            insertStructureChildren(nodeChild, itemToInsert, parentPostId)
+        );
+    }
+
+    return structureItem;
 };

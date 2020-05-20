@@ -2,7 +2,7 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import './styles/Editor.scss';
 
 import { ContentState, convertToRaw, EditorState } from 'draft-js';
-import draftToHtml from 'draftjs-to-html';
+
 import htmlToDraft from 'html-to-draftjs';
 import React, { FunctionComponent, useState, useRef } from 'react';
 import AceEditor from 'react-ace';
@@ -13,7 +13,7 @@ import 'ace-builds/webpack-resolver';
 import 'ace-builds/src-noconflict/mode-html';
 import 'ace-builds/src-noconflict/theme-github';
 
-import { imageUploadCallback } from '../services/editor';
+import { imageUploadCallback, handleDraftToHtml } from '../services/editor';
 
 interface IProps {
     value: string;
@@ -53,7 +53,9 @@ const StandardEditor: FunctionComponent<IProps> = ({
     const htmlState = useRef(
         forceMode === 'html'
             ? pretty(value, { ocd: true })
-            : draftToHtml(convertToRaw(initialEditorState.getCurrentContent()))
+            : handleDraftToHtml(
+                  convertToRaw(initialEditorState.getCurrentContent())
+              )
     );
 
     const EditHTMLButton = ({ onClick, title }: any) => {
@@ -73,7 +75,9 @@ const StandardEditor: FunctionComponent<IProps> = ({
     const updateEditorState = state => {
         setEditorState(state);
 
-        const htmlState = draftToHtml(convertToRaw(state.getCurrentContent()));
+        const htmlState = handleDraftToHtml(
+            convertToRaw(state.getCurrentContent())
+        );
         onChange && onChange(htmlState);
     };
 
@@ -83,7 +87,7 @@ const StandardEditor: FunctionComponent<IProps> = ({
 
     const getDraftHTMLState = () => {
         const html = pretty(
-            draftToHtml(convertToRaw(editorState.getCurrentContent())),
+            handleDraftToHtml(convertToRaw(editorState.getCurrentContent())),
             { ocd: true }
         );
         htmlState.current = html;

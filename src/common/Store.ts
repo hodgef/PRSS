@@ -4,7 +4,13 @@ import fs from 'fs';
 import knex from 'knex';
 import { mapFieldsFromJSON } from '../renderer/services/utils';
 
-const JSON_FIELDS = ['structure', 'menus', 'vars', 'exclusiveVars'];
+const JSON_FIELDS = [
+    'structure',
+    'menus',
+    'vars',
+    'exclusiveVars',
+    'isContentRaw'
+];
 
 const { app } = require('electron').remote;
 

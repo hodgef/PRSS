@@ -75,7 +75,7 @@ const TitleEditor: FunctionComponent<IProps> = ({
                 </Fragment>
             ) : (
                 <Fragment>
-                    <span>{post.title}</span>
+                    <span title={post.title}>{post.title}</span>
                     <i
                         className="material-icons clickable"
                         onClick={() => {

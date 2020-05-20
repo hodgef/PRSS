@@ -1,7 +1,15 @@
 .slug-editor {
     font-size: 16px;
     display: flex;
-    height: 35px;
+    max-height: 35px;
+    margin-bottom: 10px;
+
+    a {
+        width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
     &:not(.editing) {
         align-items: center;

@@ -43,7 +43,7 @@
 
     .editor-container {
         display: flex;
-        height: 100%;
+        flex: 1;
 
         .left-align {
             flex: 1;
@@ -51,6 +51,17 @@
 
         .right-align {
             display: flex;
+        }
+    }
+
+    .rdw-editor-wrapper {
+        box-sizing: content-box;
+        display: flex;
+        flex-flow: column;
+
+        .rdw-editor-main {
+            flex: 1;
+            height: calc(100vh - 315px);
         }
     }
 }

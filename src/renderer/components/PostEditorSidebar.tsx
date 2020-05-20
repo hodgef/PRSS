@@ -81,6 +81,8 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
         onToggleRawHTMLOnly();
     };
 
+    const buildStr = previewStarted ? 'Save & Rebuild' : 'Save';
+
     return (
         <div className="editor-sidebar">
             <ul className="editor-sidebar-featured">
@@ -95,15 +97,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
                         <i className="material-icons">save_alt</i>
                     )}
 
-                    {previewStarted ? (
-                        <Fragment>
-                            <span>Save &amp; Rebuild</span>{' '}
-                        </Fragment>
-                    ) : (
-                        <Fragment>
-                            <span>Save</span>{' '}
-                        </Fragment>
-                    )}
+                    <span>{buildLoading ? loadingStatus : buildStr}</span>
 
                     {editorChanged && (
                         <span
