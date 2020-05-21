@@ -212,7 +212,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
                         <span className="material-icons">create</span>{' '}
                         <span>Edit Variables</span>
                     </li>
-                    <li className="clickable">
+                    {/*<li className="clickable">
                         <div className="form-check">
                             <input
                                 className="form-check-input"
@@ -228,7 +228,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
                                 Force Raw HTML Editing
                             </label>
                         </div>
-                    </li>
+                                </li>*/}
                 </ul>
             )}
 

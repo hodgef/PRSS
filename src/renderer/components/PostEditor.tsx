@@ -9,7 +9,12 @@ import React, {
 } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { getString, configGet, configSet } from '../../common/utils';
-import StandardEditor from './Editor';
+//import StandardEditor from './Editor';
+
+import 'jodit';
+import 'jodit/build/jodit.min.css';
+import Editor from 'jodit-react';
+
 import Footer from './Footer';
 import Header from './Header';
 import { modal } from './Modal';
@@ -27,6 +32,7 @@ import PostEditorSidebar from './PostEditorSidebar';
 import HTMLEditorOverlay from './HTMLEditorOverlay';
 import SiteVariablesEditorOverlay from './SiteVariablesEditorOverlay';
 import { getSite, getItems, updateItem, updateSite } from '../services/db';
+import { editorOptions } from '../services/editor';
 
 const PostEditor: FunctionComponent = () => {
     const { siteId, postId } = useParams();
@@ -404,7 +410,24 @@ const PostEditor: FunctionComponent = () => {
 
                 <div className="editor-container">
                     <div className="left-align">
-                        <StandardEditor
+                        <Editor
+                            value={post ? post.content : ''}
+                            config={editorOptions}
+                            onChange={content => {
+                                editorContent.current = content;
+
+                                if (!editorChangedContent.current) {
+                                    editorChangedContent.current = content;
+                                }
+
+                                if (editorChangedContent.current === content) {
+                                    setEditorChanged(false);
+                                } else {
+                                    setEditorChanged(true);
+                                }
+                            }}
+                        />
+                        {/*<StandardEditor
                             value={post ? post.content : ''}
                             onChange={content => {
                                 editorContent.current = content;
@@ -425,7 +448,7 @@ const PostEditor: FunctionComponent = () => {
                             forceMode={
                                 post && post.isContentRaw ? 'html' : null
                             }
-                        />
+                        />*/}
                     </div>
                     <div className="right-align">
                         <PostEditorSidebar

@@ -1,8 +1,9 @@
 @import './Mixins.scss';
 
 #app .PostEditor {
-    h1 {
+    & > .content > h1 {
         padding-bottom: 0;
+        margin-bottom: 10px;
 
         .left-align {
             flex: 1;
@@ -54,14 +55,40 @@
         }
     }
 
-    .rdw-editor-wrapper {
-        box-sizing: content-box;
+    // .rdw-editor-wrapper {
+    //     box-sizing: content-box;
+    //     display: flex;
+    //     flex-flow: column;
+
+    //     .rdw-editor-main {
+    //         flex: 1;
+    //         height: calc(100vh - 315px);
+    //     }
+    // }
+
+    .jodit_container {
         display: flex;
         flex-flow: column;
 
-        .rdw-editor-main {
+        &:not(.jodit_fullsize) {
+            height: calc(100vh - 260px) !important;
+        }
+
+        .jodit_toolbar_container {
+            border: 1px solid #dcdcdc;
+        }
+
+        .jodit_toolbar {
+            background: #ffffff;
+            border: 1px solid #fff;
+        }
+
+        .jodit_workplace {
             flex: 1;
-            height: calc(100vh - 315px);
+        }
+
+        &:not(.jodit_inline) .jodit_wysiwyg {
+            padding: 20px;
         }
     }
 }

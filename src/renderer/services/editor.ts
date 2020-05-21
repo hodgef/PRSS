@@ -1,4 +1,4 @@
-import draftToHtml from 'draftjs-to-html';
+//import draftToHtml from 'draftjs-to-html';
 
 export const imageUploadCallback = file => {
     new Promise((resolve, reject) => {
@@ -94,9 +94,16 @@ const convertImages = htmlText => {
     return htmlText;
 };
 
-export const handleDraftToHtml = editorState => {
-    const htmlText = draftToHtml(editorState);
-    const htmlConverted = convertImages(htmlText); //here I call the function that converts the <img/> to <div><img/></div>.
+// export const handleDraftToHtml = editorState => {
+//     const htmlText = draftToHtml(editorState);
+//     const htmlConverted = convertImages(htmlText); //here I call the function that converts the <img/> to <div><img/></div>.
 
-    return htmlConverted;
+//     return htmlConverted;
+// };
+
+export const editorOptions = {
+    autofocus: true,
+    uploader: {
+        insertImageAsBase64URI: true
+    }
 };
