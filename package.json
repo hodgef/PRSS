@@ -2,7 +2,7 @@
   "name": "prss",
   "version": "1.2.0",
   "description": "Powerful Blogging",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "start": "electron-webpack dev",
     "build": "electron-webpack",

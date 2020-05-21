@@ -8,11 +8,11 @@ export const parseHtmlParams = (html: string = '', bufferItem: IBufferItem) => {
     if (matches) {
         matches.forEach((match: string) => {
             const param = match.replace(/%/g, '');
-            const value = objGet(param, bufferItem);
+            const value = objGet(param, bufferItem) || '';
 
-            if (typeof value !== 'undefined') {
-                output = output.split(match).join(value);
-            }
+            //if (typeof value !== 'undefined') {
+            output = output.split(match).join(value);
+            //}
         });
     }
 

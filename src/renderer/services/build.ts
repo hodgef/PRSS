@@ -17,6 +17,7 @@ import {
 import { modal } from '../components/Modal';
 import { getThemeManifest, getDefaultReadme } from './theme';
 import { getSite, getItems, getItem } from './db';
+import { getRootPost } from './hosting';
 
 export const bufferPathFileNames = ['index.html', 'index.js'];
 export const configFileName = 'config.js';
@@ -299,6 +300,7 @@ export const getBufferItems = async (
             : siteUUIDOrSite;
     const structurePaths = getStructurePaths(site.structure);
     const themeManifest = await getThemeManifest(site.theme);
+    const rootPost = getRootPost(site);
     const bufferItems = [];
 
     if (!themeManifest) {
@@ -347,7 +349,8 @@ export const getBufferItems = async (
             (site.headHtml || '') +
             (getAggregateItemPropValues(
                 'item.headHtml',
-                parentIds,
+                //parentIds,
+                [rootPost.uuid],
                 bufferItems
             ) || '') +
             (post.headHtml || '');
@@ -356,7 +359,8 @@ export const getBufferItems = async (
             (site.footerHtml || '') +
             (getAggregateItemPropValues(
                 'item.footerHtml',
-                parentIds,
+                //parentIds,
+                [rootPost.uuid],
                 bufferItems
             ) || '') +
             (post.footerHtml || '');
@@ -365,7 +369,8 @@ export const getBufferItems = async (
             (site.sidebarHtml || '') +
             (getAggregateItemPropValues(
                 'item.sidebarHtml',
-                parentIds,
+                //parentIds,
+                [rootPost.uuid],
                 bufferItems
             ) || '') +
             (post.sidebarHtml || '');

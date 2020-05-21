@@ -64,6 +64,7 @@ const PostEditor: FunctionComponent = () => {
     const [editorChanged, setEditorChanged] = useState(false);
     const [previewLoading, setPreviewLoading] = useState(false);
     const [buildLoading, setBuildLoading] = useState(false);
+    const [buildAllLoading, setBuildAllLoading] = useState(false);
     const [deployLoading, setDeployLoading] = useState(false);
     const [loadingStatus, setLoadingStatus] = useState('');
 
@@ -89,14 +90,22 @@ const PostEditor: FunctionComponent = () => {
         return null;
     }
 
-    const handleSave = async (isAutosave = false) => {
-        setBuildLoading(true);
+    const handleSave = async (isAutosave = false, buildAll = false) => {
+        if (buildAll) {
+            setBuildAllLoading(true);
+        } else {
+            setBuildLoading(true);
+        }
 
         const prevContent = post.content;
 
         if (editorMode.current === 'html' && post && !post.isContentRaw) {
             modal.alert(getString('error_save_text_editor'));
-            setBuildLoading(false);
+            if (buildAll) {
+                setBuildAllLoading(false);
+            } else {
+                setBuildLoading(false);
+            }
             return;
         }
 
@@ -136,12 +145,18 @@ const PostEditor: FunctionComponent = () => {
                 toast.success('Post autosaved');
             } else {
                 if (previewServer.active) {
-                    await buildPost(postId, setLoadingStatus);
+                    await buildPost(buildAll ? null : postId, setLoadingStatus);
                     previewServer.reload();
 
-                    toast.success(
-                        'Post saved. The page has been rebuilt and the preview reloaded.'
-                    );
+                    if (buildAll) {
+                        toast.success(
+                            'Post saved. The entire site has been rebuilt and the preview reloaded.'
+                        );
+                    } else {
+                        toast.success(
+                            'Post saved. The page has been rebuilt and the preview reloaded.'
+                        );
+                    }
                 } else {
                     toast.success('Post saved!');
                 }
@@ -151,7 +166,11 @@ const PostEditor: FunctionComponent = () => {
             }
         }
 
-        setBuildLoading(false);
+        if (buildAll) {
+            setBuildAllLoading(false);
+        } else {
+            setBuildLoading(false);
+        }
     };
 
     const handleSaveTitle = async title => {
@@ -233,11 +252,11 @@ const PostEditor: FunctionComponent = () => {
         }
     };
 
-    const buildPost = async (postId, onUpdate = null) => {
+    const buildPost = async (postId = null, onUpdate = null) => {
         if (previewServer.active) {
             previewServer.pause();
         }
-        await build(siteId, onUpdate /*, postId*/); // Build all
+        await build(siteId, onUpdate, postId, postId ? true : false);
         if (previewServer.active) {
             previewServer.resume();
         }
@@ -458,6 +477,7 @@ const PostEditor: FunctionComponent = () => {
                             editorChanged={editorChanged}
                             previewLoading={previewLoading}
                             buildLoading={buildLoading}
+                            buildAllLoading={buildAllLoading}
                             deployLoading={deployLoading}
                             publishSuggested={publishSuggested}
                             loadingStatus={loadingStatus}
@@ -465,6 +485,7 @@ const PostEditor: FunctionComponent = () => {
                                 post ? post.isContentRaw : null
                             }
                             onSave={handleSave}
+                            onSaveRebuildAll={() => handleSave(false, true)}
                             onStopPreview={handleStopPreview}
                             onStartPreview={handleStartPreview}
                             onPublish={handlePublish}

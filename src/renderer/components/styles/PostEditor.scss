@@ -81,6 +81,11 @@
         .jodit_toolbar {
             background: #ffffff;
             border: 1px solid #fff;
+
+            .jodit_toolbar_btn-print,
+            .jodit_toolbar_btn-about {
+                display: none;
+            }
         }
 
         .jodit_workplace {

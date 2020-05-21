@@ -15,6 +15,7 @@ interface IProps {
     editorChanged: boolean;
     previewLoading: boolean;
     buildLoading: boolean;
+    buildAllLoading: boolean;
     deployLoading: boolean;
     publishSuggested: boolean;
     loadingStatus: string;
@@ -23,7 +24,7 @@ interface IProps {
     onStopPreview?: noop;
     onStartPreview?: noop;
     onPublish?: noop;
-    onRebuild?: noop;
+    onSaveRebuildAll?: noop;
     onChangePostTemplate?: (t: string) => void;
     onOpenRawHTMLOverlay?: noop;
     onOpenVarEditorOverlay?: noop;
@@ -37,11 +38,13 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
     editorChanged,
     previewLoading,
     buildLoading,
+    buildAllLoading,
     deployLoading,
     publishSuggested,
     loadingStatus,
     forceRawHTMLEditing = false,
     onSave = noop,
+    onSaveRebuildAll = noop,
     onStopPreview = noop,
     onStartPreview = noop,
     onPublish = noop,
@@ -81,13 +84,17 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
         onToggleRawHTMLOnly();
     };
 
-    const buildStr = previewStarted ? 'Save & Rebuild' : 'Save';
+    const buildStr = previewStarted ? 'Save & Build' : 'Save';
 
     return (
         <div className="editor-sidebar">
             <ul className="editor-sidebar-featured">
                 <li
-                    title="Save your changes locally"
+                    title={
+                        previewStarted
+                            ? 'Save and build only this post'
+                            : 'Save your changes locally'
+                    }
                     className="clickable"
                     onClick={() => onSave()}
                 >
@@ -108,6 +115,34 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
                         </span>
                     )}
                 </li>
+                {previewStarted && (
+                    <li
+                        title="Build whole site"
+                        className="clickable"
+                        onClick={() => onSaveRebuildAll()}
+                    >
+                        {buildAllLoading ? (
+                            <Loading small classNames="mr-1" />
+                        ) : (
+                            <i className="material-icons">all_inbox</i>
+                        )}
+
+                        <span>
+                            {buildAllLoading
+                                ? loadingStatus
+                                : 'Save & Build All'}
+                        </span>
+
+                        {/*editorChanged && (
+                            <span
+                                className="color-red ml-1"
+                                title={getString('warn_unsaved_changes')}
+                            >
+                                *
+                            </span>
+                        )*/}
+                    </li>
+                )}
                 {previewStarted ? (
                     <li
                         title={getString('preview_description_message')}
