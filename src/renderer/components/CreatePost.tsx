@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import Footer from './Footer';
 import Header from './Header';
-import { normalize, error } from '../services/utils';
+import { normalize, error, removeStopWords } from '../services/utils';
 import { walkStructure, insertStructureChildren } from '../services/build';
 import { toast } from 'react-toastify';
 import { isValidSlug } from '../services/hosting';
@@ -79,7 +79,7 @@ const CreatePost: FunctionComponent = () => {
 
         const postId = uuidv4();
 
-        let normalizedSlug = normalize(postSlug || postTitle);
+        let normalizedSlug = normalize(postSlug || removeStopWords(postTitle));
 
         if (!(await isValidSlug(normalizedSlug, siteId))) {
             const randomString = postId.substring(0, 5);

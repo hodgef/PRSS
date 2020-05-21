@@ -3,9 +3,12 @@ import { build } from './build';
 
 export const previewServer = globalRequire('browser-sync').create('prss');
 
-export const bufferAndStartPreview = async (siteUUID: string) => {
+export const bufferAndStartPreview = async (
+    siteUUID: string,
+    onUpdate = null
+) => {
     stopPreview();
-    const buildRes = await build(siteUUID, null /*, itemId*/); // Building all
+    const buildRes = await build(siteUUID, onUpdate /*, itemId*/); // Building all
 
     if (buildRes && buildRes.length) {
         const bufferItem = buildRes[0];

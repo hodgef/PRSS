@@ -246,7 +246,10 @@ const PostEditor: FunctionComponent = () => {
             return;
         }
 
-        const previewRes = await bufferAndStartPreview(siteId);
+        const previewRes = await bufferAndStartPreview(
+            siteId,
+            setLoadingStatus
+        );
 
         if (previewRes) {
             setPreviewStarted(true);

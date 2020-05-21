@@ -11,6 +11,7 @@ interface IProps {
     onUpdate?: any;
     onCheck?: any;
     onSelect?: any;
+    onDropCheck?: any;
     selectedKeys?: string[];
     checkStrictly?: boolean;
     draggable?: boolean;
@@ -43,7 +44,7 @@ class DraggableTree extends React.Component<IProps, IState> {
         }
     }
 
-    onDrop = info => {
+    onDrop = async info => {
         const dropKey = info.node.props.eventKey;
         const dragKey = info.dragNode.props.eventKey;
         const dropPos = info.node.props.pos.split('-');
@@ -103,12 +104,23 @@ class DraggableTree extends React.Component<IProps, IState> {
             }
         }
 
-        this.setState(
-            {
-                gData: data
-            },
-            this.props.onUpdate && this.props.onUpdate(data)
-        );
+        const dropCheck =
+            typeof this.props.onDropCheck === 'function' &&
+            (await this.props.onDropCheck(data, dragKey));
+
+        /**
+         * dropCheck true = fail
+         */
+        if (dropCheck) {
+            return;
+        } else {
+            this.setState(
+                {
+                    gData: data
+                },
+                this.props.onUpdate && this.props.onUpdate(data, dragKey)
+            );
+        }
     };
 
     render() {

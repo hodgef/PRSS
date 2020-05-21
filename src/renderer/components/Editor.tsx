@@ -118,9 +118,10 @@ const StandardEditor: FunctionComponent<IProps> = ({
                                         const editorVal = htmlToEditorState(
                                             htmlState.current
                                         );
+
                                         updateEditorState(editorVal);
                                         toggleEditMode();
-                                        htmlState.current = '';
+                                        //htmlState.current = '';
                                     }}
                                 />
                             </div>
@@ -160,6 +161,7 @@ const StandardEditor: FunctionComponent<IProps> = ({
                 </div>
             ) : (
                 <Editor
+                    handlePastedText={() => false}
                     editorState={editorState}
                     onEditorStateChange={onEditorStateChange}
                     toolbarCustomButtons={[<EditHTMLButton key="sup" />]}

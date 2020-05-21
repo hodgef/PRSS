@@ -3,7 +3,11 @@ import './styles/ListPosts.scss';
 import React, { Fragment, FunctionComponent, useEffect, useState } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { walkStructure } from '../services/build';
+import {
+    walkStructure,
+    findInStructureCondition,
+    findParentInStructure
+} from '../services/build';
 import {
     deletePosts,
     updateSiteStructure,
@@ -16,6 +20,7 @@ import Header from './Header';
 import Loading from './Loading';
 import { getSite, getItems } from '../services/db';
 import { configGet, configSet } from '../../common/utils';
+import { error } from '../services/utils';
 
 const ListPosts: FunctionComponent = () => {
     const { siteId } = useParams();
@@ -130,6 +135,41 @@ const ListPosts: FunctionComponent = () => {
         setLoading(false);
     };
 
+    /**
+     * Ensure unique slug wherever item is dropped.
+     * Cancel if item with same slug exists at drop point.
+     */
+    const onDropItemCheck = async (newData, draggedNodeUUID) => {
+        const draggedItem = items.find(item => item.uuid === draggedNodeUUID);
+        const draggedItemParent = findParentInStructure(
+            draggedNodeUUID,
+            structureState
+        );
+
+        const hasSlugDuplicates = findInStructureCondition(newData, node => {
+            const nodeItem = items.find(item => item.uuid === node.key);
+            const nodeParent =
+                findParentInStructure(node.key, structureState) || {};
+
+            const hasSameSlug = nodeItem.slug === draggedItem.slug;
+            const isSameItem = nodeItem.uuid === draggedItem.uuid;
+            const hasSameParent = draggedItemParent.key === nodeParent.key;
+
+            const duplicatesAtSameLevel =
+                !isSameItem && hasSameParent && hasSameSlug;
+
+            return duplicatesAtSameLevel;
+        });
+
+        if (hasSlugDuplicates) {
+            error(
+                `There is already an item with the same slug ("${draggedItem.slug}") at this position. Please change the slug or drop elsewhere`
+            );
+        }
+
+        return hasSlugDuplicates;
+    };
+
     return (
         <div className="ListPosts page fixed">
             <Header
@@ -219,6 +259,7 @@ const ListPosts: FunctionComponent = () => {
                         onUpdate={data => {
                             onStructureUpdate(data);
                         }}
+                        onDropCheck={onDropItemCheck}
                         onSelect={items => items[0] && onItemClick(items[0])}
                         selectedKeys={selectedItems}
                         onCheck={setSelectedItems}

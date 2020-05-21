@@ -128,7 +128,9 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
                         ) : (
                             <i className="material-icons">play_arrow</i>
                         )}
-                        <span>Preview</span>
+                        <span>
+                            {previewLoading ? loadingStatus : 'Preview'}
+                        </span>
                     </li>
                 )}
                 <li

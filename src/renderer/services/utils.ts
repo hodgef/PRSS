@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { getString, configGet } from '../../common/utils';
 import { modal } from '../components/Modal';
+import stopwords from '../json/stopwords.json';
 
 export const merge = (var1, var2) => {
     if (Array.isArray(var1) && Array.isArray(var2)) {
@@ -327,3 +328,10 @@ export const stripTags = html => {
 };
 
 export const isHtml = RegExp.prototype.test.bind(/(<([^>]+)>)/i);
+
+export const removeStopWords = (str = '') => {
+    const words = str.split(' ');
+    return words
+        .filter(word => !stopwords.includes(word.toLowerCase()))
+        .join(' ');
+};

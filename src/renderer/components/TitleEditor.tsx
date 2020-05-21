@@ -51,7 +51,7 @@ const TitleEditor: FunctionComponent<IProps> = ({
     };
 
     return (
-        <div className={cx('title-editor', { editing })}>
+        <div className={cx('title-editor mr-4', { editing })}>
             {editing ? (
                 <Fragment>
                     <input

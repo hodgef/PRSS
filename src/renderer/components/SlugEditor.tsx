@@ -74,19 +74,19 @@ const SlugEditor: FunctionComponent<IProps> = ({
         /**
          * Ensure slug is unique
          */
-        const itemsWithSlug = items.filter(
-            item => item.slug === normalizedSlug
-        );
+        // const itemsWithSlug = items.filter(
+        //     item => item.slug === normalizedSlug
+        // );
 
-        if (itemsWithSlug.length > 1) {
-            error('You have items with the same slug');
-            return;
-        }
+        // if (itemsWithSlug.length > 1) {
+        //     error('You have items with the same slug');
+        //     return;
+        // }
 
-        if (itemsWithSlug.length === 1 && itemsWithSlug[0].uuid !== post.uuid) {
-            error('You have an item with the same slug');
-            return;
-        }
+        // if (itemsWithSlug.length === 1 && itemsWithSlug[0].uuid !== post.uuid) {
+        //     error('You have an item with the same slug');
+        //     return;
+        // }
 
         await onSave(normalizedSlug);
         setPost({ ...post, slug: normalizedSlug });

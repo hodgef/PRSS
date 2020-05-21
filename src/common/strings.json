@@ -65,5 +65,5 @@
     "github_repo_info_1": "If you'll be using your own repository to serve your site, enter the repository name.",
     "github_repo_info_2": "If you're connecting to someone else's repository, use the username/repository syntax.",
     "github_repo_info_3": "Before proceeding, please ensure that you can access the repository locally through Git.",
-    "warn_force_raw_html_disable": "If you go back to the Rich Text Editor, your markup will be parsed. This will cause classes, attributes and unsaved changes to be lost. Continue?"
+    "warn_force_raw_html_disable": "If you go back to the Rich Text Editor, your markup will be parsed. This will cause classes, attributes and unsaved changes to be LOST! Continue?"
 }

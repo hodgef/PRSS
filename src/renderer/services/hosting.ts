@@ -298,8 +298,21 @@ export const deletePosts = async (siteUUID: string, postIds: string[]) => {
 };
 
 export const clonePosts = async (siteUUID: string, postIds: string[]) => {
-    const { structure } = await getSite(siteUUID);
+    const site = await getSite(siteUUID);
+    const { structure } = site;
     const items = await getItems(siteUUID);
+
+    /**
+     * Can't clone root post
+     */
+    const rootPost = getRootPost(site);
+
+    if (postIds.includes(rootPost)) {
+        error(
+            'You cannot clone the root post. Please unselect it and try again.'
+        );
+        return {};
+    }
 
     /**
      * Warn about deleting posts with children
@@ -485,8 +498,25 @@ export const isValidSlug = async (
     siteUUID: string,
     postId?: string
 ) => {
+    const site = await getSite(siteUUID);
+    const nodeParent = findParentInStructure(postId, site.structure);
+
+    /**
+     * Check if parent's children have same slug
+     */
+    const mappedChildren = await mapNodesToItems(siteUUID, nodeParent.children);
+
+    return !mappedChildren.some(
+        item => slug === item.slug && item.uuid !== postId
+    );
+};
+
+export const mapNodesToItems = async (siteUUID, nodes) => {
     const items = await getItems(siteUUID);
-    return !items.some(item => slug === item.slug && item.uuid !== postId);
+
+    return (nodes || []).map(node =>
+        items.find(item => item.uuid === node.key)
+    );
 };
 
 export const siteVarToArray = (siteVars: ISiteVar) => {

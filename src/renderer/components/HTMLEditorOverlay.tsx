@@ -12,7 +12,7 @@ import pretty from 'pretty';
 import { globalRequire } from '../../common/utils';
 import { toast } from 'react-toastify';
 import { modal } from './Modal';
-import bufferItemMockJson from '../mockData/bufferItem.json';
+import bufferItemMockJson from '../json/bufferItem.json';
 const htmlMinifier = globalRequire('html-minifier');
 
 interface IProps {

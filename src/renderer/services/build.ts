@@ -543,6 +543,25 @@ export const findInStructure = (uuid: string, nodes: IStructureItem[]) => {
     return foundItem;
 };
 
+export const findInStructureCondition = (
+    nodes: IStructureItem[],
+    condition
+) => {
+    let foundItem;
+
+    const checkNode = node => {
+        if (condition(node)) {
+            foundItem = node;
+            return true;
+        } else {
+            return node.children ? node.children.some(checkNode) : false;
+        }
+    };
+
+    nodes.some(checkNode);
+    return foundItem;
+};
+
 export const findParentInStructure = (
     uuid: string,
     nodes: IStructureItem[]
