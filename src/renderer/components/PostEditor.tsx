@@ -1,4 +1,5 @@
 import './styles/PostEditor.scss';
+import 'jodit/build/jodit.min.css';
 
 import React, {
     Fragment,
@@ -9,12 +10,6 @@ import React, {
 } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { getString, configGet, configSet } from '../../common/utils';
-//import StandardEditor from './Editor';
-
-import 'jodit';
-import 'jodit/build/jodit.min.css';
-import Editor from 'jodit-react';
-
 import Footer from './Footer';
 import Header from './Header';
 import { modal } from './Modal';
@@ -33,6 +28,9 @@ import HTMLEditorOverlay from './HTMLEditorOverlay';
 import SiteVariablesEditorOverlay from './SiteVariablesEditorOverlay';
 import { getSite, getItems, updateItem, updateSite } from '../services/db';
 import { editorOptions } from '../services/editor';
+
+require('jodit');
+const Editor = require('jodit-react');
 
 const PostEditor: FunctionComponent = () => {
     const { siteId, postId } = useParams();
