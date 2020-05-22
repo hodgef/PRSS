@@ -8,7 +8,8 @@
     "build": "electron-webpack",
     "dist": "npm run build && electron-builder",
     "dist:dir": "npm run dist --dir -c.compression=store -c.mac.identity=null",
-    "rebuild": "electron-rebuild -f -w sqlite3"
+    "rebuild": "electron-rebuild -f -w sqlite3",
+    "licenses": "npm-license-crawler -onlyDirectDependencies -json src/renderer/json/licenses.json"
   },
   "author": {
     "name": "Francisco Hodge",

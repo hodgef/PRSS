@@ -1,0 +1,44 @@
+{
+    "browser-sync@2.26.7": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/BrowserSync/browser-sync",
+        "licenseUrl": "https://github.com/BrowserSync/browser-sync/raw/master/LICENSE",
+        "parents": "prss"
+    },
+    "electron-store@5.1.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/sindresorhus/electron-store",
+        "licenseUrl": "https://github.com/sindresorhus/electron-store/raw/master/license",
+        "parents": "prss"
+    },
+    "html-minifier@4.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/kangax/html-minifier",
+        "licenseUrl": "https://github.com/kangax/html-minifier/raw/master/LICENSE",
+        "parents": "prss"
+    },
+    "keytar@5.4.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/atom/node-keytar",
+        "licenseUrl": "https://github.com/atom/node-keytar/raw/master/LICENSE.md",
+        "parents": "prss"
+    },
+    "knex@0.21.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/knex/knex",
+        "licenseUrl": "https://github.com/knex/knex/raw/master/LICENSE",
+        "parents": "prss"
+    },
+    "source-map-support@0.5.16": {
+        "licenses": "MIT",
+        "repository": "https://github.com/evanw/node-source-map-support",
+        "licenseUrl": "https://github.com/evanw/node-source-map-support/raw/master/LICENSE.md",
+        "parents": "prss"
+    },
+    "sqlite3@4.2.0": {
+        "licenses": "BSD-3-Clause",
+        "repository": "https://github.com/mapbox/node-sqlite3",
+        "licenseUrl": "https://github.com/mapbox/node-sqlite3/raw/master/LICENSE",
+        "parents": "prss"
+    }
+}
