@@ -1,7 +1,13 @@
 #app footer {
-    padding: 20px;
+    padding: 5px 10px;
     box-sizing: border-box;
     display: flex;
+    color: #0a0a0a;
+    align-items: center;
+    font-size: 12px;
+    z-index: 5;
+    box-shadow: -6px -6px 12px 2px #eaeaea1f;
+    border-top: 1px solid whitesmoke;
 
     .left-align,
     .right-align {

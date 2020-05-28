@@ -5,17 +5,24 @@ $primary: #343435;
 @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+z html {
+    height: 100%;
+}
 
-html,
 body {
+    display: flex;
     font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
     user-select: none;
 }
 
-html,
-body,
+// html,
+// body,
+// #app {
+//     height: 100%;
+// }
+
 #app {
-    height: 100%;
+    flex: 1;
 }

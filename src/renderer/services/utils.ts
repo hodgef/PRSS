@@ -310,10 +310,22 @@ export const sanitizeBufferItem = (itemObj, mergeObj = {}) => {
     return newObj;
 };
 
-export const truncateString = (string, maxLength = 50) => {
-    if (!string) return null;
-    if (string.length <= maxLength) return string;
-    return `${string.substring(0, maxLength)}...`;
+export const truncateString = (str = '', maxLength = 50) => {
+    const output = str
+        .replace(/"/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    if (!output) return null;
+    if (output.length <= maxLength) return output;
+    return `${output.substring(0, maxLength)}...`;
+};
+
+export const appendSlash = (str = '/') => {
+    let output = str;
+    if (str[str.length - 1] !== '/') {
+        output += '/';
+    }
+    return output;
 };
 
 export const removeTagsFromElem = (doc, tags) =>
@@ -323,7 +335,7 @@ export const removeTagsFromElem = (doc, tags) =>
 
 export const stripTags = html => {
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    removeTagsFromElem(doc, ['pre']);
+    removeTagsFromElem(doc, ['pre', 'h1', 'h2']);
     return doc.body.textContent || '';
 };
 

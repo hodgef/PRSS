@@ -2,15 +2,16 @@ import './styles/TitleEditor.scss';
 
 import React, { FunctionComponent, useState, Fragment, useEffect } from 'react';
 
-import { error } from '../services/utils';
+import { error, normalize, removeStopWords } from '../services/utils';
 import cx from 'classnames';
 import { getItem } from '../services/db';
+import { isValidSlug } from '../services/hosting';
 
 interface IProps {
     siteId: string;
     postId: string;
     initValue: string;
-    onSave: (s: string) => any;
+    onSave: (s: string, sl?: string) => any;
 }
 
 const TitleEditor: FunctionComponent<IProps> = ({
@@ -45,7 +46,21 @@ const TitleEditor: FunctionComponent<IProps> = ({
             return;
         }
 
-        await onSave(value);
+        const prevTitle = post.title;
+        const cloneStr = '[CLONE]';
+
+        /**
+         * If previous title was a [CLONE], trigger slug change...
+         */
+        const newSlug =
+            prevTitle.includes(cloneStr) && !value.includes(cloneStr)
+                ? normalize(removeStopWords(value))
+                : null;
+        const slugChangeAllowed = newSlug
+            ? await isValidSlug(newSlug, siteId, post.uuid)
+            : null;
+
+        await onSave(value, slugChangeAllowed ? newSlug : null);
         setPost({ ...post, title: value });
         setEditing(false);
     };

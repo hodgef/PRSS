@@ -1,10 +1,10 @@
 {
   "name": "press",
   "title": "Press",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "Francisco Hodge",
   "homepage": "https://github.com/hodgef/js-library-boilerplate-basic",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "type": "blog",
   "parser": "react",
   "siteVars": [

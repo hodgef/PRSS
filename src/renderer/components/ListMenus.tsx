@@ -200,7 +200,13 @@ const ListMenus: FunctionComponent = () => {
                     />
                 </div>
             </div>
-            <Footer />
+            <Footer
+                leftComponent={
+                    <div className="item-count">
+                        {Object.keys(menus).length} items
+                    </div>
+                }
+            />
         </div>
     );
 };

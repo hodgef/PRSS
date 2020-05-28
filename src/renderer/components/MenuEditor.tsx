@@ -32,6 +32,8 @@ const MenuEditor: FunctionComponent = () => {
     const [selectEnabled, setSelectEnabled] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
 
+    const [itemCount, setItemCount] = useState(0);
+
     useEffect(() => {
         const getData = async () => {
             const siteRes = await getSite(siteId);
@@ -51,16 +53,21 @@ const MenuEditor: FunctionComponent = () => {
     }, []);
 
     const handleMenuUpdate = async menuState => {
+        let count = 0;
         setMenuState(menuState);
         setFormattedMenuStructure(
             await walkStructure(
                 siteId,
                 menuState,
-                ({ title }, { title: nodeTitle }) => ({
-                    title: nodeTitle || title
-                })
+                ({ title }, { title: nodeTitle }) => {
+                    count++;
+                    return {
+                        title: nodeTitle || title
+                    };
+                }
             )
         );
+        setItemCount(count);
     };
 
     if (!site || !items || !menuState || !formattedStructure) {
@@ -321,7 +328,11 @@ const MenuEditor: FunctionComponent = () => {
                     />
                 </div>
             </div>
-            <Footer />
+            <Footer
+                leftComponent={
+                    <div className="item-count">{itemCount} items</div>
+                }
+            />
         </div>
     );
 };

@@ -1,15 +1,19 @@
 import './styles/Footer.scss';
 
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, ReactNode } from 'react';
 import { getPackageJson } from '../../common/utils';
 const packageJson = getPackageJson();
 
-const Footer: FunctionComponent = () => {
+interface IProps {
+    leftComponent?: ReactNode;
+}
+
+const Footer: FunctionComponent<IProps> = ({ leftComponent }) => {
     const { version } = packageJson;
 
     return (
         <footer>
-            <div className="left-align"></div>
+            <div className="left-align">{leftComponent}</div>
             <div className="right-align">
                 <span
                     className="text-tag version-tag"

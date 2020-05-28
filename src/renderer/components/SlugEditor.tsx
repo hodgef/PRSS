@@ -11,40 +11,34 @@ import { modal } from './Modal';
 import { getSite, getItems } from '../services/db';
 
 interface IProps {
-    siteId: string;
-    postId: string;
+    site: ISite;
+    post: IPostItem;
+    items: IPostItem[];
     url?: string;
     initValue: string;
     onSave: (s: string) => any;
 }
 
 const SlugEditor: FunctionComponent<IProps> = ({
-    siteId,
-    postId,
+    site,
+    post,
+    items,
     url,
     initValue = '',
     onSave
 }) => {
     const [editing, setEditing] = useState(false);
-    const [value, setValue] = useState(initValue);
+    const [value, setValue] = useState('');
 
-    const [site, setSite] = useState(null);
-    const [items, setItems] = useState(null);
-    const [post, setPost] = useState(null);
     const [bufferItems, setBufferItems] = useState(null);
 
     useEffect(() => {
         const getData = async () => {
-            const siteRes = await getSite(siteId);
-            const itemsRes = await getItems(siteId);
-            setSite(siteRes);
-            setItems(itemsRes);
-            setPost(itemsRes.find(item => item.uuid === postId));
-            const bufferItems = await getBufferItems(siteRes);
+            const bufferItems = await getBufferItems(site);
             setBufferItems(bufferItems);
         };
         getData();
-    }, []);
+    }, [site, post]);
 
     const bufferItem = bufferItems
         ? bufferItems.find(bufferItem => bufferItem.item.uuid === post.uuid)
@@ -66,7 +60,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
 
         const normalizedSlug = normalize(value);
 
-        if (!(await isValidSlug(normalizedSlug, siteId, post.uuid))) {
+        if (!(await isValidSlug(normalizedSlug, site.uuid, post.uuid))) {
             modal.alert(getString('error_invalid_slug'));
             return;
         }
@@ -89,7 +83,6 @@ const SlugEditor: FunctionComponent<IProps> = ({
         // }
 
         await onSave(normalizedSlug);
-        setPost({ ...post, slug: normalizedSlug });
         setEditing(false);
     };
 
@@ -98,7 +91,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
             {editing ? (
                 <Fragment>
                     <input
-                        value={value}
+                        value={value || initValue}
                         onChange={e => setValue(e.target.value)}
                         className="mr-2"
                     />
@@ -128,7 +121,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
                                 title={url + bufferItem.path.substring(1) + '/'}
                                 className="mr-2"
                             >
-                                {post.slug}
+                                {value || initValue}
                             </a>
 
                             <i

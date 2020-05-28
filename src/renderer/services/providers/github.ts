@@ -216,7 +216,7 @@ class GithubProvider {
                 setTimeout(() => {
                     try {
                         execSync(
-                            `cd "${bufferDir}" && git add --all && git commit -m "Site update" && git push`
+                            `cd "${bufferDir}" && git add --all && git commit -m "Build update" && git push`
                         );
                     } catch (e) {
                         modal.alert(e.message);

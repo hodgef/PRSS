@@ -11,10 +11,10 @@
         "licenseUrl": "https://github.com/sindresorhus/electron-store/raw/master/license",
         "parents": "prss"
     },
-    "html-minifier@4.0.0": {
+    "html-minifier-terser@5.1.1": {
         "licenses": "MIT",
-        "repository": "https://github.com/kangax/html-minifier",
-        "licenseUrl": "https://github.com/kangax/html-minifier/raw/master/LICENSE",
+        "repository": "https://github.com/DanielRuf/html-minifier-terser",
+        "licenseUrl": "https://github.com/DanielRuf/html-minifier-terser/raw/master/LICENSE",
         "parents": "prss"
     },
     "keytar@5.4.0": {
@@ -27,6 +27,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/knex/knex",
         "licenseUrl": "https://github.com/knex/knex/raw/master/LICENSE",
+        "parents": "prss"
+    },
+    "sitemap@6.1.5": {
+        "licenses": "MIT",
+        "repository": "https://github.com/ekalinin/sitemap.js",
+        "licenseUrl": "https://github.com/ekalinin/sitemap.js/raw/master/LICENSE",
         "parents": "prss"
     },
     "source-map-support@0.5.16": {

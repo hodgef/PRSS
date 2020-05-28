@@ -6,6 +6,11 @@
             @include boxlist;
         }
 
+        > .items {
+            flex: 1;
+            overflow: auto;
+        }
+
         .left-align {
             flex: 1;
             display: flex;

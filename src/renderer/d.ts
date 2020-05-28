@@ -24,7 +24,7 @@ interface ISite {
 }
 
 interface ISiteVar {
-    key?: string;
+    [key: string]: string;
 }
 
 interface ISiteMenus {

@@ -12,7 +12,8 @@ import {
     error,
     objGet,
     sanitizeSiteItems,
-    toJson
+    toJson,
+    appendSlash
 } from './utils';
 import { modal } from '../components/Modal';
 import { getThemeManifest, getDefaultReadme } from './theme';
@@ -27,7 +28,8 @@ export const build = async (
     siteUUID: string,
     onUpdate = (a?) => {},
     itemIdToLoad?,
-    skipClear?
+    skipClear?,
+    generateSiteMap = true
 ) => {
     if (!siteUUID) {
         console.error('No UUID was provided to build()');
@@ -45,7 +47,7 @@ export const build = async (
         await clearBuffer();
     }
 
-    const { name: siteName } = await getSite(siteUUID);
+    const { name: siteName, url: siteUrl } = await getSite(siteUUID);
 
     /**
      * Adding config file
@@ -88,6 +90,13 @@ export const build = async (
         return false;
     }
 
+    /**
+     * Generate site map
+     */
+    if (generateSiteMap && !itemIdToLoad) {
+        await createSiteMap(bufferItems, siteUrl, onUpdate);
+    }
+
     return mainBufferItem ? [mainBufferItem] : bufferItems;
 };
 
@@ -124,6 +133,58 @@ export const createPublicDir = (dirPath: string) => {
                 path.join(dirPath, 'README.md'),
                 getDefaultReadme()
             );
+        }
+    } catch (e) {
+        return;
+    }
+};
+
+export const createSiteMap = async (
+    bufferItems: IBufferItem[],
+    siteUrl: string,
+    onUpdate?
+) => {
+    const { SitemapStream, streamToPromise } = require('sitemap');
+    const bufferDir = configGet('paths.buffer');
+
+    if (onUpdate) {
+        onUpdate('Generating Sitemap');
+    }
+
+    const stream = new SitemapStream({ hostname: siteUrl });
+
+    bufferItems.forEach(bufferItem => {
+        const post = bufferItem.item;
+        const postLastUpdated = post.updatedAt || post.createdAt;
+        const postPath = appendSlash(bufferItem.path);
+
+        stream.write({
+            url: postPath,
+            lastmod: new Date(postLastUpdated).toISOString(),
+            changefreq: 'daily'
+        });
+    });
+
+    stream.end();
+    const res = (await streamToPromise(stream)).toString();
+
+    try {
+        fse.outputFileSync(path.join(bufferDir, 'sitemap.xml'), res);
+
+        /**
+         * Creating robots.txt if it doesn't exist
+         */
+        if (!fs.existsSync(path.join(bufferDir, 'robots.txt'))) {
+            fse.outputFileSync(
+                path.join(bufferDir, 'robots.txt'),
+                `Sitemap: ${appendSlash(siteUrl) + 'sitemap.xml'}\n` +
+                    'User-agent:*\n' +
+                    'Disallow:\n'
+            );
+        }
+
+        if (onUpdate) {
+            onUpdate('');
         }
     } catch (e) {
         return;

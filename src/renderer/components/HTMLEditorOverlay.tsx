@@ -13,7 +13,7 @@ import { globalRequire } from '../../common/utils';
 import { toast } from 'react-toastify';
 import { modal } from './Modal';
 import bufferItemMockJson from '../json/bufferItem.json';
-const htmlMinifier = globalRequire('html-minifier');
+const htmlMinifier = globalRequire('html-minifier-terser');
 
 interface IProps {
     headDefaultValue?: string;

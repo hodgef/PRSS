@@ -30,7 +30,7 @@ import { getSite, getItems, updateItem, updateSite } from '../services/db';
 import { editorOptions } from '../services/editor';
 
 require('jodit');
-const Editor = require('jodit-react');
+const Editor = require('jodit-react').default;
 
 const PostEditor: FunctionComponent = () => {
     const { siteId, postId } = useParams();
@@ -171,15 +171,19 @@ const PostEditor: FunctionComponent = () => {
         }
     };
 
-    const handleSaveTitle = async title => {
+    const handleSaveTitle = async (title, slug) => {
         const updatedAt = Date.now();
         const updatedItem = { ...post, title, updatedAt };
+        updatedItem.slug = slug ? slug : updatedItem.slug;
+
+        const itemSlug = slug ? slug : updatedItem.slug;
 
         /**
          *  Update item
          */
         await updateItem(siteId, postId, {
             title,
+            slug: itemSlug,
             updatedAt
         });
 
@@ -190,7 +194,7 @@ const PostEditor: FunctionComponent = () => {
         toast.success('Title saved');
     };
 
-    const handleSaveSlug = async slug => {
+    const handleSaveSlug = async (slug, silent?: boolean) => {
         const updatedAt = Date.now();
         const updatedItem = { ...post, slug, updatedAt };
 
@@ -206,7 +210,10 @@ const PostEditor: FunctionComponent = () => {
 
         configSet(`sites.${siteId}.publishSuggested`, true);
         setPublishSuggested(true);
-        toast.success('Slug saved');
+
+        if (!silent) {
+            toast.success('Slug saved');
+        }
     };
 
     const changePostTemplate = async template => {
@@ -414,8 +421,9 @@ const PostEditor: FunctionComponent = () => {
                                     Editing:
                                 </span>
                                 <SlugEditor
-                                    siteId={siteId}
-                                    postId={postId}
+                                    post={post}
+                                    items={items}
+                                    site={site}
                                     url={url}
                                     initValue={post ? post.slug : null}
                                     onSave={handleSaveSlug}

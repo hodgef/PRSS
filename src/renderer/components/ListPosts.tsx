@@ -124,7 +124,7 @@ const ListPosts: FunctionComponent = () => {
         setLoading(true);
 
         const site = await getSite(siteId);
-        const publishRes = await buildAndDeploy(site, setLoadingStatus);
+        const publishRes = await buildAndDeploy(siteId, setLoadingStatus);
         configSet(`sites.${siteId}.publishSuggested`, false);
         toast.success('Publish complete');
         if (typeof publishRes === 'object') {
@@ -267,7 +267,11 @@ const ListPosts: FunctionComponent = () => {
                     />
                 </div>
             </div>
-            <Footer />
+            <Footer
+                leftComponent={
+                    <div className="item-count">{items.length} items</div>
+                }
+            />
             {loading && <Loading classNames="block" title={loadingStatus} />}
         </div>
     );
