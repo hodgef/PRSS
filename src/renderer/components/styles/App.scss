@@ -12,6 +12,7 @@
         height: 100%;
         display: flex;
         flex-flow: column;
+        user-select: none;
 
         &.fixed {
             header {

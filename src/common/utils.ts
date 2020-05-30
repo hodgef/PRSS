@@ -55,16 +55,3 @@ export const keychainRemove = (service: string, username: string) => {
     const keytar = globalRequire('keytar');
     return keytar.deletePassword(service, username);
 };
-
-export const getPackageJson = function(...args) {
-    const packageJSON = JSON.parse(
-        fs.readFileSync(path.join(__dirname, '../../package.json')).toString()
-    );
-    if (!args.length) {
-        return packageJSON;
-    }
-    return args.reduce((out, key) => {
-        out[key] = packageJSON[key];
-        return out;
-    }, {});
-};

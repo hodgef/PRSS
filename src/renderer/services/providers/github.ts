@@ -121,9 +121,16 @@ class GithubProvider {
         }
 
         /**
-         * Deploy project
+         * Deploy project to set up repo's master branch
          */
-        await this.deploy(onUpdate, null, true);
+        await this.deploy(
+            onUpdate,
+            null,
+            true,
+            false,
+            'Preparing',
+            'Initial Commit'
+        );
 
         /**
          * Enabling pages site
@@ -143,6 +150,11 @@ class GithubProvider {
         await updateSite(this.siteUUID, {
             url: siteUrl
         });
+
+        /**
+         * Deploy project (for real this time)
+         */
+        await this.deploy(onUpdate, null, true, false);
 
         return true;
     };
@@ -181,8 +193,16 @@ class GithubProvider {
         return `https://${this.vars.baseUrl()}/${username}/${repositoryName}`;
     };
 
-    deploy = async (onUpdate = s => {}, itemIdToDeploy?, clearRemote?) => {
+    deploy = async (
+        onUpdate = s => {},
+        itemIdToDeploy?,
+        clearRemote?,
+        generateSiteMap = true,
+        deployText = 'Deploying',
+        commitMessage = 'Build update'
+    ) => {
         const repositoryUrl = await this.getRepositoryUrl();
+        const bufferDir = configGet('paths.buffer');
 
         /**
          * Clearing buffer
@@ -202,7 +222,8 @@ class GithubProvider {
                 this.siteUUID,
                 onUpdate,
                 itemIdToDeploy,
-                !clearRemote
+                !clearRemote,
+                generateSiteMap
             );
 
             if (!buildRes) {
@@ -210,13 +231,13 @@ class GithubProvider {
                 return false;
             }
 
-            onUpdate('Deploying');
+            onUpdate(deployText);
 
             await new Promise(resolve => {
                 setTimeout(() => {
                     try {
                         execSync(
-                            `cd "${bufferDir}" && git add --all && git commit -m "Build update" && git push`
+                            `cd "${bufferDir}" && git add --all && git commit -m "${commitMessage}" && git push`
                         );
                     } catch (e) {
                         modal.alert(e.message);
@@ -232,6 +253,8 @@ class GithubProvider {
 
         // TODO: Re-enable if it's needed
         //await clearBuffer(true);
+        await del([path.join(bufferDir, '.git')]);
+
         return true;
     };
 

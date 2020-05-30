@@ -29,7 +29,7 @@ export const build = async (
     onUpdate = (a?) => {},
     itemIdToLoad?,
     skipClear?,
-    generateSiteMap = true
+    generateSiteMap = false
 ) => {
     if (!siteUUID) {
         console.error('No UUID was provided to build()');

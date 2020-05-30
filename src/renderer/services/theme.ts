@@ -55,7 +55,7 @@ export const getThemeListDetails = async () => {
 };
 
 export const getThemeList = async () => {
-    const themeDir = path.join(await configGet('paths.themes'));
+    const themeDir = await configGet('paths.themes');
     const templateList = getDirPaths(themeDir).map(filePath =>
         path.basename(filePath)
     );

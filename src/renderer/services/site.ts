@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { getString } from '../../common/utils';
 
 export const getSampleSiteStructure = (): {
     site: ISite;
@@ -37,7 +38,16 @@ export const getSampleSiteStructure = (): {
             ],
             vars: {},
             menus: {
-                header: [],
+                header: [
+                    {
+                        key: home.uuid,
+                        children: []
+                    },
+                    {
+                        key: blog.uuid,
+                        children: []
+                    }
+                ],
                 footer: [],
                 sidebar: []
             } as ISiteMenus
@@ -58,31 +68,36 @@ export const getSampleSiteItems = (siteUUID: string) => {
 
     return {
         home: {
+            ...commonProps,
             uuid: uuidv4(),
             siteId: siteUUID,
             slug: 'home',
             title: 'Home',
             content: '<p>This is the beginning of something great.</p>',
             template: 'home',
-            ...commonProps
+            vars: {
+                heroTitle: 'Welcome',
+                heroMessage: getString('theme_default_hero_message')
+            },
+            exclusiveVars: ['heroTitle', 'heroMessage']
         },
         blog: {
+            ...commonProps,
             uuid: uuidv4(),
             siteId: siteUUID,
             slug: 'blog',
             title: 'Blog',
             content: '<p>Explore the latest posts</p>',
-            template: 'blog',
-            ...commonProps
+            template: 'blog'
         },
         post: {
+            ...commonProps,
             uuid: uuidv4(),
             siteId: siteUUID,
             slug: 'my-post',
             title: 'My Post',
             content: '<p>This is my first post.</p>',
-            template: 'post',
-            ...commonProps
+            template: 'post'
         }
     };
 };
