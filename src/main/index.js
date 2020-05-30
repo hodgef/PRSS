@@ -38,6 +38,7 @@ const createMainWindow = () => {
 
   if (!isDevelopment) {
     Menu.setApplicationMenu(null);
+    window.removeMenu();
   }
 
   if (isDevelopment) {
