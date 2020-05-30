@@ -1,6 +1,6 @@
 {
   "name": "prss",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Powerful Blogging",
   "license": "GPL-3.0-or-later",
   "scripts": {
@@ -95,6 +95,14 @@
     "win": {
       "icon": "static/icons/icon.ico",
       "target": "nsis"
+    },
+    "linux": {
+      "icon": "static/icons/icon.png",
+      "target": ["zip", "snap", "deb"]
+    },
+    "mac": {
+      "icon": "static/icons/icon.icns",
+      "target": "default"
     }
   }
 }
