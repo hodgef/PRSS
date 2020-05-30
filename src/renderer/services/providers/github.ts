@@ -253,7 +253,7 @@ class GithubProvider {
 
         // TODO: Re-enable if it's needed
         //await clearBuffer(true);
-        await del([path.join(bufferDir, '.git')]);
+        await del([path.join(bufferDir, '.git')], { force: true });
 
         return true;
     };
@@ -323,7 +323,9 @@ class GithubProvider {
             execSync(`cd "${bufferDir}" && git clone "${repoUrl}" .`);
 
             if (bufferDir && bufferDir.includes('buffer')) {
-                await del([path.join(bufferDir, '*'), '!.git']);
+                await del([path.join(bufferDir, '*'), '!.git'], {
+                    force: true
+                });
             }
 
             execSync(
