@@ -98,11 +98,11 @@
     },
     "linux": {
       "icon": "static/icons/icon.png",
-      "target": ["zip", "snap", "deb"]
+      "target": "zip"
     },
     "mac": {
       "icon": "static/icons/icon.icns",
-      "target": "default"
+      "target": "dmg"
     }
   }
 }
