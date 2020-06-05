@@ -3,7 +3,7 @@ import './styles/SlugEditor.scss';
 import React, { FunctionComponent, useState, Fragment, useEffect } from 'react';
 
 import { getString } from '../../common/utils';
-import { error, normalize } from '../services/utils';
+import { error, normalize, appendSlash } from '../services/utils';
 import cx from 'classnames';
 import { getBufferItems } from '../services/build';
 import { isValidSlug } from '../services/hosting';
@@ -17,6 +17,7 @@ interface IProps {
     url?: string;
     initValue: string;
     onSave: (s: string) => any;
+    previewMode?: boolean;
 }
 
 const SlugEditor: FunctionComponent<IProps> = ({
@@ -25,7 +26,8 @@ const SlugEditor: FunctionComponent<IProps> = ({
     items,
     url,
     initValue = '',
-    onSave
+    onSave,
+    previewMode
 }) => {
     const [editing, setEditing] = useState(false);
     const [value, setValue] = useState('');
@@ -86,6 +88,17 @@ const SlugEditor: FunctionComponent<IProps> = ({
         setEditing(false);
     };
 
+    const getUrlPath = (path = '') => {
+        let host = site.url;
+
+        if (previewMode) {
+            // TODO: Find a way to get host from BrowserSync
+            host = 'http://localhost:3000/';
+        }
+
+        return appendSlash(host + path);
+    };
+
     return (
         <div className={cx('slug-editor', { editing })}>
             {editing ? (
@@ -115,10 +128,10 @@ const SlugEditor: FunctionComponent<IProps> = ({
                     {bufferItem.path !== '/' ? (
                         <Fragment>
                             <a
-                                href={url + bufferItem.path.substring(1) + '/'}
+                                href={getUrlPath(bufferItem.path.substring(1))}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                title={url + bufferItem.path.substring(1) + '/'}
+                                title={getUrlPath(bufferItem.path.substring(1))}
                                 className="mr-2"
                             >
                                 {value || initValue}
@@ -136,10 +149,10 @@ const SlugEditor: FunctionComponent<IProps> = ({
                         </Fragment>
                     ) : (
                         <a
-                            href={url}
+                            href={getUrlPath()}
                             target="_blank"
                             rel="noopener noreferrer"
-                            title={url}
+                            title={getUrlPath()}
                             className="mr-2 font-italic"
                         >
                             Site Index

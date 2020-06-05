@@ -9,7 +9,7 @@ import Header from './Header';
 import { normalize, error, removeStopWords } from '../services/utils';
 import { walkStructure, insertStructureChildren } from '../services/build';
 import { toast } from 'react-toastify';
-import { isValidSlug } from '../services/hosting';
+import { isValidSlug, getRootPost } from '../services/hosting';
 import { getSite, getItems, updateSite, createItems } from '../services/db';
 
 const CreatePost: FunctionComponent = () => {
@@ -78,10 +78,18 @@ const CreatePost: FunctionComponent = () => {
         }
 
         const postId = uuidv4();
+        const rootPost = getRootPost(site);
 
         let normalizedSlug = normalize(postSlug || removeStopWords(postTitle));
 
-        if (!(await isValidSlug(normalizedSlug, siteId))) {
+        if (
+            !(await isValidSlug(
+                normalizedSlug,
+                siteId,
+                null,
+                postParent || rootPost
+            ))
+        ) {
             const randomString = postId.substring(0, 5);
             normalizedSlug += `-${randomString}`;
         }

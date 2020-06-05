@@ -425,6 +425,7 @@ const PostEditor: FunctionComponent = () => {
                                     items={items}
                                     site={site}
                                     url={url}
+                                    previewMode={previewStarted}
                                     initValue={post ? post.slug : null}
                                     onSave={handleSaveSlug}
                                 />

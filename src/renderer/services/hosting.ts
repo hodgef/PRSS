@@ -8,7 +8,8 @@ import { getString } from '../../common/utils';
 import {
     getStructurePaths,
     findParentInStructure,
-    insertStructureChildren
+    insertStructureChildren,
+    findInStructure
 } from './build';
 import GithubProvider from './providers/github';
 import FallbackProvider from './providers/none';
@@ -496,10 +497,13 @@ export const validateHostingFields = (
 export const isValidSlug = async (
     slug: string,
     siteUUID: string,
-    postId?: string
+    postId?: string,
+    parentId?: string
 ) => {
     const site = await getSite(siteUUID);
-    const nodeParent = findParentInStructure(postId, site.structure);
+    const nodeParent = parentId
+        ? await findInStructure(parentId, site.structure)
+        : findParentInStructure(postId, site.structure);
 
     /**
      * Check if parent's children have same slug

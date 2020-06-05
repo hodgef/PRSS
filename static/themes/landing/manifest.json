@@ -1,0 +1,13 @@
+{
+  "name": "landing",
+  "title": "Landing",
+  "version": "1.0.0",
+  "author": "Francisco Hodge",
+  "homepage": "https://github.com/hodgef/js-library-boilerplate-basic",
+  "license": "GPL-3.0-or-later",
+  "type": "blog",
+  "parser": "react",
+  "siteVars": [
+    "headerImageUrl"
+  ]
+}
