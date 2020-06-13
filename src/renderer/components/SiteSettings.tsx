@@ -5,7 +5,7 @@ import { useHistory, useParams, Link } from 'react-router-dom';
 
 import Footer from './Footer';
 import Header from './Header';
-import { normalizeStrict, error } from '../services/utils';
+import { normalizeStrict, error, appendSlash } from '../services/utils';
 import { toast } from 'react-toastify';
 import HTMLEditorOverlay from './HTMLEditorOverlay';
 import { modal } from './Modal';
@@ -277,6 +277,9 @@ const SiteSettings: FunctionComponent = () => {
                                     className="form-control"
                                     value={siteUrl}
                                     onChange={e => setSiteUrl(e.target.value)}
+                                    onBlur={e =>
+                                        setSiteUrl(appendSlash(e.target.value))
+                                    }
                                 />
                             </div>
                         </div>

@@ -321,7 +321,7 @@ const MenuEditor: FunctionComponent = () => {
                         data={formattedMenuStructure}
                         onSelect={items => items[0] && onItemClick(items[0])}
                         onUpdate={onMenuUpdate}
-                        selectedKeys={selectedItems}
+                        checkedKeys={selectedItems}
                         onCheck={setSelectedItems}
                         checkStrictly
                         noRootParent={true}

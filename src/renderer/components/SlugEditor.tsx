@@ -8,14 +8,12 @@ import cx from 'classnames';
 import { getBufferItems } from '../services/build';
 import { isValidSlug } from '../services/hosting';
 import { modal } from './Modal';
-import { getSite, getItems } from '../services/db';
 
 interface IProps {
     site: ISite;
     post: IPostItem;
     items: IPostItem[];
     url?: string;
-    initValue: string;
     onSave: (s: string) => any;
     previewMode?: boolean;
 }
@@ -25,19 +23,18 @@ const SlugEditor: FunctionComponent<IProps> = ({
     post,
     items,
     url,
-    initValue = '',
     onSave,
     previewMode
 }) => {
     const [editing, setEditing] = useState(false);
-    const [value, setValue] = useState('');
-
+    const [value, setValue] = useState(post.slug);
     const [bufferItems, setBufferItems] = useState(null);
 
     useEffect(() => {
         const getData = async () => {
             const bufferItems = await getBufferItems(site);
             setBufferItems(bufferItems);
+            setValue(post.slug);
         };
         getData();
     }, [site, post]);
@@ -104,7 +101,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
             {editing ? (
                 <Fragment>
                     <input
-                        value={value || initValue}
+                        value={value}
                         onChange={e => setValue(e.target.value)}
                         className="mr-2"
                     />
@@ -134,7 +131,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
                                 title={getUrlPath(bufferItem.path.substring(1))}
                                 className="mr-2"
                             >
-                                {value || initValue}
+                                {value}
                             </a>
 
                             <i

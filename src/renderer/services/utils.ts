@@ -20,7 +20,8 @@ export const normalizeStrict = (str: string) => {
         .replace(/[^\w\-]+/g, '')
         .replace(/\-\-+/g, '-')
         .replace(/^-+/, '')
-        .replace(/-+$/, '');
+        .replace(/-+$/, '')
+        .replace(/[^\w\s-\.]/gi, '');
 };
 
 export const normalize = (str: string) => {
@@ -33,7 +34,8 @@ export const normalize = (str: string) => {
         .replace(/\-\-+/g, '-')
         .replace(/\.\.+/g, '.')
         .replace(/^-+/, '')
-        .replace(/-+$/, '');
+        .replace(/-+$/, '')
+        .replace(/[^\w\s-\.]/gi, '');
 };
 
 export const camelCase = (str: string) => {
@@ -334,9 +336,24 @@ export const removeTagsFromElem = (doc, tags) =>
     );
 
 export const stripTags = html => {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const rawHtml = stripShortcodes(html);
+    const doc = new DOMParser().parseFromString(rawHtml, 'text/html');
     removeTagsFromElem(doc, ['pre', 'h1', 'h2']);
     return doc.body.textContent || '';
+};
+
+export const stripShortcodes = html => {
+    let output = html;
+    const shortcodeRegex = /\[([a-zA-Z]+)=?([a-zA-Z0-9]+)?\](.+?)\[\/[a-zA-Z]+\]?/gi;
+    const matches = [...output.matchAll(shortcodeRegex)];
+    matches.forEach(match => {
+        const [fullMatch] = match;
+
+        if (fullMatch) {
+            output = output.replace(fullMatch, '');
+        }
+    });
+    return output;
 };
 
 export const isHtml = RegExp.prototype.test.bind(/(<([^>]+)>)/i);

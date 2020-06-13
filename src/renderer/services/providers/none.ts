@@ -1,7 +1,6 @@
 import { getString, configGet } from '../../../common/utils';
 import { build } from '../build';
 import { error, confirmation } from '../utils';
-import path from 'path';
 import { shell } from 'electron';
 import { getSite } from '../db';
 
@@ -40,6 +39,19 @@ class FallbackProvider {
     };
 
     deploy = async (onUpdate?, providedBufferItems?: IBufferItem[]) => {
+        const buildRes = await build(
+            this.siteUUID,
+            onUpdate,
+            null,
+            false,
+            true
+        );
+
+        if (!buildRes) {
+            error(getString('error_buffer'));
+            return false;
+        }
+
         const confirmationRes = await confirmation({
             title:
                 'You have no hosting set up with this site. Please change hosting or deploy the files manually.',
@@ -66,23 +78,23 @@ class FallbackProvider {
         if (confirmationRes === 1) {
             const bufferDir = configGet('paths.buffer');
 
-            if (providedBufferItems && providedBufferItems.length) {
-                if (providedBufferItems.length > 1) {
-                    /**
-                     * Open root buffer dir
-                     */
-                    shell.openItem(bufferDir);
-                } else {
-                    /**
-                     * Open item dir
-                     */
-                    const itemBufferPath = path.join(
-                        bufferDir,
-                        providedBufferItems[0].path
-                    );
-                    shell.openItem(itemBufferPath);
-                }
-            }
+            // if (providedBufferItems && providedBufferItems.length) {
+            //     if (providedBufferItems.length > 1) {
+            /**
+             * Open root buffer dir
+             */
+            shell.openItem(bufferDir);
+            //     } else {
+            //         /**
+            //          * Open item dir
+            //          */
+            //         const itemBufferPath = path.join(
+            //             bufferDir,
+            //             providedBufferItems[0].path
+            //         );
+            //         shell.openItem(itemBufferPath);
+            //     }
+            // }
         }
 
         onUpdate && onUpdate();

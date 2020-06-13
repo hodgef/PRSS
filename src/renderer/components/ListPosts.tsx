@@ -123,8 +123,12 @@ const ListPosts: FunctionComponent = () => {
     const publishSite = async () => {
         setLoading(true);
 
-        const site = await getSite(siteId);
-        const publishRes = await buildAndDeploy(siteId, setLoadingStatus);
+        const publishRes = await buildAndDeploy(
+            siteId,
+            setLoadingStatus,
+            null,
+            true
+        );
         configSet(`sites.${siteId}.publishSuggested`, false);
         toast.success('Publish complete');
         if (typeof publishRes === 'object') {
@@ -261,8 +265,10 @@ const ListPosts: FunctionComponent = () => {
                         }}
                         onDropCheck={onDropItemCheck}
                         onSelect={items => items[0] && onItemClick(items[0])}
-                        selectedKeys={selectedItems}
-                        onCheck={setSelectedItems}
+                        checkedKeys={selectedItems}
+                        onCheck={items => {
+                            setSelectedItems(items);
+                        }}
                         checkStrictly
                     />
                 </div>

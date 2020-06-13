@@ -12,7 +12,7 @@ interface IProps {
     onCheck?: any;
     onSelect?: any;
     onDropCheck?: any;
-    selectedKeys?: string[];
+    checkedKeys?: string[];
     checkStrictly?: boolean;
     draggable?: boolean;
     noRootParent?: boolean;
@@ -128,7 +128,7 @@ class DraggableTree extends React.Component<IProps, IState> {
             onCheck = noop,
             onSelect = noop,
             checkable,
-            selectedKeys = [],
+            checkedKeys = [],
             checkStrictly
         } = this.props;
 
@@ -143,12 +143,14 @@ class DraggableTree extends React.Component<IProps, IState> {
                     onDrop={this.onDrop}
                     treeData={this.state.gData}
                     onSelect={onSelect}
-                    onCheck={(chk: any) =>
-                        checkStrictly ? onCheck(chk.checked) : onCheck(chk)
-                    }
+                    onCheck={(chk: any) => {
+                        const checked = checkStrictly ? chk.checked : chk;
+                        onCheck(checked);
+                    }}
                     showLine
                     checkable={checkable}
-                    selectedKeys={selectedKeys}
+                    checkedKeys={checkedKeys}
+                    selectedKeys={[]}
                     checkStrictly={checkStrictly}
                 />
             </div>

@@ -1,10 +1,10 @@
 import minify from 'babel-minify';
 import { getTemplate, getThemeIndex } from '../../theme';
-import { globalRequire } from '../../../../common/utils';
 import { parseHtmlParams } from '..';
 import { sanitizeBufferItem, stripTags, truncateString } from '../../utils';
 import { configFileName } from '../../build';
 import { parseShortcodes } from '../../shortcode';
+import { globalRequire } from '../../../../common/utils';
 
 const htmlMinifier = globalRequire('html-minifier-terser');
 

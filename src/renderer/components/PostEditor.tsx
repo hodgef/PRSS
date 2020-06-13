@@ -278,7 +278,8 @@ const PostEditor: FunctionComponent = () => {
 
         const previewRes = await bufferAndStartPreview(
             siteId,
-            setLoadingStatus
+            setLoadingStatus,
+            postId
         );
 
         if (previewRes) {
@@ -303,12 +304,20 @@ const PostEditor: FunctionComponent = () => {
     };
 
     const handlePublish = async () => {
+        if (!url) {
+            toast.error(
+                'Site URL not defined! Please add one in your Site Settings'
+            );
+            return;
+        }
+
         setDeployLoading(true);
 
         const deployRes = await buildAndDeploy(
             siteId,
-            setLoadingStatus
-            //postId
+            setLoadingStatus,
+            null,
+            true
         );
 
         if (deployRes) {
@@ -426,7 +435,6 @@ const PostEditor: FunctionComponent = () => {
                                     site={site}
                                     url={url}
                                     previewMode={previewStarted}
-                                    initValue={post ? post.slug : null}
                                     onSave={handleSaveSlug}
                                 />
                             </Fragment>

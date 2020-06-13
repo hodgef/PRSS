@@ -97,14 +97,15 @@ export const wipe = (siteUUID: string, onUpdate?) => {
 
 export const buildAndDeploy = (
     siteUUID: string,
-    onUpdate?: updaterType
-    //itemId?: string
+    onUpdate?: updaterType,
+    itemId?: string,
+    cleanRemote?: boolean
 ) => {
     if (typeof siteUUID !== 'string') {
         throw new Error('buildAndDeploy: siteUUID must be a string');
     }
 
-    return deploy(siteUUID, [onUpdate /*, itemId*/]);
+    return deploy(siteUUID, [onUpdate, itemId, cleanRemote]);
 };
 
 export const deleteRemoteItems = (filesToDeleteArr, siteUUID: string) => {

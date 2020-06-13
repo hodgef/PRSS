@@ -53,15 +53,18 @@ const ListSites: FunctionComponent = () => {
         }
     };
 
-    const formatSites = rawSitesObj => {
-        const values = Object.values(rawSitesObj) as [];
-        return values.map(({ id, title }) => ({
+    const formatSites = rawSitesArr => {
+        const sortedObj = rawSitesArr.sort((a, b) =>
+            a.name.localeCompare(b.name)
+        );
+
+        return sortedObj.map(({ id, name }) => ({
             key: id,
             title: (
                 <Fragment>
                     <div className="left-align">
                         <i className="material-icons mr-2">public</i>
-                        <div className="site-title">{title}</div>
+                        <div className="site-title">{name}</div>
                     </div>
                     <div className="right-align"></div>
                 </Fragment>
@@ -124,7 +127,7 @@ const ListSites: FunctionComponent = () => {
                         checkable={selectEnabled}
                         data={formatSites(sites)}
                         onSelect={items => items[0] && onItemClick(items[0])}
-                        selectedKeys={selectedItems}
+                        checkedKeys={selectedItems}
                         onCheck={setSelectedItems}
                         draggable={false}
                         checkStrictly

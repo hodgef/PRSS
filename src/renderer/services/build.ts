@@ -93,7 +93,7 @@ export const build = async (
     /**
      * Generate site map
      */
-    if (generateSiteMap && !itemIdToLoad) {
+    if (generateSiteMap && siteUrl && !itemIdToLoad) {
         await createSiteMap(bufferItems, siteUrl, onUpdate);
     }
 
@@ -202,12 +202,35 @@ export const copyPublicToBuffer = siteName => {
     return fse.copy(publicDir, bufferDir);
 };
 
+export const getParentIds = (itemUUID: string, nodes: IStructureItem[]) => {
+    const parentIds = [];
+
+    const parseNode = node => {
+        const nodeChildren = node && node.children ? node.children : [];
+
+        if (node.key === itemUUID) return true;
+
+        if (structureHasItem(itemUUID, nodeChildren)) {
+            parentIds.push(node.key);
+
+            if (nodeChildren.length) {
+                return nodeChildren.some(parseNode);
+            }
+        }
+
+        return false;
+    };
+
+    nodes.some(parseNode);
+
+    return parentIds;
+};
+
 export const getFilteredBufferItems = async (
     siteUUID: string,
     itemIdToLoad?: string
 ) => {
     const site = await getSite(siteUUID);
-    const items = await getItems(siteUUID);
     const bufferItems = await getBufferItems(site);
     let itemsToLoad = bufferItems;
     let mainBufferItem;
@@ -217,23 +240,11 @@ export const getFilteredBufferItems = async (
             bufferItem => itemIdToLoad === bufferItem.item.uuid
         );
 
-        const itemSlugsToLoad = mainBufferItem.path
-            // left-right trim forward slash
-            .replace(/^\/+|\/+$/g, '')
-            .split('/');
-
-        const rootPostItemId = items[0].uuid;
-        const itemIdsToLoad = [rootPostItemId];
-
-        itemSlugsToLoad.forEach(itemSlug => {
-            const foundBufferItem = bufferItems.find(
-                bufferItem => bufferItem.item.slug === itemSlug
-            );
-
-            if (foundBufferItem) {
-                itemIdsToLoad.push(foundBufferItem.item.uuid);
-            }
-        });
+        /**
+         * Get predecessors
+         */
+        const predecessorIds = getParentIds(itemIdToLoad, site.structure) || [];
+        const itemIdsToLoad = [...predecessorIds, itemIdToLoad];
 
         itemsToLoad = bufferItems.filter(bufferItem =>
             itemIdsToLoad.includes(bufferItem.item.uuid)

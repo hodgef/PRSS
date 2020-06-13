@@ -3,7 +3,8 @@ import { reactHandler, reactHandlerExtension } from '../handlers/react';
 
 export const parseHtmlParams = (html: string = '', bufferItem: IBufferItem) => {
     let output = html;
-    const matches = html.match(/%[0-9a-zA-Z\.]+%/g);
+
+    const matches = output.match(/%[0-9a-zA-Z\.]+%/g);
 
     if (matches) {
         matches.forEach((match: string) => {
@@ -13,6 +14,15 @@ export const parseHtmlParams = (html: string = '', bufferItem: IBufferItem) => {
             //if (typeof value !== 'undefined') {
             output = output.split(match).join(value);
             //}
+        });
+    }
+
+    const matchesEscaped = output.match(/\\%[0-9a-zA-Z\.]+\\%/g);
+
+    if (matchesEscaped) {
+        matchesEscaped.forEach((match: string) => {
+            const param = match.replace(/\\%/g, '%');
+            output = output.split(match).join(param);
         });
     }
 

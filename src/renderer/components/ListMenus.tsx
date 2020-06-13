@@ -193,7 +193,7 @@ const ListMenus: FunctionComponent = () => {
                         checkable={selectEnabled}
                         data={formatMenus(menus) as any}
                         onSelect={items => items[0] && onItemClick(items[0])}
-                        selectedKeys={selectedItems}
+                        checkedKeys={selectedItems}
                         onCheck={setSelectedItems}
                         draggable={false}
                         checkStrictly

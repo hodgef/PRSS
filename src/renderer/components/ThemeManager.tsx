@@ -124,8 +124,8 @@ const ThemeManager: FunctionComponent = () => {
                         Please ensure you get themes from trusted sources, such
                         as the{' '}
                         <a
-                            href="https://prss.io/themes"
-                            title="https://prss.io/themes"
+                            href="https://hodgef.com/prss/themes/"
+                            title="https://hodgef.com/prss/themes/"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -198,6 +198,9 @@ const ThemeManager: FunctionComponent = () => {
                         } = theme;
                         let image = defaultThumbnail;
 
+                        const authorFormatted =
+                            author === 'Francisco Hodge' ? 'PRSS' : author;
+
                         try {
                             image =
                                 'data:image/png;base64,' +
@@ -233,16 +236,19 @@ const ThemeManager: FunctionComponent = () => {
                                             <span>{title || name}</span>
                                         </div>
                                         <div className="right-align">
-                                            {['blog', 'docs'].includes(
-                                                type
-                                            ) && (
+                                            {[
+                                                'blog',
+                                                'docs',
+                                                'showcase',
+                                                'multi'
+                                            ].includes(type) && (
                                                 <div className="text-tag">
                                                     {type}
                                                 </div>
                                             )}
                                         </div>
                                     </div>
-                                    {author && (
+                                    {authorFormatted && (
                                         <div className="theme-author">
                                             <div className="left-align">
                                                 {url ? (
@@ -252,10 +258,12 @@ const ThemeManager: FunctionComponent = () => {
                                                         rel="noopener noreferrer"
                                                         title={url}
                                                     >
-                                                        {author}
+                                                        {authorFormatted}
                                                     </a>
                                                 ) : (
-                                                    <span>{author}</span>
+                                                    <span>
+                                                        {authorFormatted}
+                                                    </span>
                                                 )}
                                             </div>
                                             <div className="right-align"></div>

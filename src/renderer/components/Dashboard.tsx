@@ -132,7 +132,9 @@ const Dashboard: FunctionComponent = () => {
                 setLoading('publish');
                 const publishRes = await buildAndDeploy(
                     siteId,
-                    setPublishDescription
+                    setPublishDescription,
+                    null,
+                    true
                 );
 
                 configSet(`sites.${siteId}.publishSuggested`, false);

@@ -5,13 +5,16 @@ export const previewServer = globalRequire('browser-sync').create('prss');
 
 export const bufferAndStartPreview = async (
     siteUUID: string,
-    onUpdate = null
+    onUpdate = null,
+    openPostId = ''
 ) => {
     stopPreview();
     const buildRes = await build(siteUUID, onUpdate /*, itemId*/); // Building all
 
     if (buildRes && buildRes.length) {
-        const bufferItem = buildRes[0];
+        const bufferItem = openPostId
+            ? buildRes.find(bItem => bItem.item.uuid === openPostId)
+            : buildRes[0];
         startPreview(bufferItem.path);
     }
 
