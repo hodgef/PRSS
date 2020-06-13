@@ -1,7 +1,7 @@
 <p>
-  <img src="https://i.imgur.com/YRgThpr.png" width="150" />
+  <a href="https://prss.io/"><img src="https://i.imgur.com/YRgThpr.png" width="150" /></a>
 </p>
-<img src="https://i.imgur.com/xoexEVg.png" width="100%" />
+<a href="https://prss.io/"><img src="https://i.imgur.com/xoexEVg.png" width="100%" /></a>
 
 ## Installation & Usage 📦
 You can download PRSS for Windows, Mac and Linux and manage your sites locally.
