@@ -3,16 +3,16 @@
 </p>
 <img src="https://i.imgur.com/xoexEVg.png" width="100%" />
 
-## 📦 Installation & Usage
+## Installation & Usage 📦
 You can download PRSS for Windows, Mac and Linux and manage your sites locally.
   
 Check out the [Getting Started](https://hodgef.com/prss/) docs to begin.
 
-## 📖 Documentation
+## Documentation 📖
 Check out the [PRSS documentation](https://hodgef.com/prss) for site customization guides.
 
 
-## 🚀 Demo
+## Demo 🚀
 [PRSS Site Demo (React)](https://prss-io.github.io/demo-press-theme/)
 
 
