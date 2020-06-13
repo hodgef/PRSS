@@ -3,11 +3,9 @@
   "title": "Landing",
   "version": "1.0.0",
   "author": "Francisco Hodge",
-  "homepage": "https://github.com/hodgef/js-library-boilerplate-basic",
-  "license": "GPL-3.0-or-later",
-  "type": "blog",
+  "homepage": "https://github.com/prss-io/landing-theme",
+  "license": "MIT",
+  "type": "showcase",
   "parser": "react",
-  "siteVars": [
-    "headerImageUrl"
-  ]
+  "siteVars": []
 }
