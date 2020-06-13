@@ -23,7 +23,7 @@ Check out the [PRSS documentation](https://hodgef.com/prss) for site customizati
 * `npm start`
 
 
-## ✅ Contributing
+## Contributing ✅ 
 
 PRs and issues are welcome. Feel free to submit any issues you have at:
 [https://github.com/hodgef/PRSS/issues](https://github.com/hodgef/PRSS/issues)
