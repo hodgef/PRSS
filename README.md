@@ -1,7 +1,7 @@
 <p>
   <img src="https://i.imgur.com/YRgThpr.png" width="200" />
 </p>
-<img src="https://i.imgur.com/1zNHnmg.png" width="100%" />
+<img src="https://i.imgur.com/ixo99kI.png" width="100%" />
 
 ## 🚀 Demo
 [Site Demo (React)](https://prss-io.github.io/demo-press-theme/)
