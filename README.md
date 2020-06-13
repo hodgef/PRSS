@@ -1,10 +1,10 @@
 <p>
-  <img src="https://i.imgur.com/YRgThpr.png" width="200" />
+  <img src="https://i.imgur.com/YRgThpr.png" width="150" />
 </p>
-<img src="https://i.imgur.com/ixo99kI.png" width="100%" />
+<img src="https://i.imgur.com/xoexEVg.png" width="100%" />
 
 ## 🚀 Demo
-[Site Demo (React)](https://prss-io.github.io/demo-press-theme/)
+[PRSS Site Demo (React)](https://prss-io.github.io/demo-press-theme/)
 
 ## 📦 Installation & Usage
 You can download PRSS for Windows, Mac and Linux and manage your sites locally.
