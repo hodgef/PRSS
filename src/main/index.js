@@ -11,7 +11,7 @@ const gotTheLock = app.requestSingleInstanceLock();
 let mainWindow;
 
 const createMainWindow = () => {
-  const options = {
+  let options = {
     icon: iconPath,
     frame: process.platform === 'darwin',
     width: 1250,
