@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow, Menu } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import { format as formatUrl } from 'url';
 
@@ -11,7 +11,7 @@ const gotTheLock = app.requestSingleInstanceLock();
 let mainWindow;
 
 const createMainWindow = () => {
-  let options = {
+  const options = {
     icon: iconPath,
     frame: process.platform === 'darwin',
     width: 1250,
@@ -28,18 +28,9 @@ const createMainWindow = () => {
       ...options,
       devTools: false
     };
-  } else {
-    options = {
-      ...options
-    };
   }
 
   const window = new BrowserWindow(options);
-
-  if (!isDevelopment) {
-    Menu.setApplicationMenu(null);
-    window.removeMenu();
-  }
 
   if (isDevelopment) {
     window.webContents.openDevTools();
