@@ -99,7 +99,9 @@
     ],
     "win": {
       "icon": "static/icons/icon.ico",
-      "target": "nsis"
+      "target": "nsis",
+      "publisherName": "Francisco Hodge",
+      "certificateSubjectName": "Francisco Hodge"
     },
     "linux": {
       "icon": "static/icons/icon.png",
