@@ -7,10 +7,6 @@ import { getSite } from '../db';
 class FallbackProvider {
     private readonly siteUUID: string;
     public readonly vars = {};
-    public static hostingTypeDef = {
-        title: 'None (Manual deployment)',
-        fields: []
-    };
 
     constructor(siteUUID: string) {
         this.siteUUID = siteUUID;

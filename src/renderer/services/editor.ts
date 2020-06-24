@@ -105,5 +105,13 @@ export const editorOptions = {
     autofocus: true,
     uploader: {
         insertImageAsBase64URI: true
-    }
+    },
+    mediaBlocks: [],
+    buttons:
+        'source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,outdent,indent,|,font,fontsize,brush,paragraph,|,image,video,table,link,|,hr,symbol,fullsize',
+    buttonsMD:
+        'source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,outdent,indent,|,font,fontsize,brush,paragraph,|,image,link,dots',
+    buttonsSM:
+        'source,|,bold,strikethrough,underline,italic,|,font,paragraph,image,link,dots',
+    buttonsXS: 'source,|,bold,underline,italic,|,font,paragraph,image,link,dots'
 };

@@ -1,19 +1,38 @@
 import './styles/AppSettings.scss';
 
-import React, { FunctionComponent, Fragment, useState } from 'react';
-import { useHistory, Link } from 'react-router-dom';
+import React, {
+    FunctionComponent,
+    Fragment,
+    useState,
+    useEffect,
+    ReactNode
+} from 'react';
+import { useHistory } from 'react-router-dom';
 
-import Footer from './Footer';
-import Header from './Header';
 import { getString, configSet, configGet } from '../../common/utils';
 import { error, confirmation } from '../services/utils';
 import { modal } from './Modal';
 const { app } = require('electron').remote;
 
-const AppSettings: FunctionComponent = () => {
+interface IProps {
+    setHeaderLeftComponent: (comp?: ReactNode) => void;
+}
+
+const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const history = useHistory();
 
     const [storePath, setStorePath] = useState(configGet('paths.db'));
+
+    useEffect(() => {
+        setHeaderLeftComponent(
+            <Fragment>
+                <div className="align-center">
+                    <i className="material-icons">public</i>
+                    <a onClick={() => history.push('/settings')}>Settings</a>
+                </div>
+            </Fragment>
+        );
+    }, []);
 
     const handleSubmit = async () => {
         if (storePath) {
@@ -51,16 +70,6 @@ const AppSettings: FunctionComponent = () => {
 
     return (
         <div className="CreatePost page">
-            <Header
-                undertitle={
-                    <Fragment>
-                        <div className="align-center">
-                            <i className="material-icons">public</i>
-                            <Link to={'/settings'}>Settings</Link>
-                        </div>
-                    </Fragment>
-                }
-            />
             <div className="content">
                 <h1>
                     <div className="left-align">
@@ -106,7 +115,6 @@ const AppSettings: FunctionComponent = () => {
                     </button>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };

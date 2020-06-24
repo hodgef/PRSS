@@ -1,7 +1,13 @@
 import './styles/SiteHostingSwitcher.scss';
 
-import React, { Fragment, FunctionComponent, useState, useEffect } from 'react';
-import { useHistory, useParams, Link } from 'react-router-dom';
+import React, {
+    Fragment,
+    FunctionComponent,
+    useState,
+    useEffect,
+    ReactNode
+} from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 
 import { getString, configGet, configSet } from '../../common/utils';
 import {
@@ -12,13 +18,18 @@ import {
 } from '../services/hosting';
 import { error } from '../services/utils';
 import Footer from './Footer';
-import Header from './Header';
 import Loading from './Loading';
 import { modal } from './Modal';
 import { toast } from 'react-toastify';
 import { getSite } from '../services/db';
 
-const SiteHostingSwitcher: FunctionComponent = () => {
+interface IProps {
+    setHeaderLeftComponent: (comp?: ReactNode) => void;
+}
+
+const SiteHostingSwitcher: FunctionComponent<IProps> = ({
+    setHeaderLeftComponent
+}) => {
     const { siteId } = useParams();
 
     const [site, setSite] = useState(null);
@@ -29,6 +40,28 @@ const SiteHostingSwitcher: FunctionComponent = () => {
     const [hostingFields, setHostingFields] = useState({});
     const hostingTypes = getHostingTypes();
     const history = useHistory();
+
+    useEffect(() => {
+        if (!site) {
+            return;
+        }
+        setHeaderLeftComponent(
+            <Fragment>
+                <div className="align-center">
+                    <i className="material-icons">public</i>
+                    <a onClick={() => history.push(`/sites/${siteId}`)}>
+                        {site ? site.title : ''}
+                    </a>
+                </div>
+                <div className="align-center">
+                    <i className="material-icons">keyboard_arrow_right</i>
+                    <a onClick={() => history.push(`/sites/${siteId}/hosting`)}>
+                        Change hosting
+                    </a>
+                </div>
+            </Fragment>
+        );
+    }, [site]);
 
     useEffect(() => {
         const getData = async () => {
@@ -103,26 +136,51 @@ const SiteHostingSwitcher: FunctionComponent = () => {
         history.push(`/sites/${siteId}/settings`);
     };
 
+    const renderHostingFields = ({ name, title, type, description }) => {
+        console.log('type', type);
+        if (type === 'github_login') {
+            return (
+                <button className="btn btn-outline">Login with GitHub</button>
+            );
+        } else {
+            return (
+                <div
+                    className="input-group input-group-lg"
+                    key={`${name}-fields`}
+                >
+                    <input
+                        type={type}
+                        placeholder={title}
+                        className="form-control"
+                        value={hostingFields[name] || ''}
+                        onChange={e =>
+                            setHostingFields({
+                                ...hostingFields,
+                                ...{ [name]: e.target.value }
+                            })
+                        }
+                    />
+                    {description && (
+                        <div
+                            className="description-icon clickable"
+                            onClick={() =>
+                                modal.alert(
+                                    description,
+                                    null,
+                                    'hosting-field-desc'
+                                )
+                            }
+                        >
+                            <span className="material-icons mr-2">info</span>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+    };
+
     return !loading ? (
         <div className="SiteHostingSwitcher page">
-            <Header
-                undertitle={
-                    <Fragment>
-                        <div className="align-center">
-                            <i className="material-icons">public</i>
-                            <Link to={`/sites/${siteId}`}>{site.title}</Link>
-                        </div>
-                        <div className="align-center">
-                            <i className="material-icons">
-                                keyboard_arrow_right
-                            </i>
-                            <Link to={`/sites/${siteId}/hosting`}>
-                                Change hosting
-                            </Link>
-                        </div>
-                    </Fragment>
-                }
-            />
             <div className="content">
                 <h1 className="mb-4">
                     <div className="left-align">
@@ -160,43 +218,7 @@ const SiteHostingSwitcher: FunctionComponent = () => {
 
                 {hosting &&
                     hostingTypes[hosting].fields &&
-                    hostingTypes[hosting].fields.map(
-                        ({ name, title, type, description }) => (
-                            <div
-                                className="input-group input-group-lg"
-                                key={`${name}-fields`}
-                            >
-                                <input
-                                    type={type}
-                                    placeholder={title}
-                                    className="form-control"
-                                    value={hostingFields[name] || ''}
-                                    onChange={e =>
-                                        setHostingFields({
-                                            ...hostingFields,
-                                            ...{ [name]: e.target.value }
-                                        })
-                                    }
-                                />
-                                {description && (
-                                    <div
-                                        className="description-icon clickable"
-                                        onClick={() =>
-                                            modal.alert(
-                                                description,
-                                                null,
-                                                'hosting-field-desc'
-                                            )
-                                        }
-                                    >
-                                        <span className="material-icons mr-2">
-                                            info
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                        )
-                    )}
+                    hostingTypes[hosting].fields.map(renderHostingFields)}
 
                 <div className="button-container mt-2">
                     <button
@@ -208,8 +230,6 @@ const SiteHostingSwitcher: FunctionComponent = () => {
                     </button>
                 </div>
             </div>
-
-            <Footer />
         </div>
     ) : (
         <Loading title={loadingStatus} />

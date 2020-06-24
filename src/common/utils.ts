@@ -1,7 +1,4 @@
-import path from 'path';
-import fs from 'fs';
-
-import { store } from './Store';
+import { store } from './bootstrap';
 import strings from './strings.json';
 
 /**

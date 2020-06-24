@@ -9,6 +9,7 @@
             flex: 1;
             display: flex;
             align-items: center;
+            width: 65%;
 
             > .material-icons {
                 margin-right: 10px;
@@ -71,29 +72,65 @@
         flex-flow: column;
 
         &:not(.jodit_fullsize) {
-            height: calc(100vh - 260px) !important;
+            height: calc(100vh - 185px) !important;
         }
 
         .jodit_toolbar_container {
-            border: 1px solid #dcdcdc;
+            border: none;
+            margin-bottom: 20px;
         }
 
-        .jodit_toolbar {
-            background: #ffffff;
-            border: 1px solid #fff;
+        &.jodit_default_theme.jodit_fullsize {
+            top: 49px;
+        }
 
-            .jodit_toolbar_btn-print,
-            .jodit_toolbar_btn-about {
-                display: none;
+        .jodit_statusbar {
+            font-family: 'Roboto', sans-serif;
+            border: none;
+            padding: 5px;
+            border-radius: 3px;
+            height: 27px;
+        }
+
+        .jodit_toolbar_container > .jodit_toolbar {
+            background: #ffffff;
+            border: 1px solid #ececec;
+            border-radius: 10px;
+            padding: 3px 5px !important;
+
+            & > .jodit_toolbar_btn {
+                margin-right: 3px !important;
+                border-radius: 10px;
             }
         }
 
         .jodit_workplace {
             flex: 1;
+            border: none;
+            margin-bottom: 15px;
+        }
+
+        span.jodit_placeholder {
+            padding: 0 10px;
         }
 
         &:not(.jodit_inline) .jodit_wysiwyg {
-            padding: 20px;
+            padding: 0 10px;
+            overflow-x: hidden;
+        }
+
+        .jodit_wysiwyg {
+            h3 {
+                font-size: 23px;
+            }
+
+            h2 {
+                font-size: 25px;
+            }
+        }
+
+        .jodit_toolbar_btn-break {
+            display: none;
         }
     }
 }

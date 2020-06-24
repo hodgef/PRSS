@@ -96,7 +96,10 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
         }
         ${
             metaImage
-                ? `<meta property="og:image" content="${metaImage}" />`
+                ? `
+                <meta name="twitter:image:src" content="${metaImage}" />
+                <meta property="og:image" content="${metaImage}" />
+                `
                 : ''
         }
         `

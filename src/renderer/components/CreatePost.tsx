@@ -1,18 +1,26 @@
 import './styles/CreatePost.scss';
 
-import React, { FunctionComponent, Fragment, useState, useEffect } from 'react';
-import { useHistory, useParams, Link } from 'react-router-dom';
+import React, {
+    FunctionComponent,
+    Fragment,
+    useState,
+    useEffect,
+    ReactNode
+} from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
-import Footer from './Footer';
-import Header from './Header';
 import { normalize, error, removeStopWords } from '../services/utils';
 import { walkStructure, insertStructureChildren } from '../services/build';
 import { toast } from 'react-toastify';
 import { isValidSlug, getRootPost } from '../services/hosting';
 import { getSite, getItems, updateSite, createItems } from '../services/db';
 
-const CreatePost: FunctionComponent = () => {
+interface IProps {
+    setHeaderLeftComponent: (comp?: ReactNode) => void;
+}
+
+const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const { siteId } = useParams();
 
     const [site, setSite] = useState(null);
@@ -24,6 +32,38 @@ const CreatePost: FunctionComponent = () => {
     const [postSlug, setPostSlug] = useState('');
     const [postParent, setPostParent] = useState('');
     const history = useHistory();
+
+    useEffect(() => {
+        if (!title) {
+            return;
+        }
+        setHeaderLeftComponent(
+            <Fragment>
+                <div className="align-center">
+                    <i className="material-icons">public</i>
+                    <a onClick={() => history.push(`/sites/${siteId}`)}>
+                        {title}
+                    </a>
+                </div>
+                <div className="align-center">
+                    <i className="material-icons">keyboard_arrow_right</i>
+                    <a onClick={() => history.push(`/sites/${siteId}/posts`)}>
+                        Posts
+                    </a>
+                </div>
+                <div className="align-center">
+                    <i className="material-icons">keyboard_arrow_right</i>
+                    <a
+                        onClick={() =>
+                            history.push(`/sites/${siteId}/posts/create`)
+                        }
+                    >
+                        Create Post
+                    </a>
+                </div>
+            </Fragment>
+        );
+    }, [title]);
 
     useEffect(() => {
         const getData = async () => {
@@ -139,30 +179,6 @@ const CreatePost: FunctionComponent = () => {
 
     return (
         <div className="CreatePost page">
-            <Header
-                undertitle={
-                    <Fragment>
-                        <div className="align-center">
-                            <i className="material-icons">public</i>
-                            <Link to={`/sites/${siteId}`}>{title}</Link>
-                        </div>
-                        <div className="align-center">
-                            <i className="material-icons">
-                                keyboard_arrow_right
-                            </i>
-                            <Link to={`/sites/${siteId}/posts`}>Posts</Link>
-                        </div>
-                        <div className="align-center">
-                            <i className="material-icons">
-                                keyboard_arrow_right
-                            </i>
-                            <Link to={`/sites/${siteId}/posts/create`}>
-                                Create Post
-                            </Link>
-                        </div>
-                    </Fragment>
-                }
-            />
             <div className="content">
                 <h1>
                     <div className="left-align">
@@ -242,7 +258,6 @@ const CreatePost: FunctionComponent = () => {
                     </div>
                 </form>
             </div>
-            <Footer />
         </div>
     );
 };

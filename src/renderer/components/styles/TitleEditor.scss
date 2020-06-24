@@ -1,6 +1,7 @@
 .title-editor {
     display: flex;
     width: 100%;
+    overflow: hidden;
 
     &:not(.editing) {
         align-items: center;
@@ -8,7 +9,7 @@
 
     span {
         margin-right: 10px;
-        max-width: 670px;
+        max-width: calc(100% - 40px);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

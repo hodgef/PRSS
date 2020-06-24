@@ -5,4 +5,5 @@ thumbs.db
 .idea/
 static/buffer/
 static/public/
+static/.env
 .vscode

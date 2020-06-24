@@ -25,11 +25,6 @@ import {
     createItems
 } from './db';
 
-export const getHostingTypes = () => ({
-    github: GithubProvider.hostingTypeDef,
-    none: FallbackProvider.hostingTypeDef
-});
-
 export const setupRemote = (siteUUID: string, onUpdate: updaterType) => {
     const {
         hosting: { name: hostingName }

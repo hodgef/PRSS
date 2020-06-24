@@ -1,7 +1,13 @@
 import './styles/ListPosts.scss';
 
-import React, { Fragment, FunctionComponent, useEffect, useState } from 'react';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import React, {
+    Fragment,
+    FunctionComponent,
+    useEffect,
+    useState,
+    ReactNode
+} from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
     walkStructure,
@@ -16,13 +22,16 @@ import {
 } from '../services/hosting';
 import DraggableTree from './DraggableTree';
 import Footer from './Footer';
-import Header from './Header';
 import Loading from './Loading';
 import { getSite, getItems } from '../services/db';
 import { configGet, configSet } from '../../common/utils';
 import { error } from '../services/utils';
 
-const ListPosts: FunctionComponent = () => {
+interface IProps {
+    setHeaderLeftComponent: (comp?: ReactNode) => void;
+}
+
+const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const { siteId } = useParams();
 
     const [site, setSite] = useState(null);
@@ -41,6 +50,28 @@ const ListPosts: FunctionComponent = () => {
     const renderItem = ({ title }) => ({
         title
     });
+
+    useEffect(() => {
+        if (!title) {
+            return;
+        }
+        setHeaderLeftComponent(
+            <Fragment>
+                <div className="align-center">
+                    <i className="material-icons">public</i>
+                    <a onClick={() => history.push(`/sites/${siteId}`)}>
+                        {title}
+                    </a>
+                </div>
+                <div className="align-center">
+                    <i className="material-icons">keyboard_arrow_right</i>
+                    <a onClick={() => history.push(`/sites/${siteId}/posts`)}>
+                        Posts
+                    </a>
+                </div>
+            </Fragment>
+        );
+    }, [title]);
 
     useEffect(() => {
         const getData = async () => {
@@ -175,23 +206,7 @@ const ListPosts: FunctionComponent = () => {
     };
 
     return (
-        <div className="ListPosts page fixed">
-            <Header
-                undertitle={
-                    <Fragment>
-                        <div className="align-center">
-                            <i className="material-icons">public</i>
-                            <Link to={`/sites/${siteId}`}>{title}</Link>
-                        </div>
-                        <div className="align-center">
-                            <i className="material-icons">
-                                keyboard_arrow_right
-                            </i>
-                            <Link to={`/sites/${siteId}/posts`}>Posts</Link>
-                        </div>
-                    </Fragment>
-                }
-            />
+        <div className="ListPosts page">
             <div className="content">
                 <h1>
                     <div className="left-align">

@@ -1,11 +1,10 @@
 import './styles/App.scss';
 import 'react-toastify/dist/ReactToastify.css';
 
-import React, { FunctionComponent, Fragment } from 'react';
+import React, { FunctionComponent, Fragment, useState } from 'react';
 import { HashRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 
-import CreateSite from './CreateSite';
 import Dashboard from './Dashboard';
 import ListPosts from './ListPosts';
 import ListSites from './ListSites';
@@ -15,69 +14,102 @@ import CreatePost from './CreatePost';
 import SiteSettings from './SiteSettings';
 import AppSettings from './AppSettings';
 import ThemeManager from './ThemeManager';
-import SiteHostingSwitcher from './SiteHostingSwitcher';
 import ListMenus from './ListMenus';
 import MenuEditor from './MenuEditor';
 import { configGet } from '../../common/utils';
+import Header from './Header';
+import SiteSetup from './SiteSetup';
 
 const App: FunctionComponent = () => {
+    const [headerLeft, setHeaderLeft] = useState(null);
+    const [history, setHistory] = useState(null);
+    const commonProps = {
+        setHeaderLeftComponent: value => {
+            setHeaderLeft(value);
+        }
+    };
+
+    const handleRoute = (RouteComponent, props) => {
+        setTimeout(() => setHistory(props.history), 0);
+        return <RouteComponent {...props} {...commonProps} />;
+    };
+
     return (
         <Fragment>
+            <Header headerLeft={headerLeft} history={history} />
             <HashRouter>
                 <Switch>
-                    <Route exact path="/sites" component={ListSites} />
-                    <Route exact path="/settings" component={AppSettings} />
-                    <Route exact path="/sites/create" component={CreateSite} />
+                    <Route
+                        exact
+                        path="/sites"
+                        render={props => handleRoute(ListSites, props)}
+                    />
+
+                    <Route
+                        exact
+                        path="/settings"
+                        render={props => handleRoute(AppSettings, props)}
+                    />
+
+                    <Route
+                        exact
+                        path="/sites/create"
+                        render={props => handleRoute(SiteSetup, props)}
+                    />
 
                     <Route
                         exact
                         path="/sites/:siteId/posts"
-                        component={ListPosts}
+                        render={props => handleRoute(ListPosts, props)}
                     />
 
                     <Route
                         exact
                         path="/sites/:siteId/themes"
-                        component={ThemeManager}
+                        render={props => handleRoute(ThemeManager, props)}
                     />
 
                     <Route
                         exact
                         path="/sites/:siteId/settings"
-                        component={SiteSettings}
+                        render={props => handleRoute(SiteSettings, props)}
                     />
 
                     <Route
                         exact
                         path="/sites/:siteId/menus"
-                        component={ListMenus}
+                        render={props => handleRoute(ListMenus, props)}
                     />
 
                     <Route
                         exact
                         path="/sites/:siteId/menus/:menuId"
-                        component={MenuEditor}
+                        render={props => handleRoute(MenuEditor, props)}
                     />
 
                     <Route
                         exact
                         path="/sites/:siteId/hosting"
-                        component={SiteHostingSwitcher}
+                        render={props => handleRoute(SiteSetup, props)}
                     />
 
                     <Route
                         exact
                         path="/sites/:siteId/posts/editor/:postId"
-                        component={PostEditor}
+                        render={props => handleRoute(PostEditor, props)}
                     />
 
                     <Route
                         exact
                         path="/sites/:siteId/posts/create"
-                        component={CreatePost}
+                        render={props => handleRoute(CreatePost, props)}
                     />
 
-                    <Route exact path="/sites/:siteId" component={Dashboard} />
+                    <Route
+                        exact
+                        path="/sites/:siteId"
+                        render={props => handleRoute(Dashboard, props)}
+                    />
 
                     <Route
                         exact

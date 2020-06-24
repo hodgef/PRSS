@@ -1,23 +1,35 @@
 import './styles/ListSites.scss';
 
-import React, { FunctionComponent, useState, Fragment, useEffect } from 'react';
+import React, {
+    FunctionComponent,
+    useState,
+    Fragment,
+    useEffect,
+    ReactNode
+} from 'react';
 import { useHistory } from 'react-router-dom';
 
-import Footer from './Footer';
-import Header from './Header';
 import { toast } from 'react-toastify';
 import { deleteSites } from '../services/hosting';
 import DraggableTree from './DraggableTree';
 import { configGet } from '../../common/utils';
 import { getSites } from '../services/db';
 
-const ListSites: FunctionComponent = () => {
+interface IProps {
+    setHeaderLeftComponent: (comp?: ReactNode) => void;
+}
+
+const ListSites: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const history = useHistory();
 
     const [selectEnabled, setSelectEnabled] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
 
     const [sites, setSites] = useState(null);
+
+    useEffect(() => {
+        setHeaderLeftComponent();
+    }, []);
 
     useEffect(() => {
         const getData = async () => {
@@ -82,7 +94,6 @@ const ListSites: FunctionComponent = () => {
 
     return (
         <div className="ListSites page">
-            <Header />
             <div className="content">
                 <h1>
                     <div className="left-align">
@@ -134,7 +145,6 @@ const ListSites: FunctionComponent = () => {
                     />
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };

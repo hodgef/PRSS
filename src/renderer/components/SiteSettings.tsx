@@ -1,10 +1,14 @@
 import './styles/SiteSettings.scss';
 
-import React, { FunctionComponent, Fragment, useState, useEffect } from 'react';
-import { useHistory, useParams, Link } from 'react-router-dom';
+import React, {
+    FunctionComponent,
+    Fragment,
+    useState,
+    useEffect,
+    ReactNode
+} from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 
-import Footer from './Footer';
-import Header from './Header';
 import { normalizeStrict, error, appendSlash } from '../services/utils';
 import { toast } from 'react-toastify';
 import HTMLEditorOverlay from './HTMLEditorOverlay';
@@ -17,7 +21,13 @@ import { shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
 
-const SiteSettings: FunctionComponent = () => {
+interface IProps {
+    setHeaderLeftComponent: (comp?: ReactNode) => void;
+}
+
+const SiteSettings: FunctionComponent<IProps> = ({
+    setHeaderLeftComponent
+}) => {
     const { siteId } = useParams();
 
     const siteInt = configGet(`sites.${siteId}`) as ISiteInternal;
@@ -44,6 +54,32 @@ const SiteSettings: FunctionComponent = () => {
 
     const [themeList, setThemeList] = useState(null);
     const history = useHistory();
+
+    useEffect(() => {
+        if (!title) {
+            return;
+        }
+        setHeaderLeftComponent(
+            <Fragment>
+                <div className="align-center">
+                    <i className="material-icons">public</i>
+                    <a onClick={() => history.push(`/sites/${siteId}`)}>
+                        {title}
+                    </a>
+                </div>
+                <div className="align-center">
+                    <i className="material-icons">keyboard_arrow_right</i>
+                    <a
+                        onClick={() =>
+                            history.push(`/sites/${siteId}/settings`)
+                        }
+                    >
+                        Settings
+                    </a>
+                </div>
+            </Fragment>
+        );
+    }, [title]);
 
     useEffect(() => {
         const getData = async () => {
@@ -173,24 +209,6 @@ const SiteSettings: FunctionComponent = () => {
 
     return (
         <div className="CreatePost page">
-            <Header
-                undertitle={
-                    <Fragment>
-                        <div className="align-center">
-                            <i className="material-icons">public</i>
-                            <Link to={`/sites/${siteId}`}>{title}</Link>
-                        </div>
-                        <div className="align-center">
-                            <i className="material-icons">
-                                keyboard_arrow_right
-                            </i>
-                            <Link to={`/sites/${siteId}/settings`}>
-                                Settings
-                            </Link>
-                        </div>
-                    </Fragment>
-                }
-            />
             <div className="content">
                 <h1>
                     <div className="left-align">
@@ -380,7 +398,6 @@ const SiteSettings: FunctionComponent = () => {
                     </button>
                 </div>
             </div>
-            <Footer />
             {showRawHTMLEditorOverlay && (
                 <HTMLEditorOverlay
                     headDefaultValue={headHtml}

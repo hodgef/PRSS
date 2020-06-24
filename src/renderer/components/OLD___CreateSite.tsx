@@ -17,7 +17,6 @@ import {
 } from '../services/hosting';
 import { error, normalizeStrict } from '../services/utils';
 import Footer from './Footer';
-import Header from './Header';
 import Loading from './Loading';
 import { modal } from './Modal';
 import {
@@ -128,9 +127,58 @@ const CreateSite: FunctionComponent = () => {
         history.push(`/sites/${siteUUID}`);
     };
 
+    const handleGithubLogin = () => {};
+
+    const renderHostingFields = ({ name, title, type, description }) => {
+        console.log('type', type);
+        if (type === 'github_login') {
+            return (
+                <button
+                    className="btn btn-outline"
+                    onClick={() => handleGithubLogin()}
+                >
+                    Login with GitHub
+                </button>
+            );
+        } else {
+            return (
+                <div
+                    className="input-group input-group-lg"
+                    key={`${name}-fields`}
+                >
+                    <input
+                        type={type}
+                        placeholder={title}
+                        className="form-control"
+                        value={hostingFields[name] || ''}
+                        onChange={e =>
+                            setHostingFields({
+                                ...hostingFields,
+                                ...{ [name]: e.target.value }
+                            })
+                        }
+                    />
+                    {description && (
+                        <div
+                            className="description-icon clickable"
+                            onClick={() =>
+                                modal.alert(
+                                    description,
+                                    null,
+                                    'hosting-field-desc'
+                                )
+                            }
+                        >
+                            <span className="material-icons mr-2">info</span>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+    };
+
     return !loading ? (
         <div className="CreateSite page">
-            <Header />
             <div className="content">
                 <h1 className="mb-4">
                     <div className="left-align">
@@ -181,43 +229,7 @@ const CreateSite: FunctionComponent = () => {
 
                 {hosting &&
                     hostingTypes[hosting].fields &&
-                    hostingTypes[hosting].fields.map(
-                        ({ name, title, type, description }) => (
-                            <div
-                                className="input-group input-group-lg"
-                                key={`${name}-fields`}
-                            >
-                                <input
-                                    type={type}
-                                    placeholder={title}
-                                    className="form-control"
-                                    value={hostingFields[name] || ''}
-                                    onChange={e =>
-                                        setHostingFields({
-                                            ...hostingFields,
-                                            ...{ [name]: e.target.value }
-                                        })
-                                    }
-                                />
-                                {description && (
-                                    <div
-                                        className="description-icon clickable"
-                                        onClick={() =>
-                                            modal.alert(
-                                                description,
-                                                null,
-                                                'hosting-field-desc'
-                                            )
-                                        }
-                                    >
-                                        <span className="material-icons mr-2">
-                                            info
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                        )
-                    )}
+                    hostingTypes[hosting].fields.map(renderHostingFields)}
 
                 <div className="id-info">
                     <span>ID</span>&nbsp;
@@ -238,8 +250,6 @@ const CreateSite: FunctionComponent = () => {
                     </button>
                 </div>
             </div>
-
-            <Footer />
         </div>
     ) : (
         <Loading title={loadingStatus} />

@@ -86,12 +86,39 @@
     }
 }
 
+@mixin bubbleblocks {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    width: 100%;
+    flex-wrap: wrap;
+
+    li {
+        display: flex;
+        align-items: center;
+        width: calc(33% - 10px);
+        margin-right: 20px;
+
+        &:nth-child(2n + 1) {
+            margin-right: auto;
+        }
+
+        &:nth-child(3n) {
+            margin-right: 0;
+        }
+    }
+
+    .box-highlight {
+        box-shadow: 0 0 10px #ffc107;
+        border-color: #e8c55f;
+    }
+}
+
 @mixin dropmenu {
     background: white;
-    border: 1px solid #e8e8e8;
     margin: 0;
     padding: 0;
-    border-radius: 5px;
 
     li {
         display: flex;

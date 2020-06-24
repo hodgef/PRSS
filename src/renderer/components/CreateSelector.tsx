@@ -4,8 +4,6 @@ import React, { FunctionComponent } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import { getString } from '../../common/utils';
-import Footer from './Footer';
-import Header from './Header';
 
 const CreateSelector: FunctionComponent = () => {
     const history = useHistory();
@@ -13,7 +11,6 @@ const CreateSelector: FunctionComponent = () => {
 
     return (
         <div className="CreateSelector page">
-            <Header />
             <div className="content">
                 <h1 className="mb-4">
                     <div className="left-align">
@@ -47,7 +44,6 @@ const CreateSelector: FunctionComponent = () => {
                     </button>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };
