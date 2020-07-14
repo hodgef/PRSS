@@ -112,7 +112,9 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     );
 
     const handleSubmit = async () => {
-        if (!postTitle) {
+        const postTitleTrimmed = postTitle.trim();
+
+        if (!postTitleTrimmed) {
             error('You must provide a title');
             return;
         }
@@ -120,7 +122,17 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         const postId = uuidv4();
         const rootPost = getRootPost(site);
 
-        let normalizedSlug = normalize(postSlug || removeStopWords(postTitle));
+        const cleanedTitle = removeStopWords(postTitleTrimmed)
+            ? removeStopWords(postTitleTrimmed)
+            : postTitleTrimmed;
+        let normalizedSlug = normalize(postSlug || cleanedTitle);
+
+        if (!normalizedSlug) {
+            error(
+                'URL Slug error. Please provide a URL Slug for your post or choose a different title.'
+            );
+            return;
+        }
 
         if (
             !(await isValidSlug(
@@ -190,71 +202,55 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                         </i>
                         <span>Create Post</span>
                     </div>
+                    <div className="right-align">
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => handleSubmit()}
+                        >
+                            <span className="material-icons mr-2">save</span>
+                            <span>Create</span>
+                        </button>
+                    </div>
                 </h1>
 
                 <form className="mt-4">
-                    <div className="form-group row">
+                    <div className="form-group">
                         <div className="input-group input-group-lg">
-                            <label className="col-sm-2 col-form-label">
-                                Post Title
-                            </label>
-                            <div className="col-sm-10">
-                                <input
-                                    className="form-control form-control mb-2"
-                                    type="text"
-                                    placeholder="Title"
-                                    value={postTitle}
-                                    onChange={e => setPostTitle(e.target.value)}
-                                ></input>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="form-group row">
-                        <div className="input-group input-group-lg">
-                            <label className="col-sm-2 col-form-label">
-                                Post Slug (optional)
-                            </label>
-                            <div className="col-sm-10">
-                                <input
-                                    className="form-control form-control mb-2"
-                                    type="text"
-                                    placeholder="Slug"
-                                    value={postSlug}
-                                    onChange={e => setPostSlug(e.target.value)}
-                                    onBlur={e =>
-                                        setPostSlug(normalize(e.target.value))
-                                    }
-                                ></input>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="form-group row">
-                        <div className="input-group input-group-lg">
-                            <label className="col-sm-2 col-form-label">
-                                Parent (optional)
-                            </label>
-                            <div className="col-sm-10">
-                                <select
-                                    className="form-control form-control custom-select mb-3"
-                                    value={postParent}
-                                    onChange={e =>
-                                        setPostParent(e.target.value)
-                                    }
-                                >
-                                    <option value="">No parent</option>
-                                    {formattedStructureOptions}
-                                </select>
-                            </div>
+                            <input
+                                className="form-control form-control mb-2"
+                                type="text"
+                                placeholder="Post Title"
+                                value={postTitle}
+                                onChange={e => setPostTitle(e.target.value)}
+                            ></input>
                         </div>
                     </div>
                     <div className="form-group">
-                        <button
-                            type="button"
-                            className="btn btn-primary btn-lg"
-                            onClick={() => handleSubmit()}
-                        >
-                            Continue
-                        </button>
+                        <div className="input-group input-group-lg">
+                            <input
+                                className="form-control form-control mb-2"
+                                type="text"
+                                placeholder="URL Slug (Optional)"
+                                value={postSlug}
+                                onChange={e => setPostSlug(e.target.value)}
+                                onBlur={e =>
+                                    setPostSlug(normalize(e.target.value))
+                                }
+                            ></input>
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <div className="input-group input-group-lg">
+                            <select
+                                className="form-control form-control custom-select mb-3"
+                                value={postParent}
+                                onChange={e => setPostParent(e.target.value)}
+                            >
+                                <option value="">Parent (Optional)</option>
+                                {formattedStructureOptions}
+                            </select>
+                        </div>
                     </div>
                 </form>
             </div>

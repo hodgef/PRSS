@@ -35,7 +35,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     }, []);
 
     const handleSubmit = async () => {
-        if (storePath) {
+        if (storePath && storePath !== configGet('paths.db')) {
             const confirmationRes = await confirmation({
                 title: (
                     <Fragment>
@@ -81,6 +81,16 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                         </i>
                         <span>Settings</span>
                     </div>
+                    <div className="right-align">
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => handleSubmit()}
+                        >
+                            <span className="material-icons mr-2">save</span>
+                            <span>Save Changes</span>
+                        </button>
+                    </div>
                 </h1>
 
                 <form className="mt-4">
@@ -90,7 +100,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                                 htmlFor="siteTitle"
                                 className="col-sm-3 col-form-label"
                             >
-                                Database directory
+                                Database file path (prss.db)
                             </label>
                             <div className="col-sm-9">
                                 <input
@@ -103,17 +113,26 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                             </div>
                         </div>
                     </div>
+                    <div className="form-group row">
+                        <div className="input-group input-group-lg">
+                            <label
+                                htmlFor="siteConfig"
+                                className="col-sm-3 col-form-label"
+                            >
+                                Config file path (prss.json)
+                            </label>
+                            <div className="col-sm-9">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="siteConfig"
+                                    value={app.getPath('userData')}
+                                    disabled
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </form>
-
-                <div className="form-group mt-4">
-                    <button
-                        type="button"
-                        className="btn btn-primary btn-lg"
-                        onClick={() => handleSubmit()}
-                    >
-                        Save Settings
-                    </button>
-                </div>
             </div>
         </div>
     );

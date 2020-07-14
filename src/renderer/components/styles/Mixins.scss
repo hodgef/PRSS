@@ -94,7 +94,7 @@
     width: 100%;
     flex-wrap: wrap;
 
-    li {
+    > li {
         display: flex;
         align-items: center;
         width: calc(33% - 10px);
@@ -123,7 +123,7 @@
     li {
         display: flex;
         align-items: center;
-        padding: 10px 8px;
+        padding: 10px;
         border-bottom: 1px solid #e8e8e84d;
 
         a {
@@ -133,6 +133,33 @@
 
         .material-icons {
             margin-right: 10px;
+        }
+    }
+}
+
+@mixin circanim {
+    animation: circanim 0.7s forwards ease-in-out;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    margin: 20px;
+    border-radius: 50%;
+
+    @keyframes circanim {
+        0% {
+            width: 10px;
+            height: 10px;
+            margin: 20px;
+            background-color: #f6ffa2;
+        }
+        100% {
+            width: 200vw;
+            height: 200vw;
+            margin: -75vw;
+            background-color: #e7ffff;
         }
     }
 }

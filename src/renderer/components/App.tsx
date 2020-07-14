@@ -1,9 +1,11 @@
 import './styles/App.scss';
 import 'react-toastify/dist/ReactToastify.css';
 
-import React, { FunctionComponent, Fragment, useState } from 'react';
+import React, { FunctionComponent, Fragment, useState, useEffect } from 'react';
 import { HashRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
+import cx from 'classnames';
+import versionCompare from 'semver-compare';
 
 import Dashboard from './Dashboard';
 import ListPosts from './ListPosts';
@@ -17,26 +19,68 @@ import ThemeManager from './ThemeManager';
 import ListMenus from './ListMenus';
 import MenuEditor from './MenuEditor';
 import { configGet } from '../../common/utils';
+import { getCurrentVersion, checkUpdates } from '../services/utils';
 import Header from './Header';
 import SiteSetup from './SiteSetup';
+import RouteWrapper from './RouteWrapper';
 
 const App: FunctionComponent = () => {
     const [headerLeft, setHeaderLeft] = useState(null);
+    const [appClass, setAppClass] = useState('');
     const [history, setHistory] = useState(null);
+    const [version, setVersion] = useState(null);
+    const [newVersion, setNewVersion] = useState(null);
+
+    useEffect(() => {
+        const currentVersion = getCurrentVersion();
+        setVersion(currentVersion);
+
+        if (!configGet('disableUpdateCheck')) {
+            const shouldPrompt =
+                !configGet('updateCheckSnoozeUntil') ||
+                (configGet('updateCheckSnoozeUntil') &&
+                    configGet('updateCheckSnoozeUntil') < Date.now());
+            checkUpdates(currentVersion, shouldPrompt).then(latestVersion => {
+                if (
+                    latestVersion &&
+                    versionCompare(latestVersion, currentVersion) > 0
+                ) {
+                    setNewVersion(latestVersion);
+                }
+            });
+        }
+    }, []);
+
     const commonProps = {
         setHeaderLeftComponent: value => {
             setHeaderLeft(value);
-        }
+        },
+        setAppClass: value => {
+            setAppClass(value);
+        },
+        version,
+        newVersion
     };
 
     const handleRoute = (RouteComponent, props) => {
         setTimeout(() => setHistory(props.history), 0);
-        return <RouteComponent {...props} {...commonProps} />;
+        return (
+            <RouteWrapper
+                {...props}
+                {...commonProps}
+                RouteComponent={RouteComponent}
+            />
+        );
     };
 
     return (
-        <Fragment>
-            <Header headerLeft={headerLeft} history={history} />
+        <div className={cx('app-content', appClass)}>
+            <div className="app-background" />
+            <Header
+                headerLeft={headerLeft}
+                history={history}
+                newVersion={newVersion}
+            />
             <HashRouter>
                 <Switch>
                     <Route
@@ -133,9 +177,9 @@ const App: FunctionComponent = () => {
             <ToastContainer
                 className="toast-container"
                 hideProgressBar
-                position={toast.POSITION.TOP_RIGHT}
+                position={toast.POSITION.BOTTOM_RIGHT}
             />
-        </Fragment>
+        </div>
     );
 };
 

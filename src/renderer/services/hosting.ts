@@ -25,6 +25,11 @@ import {
     createItems
 } from './db';
 
+export const getHostingTypes = () => ({
+    github: GithubProvider.hostingTypeDef,
+    none: FallbackProvider.hostingTypeDef
+});
+
 export const setupRemote = (siteUUID: string, onUpdate: updaterType) => {
     const {
         hosting: { name: hostingName }
@@ -456,20 +461,27 @@ export const handleHostingFields = (hostingFieldsObj = {}) => {
         const fields = { ...hostingFieldsObj };
         const { name, username } = fields as IHosting;
 
-        if (!name || !username) {
+        if (!name) {
             resolve({});
         }
 
         const storePromises = [];
-        ['password', 'token'].forEach(sensitiveField => {
-            if (fields[sensitiveField]) {
-                storePromises.push(
-                    keychainStore(name, username, fields[sensitiveField])
-                );
-            }
-            fields[sensitiveField] = null;
-            delete fields[sensitiveField];
-        });
+
+        if (username) {
+            ['password', 'token'].forEach(sensitiveField => {
+                if (fields[sensitiveField]) {
+                    storePromises.push(
+                        keychainStore(
+                            `prss-${name}`,
+                            username,
+                            fields[sensitiveField]
+                        )
+                    );
+                }
+                fields[sensitiveField] = null;
+                delete fields[sensitiveField];
+            });
+        }
 
         Promise.all(storePromises).finally(() => resolve(fields));
     });

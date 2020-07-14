@@ -1,5 +1,24 @@
 #app {
-    width: 100%;
+    width: 100vw;
+    height: 100vh;
+
+    .app-background {
+        content: '';
+        background: white;
+        position: fixed;
+        z-index: -1;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .app-content {
+        height: 100%;
+        display: flex;
+        flex-flow: column;
+    }
 
     .content {
         flex: 1;
@@ -8,6 +27,7 @@
         padding-bottom: 0;
         display: flex;
         flex-flow: column;
+        max-height: calc(100vh - 80px);
     }
 
     .page {
@@ -15,6 +35,7 @@
         display: flex;
         flex-flow: column;
         user-select: none;
+        max-height: calc(100vh - 50px);
 
         &.fixed {
             header {
@@ -41,6 +62,13 @@
             > .items {
                 flex: 1;
                 overflow: auto;
+            }
+
+            .content-header {
+                &.full-size {
+                    margin: -30px -40px 0;
+                    padding: 30px 40px;
+                }
             }
         }
     }
@@ -242,6 +270,11 @@
             a {
                 color: white;
             }
+        }
+
+        .prss-update .standard-modal-title + div > div:first-child span {
+            color: #18b342;
+            font-weight: 500;
         }
     }
 

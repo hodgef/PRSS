@@ -19,13 +19,19 @@ import restoreImg from '../images/icons/restore-k-30.png';
 import closeImg from '../images/icons/close-k-30.png';
 
 import { configGet } from '../../common/utils';
+import { notifyNewVersion } from '../services/utils';
 
 interface IProps {
     headerLeft?: ReactNode;
     history: any;
+    newVersion: string;
 }
 
-const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
+const Header: FunctionComponent<IProps> = ({
+    headerLeft,
+    history,
+    newVersion
+}) => {
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const headerMore = useRef(null);
     const hasSites = configGet('sites') || {};
@@ -96,6 +102,19 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
                                     onClick={() => setShowMoreMenu(false)}
                                 ></div>
                                 <ul className="drop-menu">
+                                    {newVersion && (
+                                        <li
+                                            className="clickable highlight-li"
+                                            onClick={() => {
+                                                notifyNewVersion(newVersion);
+                                            }}
+                                        >
+                                            <span className="material-icons">
+                                                check_circle
+                                            </span>
+                                            <span>Update PRSS</span>
+                                        </li>
+                                    )}
                                     <li
                                         className="clickable"
                                         onClick={() => {

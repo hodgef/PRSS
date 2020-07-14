@@ -3,17 +3,21 @@
 header {
     box-sizing: border-box;
     width: 100%;
-    background: white;
-    z-index: 99;
+    z-index: 999999999999999;
     border-bottom: 1px solid #efefef9e;
-    box-shadow: 0px 5px 20px #efefef47;
+    //box-shadow: 0px 5px 20px #efefef47;
     height: 50px;
     padding: 2px;
     user-select: none;
+    background-color: white;
 
     .logo {
         -webkit-app-region: none;
         display: inline-block;
+
+        img {
+            pointer-events: none;
+        }
     }
 
     .back-overlay {

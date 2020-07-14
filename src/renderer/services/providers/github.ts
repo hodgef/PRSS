@@ -26,6 +26,15 @@ class GithubProvider {
         baseUrl: () => 'github.com',
         baseApiUrl: () => 'api.github.com'
     };
+    public static hostingTypeDef = {
+        title: 'Github',
+        fields: [
+            {
+                name: 'repository',
+                optional: true
+            }
+        ]
+    };
 
     constructor(siteUUID: string) {
         this.siteUUID = siteUUID;

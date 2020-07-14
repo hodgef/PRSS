@@ -15,10 +15,11 @@ body {
     font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
 }
 
-body.jodit_fullsize_box,
-html.jodit_fullsize_box {
+body.jodit-fullsize_box,
+html.jodit-fullsize_box {
     min-width: 100% !important;
 }
 

@@ -7,6 +7,7 @@ import { format as formatUrl } from 'url';
 const iconPath = path.join(__static, 'icons', 'icon.png');
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const gotTheLock = app.requestSingleInstanceLock();
+app.allowRendererProcessReuse = false;
 
 let mainWindow;
 
@@ -19,7 +20,8 @@ const createMainWindow = () => {
     minWidth: 860,
     minHeight: 500,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      enableRemoteModule: true
     }
   };
 

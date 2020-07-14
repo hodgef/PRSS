@@ -52,6 +52,8 @@ const ListSites: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
             toast.success('Sites deleted!');
             setSelectedItems([]);
             setSelectEnabled(false);
+            const res = await getSites();
+            setSites(res);
         } else {
             toast.error('No deletion made');
         }

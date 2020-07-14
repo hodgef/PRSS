@@ -220,6 +220,16 @@ const SiteSettings: FunctionComponent<IProps> = ({
                         </i>
                         <span>Site Settings</span>
                     </div>
+                    <div className="right-align">
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => handleSubmit()}
+                        >
+                            <span className="material-icons mr-2">save</span>
+                            <span>Save Changes</span>
+                        </button>
+                    </div>
                 </h1>
 
                 <form className="mt-4">
@@ -387,16 +397,6 @@ const SiteSettings: FunctionComponent<IProps> = ({
                         </div>
                     </div>
                 </form>
-
-                <div className="form-group mt-4">
-                    <button
-                        type="button"
-                        className="btn btn-primary btn-lg"
-                        onClick={() => handleSubmit()}
-                    >
-                        Save Settings
-                    </button>
-                </div>
             </div>
             {showRawHTMLEditorOverlay && (
                 <HTMLEditorOverlay

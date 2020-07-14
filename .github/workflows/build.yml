@@ -18,6 +18,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 10
+          gh_client_id: ${{ secrets.gh_client_id }}
+          gh_client_secret: ${{ secrets.gh_client_secret }}
 
       - name: Build/Release
         uses: samuelmeuli/action-electron-builder@v1

@@ -108,10 +108,11 @@ export const editorOptions = {
     },
     mediaBlocks: [],
     buttons:
-        'source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,outdent,indent,|,font,fontsize,brush,paragraph,|,image,video,table,link,|,hr,symbol,fullsize',
+        'source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,|,font,fontsize,brush,paragraph,align,|,image,video,table,link,|,fullsize,dots',
     buttonsMD:
-        'source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,outdent,indent,|,font,fontsize,brush,paragraph,|,image,link,dots',
+        'source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,|,font,fontsize,paragraph,align,|,image,link,dots',
     buttonsSM:
-        'source,|,bold,strikethrough,underline,italic,|,font,paragraph,image,link,dots',
-    buttonsXS: 'source,|,bold,underline,italic,|,font,paragraph,image,link,dots'
+        'source,|,bold,strikethrough,underline,italic,|,font,paragraph,align,image,link,dots',
+    buttonsXS:
+        'source,|,bold,underline,italic,|,font,paragraph,align,image,link,dots'
 };

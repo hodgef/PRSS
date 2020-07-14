@@ -1,114 +1,116 @@
 {
-  "name": "prss",
-  "version": "1.4.0",
-  "description": "Powerful Blogging",
-  "license": "GPL-3.0-or-later",
-  "scripts": {
-    "start": "electron-webpack dev",
-    "build": "electron-webpack",
-    "dist": "npm run build && electron-builder",
-    "dist:dir": "npm run dist --dir -c.compression=store -c.mac.identity=null",
-    "rebuild": "electron-rebuild -f -w sqlite3",
-    "licenses": "npm-license-crawler -onlyDirectDependencies -json src/renderer/json/licenses.json"
-  },
-  "author": {
-    "name": "Francisco Hodge",
-    "email": "hello@franciscohodge.com",
-    "url": "https://github.com/hodgef"
-  },
-  "dependencies": {
-    "browser-sync": "^2.26.7",
-    "dotenv": "^8.2.0",
-    "electron-store": "^5.1.1",
-    "express": "^4.17.1",
-    "html-minifier-terser": "^5.1.1",
-    "keytar": "^5.4.0",
-    "knex": "^0.21.1",
-    "passport": "^0.4.1",
-    "passport-github": "^1.1.0",
-    "sitemap": "^6.1.5",
-    "source-map-support": "^0.5.12",
-    "sqlite3": "^4.2.0"
-  },
-  "devDependencies": {
-    "@babel/preset-react": "^7.8.3",
-    "@types/react": "^16.9.23",
-    "@types/react-dom": "^16.9.5",
-    "@types/styled-components": "^5.0.1",
-    "@typescript-eslint/eslint-plugin": "^2.24.0",
-    "@typescript-eslint/parser": "^2.24.0",
-    "ace-builds": "^1.4.8",
-    "antd": "^4.0.3",
-    "axios": "^0.19.2",
-    "babel-minify": "^0.5.1",
-    "bootstrap": "^4.4.1",
-    "classnames": "^2.2.6",
-    "del": "^5.1.0",
-    "electron": "5.0.6",
-    "electron-builder": "^22.4.1",
-    "electron-rebuild": "^1.10.1",
-    "electron-webpack": "^2.8.2",
-    "electron-webpack-eslint": "^6.0.0",
-    "electron-webpack-ts": "^4.0.1",
-    "eslint": "^6.8.0",
-    "eslint-plugin-react": "^7.19.0",
-    "eslint-plugin-simple-import-sort": "^5.0.2",
-    "fs-extra": "^8.1.0",
-    "glob": "^7.1.6",
-    "globby": "^11.0.0",
-    "history": "^4.10.1",
-    "jodit-react": "^1.0.42",
-    "lockfile": "^1.0.4",
-    "node-sass": "^4.13.1",
-    "prettier": "^1.19.1",
-    "prettier-webpack-plugin": "^1.2.0",
-    "pretty": "^2.0.0",
-    "raw-loader": "^4.0.0",
-    "react": "^16.13.0",
-    "react-ace": "^8.1.0",
-    "react-dom": "^16.13.0",
-    "react-router-dom": "^5.1.2",
-    "react-toastify": "^5.5.0",
-    "rimraf": "^3.0.2",
-    "sass-loader": "^8.0.2",
-    "simple-git": "^1.132.0",
-    "slash": "^3.0.0",
-    "styled-components": "^5.0.1",
-    "typescript": "^3.9.3",
-    "uuid": "^3.4.0",
-    "webpack": "~4.35.3"
-  },
-  "electronWebpack": {
-    "title": "PRSS - Powerful Blogging",
-    "whiteListedModules": [],
-    "main": {
-      "webpackConfig": "webpack.main.js"
+    "name": "prss",
+    "version": "1.5.0",
+    "description": "Powerful Blogging",
+    "license": "GPL-3.0-or-later",
+    "scripts": {
+        "start": "electron-webpack dev",
+        "build": "electron-webpack",
+        "dist": "npm run build && electron-builder",
+        "dist:dir": "npm run dist --dir -c.compression=store -c.mac.identity=null",
+        "rebuild": "electron-rebuild -f -w sqlite3",
+        "licenses": "npm-license-crawler -onlyDirectDependencies -json src/renderer/json/licenses.json"
     },
-    "renderer": {
-      "template": "src/renderer/index.html",
-      "webpackConfig": "webpack.renderer.js"
+    "author": {
+        "name": "Francisco Hodge",
+        "email": "hello@franciscohodge.com",
+        "url": "https://github.com/hodgef"
+    },
+    "dependencies": {
+        "browser-sync": "^2.26.7",
+        "dotenv": "^8.2.0",
+        "electron-store": "^5.1.1",
+        "express": "^4.17.1",
+        "html-minifier-terser": "^5.1.1",
+        "keytar": "^5.4.0",
+        "knex": "^0.21.1",
+        "passport": "^0.4.1",
+        "passport-github2": "^0.1.12",
+        "sitemap": "^6.1.5",
+        "source-map-support": "^0.5.12",
+        "sqlite3": "^4.2.0"
+    },
+    "devDependencies": {
+        "@babel/preset-react": "^7.8.3",
+        "@types/react": "^16.9.23",
+        "@types/react-dom": "^16.9.5",
+        "@types/styled-components": "^5.0.1",
+        "@typescript-eslint/eslint-plugin": "^2.24.0",
+        "@typescript-eslint/parser": "^2.24.0",
+        "ace-builds": "^1.4.8",
+        "antd": "^4.0.3",
+        "axios": "^0.19.2",
+        "babel-minify": "^0.5.1",
+        "bootstrap": "^4.4.1",
+        "classnames": "^2.2.6",
+        "del": "^5.1.0",
+        "electron": "9.1.0",
+        "electron-builder": "^22.7.0",
+        "electron-rebuild": "^1.11.0",
+        "electron-webpack": "^2.8.2",
+        "electron-webpack-eslint": "^6.0.0",
+        "electron-webpack-ts": "^4.0.1",
+        "eslint": "^6.8.0",
+        "eslint-plugin-react": "^7.19.0",
+        "eslint-plugin-simple-import-sort": "^5.0.2",
+        "fs-extra": "^8.1.0",
+        "glob": "^7.1.6",
+        "globby": "^11.0.0",
+        "history": "^4.10.1",
+        "jodit-react": "^1.0.42",
+        "lockfile": "^1.0.4",
+        "node-sass": "^4.13.1",
+        "prettier": "^1.19.1",
+        "prettier-webpack-plugin": "^1.2.0",
+        "pretty": "^2.0.0",
+        "raw-loader": "^4.0.0",
+        "react": "^16.13.0",
+        "react-ace": "^8.1.0",
+        "react-dom": "^16.13.0",
+        "react-router-dom": "^5.1.2",
+        "react-toastify": "^5.5.0",
+        "request": "^2.88.2",
+        "rimraf": "^3.0.2",
+        "sass-loader": "^8.0.2",
+        "semver-compare": "^1.0.0",
+        "simple-git": "^1.132.0",
+        "slash": "^3.0.0",
+        "styled-components": "^5.0.1",
+        "typescript": "^3.9.3",
+        "uuid": "^3.4.0",
+        "webpack": "~4.35.3"
+    },
+    "electronWebpack": {
+        "title": "PRSS - Powerful Blogging",
+        "whiteListedModules": [],
+        "main": {
+            "webpackConfig": "webpack.main.js"
+        },
+        "renderer": {
+            "template": "src/renderer/index.html",
+            "webpackConfig": "webpack.renderer.js"
+        }
+    },
+    "build": {
+        "productName": "PRSS",
+        "appId": "io.prss.app",
+        "copyright": "2020-present, Francisco Hodge",
+        "artifactName": "${productName}-${platform}.${ext}",
+        "files": [
+            "build/*"
+        ],
+        "win": {
+            "icon": "static/icons/icon.ico",
+            "target": "nsis",
+            "publisherName": "Francisco Hodge"
+        },
+        "linux": {
+            "icon": "static/icons/icon.png",
+            "target": "zip"
+        },
+        "mac": {
+            "icon": "static/icons/icon.icns",
+            "target": "dmg"
+        }
     }
-  },
-  "build": {
-    "productName": "PRSS",
-    "appId": "com.prss.app",
-    "artifactName": "${productName}-${platform}.${ext}",
-    "copyright": "2020-present, Francisco Hodge",
-    "files": [
-      "build/*"
-    ],
-    "win": {
-      "icon": "static/icons/icon.ico",
-      "target": "nsis",
-      "publisherName": "Francisco Hodge"
-    },
-    "linux": {
-      "icon": "static/icons/icon.png",
-      "target": "zip"
-    },
-    "mac": {
-      "icon": "static/icons/icon.icns",
-      "target": "dmg"
-    }
-  }
 }
