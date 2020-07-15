@@ -97,7 +97,8 @@
         "copyright": "2020-present, Francisco Hodge",
         "artifactName": "${productName}-${platform}.${ext}",
         "files": [
-            "build/*"
+            "build/*",
+            "embedded.provisionprofile"
         ],
         "win": {
             "icon": "static/icons/icon.ico",
@@ -109,8 +110,17 @@
             "target": "zip"
         },
         "mac": {
+            "category": "public.app-category.productivity",
+            "entitlements": "build/entitlements.mac.plist",
             "icon": "static/icons/icon.icns",
-            "target": "dmg"
+            "target": "dmg",
+            "hardenedRuntime": true
+        },
+        "mas": {
+            "type": "distribution",
+            "category": "public.app-category.productivity",
+            "entitlements": "build/entitlements.mas.plist",
+            "icon": "static/icons/icon.icns"
         }
     }
 }
