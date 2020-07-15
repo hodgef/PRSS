@@ -116,7 +116,8 @@
             "icon": "static/icons/icon.icns",
             "target": "dmg",
             "hardenedRuntime": true,
-            "provisioningProfile": "embedded.provisionprofile"
+            "provisioningProfile": "embedded.provisionprofile",
+            "gatekeeperAssess" : false
         },
         "mas": {
             "type": "distribution",
