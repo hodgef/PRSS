@@ -1,0 +1,105 @@
+@import './Mixins.scss';
+
+#app .SiteSetup {
+    .content {
+        .items > ul {
+            @include bubbleblocks;
+
+            > li {
+                margin-bottom: 30px;
+                align-items: flex-start;
+
+                &:nth-child(2n + 1) {
+                    margin-right: 10px;
+                }
+            }
+
+            .feature-title {
+                font-size: 23px;
+                display: flex;
+
+                span.material-icons {
+                    font-size: 13px;
+                    color: #3eccc0;
+                    display: flex;
+                    align-items: center;
+
+                    &:after {
+                        font-family: 'Roboto', sans-serif;
+                        content: 'DEFAULT';
+                        margin-left: 5px;
+                    }
+                }
+            }
+
+            .feature-description {
+                opacity: 0.5;
+
+                ul {
+                    padding-left: 20px;
+                    margin-top: 2px;
+                    list-style: none;
+                    padding: 0;
+                    border-radius: 10px;
+                }
+            }
+        }
+
+        .sites-intro {
+            // font-size: 23px;
+            // font-weight: 300;
+            // padding: 20px 0px 20px 30px;
+            // margin-bottom: 30px;
+            // background: #fbfbfb;
+            // color: white;
+            // border-radius: 10px;
+            // border-bottom: 7px solid #efefef;
+        }
+
+        h2 {
+            font-size: 28px;
+        }
+
+        .image-cnt {
+            width: 50px;
+            margin-right: 15px;
+
+            img {
+                width: 100%;
+            }
+
+            .material-icons {
+                font-size: 28px;
+                color: #464646;
+                margin-right: 20px;
+                border: 1px solid #e0e0e0;
+                border-radius: 50%;
+                height: 50px;
+                width: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    }
+}
+
+#app .app-site-setup {
+    .app-background {
+        height: 225px;
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            @include circanim;
+        }
+    }
+    header {
+        background-color: unset;
+        border-bottom-color: transparent;
+    }
+
+    header .header-cont .right-align .drop-menu {
+        background: #d0fcfd;
+    }
+}

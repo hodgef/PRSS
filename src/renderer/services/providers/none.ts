@@ -83,7 +83,7 @@ class FallbackProvider {
             /**
              * Open root buffer dir
              */
-            shell.openItem(bufferDir);
+            shell.openPath(bufferDir);
             //     } else {
             //         /**
             //          * Open item dir
@@ -92,7 +92,7 @@ class FallbackProvider {
             //             bufferDir,
             //             providedBufferItems[0].path
             //         );
-            //         shell.openItem(itemBufferPath);
+            //         shell.openPath(itemBufferPath);
             //     }
             // }
         }

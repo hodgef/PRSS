@@ -86,17 +86,44 @@
     }
 }
 
+@mixin bubbleblocks {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    width: 100%;
+    flex-wrap: wrap;
+
+    > li {
+        display: flex;
+        align-items: center;
+        width: calc(33% - 10px);
+        margin-right: 20px;
+
+        &:nth-child(2n + 1) {
+            margin-right: auto;
+        }
+
+        &:nth-child(3n) {
+            margin-right: 0;
+        }
+    }
+
+    .box-highlight {
+        box-shadow: 0 0 10px #ffc107;
+        border-color: #e8c55f;
+    }
+}
+
 @mixin dropmenu {
     background: white;
-    border: 1px solid #e8e8e8;
     margin: 0;
     padding: 0;
-    border-radius: 5px;
 
     li {
         display: flex;
         align-items: center;
-        padding: 10px 8px;
+        padding: 10px;
         border-bottom: 1px solid #e8e8e84d;
 
         a {
@@ -106,6 +133,33 @@
 
         .material-icons {
             margin-right: 10px;
+        }
+    }
+}
+
+@mixin circanim {
+    animation: circanim 0.7s forwards ease-in-out;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    margin: 20px;
+    border-radius: 50%;
+
+    @keyframes circanim {
+        0% {
+            width: 10px;
+            height: 10px;
+            margin: 20px;
+            background-color: #f6ffa2;
+        }
+        100% {
+            width: 200vw;
+            height: 200vw;
+            margin: -75vw;
+            background-color: #e7ffff;
         }
     }
 }

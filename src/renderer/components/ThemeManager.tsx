@@ -1,13 +1,17 @@
 import './styles/ThemeManager.scss';
 
-import React, { FunctionComponent, Fragment, useState, useEffect } from 'react';
-import { useHistory, useParams, Link } from 'react-router-dom';
+import React, {
+    FunctionComponent,
+    Fragment,
+    useState,
+    useEffect,
+    ReactNode
+} from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import path from 'path';
 import fs from 'fs';
 import cx from 'classnames';
 
-import Footer from './Footer';
-import Header from './Header';
 import { confirmation } from '../services/utils';
 import { toast } from 'react-toastify';
 import { modal } from './Modal';
@@ -17,7 +21,13 @@ import defaultThumbnail from '../images/defaultThemeThumbnail.png';
 import { getSite, updateSite } from '../services/db';
 import { configSet, configGet } from '../../common/utils';
 
-const ThemeManager: FunctionComponent = () => {
+interface IProps {
+    setHeaderLeftComponent: (comp?: ReactNode) => void;
+}
+
+const ThemeManager: FunctionComponent<IProps> = ({
+    setHeaderLeftComponent
+}) => {
     const { siteId } = useParams();
 
     const [site, setSite] = useState(null);
@@ -25,6 +35,28 @@ const ThemeManager: FunctionComponent = () => {
 
     const [siteTheme, setSiteTheme] = useState(null);
     const [themeList, setThemeList] = useState([]);
+
+    useEffect(() => {
+        if (!title) {
+            return;
+        }
+        setHeaderLeftComponent(
+            <Fragment>
+                <div className="align-center">
+                    <i className="material-icons">public</i>
+                    <a onClick={() => history.push(`/sites/${siteId}`)}>
+                        {title}
+                    </a>
+                </div>
+                <div className="align-center">
+                    <i className="material-icons">keyboard_arrow_right</i>
+                    <a onClick={() => history.push(`/sites/${siteId}/themes`)}>
+                        Themes
+                    </a>
+                </div>
+            </Fragment>
+        );
+    }, [title]);
 
     useEffect(() => {
         const getData = async () => {
@@ -143,27 +175,11 @@ const ThemeManager: FunctionComponent = () => {
         }
 
         const themesDir = configGet('paths.themes');
-        shell.openItem(themesDir);
+        shell.openPath(themesDir);
     };
 
     return (
         <div className="ThemeManager page">
-            <Header
-                undertitle={
-                    <Fragment>
-                        <div className="align-center">
-                            <i className="material-icons">public</i>
-                            <Link to={`/sites/${siteId}`}>{title}</Link>
-                        </div>
-                        <div className="align-center">
-                            <i className="material-icons">
-                                keyboard_arrow_right
-                            </i>
-                            <Link to={`/sites/${siteId}/themes`}>Themes</Link>
-                        </div>
-                    </Fragment>
-                }
-            />
             <div className="content">
                 <h1>
                     <div className="left-align">
@@ -281,7 +297,6 @@ const ThemeManager: FunctionComponent = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };

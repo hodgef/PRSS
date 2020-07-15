@@ -22,7 +22,8 @@ class Modal extends Component {
         title,
         buttons = [],
         showCancel = false,
-        onCancel = () => {}
+        onCancel = () => {},
+        contentClassName = ''
     }) => {
         this.setState({
             mode: 'confirm',
@@ -30,7 +31,8 @@ class Modal extends Component {
             title,
             buttons,
             showCancel,
-            onCancel
+            onCancel,
+            contentClassName
         });
     };
 
@@ -91,7 +93,8 @@ class Modal extends Component {
                         top: 0,
                         left: 0,
                         display: 'flex',
-                        zIndex: 9999
+                        zIndex: 9999,
+                        paddingTop: '40px'
                     }}
                 >
                     <div

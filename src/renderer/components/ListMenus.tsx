@@ -1,18 +1,28 @@
 import './styles/ListMenus.scss';
 
-import React, { FunctionComponent, useState, Fragment, useEffect } from 'react';
-import { useHistory, useParams, Link } from 'react-router-dom';
+import React, {
+    FunctionComponent,
+    useState,
+    Fragment,
+    useEffect,
+    ReactNode
+} from 'react';
+import { useHistory, useParams, useLocation } from 'react-router-dom';
 
 import Footer from './Footer';
-import Header from './Header';
 import { toast } from 'react-toastify';
 import { deleteMenus } from '../services/hosting';
 import DraggableTree from './DraggableTree';
 import { ask, normalizeStrict } from '../services/utils';
 import { getSite, updateSite } from '../services/db';
 
-const ListMenus: FunctionComponent = () => {
+interface IProps {
+    setHeaderLeftComponent: (comp?: ReactNode) => void;
+}
+
+const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const { siteId } = useParams();
+    const { state = {} } = useLocation();
 
     const [site, setSite] = useState(null);
     const [menus, setMenus] = useState(null);
@@ -22,6 +32,28 @@ const ListMenus: FunctionComponent = () => {
 
     const [selectEnabled, setSelectEnabled] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
+
+    useEffect(() => {
+        if (!title) {
+            return;
+        }
+        setHeaderLeftComponent(
+            <Fragment>
+                <div className="align-center">
+                    <i className="material-icons">public</i>
+                    <a onClick={() => history.push(`/sites/${siteId}`)}>
+                        {title}
+                    </a>
+                </div>
+                <div className="align-center">
+                    <i className="material-icons">keyboard_arrow_right</i>
+                    <a onClick={() => history.push(`/sites/${siteId}/menus`)}>
+                        Menus
+                    </a>
+                </div>
+            </Fragment>
+        );
+    }, [title]);
 
     useEffect(() => {
         const getData = async () => {
@@ -138,25 +170,15 @@ const ListMenus: FunctionComponent = () => {
 
     return (
         <div className="ListMenus page">
-            <Header
-                undertitle={
-                    <Fragment>
-                        <div className="align-center">
-                            <i className="material-icons">public</i>
-                            <Link to={`/sites/${siteId}`}>{title}</Link>
-                        </div>
-                        <div className="align-center">
-                            <i className="material-icons">
-                                keyboard_arrow_right
-                            </i>
-                            <Link to={`/sites/${siteId}/menus`}>Menus</Link>
-                        </div>
-                    </Fragment>
-                }
-            />
             <div className="content">
                 <h1>
                     <div className="left-align">
+                        <i
+                            className="material-icons clickable"
+                            onClick={() => history.goBack()}
+                        >
+                            arrow_back
+                        </i>
                         <span>Menus</span>
                     </div>
                     <div className="right-align">

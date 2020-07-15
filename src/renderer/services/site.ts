@@ -13,7 +13,7 @@ export const getSampleSiteStructure = (): {
             uuid: siteUUID,
             title: '',
             url: '',
-            theme: 'press',
+            theme: 'slate',
             updatedAt: null,
             createdAt: Date.now(),
             publishedAt: null,

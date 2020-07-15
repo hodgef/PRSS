@@ -1,18 +1,26 @@
 import './styles/CreatePost.scss';
 
-import React, { FunctionComponent, Fragment, useState, useEffect } from 'react';
-import { useHistory, useParams, Link } from 'react-router-dom';
+import React, {
+    FunctionComponent,
+    Fragment,
+    useState,
+    useEffect,
+    ReactNode
+} from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
-import Footer from './Footer';
-import Header from './Header';
 import { normalize, error, removeStopWords } from '../services/utils';
 import { walkStructure, insertStructureChildren } from '../services/build';
 import { toast } from 'react-toastify';
 import { isValidSlug, getRootPost } from '../services/hosting';
 import { getSite, getItems, updateSite, createItems } from '../services/db';
 
-const CreatePost: FunctionComponent = () => {
+interface IProps {
+    setHeaderLeftComponent: (comp?: ReactNode) => void;
+}
+
+const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const { siteId } = useParams();
 
     const [site, setSite] = useState(null);
@@ -24,6 +32,38 @@ const CreatePost: FunctionComponent = () => {
     const [postSlug, setPostSlug] = useState('');
     const [postParent, setPostParent] = useState('');
     const history = useHistory();
+
+    useEffect(() => {
+        if (!title) {
+            return;
+        }
+        setHeaderLeftComponent(
+            <Fragment>
+                <div className="align-center">
+                    <i className="material-icons">public</i>
+                    <a onClick={() => history.push(`/sites/${siteId}`)}>
+                        {title}
+                    </a>
+                </div>
+                <div className="align-center">
+                    <i className="material-icons">keyboard_arrow_right</i>
+                    <a onClick={() => history.push(`/sites/${siteId}/posts`)}>
+                        Posts
+                    </a>
+                </div>
+                <div className="align-center">
+                    <i className="material-icons">keyboard_arrow_right</i>
+                    <a
+                        onClick={() =>
+                            history.push(`/sites/${siteId}/posts/create`)
+                        }
+                    >
+                        Create Post
+                    </a>
+                </div>
+            </Fragment>
+        );
+    }, [title]);
 
     useEffect(() => {
         const getData = async () => {
@@ -72,7 +112,9 @@ const CreatePost: FunctionComponent = () => {
     );
 
     const handleSubmit = async () => {
-        if (!postTitle) {
+        const postTitleTrimmed = postTitle.trim();
+
+        if (!postTitleTrimmed) {
             error('You must provide a title');
             return;
         }
@@ -80,7 +122,17 @@ const CreatePost: FunctionComponent = () => {
         const postId = uuidv4();
         const rootPost = getRootPost(site);
 
-        let normalizedSlug = normalize(postSlug || removeStopWords(postTitle));
+        const cleanedTitle = removeStopWords(postTitleTrimmed)
+            ? removeStopWords(postTitleTrimmed)
+            : postTitleTrimmed;
+        let normalizedSlug = normalize(postSlug || cleanedTitle);
+
+        if (!normalizedSlug) {
+            error(
+                'URL Slug error. Please provide a URL Slug for your post or choose a different title.'
+            );
+            return;
+        }
 
         if (
             !(await isValidSlug(
@@ -139,30 +191,6 @@ const CreatePost: FunctionComponent = () => {
 
     return (
         <div className="CreatePost page">
-            <Header
-                undertitle={
-                    <Fragment>
-                        <div className="align-center">
-                            <i className="material-icons">public</i>
-                            <Link to={`/sites/${siteId}`}>{title}</Link>
-                        </div>
-                        <div className="align-center">
-                            <i className="material-icons">
-                                keyboard_arrow_right
-                            </i>
-                            <Link to={`/sites/${siteId}/posts`}>Posts</Link>
-                        </div>
-                        <div className="align-center">
-                            <i className="material-icons">
-                                keyboard_arrow_right
-                            </i>
-                            <Link to={`/sites/${siteId}/posts/create`}>
-                                Create Post
-                            </Link>
-                        </div>
-                    </Fragment>
-                }
-            />
             <div className="content">
                 <h1>
                     <div className="left-align">
@@ -174,75 +202,58 @@ const CreatePost: FunctionComponent = () => {
                         </i>
                         <span>Create Post</span>
                     </div>
+                    <div className="right-align">
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => handleSubmit()}
+                        >
+                            <span className="material-icons mr-2">save</span>
+                            <span>Create</span>
+                        </button>
+                    </div>
                 </h1>
 
                 <form className="mt-4">
-                    <div className="form-group row">
+                    <div className="form-group">
                         <div className="input-group input-group-lg">
-                            <label className="col-sm-2 col-form-label">
-                                Post Title
-                            </label>
-                            <div className="col-sm-10">
-                                <input
-                                    className="form-control form-control mb-2"
-                                    type="text"
-                                    placeholder="Title"
-                                    value={postTitle}
-                                    onChange={e => setPostTitle(e.target.value)}
-                                ></input>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="form-group row">
-                        <div className="input-group input-group-lg">
-                            <label className="col-sm-2 col-form-label">
-                                Post Slug (optional)
-                            </label>
-                            <div className="col-sm-10">
-                                <input
-                                    className="form-control form-control mb-2"
-                                    type="text"
-                                    placeholder="Slug"
-                                    value={postSlug}
-                                    onChange={e => setPostSlug(e.target.value)}
-                                    onBlur={e =>
-                                        setPostSlug(normalize(e.target.value))
-                                    }
-                                ></input>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="form-group row">
-                        <div className="input-group input-group-lg">
-                            <label className="col-sm-2 col-form-label">
-                                Parent (optional)
-                            </label>
-                            <div className="col-sm-10">
-                                <select
-                                    className="form-control form-control custom-select mb-3"
-                                    value={postParent}
-                                    onChange={e =>
-                                        setPostParent(e.target.value)
-                                    }
-                                >
-                                    <option value="">No parent</option>
-                                    {formattedStructureOptions}
-                                </select>
-                            </div>
+                            <input
+                                className="form-control form-control mb-2"
+                                type="text"
+                                placeholder="Post Title"
+                                value={postTitle}
+                                onChange={e => setPostTitle(e.target.value)}
+                            ></input>
                         </div>
                     </div>
                     <div className="form-group">
-                        <button
-                            type="button"
-                            className="btn btn-primary btn-lg"
-                            onClick={() => handleSubmit()}
-                        >
-                            Continue
-                        </button>
+                        <div className="input-group input-group-lg">
+                            <input
+                                className="form-control form-control mb-2"
+                                type="text"
+                                placeholder="URL Slug (Optional)"
+                                value={postSlug}
+                                onChange={e => setPostSlug(e.target.value)}
+                                onBlur={e =>
+                                    setPostSlug(normalize(e.target.value))
+                                }
+                            ></input>
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <div className="input-group input-group-lg">
+                            <select
+                                className="form-control form-control custom-select mb-3"
+                                value={postParent}
+                                onChange={e => setPostParent(e.target.value)}
+                            >
+                                <option value="">Parent (Optional)</option>
+                                {formattedStructureOptions}
+                            </select>
+                        </div>
                     </div>
                 </form>
             </div>
-            <Footer />
         </div>
     );
 };

@@ -6,12 +6,12 @@ import React, {
     FunctionComponent,
     useRef,
     useState,
-    useEffect
+    useEffect,
+    ReactNode
 } from 'react';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { getString, configGet, configSet } from '../../common/utils';
 import Footer from './Footer';
-import Header from './Header';
 import { modal } from './Modal';
 import { toast } from 'react-toastify';
 import {
@@ -28,11 +28,18 @@ import HTMLEditorOverlay from './HTMLEditorOverlay';
 import SiteVariablesEditorOverlay from './SiteVariablesEditorOverlay';
 import { getSite, getItems, updateItem, updateSite } from '../services/db';
 import { editorOptions } from '../services/editor';
+import { truncateString } from '../services/utils';
+const remote = require('electron').remote;
+const win = remote.getCurrentWindow();
 
 require('jodit');
 const Editor = require('jodit-react').default;
 
-const PostEditor: FunctionComponent = () => {
+interface IProps {
+    setHeaderLeftComponent: (comp?: ReactNode) => void;
+}
+
+const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const { siteId, postId } = useParams();
     const [publishSuggested, setPublishSuggested] = useState(null);
 
@@ -65,6 +72,44 @@ const PostEditor: FunctionComponent = () => {
     const [buildAllLoading, setBuildAllLoading] = useState(false);
     const [deployLoading, setDeployLoading] = useState(false);
     const [loadingStatus, setLoadingStatus] = useState('');
+
+    const editorResizeFix = () => {
+        if (!win.isMaximized()) {
+            window.resizeTo(window.outerWidth - 1, window.outerHeight - 1);
+            window.resizeTo(window.outerWidth + 1, window.outerHeight + 1);
+        }
+    };
+
+    useEffect(() => {
+        if (!title || !post) {
+            return;
+        }
+
+        editorResizeFix();
+
+        setHeaderLeftComponent(
+            <Fragment>
+                <div className="align-center">
+                    <i className="material-icons">public</i>
+                    <a onClick={() => history.push(`/sites/${siteId}`)}>
+                        {title}
+                    </a>
+                </div>
+                <div className="align-center">
+                    <i className="material-icons">keyboard_arrow_right</i>
+                    <a onClick={() => history.push(`/sites/${siteId}/posts`)}>
+                        Posts
+                    </a>
+                </div>
+                {post && (
+                    <div className="align-center">
+                        <i className="material-icons">keyboard_arrow_right</i>
+                        <span>{truncateString(post.title, 30)}</span>
+                    </div>
+                )}
+            </Fragment>
+        );
+    }, [title, post]);
 
     useEffect(() => {
         const getData = async () => {
@@ -378,31 +423,7 @@ const PostEditor: FunctionComponent = () => {
     };
 
     return (
-        <div className="PostEditor page fixed">
-            <Header
-                undertitle={
-                    <Fragment>
-                        <div className="align-center">
-                            <i className="material-icons">public</i>
-                            <Link to={`/sites/${siteId}`}>{title}</Link>
-                        </div>
-                        <div className="align-center">
-                            <i className="material-icons">
-                                keyboard_arrow_right
-                            </i>
-                            <Link to={`/sites/${siteId}/posts`}>Posts</Link>
-                        </div>
-                        {post && (
-                            <div className="align-center">
-                                <i className="material-icons">
-                                    keyboard_arrow_right
-                                </i>
-                                <span>{post.title}</span>
-                            </div>
-                        )}
-                    </Fragment>
-                }
-            />
+        <div className="PostEditor page">
             <div className="content">
                 <h1>
                     <div className="left-align">
@@ -488,13 +509,13 @@ const PostEditor: FunctionComponent = () => {
                         <PostEditorSidebar
                             site={site}
                             item={post}
+                            publishSuggested={publishSuggested}
                             previewStarted={previewStarted}
                             editorChanged={editorChanged}
                             previewLoading={previewLoading}
                             buildLoading={buildLoading}
                             buildAllLoading={buildAllLoading}
                             deployLoading={deployLoading}
-                            publishSuggested={publishSuggested}
                             loadingStatus={loadingStatus}
                             forceRawHTMLEditing={
                                 post ? post.isContentRaw : null
@@ -512,7 +533,6 @@ const PostEditor: FunctionComponent = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
             {post && (
                 <Fragment>
                     {showRawHTMLEditorOverlay && (

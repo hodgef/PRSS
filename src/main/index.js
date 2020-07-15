@@ -1,25 +1,27 @@
 'use strict'
 
-import { app, BrowserWindow, Menu } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import { format as formatUrl } from 'url';
 
 const iconPath = path.join(__static, 'icons', 'icon.png');
 const isDevelopment = process.env.NODE_ENV !== 'production';
-
-const gotTheLock = app.requestSingleInstanceLock()
+const gotTheLock = app.requestSingleInstanceLock();
+app.allowRendererProcessReuse = false;
 
 let mainWindow;
 
 const createMainWindow = () => {
   let options = {
     icon: iconPath,
-    width: 1380,
-    height: 750,
-    minWidth: 1380,
-    minHeight: 750,
+    frame: process.platform === 'darwin',
+    width: 1250,
+    height: 720,
+    minWidth: 860,
+    minHeight: 500,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      enableRemoteModule: true
     }
   };
 
@@ -28,18 +30,9 @@ const createMainWindow = () => {
       ...options,
       devTools: false
     };
-  } else {
-    options = {
-      ...options
-    };
   }
 
   const window = new BrowserWindow(options);
-
-  if (!isDevelopment) {
-    Menu.setApplicationMenu(null);
-    window.removeMenu();
-  }
 
   if (isDevelopment) {
     window.webContents.openDevTools();

@@ -1,7 +1,9 @@
 import fs from 'fs';
-import { getString, configGet } from '../../common/utils';
+import { getString, configGet, configSet } from '../../common/utils';
 import { modal } from '../components/Modal';
 import stopwords from '../json/stopwords.json';
+import React from 'react';
+import versionCompare from 'semver-compare';
 
 export const merge = (var1, var2) => {
     if (Array.isArray(var1) && Array.isArray(var2)) {
@@ -49,6 +51,21 @@ export const camelCase = (str: string) => {
         .replace(/\s+/g, '');
 };
 
+export const getJson = url => {
+    return new Promise(resolve => {
+        require('request')(
+            {
+                url: url,
+                json: true,
+                headers: { 'User-Agent': 'PRSS' }
+            },
+            function(error, response, body) {
+                resolve(body);
+            }
+        );
+    });
+};
+
 export const alert = (message: string, title?: string) => {
     modal.alert(message, title);
 };
@@ -63,8 +80,9 @@ export const error = (
 
 export const confirmation = ({
     title,
-    buttons = [{ label: 'Yes', action: () => {} }],
-    showCancel = true
+    buttons = [{ label: 'Yes', action: () => {} }] as any,
+    showCancel = true,
+    contentClassName = ''
 }) => {
     return new Promise(resolve => {
         const mappedButtons = buttons.map(
@@ -86,7 +104,8 @@ export const confirmation = ({
             showCancel,
             onCancel: () => {
                 resolve(-1);
-            }
+            },
+            contentClassName
         });
     });
 };
@@ -277,6 +296,78 @@ export const sanitizeSite = siteObj => {
     });
 
     return newObj;
+};
+
+export const getLatestVersion = async () => {
+    const res = ((await getJson('https://app.prss.io/api/version')) ||
+        {}) as any;
+    return res;
+};
+
+export const getCurrentVersion = () => {
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    const { app } = require('electron').remote;
+    let currentVersion;
+
+    if (isDevelopment) {
+        currentVersion = require('../../../package.json').version;
+    } else {
+        currentVersion = app.getVersion();
+    }
+
+    return currentVersion;
+};
+
+export const notifyNewVersion = async newVersion => {
+    const response = await confirmation({
+        title: [
+            React.createElement(
+                'p',
+                { key: 'ver-1a' },
+                `Version ${newVersion} is available`
+            ),
+            React.createElement(
+                'p',
+                { key: 'ver-1b' },
+                'Update to the latest version to have the latest improvements and bug fixes.'
+            )
+        ],
+        buttons: [{ label: 'Update' }, { label: 'Remind me later' }],
+        contentClassName: 'prss-update'
+    });
+
+    /**
+     * If "Remind me later"
+     */
+    if (response === 0) {
+        /**
+         * Open PRSS download site
+         */
+        window.open('https://hodgef.com/prss/?d=update');
+    } else if (response === 1) {
+        configSet('updateCheckSnoozeUntil', Date.now() + 604800000);
+    }
+};
+
+export const checkUpdates = (currentVersion, shouldPrompt) => {
+    return new Promise(resolve => {
+        try {
+            getLatestVersion().then(async res => {
+                const latestVersion = res.latest;
+                if (latestVersion) {
+                    if (versionCompare(latestVersion, currentVersion) > 0) {
+                        if (shouldPrompt) {
+                            notifyNewVersion(latestVersion);
+                        }
+                        resolve(latestVersion);
+                    }
+                }
+            });
+        } catch (e) {
+            console.error(e);
+            resolve();
+        }
+    });
 };
 
 export const sanitizeSiteItems = items => {

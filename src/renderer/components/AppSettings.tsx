@@ -1,22 +1,41 @@
 import './styles/AppSettings.scss';
 
-import React, { FunctionComponent, Fragment, useState } from 'react';
-import { useHistory, Link } from 'react-router-dom';
+import React, {
+    FunctionComponent,
+    Fragment,
+    useState,
+    useEffect,
+    ReactNode
+} from 'react';
+import { useHistory } from 'react-router-dom';
 
-import Footer from './Footer';
-import Header from './Header';
 import { getString, configSet, configGet } from '../../common/utils';
 import { error, confirmation } from '../services/utils';
 import { modal } from './Modal';
 const { app } = require('electron').remote;
 
-const AppSettings: FunctionComponent = () => {
+interface IProps {
+    setHeaderLeftComponent: (comp?: ReactNode) => void;
+}
+
+const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const history = useHistory();
 
     const [storePath, setStorePath] = useState(configGet('paths.db'));
 
+    useEffect(() => {
+        setHeaderLeftComponent(
+            <Fragment>
+                <div className="align-center">
+                    <i className="material-icons">public</i>
+                    <a onClick={() => history.push('/settings')}>Settings</a>
+                </div>
+            </Fragment>
+        );
+    }, []);
+
     const handleSubmit = async () => {
-        if (storePath) {
+        if (storePath && storePath !== configGet('paths.db')) {
             const confirmationRes = await confirmation({
                 title: (
                     <Fragment>
@@ -51,16 +70,6 @@ const AppSettings: FunctionComponent = () => {
 
     return (
         <div className="CreatePost page">
-            <Header
-                undertitle={
-                    <Fragment>
-                        <div className="align-center">
-                            <i className="material-icons">public</i>
-                            <Link to={'/settings'}>Settings</Link>
-                        </div>
-                    </Fragment>
-                }
-            />
             <div className="content">
                 <h1>
                     <div className="left-align">
@@ -72,6 +81,16 @@ const AppSettings: FunctionComponent = () => {
                         </i>
                         <span>Settings</span>
                     </div>
+                    <div className="right-align">
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => handleSubmit()}
+                        >
+                            <span className="material-icons mr-2">save</span>
+                            <span>Save Changes</span>
+                        </button>
+                    </div>
                 </h1>
 
                 <form className="mt-4">
@@ -81,7 +100,7 @@ const AppSettings: FunctionComponent = () => {
                                 htmlFor="siteTitle"
                                 className="col-sm-3 col-form-label"
                             >
-                                Database directory
+                                Database file path (prss.db)
                             </label>
                             <div className="col-sm-9">
                                 <input
@@ -94,19 +113,27 @@ const AppSettings: FunctionComponent = () => {
                             </div>
                         </div>
                     </div>
+                    <div className="form-group row">
+                        <div className="input-group input-group-lg">
+                            <label
+                                htmlFor="siteConfig"
+                                className="col-sm-3 col-form-label"
+                            >
+                                Config file path (prss.json)
+                            </label>
+                            <div className="col-sm-9">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="siteConfig"
+                                    value={app.getPath('userData')}
+                                    disabled
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </form>
-
-                <div className="form-group mt-4">
-                    <button
-                        type="button"
-                        className="btn btn-primary btn-lg"
-                        onClick={() => handleSubmit()}
-                    >
-                        Save Settings
-                    </button>
-                </div>
             </div>
-            <Footer />
         </div>
     );
 };

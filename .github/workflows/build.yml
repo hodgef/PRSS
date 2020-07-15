@@ -22,5 +22,11 @@ jobs:
       - name: Build/Release
         uses: samuelmeuli/action-electron-builder@v1
         with:
+          mac_certs: ${{ secrets.mac_certs }}
+          mac_certs_password: ${{ secrets.mac_certs_password }}
+          windows_certs: ${{ secrets.windows_certs }}
+          windows_certs_password: ${{ secrets.windows_certs_password }}
           github_token: ${{ secrets.github_token }}
           release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+          gh_client_id: ${{ secrets.gh_client_id }}
+          gh_client_secret: ${{ secrets.gh_client_secret }}

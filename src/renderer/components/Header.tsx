@@ -8,44 +8,66 @@ import React, {
     useEffect,
     useRef
 } from 'react';
-import { useHistory } from 'react-router-dom';
+const isFrameless = process.platform !== 'darwin';
+const remote = require('electron').remote;
+const win = remote.getCurrentWindow();
 
-import PRSSLogo from '../images/PRSS.png';
+import PRSSLogo from '../images/prss-sm.png';
+import minImg from '../images/icons/min-k-30.png';
+import maxImg from '../images/icons/max-k-30.png';
+import restoreImg from '../images/icons/restore-k-30.png';
+import closeImg from '../images/icons/close-k-30.png';
+
 import { configGet } from '../../common/utils';
+import { notifyNewVersion } from '../services/utils';
 
 interface IProps {
-    undertitle?: ReactNode;
+    headerLeft?: ReactNode;
+    history: any;
+    newVersion: string;
 }
 
-const Header: FunctionComponent<IProps> = ({ undertitle }) => {
-    const history = useHistory();
-
+const Header: FunctionComponent<IProps> = ({
+    headerLeft,
+    history,
+    newVersion
+}) => {
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const headerMore = useRef(null);
     const hasSites = configGet('sites') || {};
+    const [isMaximized, setIsMaximized] = useState(false);
 
-    const handleDOMClick = e => {
-        if (headerMore.current && headerMore.current.contains(e.target)) {
-            return;
-        }
+    const toggleMaximize = () => {
+        const newState = !win.isMaximized();
+        setIsMaximized(newState);
+        newState ? win.maximize() : win.unmaximize();
+    };
 
-        setShowMoreMenu(false);
+    const maxHandler = () => {
+        setIsMaximized(true);
+    };
+
+    const minHandler = () => {
+        setIsMaximized(false);
     };
 
     useEffect(() => {
-        document.addEventListener('mousedown', handleDOMClick, false);
+        win.on('maximize', maxHandler);
+        win.on('unmaximize', minHandler);
+
+        return () => {
+            win.removeListener('maximize', maxHandler);
+            win.removeListener('unmaximize', minHandler);
+        };
     }, []);
 
-    useEffect(
-        () => () => {
-            document.removeEventListener('mousedown', handleDOMClick, false);
-        },
-        []
-    );
-
     return (
-        <header className={cx({ 'has-undertitle': undertitle })}>
-            <div className="header-cont">
+        <header className={cx({ 'has-header-left': headerLeft })}>
+            <div
+                className={cx('header-cont', {
+                    'title-mode': isFrameless
+                })}
+            >
                 <div className="left-align">
                     <div
                         className={cx('logo', {
@@ -56,35 +78,95 @@ const Header: FunctionComponent<IProps> = ({ undertitle }) => {
                             history.push('/sites')
                         }
                     >
-                        <img src={PRSSLogo} width="150" />
+                        <img src={PRSSLogo} width="30" />
                     </div>
+                    {headerLeft && (
+                        <div className="header-subtitle">{headerLeft}</div>
+                    )}
                 </div>
                 <div className="right-align">
                     <div className="header-more" ref={headerMore}>
                         <button
                             type="button"
-                            className="btn btn-light btn-lg"
-                            onClick={() => setShowMoreMenu(true)}
+                            className={cx('btn btn-transparent btn-lg', {
+                                expanded: showMoreMenu
+                            })}
+                            onClick={() => setShowMoreMenu(!showMoreMenu)}
                         >
-                            <span className="material-icons">more_horiz</span>
+                            <span className="material-icons">expand_more</span>
                         </button>
                         {showMoreMenu && (
-                            <ul className="drop-menu">
-                                <li
-                                    className="clickable"
-                                    onClick={() => history.push('/settings')}
-                                >
-                                    <span className="material-icons">
-                                        settings
-                                    </span>
-                                    <span>Settings</span>
-                                </li>
-                            </ul>
+                            <React.Fragment>
+                                <div
+                                    className="back-overlay"
+                                    onClick={() => setShowMoreMenu(false)}
+                                ></div>
+                                <ul className="drop-menu">
+                                    {newVersion && (
+                                        <li
+                                            className="clickable highlight-li"
+                                            onClick={() => {
+                                                notifyNewVersion(newVersion);
+                                            }}
+                                        >
+                                            <span className="material-icons">
+                                                check_circle
+                                            </span>
+                                            <span>Update PRSS</span>
+                                        </li>
+                                    )}
+                                    <li
+                                        className="clickable"
+                                        onClick={() => {
+                                            setShowMoreMenu(false);
+                                            history.push('/settings');
+                                        }}
+                                    >
+                                        <span className="material-icons">
+                                            settings
+                                        </span>
+                                        <span>Settings</span>
+                                    </li>
+                                </ul>
+                            </React.Fragment>
                         )}
+                    </div>
+                    <div className="window-controls">
+                        <div
+                            className="btn btn-transparent btn-lg"
+                            onClick={() => win.minimize()}
+                        >
+                            <img
+                                className="icon"
+                                src={minImg}
+                                draggable="false"
+                            />
+                        </div>
+
+                        <div
+                            className="btn btn-transparent btn-lg"
+                            onClick={() => toggleMaximize()}
+                        >
+                            <img
+                                className="icon"
+                                src={isMaximized ? restoreImg : maxImg}
+                                draggable="false"
+                            />
+                        </div>
+
+                        <div
+                            className="btn btn-transparent btn-lg"
+                            onClick={() => win.close()}
+                        >
+                            <img
+                                className="icon"
+                                src={closeImg}
+                                draggable="false"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
-            {undertitle && <div className="header-subtitle">{undertitle}</div>}
         </header>
     );
 };

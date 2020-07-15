@@ -1,9 +1,6 @@
-import { db } from '../../common/Store';
+import { db } from '../../common/bootstrap';
 import { mapFieldsToJSON } from './utils';
-import { JSON_FIELDS } from '../../common/Store';
-// import path from 'path';
-// import { configGet } from '../../common/utils';
-// import fs from 'fs';
+import { JSON_FIELDS } from '../../common/bootstrap';
 
 /**
  * Sites

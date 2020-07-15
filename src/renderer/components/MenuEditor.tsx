@@ -1,7 +1,13 @@
 import './styles/MenuEditor.scss';
 
-import React, { Fragment, FunctionComponent, useState, useEffect } from 'react';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import React, {
+    Fragment,
+    FunctionComponent,
+    useState,
+    useEffect,
+    ReactNode
+} from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import {
@@ -12,11 +18,14 @@ import {
 import { deleteMenuEntries } from '../services/hosting';
 import DraggableTree from './DraggableTree';
 import Footer from './Footer';
-import Header from './Header';
 import { ask } from '../services/utils';
 import { getSite, getItems, updateSite, getItem } from '../services/db';
 
-const MenuEditor: FunctionComponent = () => {
+interface IProps {
+    setHeaderLeftComponent: (comp?: ReactNode) => void;
+}
+
+const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const { siteId, menuId } = useParams();
 
     const [site, setSite] = useState(null);
@@ -33,6 +42,38 @@ const MenuEditor: FunctionComponent = () => {
     const [selectedItems, setSelectedItems] = useState([]);
 
     const [itemCount, setItemCount] = useState(0);
+
+    useEffect(() => {
+        if (!title) {
+            return;
+        }
+        setHeaderLeftComponent(
+            <Fragment>
+                <div className="align-center">
+                    <i className="material-icons">public</i>
+                    <a onClick={() => history.push(`/sites/${siteId}`)}>
+                        {title}
+                    </a>
+                </div>
+                <div className="align-center">
+                    <i className="material-icons">keyboard_arrow_right</i>
+                    <a onClick={() => history.push(`/sites/${siteId}/menus`)}>
+                        Menus
+                    </a>
+                </div>
+                <div className="align-center">
+                    <i className="material-icons">keyboard_arrow_right</i>
+                    <a
+                        onClick={() =>
+                            history.push(`/sites/${siteId}/menus/${menuId}`)
+                        }
+                    >
+                        {menuId}
+                    </a>
+                </div>
+            </Fragment>
+        );
+    }, [title]);
 
     useEffect(() => {
         const getData = async () => {
@@ -237,31 +278,7 @@ const MenuEditor: FunctionComponent = () => {
     };
 
     return (
-        <div className="MenuEditor page fixed">
-            <Header
-                undertitle={
-                    <Fragment>
-                        <div className="align-center">
-                            <i className="material-icons">public</i>
-                            <Link to={`/sites/${siteId}`}>{title}</Link>
-                        </div>
-                        <div className="align-center">
-                            <i className="material-icons">
-                                keyboard_arrow_right
-                            </i>
-                            <Link to={`/sites/${siteId}/menus`}>Menus</Link>
-                        </div>
-                        <div className="align-center">
-                            <i className="material-icons">
-                                keyboard_arrow_right
-                            </i>
-                            <Link to={`/sites/${siteId}/menus/${menuId}`}>
-                                {menuId}
-                            </Link>
-                        </div>
-                    </Fragment>
-                }
-            />
+        <div className="MenuEditor page">
             <div className="content">
                 <h1>
                     <div className="left-align">

@@ -1,18 +1,26 @@
 import './styles/Dashboard.scss';
 
-import React, { Fragment, FunctionComponent, useState, useEffect } from 'react';
+import React, {
+    Fragment,
+    FunctionComponent,
+    useState,
+    useEffect,
+    ReactNode
+} from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import cx from 'classnames';
 
 import { getString, configGet, configSet } from '../../common/utils';
-import Footer from './Footer';
-import Header from './Header';
 import { buildAndDeploy, getRepositoryUrl } from '../services/hosting';
 import { toast } from 'react-toastify';
 import Loading from './Loading';
 import { getSite } from '../services/db';
 
-const Dashboard: FunctionComponent = () => {
+interface IProps {
+    setHeaderLeftComponent: (comp?: ReactNode) => void;
+}
+
+const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const { siteId } = useParams();
 
     const [site, setSite] = useState(null);
@@ -25,6 +33,20 @@ const Dashboard: FunctionComponent = () => {
 
     const history = useHistory();
     const { title, url } = (site as ISite) || {};
+
+    useEffect(() => {
+        if (!title) {
+            return;
+        }
+        setHeaderLeftComponent(
+            <Fragment>
+                <div className="align-center">
+                    <i className="material-icons">public</i>
+                    <span>{title}</span>
+                </div>
+            </Fragment>
+        );
+    }, [title]);
 
     useEffect(() => {
         const getData = async () => {
@@ -54,7 +76,10 @@ const Dashboard: FunctionComponent = () => {
             className: '',
             tooltip: '',
             onClick: () => {
-                history.push(`/sites/${siteId}/posts`);
+                history.push({
+                    pathname: `/sites/${siteId}/posts`,
+                    state: { showBack: true }
+                });
             }
         },
         {
@@ -65,7 +90,10 @@ const Dashboard: FunctionComponent = () => {
             className: '',
             tooltip: '',
             onClick: () => {
-                history.push(`/sites/${siteId}/themes`);
+                history.push({
+                    pathname: `/sites/${siteId}/themes`,
+                    state: { showBack: true }
+                });
             }
         },
         {
@@ -76,7 +104,10 @@ const Dashboard: FunctionComponent = () => {
             className: '',
             tooltip: '',
             onClick: () => {
-                history.push(`/sites/${siteId}/settings`);
+                history.push({
+                    pathname: `/sites/${siteId}/settings`,
+                    state: { showBack: true }
+                });
             }
         },
         {
@@ -87,7 +118,10 @@ const Dashboard: FunctionComponent = () => {
             className: '',
             tooltip: '',
             onClick: () => {
-                history.push(`/sites/${siteId}/menus`);
+                history.push({
+                    pathname: `/sites/${siteId}/menus`,
+                    state: { showBack: true }
+                });
             }
         }
     ];
@@ -154,16 +188,6 @@ const Dashboard: FunctionComponent = () => {
 
     return (
         <div className="Dashboard page">
-            <Header
-                undertitle={
-                    <Fragment>
-                        <div className="align-center">
-                            <i className="material-icons">public</i>
-                            <span>{title}</span>
-                        </div>
-                    </Fragment>
-                }
-            />
             <div className="content">
                 <h1>
                     <div className="left-align">
@@ -211,7 +235,6 @@ const Dashboard: FunctionComponent = () => {
                     </ul>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };
