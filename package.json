@@ -113,19 +113,16 @@
         "mac": {
             "category": "public.app-category.productivity",
             "entitlements": "build/entitlements.mac.plist",
+            "entitlementsInherit": "build/entitlements.mac.plist",
             "icon": "static/icons/icon.icns",
             "target": "dmg",
             "hardenedRuntime": true,
-            "provisioningProfile": "embedded.provisionprofile",
+            "provisioningProfile": "build/embedded.provisionprofile",
             "gatekeeperAssess" : false
         },
-        "mas": {
-            "type": "distribution",
-            "category": "public.app-category.productivity",
-            "entitlements": "build/entitlements.mas.plist",
-            "provisioningProfile": "embedded.provisionprofile",
-            "icon": "static/icons/icon.icns"
-        },
-        "afterSign": "scripts/afterSignHook.js"
+        "afterSign": "scripts/afterSignHook.js",
+        "dmg": {
+            "sign": false
+        }
     }
 }
