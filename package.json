@@ -114,12 +114,14 @@
             "entitlements": "build/entitlements.mac.plist",
             "icon": "static/icons/icon.icns",
             "target": "dmg",
-            "hardenedRuntime": true
+            "hardenedRuntime": true,
+            "provisioningProfile": "embedded.provisionprofile"
         },
         "mas": {
             "type": "distribution",
             "category": "public.app-category.productivity",
             "entitlements": "build/entitlements.mas.plist",
+            "provisioningProfile": "embedded.provisionprofile",
             "icon": "static/icons/icon.icns"
         }
     }
