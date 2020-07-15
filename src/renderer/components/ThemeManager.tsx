@@ -175,7 +175,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
         }
 
         const themesDir = configGet('paths.themes');
-        shell.openItem(themesDir);
+        shell.openPath(themesDir);
     };
 
     return (

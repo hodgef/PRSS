@@ -8,6 +8,7 @@
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "noUnusedLocals": false,
-        "jsx": "react"
+        "jsx": "react",
+        "noEmit": false
     }
 }

@@ -105,7 +105,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
         const publicDir = path.join(configGet('paths.public'), siteName);
 
         if (fs.existsSync(publicDir)) {
-            shell.openItem(publicDir);
+            shell.openPath(publicDir);
         } else {
             error(
                 'The directory does not exist yet. Please preview or deploy your site'
