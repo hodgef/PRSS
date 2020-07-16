@@ -120,7 +120,6 @@
             "provisioningProfile": "build/embedded.provisionprofile",
             "gatekeeperAssess" : false
         },
-        "afterSign": "scripts/afterSignHook.js",
         "dmg": {
             "sign": false
         }
