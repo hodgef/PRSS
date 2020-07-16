@@ -34,7 +34,8 @@ jobs:
           windows_certs_password: ${{ secrets.windows_certs_password }}
           github_token: ${{ secrets.github_token }}
           release: ${{ startsWith(github.ref, 'refs/tags/v') }}
-          gh_client_id: ${{ secrets.gh_client_id }}
-          gh_client_secret: ${{ secrets.gh_client_secret }}
-          api_key_id: ${{ secrets.api_key_id }}
-          api_key_issuer_id: ${{ secrets.api_key_issuer_id }}
+        env:
+          API_KEY_ID: ${{ secrets.api_key_id }}
+          API_KEY_ISSUER_ID : ${{ secrets.api_key_issuer_id }}
+          GH_CLIENT_ID: ${{ secrets.gh_client_id }}
+          GH_CLIENT_SECRET: ${{ secrets.gh_client_secret }}
