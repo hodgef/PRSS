@@ -2,7 +2,10 @@ import Store from 'electron-store';
 import path from 'path';
 import fs from 'fs';
 import knex from 'knex';
-import { mapFieldsFromJSON } from '../renderer/services/utils';
+import {
+    mapFieldsFromJSON,
+    getGithubSecureAuth
+} from '../renderer/services/utils';
 
 const JSON_FIELDS = [
     'structure',
@@ -13,7 +16,6 @@ const JSON_FIELDS = [
 ];
 
 const { app } = require('electron').remote;
-const dotenv = require('dotenv').config({ path: path.join(__static, '.env') });
 
 const defaults = {
     sites: {},
@@ -27,6 +29,7 @@ let expressServer;
 let hooks = {};
 
 const expressUrl = 'http://127.0.0.1:3001';
+const getApiUrl = (path = '/') => `https://app.prss.io/api${path}`;
 
 const setHook = (name, fct) => {
     hooks[name] = fct;
@@ -153,65 +156,6 @@ const initExpress = async () => {
      */
     const express = require('express');
     expressApp = express();
-    const passport = require('passport');
-    const GitHubStrategy = require('passport-github2').Strategy;
-
-    expressApp.use(passport.initialize());
-
-    const filter = {
-        urls: ['*://*.prss.io/*']
-    };
-    const session = require('electron').remote.session;
-    session.defaultSession.webRequest.onBeforeSendHeaders(
-        filter,
-        (details, callback) => {
-            details.requestHeaders['Origin'] = null;
-            details.headers['Origin'] = null;
-            callback({ requestHeaders: details.requestHeaders });
-        }
-    );
-
-    passport.serializeUser(function(user, done) {
-        done(null, user);
-    });
-
-    passport.deserializeUser(function(obj, done) {
-        done(null, obj);
-    });
-
-    passport.use(
-        new GitHubStrategy(
-            {
-                clientID:
-                    process.env.GH_CLIENT_ID || dotenv.parsed?.GH_CLIENT_ID,
-                clientSecret:
-                    process.env.GH_CLIENT_SECRET ||
-                    dotenv.parsed?.GH_CLIENT_SECRET,
-                callbackURL: 'http://127.0.0.1:3001/auth/github/callback'
-            },
-            function(accessToken, refreshToken, profile, done) {
-                process.nextTick(function() {
-                    runHook('github_login_success', {
-                        token: accessToken,
-                        profile
-                    });
-
-                    // To keep the example simple, the user's GitHub profile is returned to
-                    // represent the logged-in user.  In a typical application, you would want
-                    // to associate the GitHub account with a user record in your database,
-                    // and return that user instead.
-                    return done(null, profile);
-                });
-            }
-        )
-    );
-
-    expressApp.get('/', function(req, res) {
-        res.send('PRSS');
-    });
-    expressApp.get('/login-error', function(req, res) {
-        res.send('Could not log-in - Please try again later');
-    });
 
     expressServer = expressApp.listen(3001, function() {
         console.log(
@@ -219,24 +163,20 @@ const initExpress = async () => {
         );
     });
 
-    expressApp.get(
-        '/auth/github',
-        passport.authenticate('github', { failureRedirect: '/login-error' }),
-        function(req, res) {
-            // The request will be redirected to GitHub for authentication, so this
-            // function will not be called.
-        }
-    );
+    expressApp.get('/', function(req, res) {
+        res.send('PRSS');
+    });
 
-    expressApp.get(
-        '/auth/github/callback',
-        passport.authenticate('github', { failureRedirect: '/login-error' }),
-        function(req, res) {
-            res.send(
-                'Success - You can now close this page and return to PRSS'
-            );
+    expressApp.get('/github/callback', async (req, res) => {
+        res.send('Success - You can now close this page and return to PRSS');
+        const code = req.query.c;
+        if (code) {
+            const { token, username } = await getGithubSecureAuth(code);
+            if (token && username) {
+                runHook('github_login_success', { token, username });
+            }
         }
-    );
+    });
 };
 
 const expressOpen = path => {
@@ -256,6 +196,7 @@ export {
     expressApp,
     expressServer,
     expressOpen,
+    getApiUrl,
     setHook,
     runHook,
     getHooks,

@@ -37,5 +37,3 @@ jobs:
         env:
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID : ${{ secrets.api_key_issuer_id }}
-          GH_CLIENT_ID: ${{ secrets.gh_client_id }}
-          GH_CLIENT_SECRET: ${{ secrets.gh_client_secret }}

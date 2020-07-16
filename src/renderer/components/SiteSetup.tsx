@@ -24,14 +24,13 @@ import { toast } from 'react-toastify';
 import Loading from './Loading';
 import {
     getSite,
-    getSites,
     createSite,
     createItems,
     deleteSite,
     deleteAllSiteItems
 } from '../services/db';
 import ghImage from '../images/gh-mark.png';
-import { setHook, expressOpen } from '../../common/bootstrap';
+import { setHook, getApiUrl } from '../../common/bootstrap';
 import SiteSetupGithub from './SiteSetupGithub';
 import { error, normalizeStrict } from '../services/utils';
 import {
@@ -119,7 +118,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
     }, []);
 
     useEffect(() => {
-        setHook('github_login_success', async ({ token, profile }) => {
+        setHook('github_login_success', async ({ token, username }) => {
             toast.success('Login Success');
 
             /**
@@ -127,7 +126,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
              */
             const parsedHostingFields = await handleHostingFields({
                 name: 'github',
-                username: profile.username,
+                username: username,
                 token
             });
 
@@ -156,7 +155,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
             className: '',
             tooltip: '',
             onClick: () => {
-                expressOpen('/auth/github');
+                window.open(getApiUrl('/login/github'));
             }
         },
         /*{

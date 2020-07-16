@@ -4,6 +4,7 @@ import { modal } from '../components/Modal';
 import stopwords from '../json/stopwords.json';
 import React from 'react';
 import versionCompare from 'semver-compare';
+import { getApiUrl } from '../../common/bootstrap';
 
 export const merge = (var1, var2) => {
     if (Array.isArray(var1) && Array.isArray(var2)) {
@@ -299,7 +300,12 @@ export const sanitizeSite = siteObj => {
 };
 
 export const getLatestVersion = async () => {
-    const res = ((await getJson('https://app.prss.io/api/version')) ||
+    const res = ((await getJson(getApiUrl('/version'))) || {}) as any;
+    return res;
+};
+
+export const getGithubSecureAuth = async code => {
+    const res = ((await getJson(getApiUrl(`/login/github/verify/${code}`))) ||
         {}) as any;
     return res;
 };
