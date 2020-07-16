@@ -12,7 +12,7 @@ app.allowRendererProcessReuse = false;
 let mainWindow;
 
 const createMainWindow = () => {
-  let options = {
+  const options = {
     icon: iconPath,
     frame: process.platform === 'darwin',
     width: 1250,
@@ -25,18 +25,18 @@ const createMainWindow = () => {
     }
   };
 
-  if (!isDevelopment) {
-    options = {
-      ...options,
-      devTools: false
-    };
-  }
+  // if (!isDevelopment) {
+  //   options = {
+  //     ...options,
+  //     devTools: false
+  //   };
+  // }
 
   const window = new BrowserWindow(options);
 
-  if (isDevelopment) {
+  //if (isDevelopment) {
     window.webContents.openDevTools();
-  }
+  //}
 
   if (isDevelopment) {
     window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`);
