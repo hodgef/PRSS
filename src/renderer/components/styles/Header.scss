@@ -37,12 +37,6 @@ header {
             -webkit-app-region: drag;
         }
 
-        &:not(.title-mode) {
-            .window-controls {
-                display: none;
-            }
-        }
-
         .left-align {
             flex: 1;
             align-items: center;
@@ -89,6 +83,12 @@ header {
                     width: 12px;
                     height: auto;
                 }
+            }
+        }
+
+        &:not(.title-mode) {
+            .window-controls {
+                display: none !important;
             }
         }
     }

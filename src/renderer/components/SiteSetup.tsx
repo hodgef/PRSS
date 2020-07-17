@@ -126,7 +126,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
              */
             const parsedHostingFields = await handleHostingFields({
                 name: 'github',
-                username: username,
+                username,
                 token
             });
 
@@ -415,7 +415,13 @@ const SiteSetup: FunctionComponent<IProps> = ({
                                 <div className="left-align">
                                     <i
                                         className="material-icons clickable"
-                                        onClick={() => history.push('/sites')}
+                                        onClick={() =>
+                                            hasSites
+                                                ? history.push('/sites')
+                                                : history.replace(
+                                                      '/sites/create'
+                                                  )
+                                        }
                                     >
                                         arrow_back
                                     </i>

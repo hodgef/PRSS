@@ -469,7 +469,7 @@ class GithubProvider {
         const url = `https://${this.vars.baseApiUrl()}/${endpoint}`;
         const { hosting } = configGet(`sites.${this.siteUUID}`);
         const { name, username } = hosting;
-        const password = await keychainRetreive(name, username);
+        const password = await keychainRetreive(`prss-${name}`, username);
 
         return axios({
             method,
