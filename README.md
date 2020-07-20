@@ -1,6 +1,6 @@
- <div align="center">
- <a href="https://prss.io/"><img src="https://i.imgur.com/YRgThpr.png" width="150" /></a>
-    <blockquote>Cross-platform static site generator for blazing fast blogs, documentation sites and more.</blockquote>
+ <div>
+ <p><a href="https://prss.io/"><img src="https://i.imgur.com/YRgThpr.png" width="150" /></a></p>
+<blockquote>Cross-platform static site generator for blazing fast blogs, documentation sites and more.</blockquote>
  <div><a href="https://prss.io/"><img src="https://i.imgur.com/GY8XQdz.gif" width="600" /></a></div>
  </div>
 
