@@ -1,5 +1,10 @@
+ <div align="center">
+ <a href="https://prss.io/"><img src="https://i.imgur.com/YRgThpr.png" width="150" /></a>
+    <h2>Powerful Blogging - Static Site Generator</h2>
+    <blockquote>Cross-platform static site generator for blazing fast blogs, documentation sites and more.</blockquote>
+ </div>
+
 <p align="center">
-    <div><a href="https://prss.io/"><img src="https://i.imgur.com/YRgThpr.png" width="150" /></a></div>
     <div><a href="https://prss.io/"><img src="https://i.imgur.com/GY8XQdz.gif" width="600" /></a></div>
 </p>
 
