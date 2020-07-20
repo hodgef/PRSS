@@ -15,7 +15,7 @@ Check out the [PRSS documentation](https://hodgef.com/prss) for site customizati
 
 
 ## Demo 🚀
-[PRSS Site Demo (React)](https://prss-io.github.io/demo-press-theme/)
+[PRSS Demo Site](https://prss-io.github.io/demo-slate-theme/)
 
 
 ### To run PRSS in dev mode
