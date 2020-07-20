@@ -6,7 +6,7 @@
 
 
 ## Installation & Usage 📦
-You can download PRSS for Windows, Mac and Linux and manage your sites locally.
+You can download PRSS for Windows, Mac and Linux and breeze through setup.
   
 Check out the [Getting Started](https://prss.io) page to begin.
 
