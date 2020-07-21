@@ -1,0 +1,22 @@
+.about-modal {
+    max-width: 700px !important;
+
+    .list {
+        list-style: disc;
+        margin: 0;
+        margin-top: 15px;
+        padding-left: 20px;
+
+        li a {
+            display: flex;
+
+            i {
+                margin-right: 5px;
+            }
+        }
+    }
+
+    .separator-bar {
+        border-top: 1px solid gray;
+    }
+}

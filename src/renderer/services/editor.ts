@@ -108,11 +108,16 @@ export const editorOptions = {
     },
     mediaBlocks: [],
     buttons:
-        'source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,|,font,fontsize,brush,paragraph,align,|,image,video,table,link,|,fullsize,dots',
+        'source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,|,font,fontsize,brush,paragraph,align,|,image,video,table,link,|,fullsize',
     buttonsMD:
         'source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,|,font,fontsize,paragraph,align,|,image,link,dots',
     buttonsSM:
         'source,|,bold,strikethrough,underline,italic,|,font,paragraph,align,image,link,dots',
     buttonsXS:
-        'source,|,bold,underline,italic,|,font,paragraph,align,image,link,dots'
+        'source,|,bold,underline,italic,|,font,paragraph,align,image,link,dots',
+    cleanHTML: {
+        removeEmptyElements: false,
+        fillEmptyParagraph: false,
+        replaceNBSP: false
+    }
 };

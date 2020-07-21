@@ -79,6 +79,7 @@ const App: FunctionComponent = () => {
             <Header
                 headerLeft={headerLeft}
                 history={history}
+                version={version}
                 newVersion={newVersion}
             />
             <HashRouter>

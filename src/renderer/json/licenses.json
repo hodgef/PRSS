@@ -5,10 +5,16 @@
         "licenseUrl": "https://github.com/BrowserSync/browser-sync/raw/master/LICENSE",
         "parents": "prss"
     },
-    "electron-store@5.1.1": {
+    "electron-store@5.2.0": {
         "licenses": "MIT",
         "repository": "https://github.com/sindresorhus/electron-store",
         "licenseUrl": "https://github.com/sindresorhus/electron-store/raw/master/license",
+        "parents": "prss"
+    },
+    "express@4.17.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expressjs/express",
+        "licenseUrl": "https://github.com/expressjs/express/raw/master/LICENSE",
         "parents": "prss"
     },
     "html-minifier-terser@5.1.1": {
@@ -17,7 +23,7 @@
         "licenseUrl": "https://github.com/DanielRuf/html-minifier-terser/raw/master/LICENSE",
         "parents": "prss"
     },
-    "keytar@5.4.0": {
+    "keytar@5.6.0": {
         "licenses": "MIT",
         "repository": "https://github.com/atom/node-keytar",
         "licenseUrl": "https://github.com/atom/node-keytar/raw/master/LICENSE.md",
@@ -29,13 +35,13 @@
         "licenseUrl": "https://github.com/knex/knex/raw/master/LICENSE",
         "parents": "prss"
     },
-    "sitemap@6.1.5": {
+    "sitemap@6.1.7": {
         "licenses": "MIT",
         "repository": "https://github.com/ekalinin/sitemap.js",
         "licenseUrl": "https://github.com/ekalinin/sitemap.js/raw/master/LICENSE",
         "parents": "prss"
     },
-    "source-map-support@0.5.16": {
+    "source-map-support@0.5.19": {
         "licenses": "MIT",
         "repository": "https://github.com/evanw/node-source-map-support",
         "licenseUrl": "https://github.com/evanw/node-source-map-support/raw/master/LICENSE.md",

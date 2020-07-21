@@ -16,12 +16,12 @@
         overflow: hidden;
         border-radius: 10px;
         margin-top: 20px;
-        display: flex;
+        //display: flex;
         flex-flow: column;
         overflow-y: auto !important;
 
         .ace_editor {
-            min-height: 220px;
+            min-height: 400px;
         }
 
         h2 {

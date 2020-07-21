@@ -53,12 +53,14 @@ export const camelCase = (str: string) => {
 };
 
 export const getJson = url => {
+    const userAgent =
+        process.env.NODE_ENV !== 'production' ? 'PRSS_DEV' : 'PRSS';
     return new Promise(resolve => {
         require('request')(
             {
                 url: url,
                 json: true,
-                headers: { 'User-Agent': 'PRSS' }
+                headers: { 'User-Agent': userAgent }
             },
             function(error, response, body) {
                 resolve(body);

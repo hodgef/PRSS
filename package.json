@@ -75,6 +75,7 @@
         "simple-git": "^1.132.0",
         "slash": "^3.0.0",
         "styled-components": "^5.0.1",
+        "terser": "^4.8.0",
         "typescript": "^3.9.3",
         "uuid": "^3.4.0",
         "webpack": "~4.35.3"

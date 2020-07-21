@@ -1,12 +1,8 @@
-import minify from 'babel-minify';
 import { getTemplate, getThemeIndex } from '../../theme';
-import { parseHtmlParams } from '..';
+import { parseHtmlParams, minifyHTML, minifyJS } from '..';
 import { sanitizeBufferItem, stripTags, truncateString } from '../../utils';
 import { configFileName } from '../../build';
 import { parseShortcodes } from '../../shortcode';
-import { globalRequire } from '../../../../common/utils';
-
-const htmlMinifier = globalRequire('html-minifier-terser');
 
 const reactHandlerExtension = 'js';
 
@@ -19,19 +15,9 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
     const templateName = templateId.split('.')[1];
     const time = Date.now();
 
-    const minifierOptions = {
-        minifyCSS: true,
-        minifyJS: true,
-        removeComments: true,
-        collapseWhitespace: true
-    };
-
     const headHtml = parseHtmlParams(data.headHtml, data);
     const footerHtml = parseHtmlParams(data.footerHtml, data);
-    const sidebarHtml = htmlMinifier.minify(
-        parseHtmlParams(data.sidebarHtml, data),
-        minifierOptions
-    );
+    const sidebarHtml = minifyHTML(parseHtmlParams(data.sidebarHtml, data));
 
     const configPath = data.rootPath + configFileName;
     const baseTemplatePath = data.rootPath + 'templates/';
@@ -131,7 +117,7 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
     `
         );
 
-    const html = htmlMinifier.minify(parsedHtml, minifierOptions);
+    const html = minifyHTML(parsedHtml);
 
     const parsedData = {
         ...data,
@@ -146,18 +132,14 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
         sidebarHtml
     });
 
-    const js = minify(
+    const js = minifyJS(
         `
         var PRSSElement = React.createElement(PRSSComponent.default, Object.assign(${JSON.stringify(
             sanitizedBufferItem
         )}, { site: PRSSConfig }));
         ReactDOM.render(PRSSElement, document.getElementById("root"));
-    `,
-        {},
-        {
-            comments: false
-        }
-    ).code;
+    `
+    );
 
     return [
         { name: 'index.html', content: html, path: './' },

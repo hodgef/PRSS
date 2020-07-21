@@ -1,5 +1,8 @@
 import { objGet } from '../utils';
 import { reactHandler, reactHandlerExtension } from '../handlers/react';
+import { globalRequire } from '../../../common/utils';
+const htmlMinifier = globalRequire('html-minifier-terser');
+const Terser = require('terser');
 
 export const parseHtmlParams = (html: string = '', bufferItem: IBufferItem) => {
     let output = html;
@@ -59,4 +62,26 @@ export const getParserTemplateExtension = parser => {
     }
 
     return extensions;
+};
+
+export const minifyJS = code => {
+    const res = Terser.minify(code, {
+        ecma: 5,
+        compress: true,
+        mangle: true
+    });
+
+    return !res.error ? res.code : '';
+};
+
+export const minifyHTML = (code = '') => {
+    const minifierOptions = {
+        minifyCSS: true,
+        minifyJS: (text, inline) => minifyJS(text),
+        removeComments: true,
+        collapseWhitespace: true,
+        collapseInlineTagWhitespace: true
+    };
+
+    return htmlMinifier.minify(code, minifierOptions);
 };
