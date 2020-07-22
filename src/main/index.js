@@ -28,15 +28,9 @@ const createMainWindow = () => {
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true
-    }
+    },
+    devTools: isDevelopment ? true : false
   };
-
-  if (!isDevelopment) {
-    options = {
-      ...options,
-      devTools: false
-    };
-  }
 
   const window = new BrowserWindow(options);
 
