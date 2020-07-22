@@ -32,23 +32,16 @@ export const toBase64 = file =>
     });
 
 /**
- * Securely any secrets in the OS keychain
+ * Store in localstorage
  */
-export const keychainStore = (
-    service: string,
-    username: string,
-    password: string
-) => {
-    const keytar = globalRequire('keytar');
-    return keytar.setPassword(service, username, password);
+export const localStorageSet = async (key: string, value: string) => {
+    window.localStorage.setItem(key, value);
 };
 
-export const keychainRetreive = (service: string, username: string) => {
-    const keytar = globalRequire('keytar');
-    return keytar.getPassword(service, username);
+export const localStorageGet = async (key: string) => {
+    return window.localStorage.getItem(key);
 };
 
-export const keychainRemove = (service: string, username: string) => {
-    const keytar = globalRequire('keytar');
-    return keytar.deletePassword(service, username);
+export const localStorageDelete = async (key: string) => {
+    window.localStorage.removeItem(key);
 };

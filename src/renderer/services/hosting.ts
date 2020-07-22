@@ -1,5 +1,5 @@
 import {
-    keychainStore,
+    localStorageSet,
     configGet,
     configSet,
     configRem
@@ -471,9 +471,8 @@ export const handleHostingFields = (hostingFieldsObj = {}) => {
             ['password', 'token'].forEach(sensitiveField => {
                 if (fields[sensitiveField]) {
                     storePromises.push(
-                        keychainStore(
-                            `prss-${name}`,
-                            username,
+                        localStorageSet(
+                            `${name}:${username}`,
                             fields[sensitiveField]
                         )
                     );

@@ -1,5 +1,5 @@
 import { updateSite } from './../db';
-import { keychainRetreive, configGet } from './../../../common/utils';
+import { localStorageGet, configGet } from './../../../common/utils';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
@@ -469,7 +469,7 @@ class GithubProvider {
         const url = `https://${this.vars.baseApiUrl()}/${endpoint}`;
         const { hosting } = configGet(`sites.${this.siteUUID}`);
         const { name, username } = hosting;
-        const password = await keychainRetreive(`prss-${name}`, username);
+        const password = await localStorageGet(`${name}:${username}`);
 
         return axios({
             method,

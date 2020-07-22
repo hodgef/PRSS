@@ -21,7 +21,6 @@
         "electron-store": "^5.1.1",
         "express": "^4.17.1",
         "html-minifier-terser": "^5.1.1",
-        "keytar": "^5.4.0",
         "knex": "^0.21.1",
         "sitemap": "^6.1.5",
         "source-map-support": "^0.5.12",
