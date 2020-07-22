@@ -5,10 +5,22 @@
         "licenseUrl": "https://github.com/BrowserSync/browser-sync/raw/master/LICENSE",
         "parents": "prss"
     },
+    "electron-log@4.2.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/megahertz/electron-log",
+        "licenseUrl": "https://github.com/megahertz/electron-log/raw/master/LICENSE",
+        "parents": "prss"
+    },
     "electron-store@5.2.0": {
         "licenses": "MIT",
         "repository": "https://github.com/sindresorhus/electron-store",
         "licenseUrl": "https://github.com/sindresorhus/electron-store/raw/master/license",
+        "parents": "prss"
+    },
+    "electron-updater@4.3.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/electron-userland/electron-builder",
+        "licenseUrl": "https://github.com/electron-userland/electron-builder",
         "parents": "prss"
     },
     "express@4.17.1": {
@@ -21,12 +33,6 @@
         "licenses": "MIT",
         "repository": "https://github.com/DanielRuf/html-minifier-terser",
         "licenseUrl": "https://github.com/DanielRuf/html-minifier-terser/raw/master/LICENSE",
-        "parents": "prss"
-    },
-    "keytar@5.6.0": {
-        "licenses": "MIT",
-        "repository": "https://github.com/atom/node-keytar",
-        "licenseUrl": "https://github.com/atom/node-keytar/raw/master/LICENSE.md",
         "parents": "prss"
     },
     "knex@0.21.1": {

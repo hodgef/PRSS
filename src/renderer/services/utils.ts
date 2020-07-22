@@ -364,9 +364,9 @@ export const checkUpdates = (currentVersion, shouldPrompt) => {
                 const latestVersion = res.latest;
                 if (latestVersion) {
                     if (versionCompare(latestVersion, currentVersion) > 0) {
-                        if (shouldPrompt) {
-                            notifyNewVersion(latestVersion);
-                        }
+                        // if (shouldPrompt) {
+                        //     notifyNewVersion(latestVersion);
+                        // }
                         resolve(latestVersion);
                     }
                 }

@@ -7,12 +7,18 @@ import { format as formatUrl } from 'url';
 const iconPath = path.join(__static, 'icons', 'icon.png');
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const gotTheLock = app.requestSingleInstanceLock();
-app.allowRendererProcessReuse = false;
+const log = require('electron-log');
+const { autoUpdater } = require('electron-updater');
 
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+log.info('App starting...');
+
+app.allowRendererProcessReuse = false;
 let mainWindow;
 
 const createMainWindow = () => {
-  let options = {
+  const options = {
     icon: iconPath,
     frame: process.platform === 'darwin',
     width: 1250,
@@ -65,6 +71,31 @@ const createMainWindow = () => {
     require('electron').shell.openExternal(url);
   });
 
+  function setLog(text) {
+    log.info(text);
+  }
+  autoUpdater.on('checking-for-update', () => {
+    setLog('Checking for update...');
+  })
+  autoUpdater.on('update-available', (info) => {
+    setLog('Update available.');
+  })
+  autoUpdater.on('update-not-available', (info) => {
+    setLog('Update not available.');
+  })
+  autoUpdater.on('error', (err) => {
+    setLog('Error in auto-updater. ' + err);
+  })
+  autoUpdater.on('download-progress', (progressObj) => {
+    let log_message = 'Download speed: ' + progressObj.bytesPerSecond;
+    log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+    log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
+    setLog(log_message);
+  })
+  autoUpdater.on('update-downloaded', (info) => {
+    setLog('Update downloaded');
+  });  
+
   return window;
 }
 
@@ -80,7 +111,9 @@ if (!gotTheLock) {
   })
 
   // Create myWindow, load the rest of the app, etc...
-  app.on('ready', () => {});
+  app.on('ready', () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
 }
 
 // quit application when all windows are closed
