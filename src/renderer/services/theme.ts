@@ -1,29 +1,47 @@
 import fs from 'fs';
 import path from 'path';
 
-import { getFilePaths, getDirPaths } from './files';
-import { getParserTemplateExtension } from './handlers';
+import { getDirPaths } from './files';
 import { configGet } from '../../common/utils';
+import { getJson, getUrl } from './utils';
+import { prssConfig, setCache, getCache } from '../../common/bootstrap';
 
 export const getTemplate = async (templateId: string, extension: string) => {
-    const templateRelPath = templateId.split('.').join('/');
-    const templatePathName = `${templateRelPath}.${extension}`;
+    const theme = templateId.split('.')[0];
+    const template = templateId.split('.')[1];
 
-    const templatePath = path.join(
-        await configGet('paths.themes'),
-        templatePathName
-    );
+    if (prssConfig.themes[theme]) {
+        return await getUrl(
+            prssConfig.themes[theme] + `/${template}.${extension}`,
+            true
+        );
+    } else {
+        const templateRelPath = templateId.split('.').join('/');
+        const templatePathName = `${templateRelPath}.${extension}`;
 
-    return fs.readFileSync(templatePath, 'utf8');
+        const templatePath = path.join(
+            await configGet('paths.themes'),
+            templatePathName
+        );
+
+        return fs.readFileSync(templatePath, 'utf8');
+    }
 };
 
 export const getThemeIndex = async (themeName: string) => {
-    const themeDir = path.join(
-        await configGet('paths.themes'),
-        themeName,
-        'index.html'
-    );
-    return fs.readFileSync(themeDir, 'utf8');
+    if (prssConfig.themes[themeName]) {
+        return (await getUrl(
+            prssConfig.themes[themeName] + '/index.html',
+            true
+        )) as string;
+    } else {
+        const themeDir = path.join(
+            await configGet('paths.themes'),
+            themeName,
+            'index.html'
+        );
+        return fs.readFileSync(themeDir, 'utf8');
+    }
 };
 
 export const getDefaultReadme = () => {
@@ -59,22 +77,21 @@ export const getThemeList = async () => {
     const templateList = getDirPaths(themeDir).map(filePath =>
         path.basename(filePath)
     );
-    return templateList;
+
+    const officialThemes = Object.keys(prssConfig.themes || {});
+    const localThemes = templateList.filter(
+        theme => !officialThemes.includes(theme)
+    );
+
+    return [...officialThemes, ...localThemes].sort();
 };
 
 export const getTemplateList = async themeName => {
-    const themeDir = path.join(await configGet('paths.themes'), themeName);
-    const themeManifest = (await getThemeManifest(themeName)) || {};
-    const templateExtension = getParserTemplateExtension(themeManifest.parser);
-
-    const templateList = getFilePaths(themeDir)
-        .filter(
-            filePath =>
-                templateExtension === path.extname(filePath).replace('.', '')
-        )
-        .map(filePath => path.basename(filePath, path.extname(filePath)));
-
-    return templateList;
+    const res =
+        getCache(`manifest-${themeName}`) ||
+        ((await getThemeManifest(themeName)) as any) ||
+        {};
+    return res.templates;
 };
 
 export const getThemeManifest = async (theme: string) => {
@@ -88,7 +105,12 @@ export const getThemeManifest = async (theme: string) => {
         'manifest.json'
     );
 
-    return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    const manifest = prssConfig.themes[theme]
+        ? await getJson(prssConfig.themes[theme] + '/manifest.json', true)
+        : JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
+    setCache(`manifest-${theme}`, manifest);
+    return manifest;
 };
 
 export const baseTemplate = ({ head = '', body = '' }: any) => {

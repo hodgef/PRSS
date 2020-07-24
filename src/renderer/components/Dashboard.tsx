@@ -15,6 +15,8 @@ import { buildAndDeploy, getRepositoryUrl } from '../services/hosting';
 import { toast } from 'react-toastify';
 import Loading from './Loading';
 import { getSite } from '../services/db';
+import { prssConfig } from '../../common/bootstrap';
+import { getThemeManifest } from '../services/theme';
 
 interface IProps {
     setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -59,6 +61,15 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
             setSite(res);
             setRepositoryUrl(repositoryUrl);
             setPublishSuggested(siteConf.publishSuggested);
+
+            const theme = res.theme;
+
+            /**
+             * If official theme, fetch manifest
+             */
+            if (prssConfig.themes[theme]) {
+                getThemeManifest(theme);
+            }
         };
         getData();
     }, []);

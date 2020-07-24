@@ -3,6 +3,7 @@ import { parseHtmlParams, minifyHTML, minifyJS } from '..';
 import { sanitizeBufferItem, stripTags, truncateString } from '../../utils';
 import { configFileName } from '../../build';
 import { parseShortcodes } from '../../shortcode';
+import { prssConfig } from '../../../../common/bootstrap';
 
 const reactHandlerExtension = 'js';
 
@@ -11,18 +12,36 @@ const reactHandlerExtension = 'js';
  */
 const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
     const templateIndex = await getThemeIndex(data.site.theme);
-    const templateJs = await getTemplate(templateId, reactHandlerExtension);
-    const templateName = templateId.split('.')[1];
-    const time = Date.now();
+    const officialThemePath = prssConfig.themes[data.site.theme];
 
+    /**
+     * If it's an official template, it will be linked from npm,
+     * If it's an user template, it will be fetched from disk
+     */
+    const templateJs = !officialThemePath
+        ? await getTemplate(templateId, reactHandlerExtension)
+        : '';
+
+    const templateName = templateId.split('.')[1];
+
+    const baseTemplatePath = officialThemePath
+        ? officialThemePath + '/'
+        : data.rootPath + 'templates/';
+    const templatePath =
+        baseTemplatePath + `${templateName}.${reactHandlerExtension}`;
+
+    const templateTag = officialThemePath
+        ? `<script crossorigin src="${templatePath}"></script>`
+        : `<script src="${templatePath}"></script>`;
+
+    /**
+     * Html parsing
+     */
     const headHtml = parseHtmlParams(data.headHtml, data);
     const footerHtml = parseHtmlParams(data.footerHtml, data);
     const sidebarHtml = minifyHTML(parseHtmlParams(data.sidebarHtml, data));
 
     const configPath = data.rootPath + configFileName;
-    const baseTemplatePath = data.rootPath + 'templates/';
-    const templatePath =
-        baseTemplatePath + `${templateName}.${reactHandlerExtension}`;
 
     const parseVars = vars => {
         const parsedVars = {};
@@ -102,9 +121,9 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
             `
         <script crossorigin src="https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js"></script>
         <script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js"></script>
-        <script src="${templatePath}"></script>
+        ${templateTag}
         <script src="${configPath}"></script>
-        <script src="index.js?v=${time}"></script>
+        [[index.js]]
         ${footerHtml}
         </body>
     `
@@ -116,8 +135,6 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
         <div id="root"></div>
     `
         );
-
-    const html = minifyHTML(parsedHtml);
 
     const parsedData = {
         ...data,
@@ -141,15 +158,25 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
     `
     );
 
-    return [
-        { name: 'index.html', content: html, path: './' },
-        { name: 'index.js', content: js, path: './' },
-        {
+    const html = minifyHTML(parsedHtml).replace(
+        '[[index.js]]',
+        `<script>${js}</script>`
+    );
+
+    const output = [
+        { name: 'index.html', content: html, path: './' }
+        //{ name: 'index.js', content: js, path: './' },
+    ];
+
+    if (!officialThemePath) {
+        output.push({
             name: `${templateName}.js`,
             content: templateJs,
             path: baseTemplatePath
-        }
-    ];
+        });
+    }
+
+    return output;
 };
 
 export { reactHandler, reactHandlerExtension };

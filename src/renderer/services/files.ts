@@ -14,7 +14,5 @@ export const getDirPaths = dir =>
     fs.readdirSync(dir).reduce((files, file) => {
         const name = path.join(dir, file);
         const isDirectory = fs.statSync(name).isDirectory();
-        return !isDirectory
-            ? [...files, ...getFilePaths(name)]
-            : [...files, name];
+        return !isDirectory ? [...files] : [...files, name];
     }, []);

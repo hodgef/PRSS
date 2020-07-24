@@ -20,7 +20,7 @@ import { getThemeManifest, getDefaultReadme } from './theme';
 import { getSite, getItems, getItem } from './db';
 import { getRootPost } from './hosting';
 
-export const bufferPathFileNames = ['index.html', 'index.js'];
+export const bufferPathFileNames = ['index.html' /*, 'index.js'*/];
 export const configFileName = 'config.js';
 export const itemsFileName = 'items.js';
 
@@ -289,7 +289,7 @@ export const loadBuffer: loadBufferType = (
     bufferItems: IBufferItem[],
     onUpdate = () => {}
 ) => {
-    return sequential(bufferItems, buildBufferItem, 300, onUpdate, false);
+    return sequential(bufferItems, buildBufferItem, 0, onUpdate, false);
 };
 
 export const buildBufferSiteConfig = async (siteUUID: string) => {

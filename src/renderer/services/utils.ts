@@ -3,8 +3,7 @@ import { getString, configGet, configSet } from '../../common/utils';
 import { modal } from '../components/Modal';
 import stopwords from '../json/stopwords.json';
 import React from 'react';
-import versionCompare from 'semver-compare';
-import { getApiUrl } from '../../common/bootstrap';
+import { getApiUrl, getCache, setCache } from '../../common/bootstrap';
 
 export const merge = (var1, var2) => {
     if (Array.isArray(var1) && Array.isArray(var2)) {
@@ -52,20 +51,47 @@ export const camelCase = (str: string) => {
         .replace(/\s+/g, '');
 };
 
-export const getJson = url => {
+export const getJson = (url, cache = false) => {
     const userAgent =
         process.env.NODE_ENV !== 'production' ? 'PRSS_DEV' : 'PRSS';
     return new Promise(resolve => {
-        require('request')(
-            {
-                url: url,
-                json: true,
-                headers: { 'User-Agent': userAgent }
-            },
-            function(error, response, body) {
-                resolve(body);
-            }
-        );
+        if (cache && getCache(url)) {
+            resolve(getCache(url));
+        } else {
+            require('request')(
+                {
+                    url: url,
+                    json: true,
+                    headers: { 'User-Agent': userAgent }
+                },
+                function(error, response, body) {
+                    cache && setCache(url, body);
+                    resolve(body);
+                }
+            );
+        }
+    });
+};
+
+export const getUrl = (url, cache = false) => {
+    const userAgent =
+        process.env.NODE_ENV !== 'production' ? 'PRSS_DEV' : 'PRSS';
+    return new Promise(resolve => {
+        if (cache && getCache(url)) {
+            resolve(getCache(url));
+        } else {
+            require('request')(
+                {
+                    url: url,
+                    json: false,
+                    headers: { 'User-Agent': userAgent }
+                },
+                function(error, response, body) {
+                    cache && setCache(url, body);
+                    resolve(body);
+                }
+            );
+        }
     });
 };
 
@@ -301,6 +327,11 @@ export const sanitizeSite = siteObj => {
     return newObj;
 };
 
+export const getPRSSConfig = async () => {
+    const res = ((await getJson(getApiUrl('/config'))) || {}) as any;
+    return res;
+};
+
 export const getLatestVersion = async () => {
     const res = ((await getJson(getApiUrl('/version'))) || {}) as any;
     return res;
@@ -355,27 +386,6 @@ export const notifyNewVersion = async newVersion => {
     } else if (response === 1) {
         configSet('updateCheckSnoozeUntil', Date.now() + 604800000);
     }
-};
-
-export const checkUpdates = (currentVersion, shouldPrompt) => {
-    return new Promise(resolve => {
-        try {
-            getLatestVersion().then(async res => {
-                const latestVersion = res.latest;
-                if (latestVersion) {
-                    if (versionCompare(latestVersion, currentVersion) > 0) {
-                        // if (shouldPrompt) {
-                        //     notifyNewVersion(latestVersion);
-                        // }
-                        resolve(latestVersion);
-                    }
-                }
-            });
-        } catch (e) {
-            console.error(e);
-            resolve();
-        }
-    });
 };
 
 export const sanitizeSiteItems = items => {

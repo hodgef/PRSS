@@ -7,6 +7,12 @@
         .theme-list {
             flex: 1;
             width: 100%;
+
+            .right-align .material-icons {
+                font-size: 21px;
+                color: #eaad24;
+                opacity: 0.6;
+            }
         }
 
         .theme-list-item {

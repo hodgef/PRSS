@@ -19,7 +19,6 @@ import ThemeManager from './ThemeManager';
 import ListMenus from './ListMenus';
 import MenuEditor from './MenuEditor';
 import { configGet } from '../../common/utils';
-import { getCurrentVersion, checkUpdates } from '../services/utils';
 import Header from './Header';
 import SiteSetup from './SiteSetup';
 import RouteWrapper from './RouteWrapper';
@@ -28,28 +27,6 @@ const App: FunctionComponent = () => {
     const [headerLeft, setHeaderLeft] = useState(null);
     const [appClass, setAppClass] = useState('');
     const [history, setHistory] = useState(null);
-    const [version, setVersion] = useState(null);
-    const [newVersion, setNewVersion] = useState(null);
-
-    useEffect(() => {
-        const currentVersion = getCurrentVersion();
-        setVersion(currentVersion);
-
-        if (!configGet('disableUpdateCheck')) {
-            const shouldPrompt =
-                !configGet('updateCheckSnoozeUntil') ||
-                (configGet('updateCheckSnoozeUntil') &&
-                    configGet('updateCheckSnoozeUntil') < Date.now());
-            checkUpdates(currentVersion, shouldPrompt).then(latestVersion => {
-                if (
-                    latestVersion &&
-                    versionCompare(latestVersion, currentVersion) > 0
-                ) {
-                    setNewVersion(latestVersion);
-                }
-            });
-        }
-    }, []);
 
     const commonProps = {
         setHeaderLeftComponent: value => {
@@ -57,9 +34,7 @@ const App: FunctionComponent = () => {
         },
         setAppClass: value => {
             setAppClass(value);
-        },
-        version,
-        newVersion
+        }
     };
 
     const handleRoute = (RouteComponent, props) => {
@@ -76,12 +51,7 @@ const App: FunctionComponent = () => {
     return (
         <div className={cx('app-content', appClass)}>
             <div className="app-background" />
-            <Header
-                headerLeft={headerLeft}
-                history={history}
-                version={version}
-                newVersion={newVersion}
-            />
+            <Header headerLeft={headerLeft} history={history} />
             <HashRouter>
                 <Switch>
                     <Route

@@ -4,7 +4,8 @@ import fs from 'fs';
 import knex from 'knex';
 import {
     mapFieldsFromJSON,
-    getGithubSecureAuth
+    getGithubSecureAuth,
+    getPRSSConfig
 } from '../renderer/services/utils';
 
 const JSON_FIELDS = [
@@ -27,6 +28,8 @@ let db;
 let expressApp;
 let expressServer;
 let hooks = {};
+let prssConfig;
+const cache = {};
 
 const expressUrl = 'http://127.0.0.1:3001';
 const getApiUrl = (path = '/') => `https://app.prss.io/api${path}`;
@@ -49,6 +52,14 @@ const runHook = (name, params?) => {
 const clearHooks = () => {
     hooks = {};
 };
+
+const setCache = (name, val) => {
+    cache[name] = val;
+};
+
+const getCache = name => cache[name];
+
+const deleteCache = name => delete cache[name];
 
 const initDb = async () => {
     const storePath = await store.get('paths.db');
@@ -133,18 +144,31 @@ const initStore = () => {
         });
 
         const paths = (await store.get('paths')) || {};
+        const envPath = path.join(__static, 'env');
+        const assetsPath = path.join(__static, 'assets');
+        const themesPath = path.join(__static, 'themes');
+        const bufferPath = path.join(__static, 'buffer');
+        const publicPath = path.join(__static, 'public');
+        const vendorPath = path.join(__static, 'vendor');
 
         store.set({
             paths: {
                 ...paths,
-                env: path.join(__static, 'env'),
-                assets: path.join(__static, 'assets'),
-                buffer: path.join(__static, 'buffer'),
-                public: path.join(__static, 'public'),
-                themes: path.join(__static, 'themes'),
-                vendor: path.join(__static, 'vendor')
+                env: envPath,
+                assets: assetsPath,
+                buffer: bufferPath,
+                public: publicPath,
+                themes: themesPath,
+                vendor: vendorPath
             }
         });
+
+        /**
+         * Creating themes dir if it doesn't exist
+         */
+        if (!fs.existsSync(themesPath)) {
+            fs.mkdirSync(themesPath);
+        }
 
         resolve();
     });
@@ -184,6 +208,7 @@ const expressOpen = path => {
 };
 
 const init = async () => {
+    prssConfig = await getPRSSConfig();
     await initStore();
     await initDb();
     await initExpress();
@@ -195,6 +220,10 @@ export {
     db,
     expressApp,
     expressServer,
+    prssConfig,
+    getCache,
+    setCache,
+    deleteCache,
     expressOpen,
     getApiUrl,
     setHook,

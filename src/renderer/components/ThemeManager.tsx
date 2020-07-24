@@ -20,6 +20,7 @@ import { getThemeListDetails } from '../services/theme';
 import defaultThumbnail from '../images/defaultThemeThumbnail.png';
 import { getSite, updateSite } from '../services/db';
 import { configSet, configGet } from '../../common/utils';
+import { prssConfig } from '../../common/bootstrap';
 
 interface IProps {
     setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -218,12 +219,17 @@ const ThemeManager: FunctionComponent<IProps> = ({
                             author === 'Francisco Hodge' ? 'PRSS' : author;
 
                         try {
-                            image =
-                                'data:image/png;base64,' +
-                                fs.readFileSync(
-                                    path.join(themeDir, 'thumbnail.png'),
-                                    { encoding: 'base64' }
-                                );
+                            if (prssConfig.themes[name]) {
+                                image =
+                                    prssConfig.themes[name] + '/thumbnail.png';
+                            } else {
+                                image =
+                                    'data:image/png;base64,' +
+                                    fs.readFileSync(
+                                        path.join(themeDir, 'thumbnail.png'),
+                                        { encoding: 'base64' }
+                                    );
+                            }
                         } catch (e) {
                             console.error(e);
                         }
@@ -252,15 +258,13 @@ const ThemeManager: FunctionComponent<IProps> = ({
                                             <span>{title || name}</span>
                                         </div>
                                         <div className="right-align">
-                                            {[
-                                                'blog',
-                                                'docs',
-                                                'showcase',
-                                                'multi'
-                                            ].includes(type) && (
-                                                <div className="text-tag">
-                                                    {type}
-                                                </div>
+                                            {prssConfig.themes[name] && (
+                                                <span
+                                                    className="material-icons"
+                                                    title="Official Theme"
+                                                >
+                                                    star
+                                                </span>
                                             )}
                                         </div>
                                     </div>

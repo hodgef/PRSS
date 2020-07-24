@@ -19,27 +19,24 @@ import restoreImg from '../images/icons/restore-k-30.png';
 import closeImg from '../images/icons/close-k-30.png';
 
 import { configGet } from '../../common/utils';
-import { notifyNewVersion } from '../services/utils';
 import { modal } from './Modal';
 import AboutModalContent from './AboutModalContent';
+import { getCurrentVersion, notifyNewVersion } from '../services/utils';
+import { prssConfig } from '../../common/bootstrap';
+import versionCompare from 'semver-compare';
 
 interface IProps {
     headerLeft?: ReactNode;
     history: any;
-    version: string;
-    newVersion: string;
 }
 
-const Header: FunctionComponent<IProps> = ({
-    headerLeft,
-    history,
-    version,
-    newVersion
-}) => {
+const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const headerMore = useRef(null);
     const hasSites = configGet('sites') || {};
     const [isMaximized, setIsMaximized] = useState(false);
+    const currentVersion = getCurrentVersion();
+    const latestVersion = prssConfig.version;
 
     const toggleMaximize = () => {
         const newState = !win.isMaximized();
@@ -106,11 +103,14 @@ const Header: FunctionComponent<IProps> = ({
                                     onClick={() => setShowMoreMenu(false)}
                                 ></div>
                                 <ul className="drop-menu">
-                                    {newVersion && (
+                                    {versionCompare(
+                                        latestVersion,
+                                        currentVersion
+                                    ) > 0 && (
                                         <li
                                             className="clickable highlight-li"
                                             onClick={() => {
-                                                notifyNewVersion(newVersion);
+                                                notifyNewVersion(latestVersion);
                                             }}
                                         >
                                             <span className="material-icons">
@@ -137,7 +137,7 @@ const Header: FunctionComponent<IProps> = ({
                                             setShowMoreMenu(false);
                                             modal.alert(
                                                 <AboutModalContent
-                                                    version={version}
+                                                    version={currentVersion}
                                                 />,
                                                 false,
                                                 'about-modal'
