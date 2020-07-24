@@ -9,7 +9,8 @@
         "dist": "npm run build && electron-builder",
         "dist:dir": "npm run dist --dir -c.compression=store -c.mac.identity=null",
         "rebuild": "electron-rebuild -f -w sqlite3",
-        "licenses": "npm-license-crawler -onlyDirectDependencies -json src/renderer/json/licenses.json"
+        "licenses": "npm-license-crawler -onlyDirectDependencies -json src/renderer/json/licenses.json",
+        "postinstall": "electron-builder install-app-deps"
     },
     "author": {
         "name": "Francisco Hodge",
@@ -26,7 +27,7 @@
         "knex": "^0.21.1",
         "sitemap": "^6.1.5",
         "source-map-support": "^0.5.12",
-        "sqlite3": "^4.2.0"
+        "sqlite3": "^5.0.0"
     },
     "devDependencies": {
         "@babel/preset-react": "^7.8.3",
@@ -123,7 +124,11 @@
             "entitlements": "build/entitlements.mac.plist",
             "entitlementsInherit": "./build/entitlements.mac.plist",
             "icon": "static/icons/icon.icns",
-            "target": "dmg",
+            "target": [
+                "dmg",
+                "zip",
+                "mas"
+            ],
             "hardenedRuntime": true,
             "provisioningProfile": "embedded.provisionprofile"
         },

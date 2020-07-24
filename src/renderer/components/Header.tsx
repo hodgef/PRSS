@@ -110,6 +110,7 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
                                         <li
                                             className="clickable highlight-li"
                                             onClick={() => {
+                                                setShowMoreMenu(false);
                                                 notifyNewVersion(latestVersion);
                                             }}
                                         >
