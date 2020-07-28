@@ -152,7 +152,6 @@ class GithubProvider {
             runCommand(bufferDir, `echo "${repositoryName}" > README.md`);
             runCommand(bufferDir, 'git add --all');
             runCommand(bufferDir, 'git commit -m "Initial commit"');
-            runCommand(bufferDir, 'git push --set-upstream origin gh-pages');
             const { error: ghPagesErrCreation } = runCommand(
                 bufferDir,
                 'git push -u origin gh-pages'
@@ -190,7 +189,7 @@ class GithubProvider {
             runCommand(bufferDir, `git clone "${repositoryUrl}" .`);
             runCommand(bufferDir, 'git branch gh-pages');
             runCommand(bufferDir, 'git checkout gh-pages');
-            runCommand(bufferDir, 'git push --set-upstream origin gh-pages');
+            runCommand(bufferDir, 'git pull origin gh-pages');
 
             const buildRes = await build(
                 this.siteUUID,
@@ -213,9 +212,10 @@ class GithubProvider {
                         bufferDir,
                         'git config --global core.autocrlf false'
                     );
+                    runCommand(bufferDir, 'git add --all');
                     const { res: e, error: commitError } = runCommand(
                         bufferDir,
-                        `git add --all && git commit -m "${commitMessage}" && git push`
+                        `git commit -m "${commitMessage}" && git push -u origin gh-pages`
                     );
 
                     if (commitError) {
@@ -301,7 +301,7 @@ class GithubProvider {
             runCommand(bufferDir, `git clone "${repoUrl}" .`);
             runCommand(bufferDir, 'git branch gh-pages');
             runCommand(bufferDir, 'git checkout gh-pages');
-            runCommand(bufferDir, 'git push --set-upstream origin gh-pages');
+            runCommand(bufferDir, 'git pull origin gh-pages');
 
             if (bufferDir && bufferDir.includes('buffer')) {
                 await del([path.join(bufferDir, '*'), '!.git'], {
@@ -310,10 +310,9 @@ class GithubProvider {
             }
 
             runCommand(bufferDir, 'git config --global core.autocrlf false');
-            runCommand(
-                bufferDir,
-                'git add --all && git commit -m "Clearing for deployment" && git push'
-            );
+            runCommand(bufferDir, 'git add --all');
+            runCommand(bufferDir, 'git commit -m "Clearing for deployment"');
+            runCommand(bufferDir, 'git push -u origin gh-pages');
         } catch (e) {
             modal.alert(e.message);
             console.error(e);
