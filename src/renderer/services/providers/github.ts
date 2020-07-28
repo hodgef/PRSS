@@ -1,5 +1,9 @@
 import { updateSite } from './../db';
-import { localStorageGet, configGet } from './../../../common/utils';
+import {
+    localStorageGet,
+    configGet,
+    runCommand
+} from './../../../common/utils';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
@@ -63,21 +67,9 @@ class GithubProvider {
         }
 
         /**
-         * Deploy project to set up repo's master branch
+         * Prepare repo for first deployment
          */
-        await this.deploy(
-            onUpdate,
-            null,
-            true,
-            false,
-            'Preparing',
-            'Initial Commit'
-        );
-
-        /**
-         * Enabling pages site
-         */
-        const siteUrl = await this.enablePagesSite();
+        const siteUrl = (await this.prepareForFirstDeployment()) as string;
 
         if (!siteUrl) {
             if (!modal.isShown()) {
@@ -97,7 +89,6 @@ class GithubProvider {
          * Deploy project (for real this time)
          */
         await this.deploy(onUpdate, null, true, false);
-
         return true;
     };
 
@@ -132,7 +123,47 @@ class GithubProvider {
     getRepositoryUrl = async () => {
         const repositoryName = await this.getRepositoryName();
         const username = await this.getUsername();
-        return `https://${this.vars.baseUrl()}/${username}/${repositoryName}`;
+        return `https://${this.vars.baseUrl()}/${username}/${repositoryName}.git`;
+    };
+
+    /**
+     * Hacky workaround until GitHub fixes Pages API
+     * https://github.community/t/cannot-enable-github-pages-via-api-blank-500-error/124406/6
+     */
+    prepareForFirstDeployment = async () => {
+        return new Promise(async resolve => {
+            const bufferDir = configGet('paths.buffer');
+            const username = await this.getUsername();
+            const repositoryName = await this.getRepositoryName();
+            const repositoryUrl = await this.getRepositoryUrl();
+
+            /**
+             * Clearing buffer
+             */
+            await clearBuffer(true);
+
+            /**
+             * Creating gh-pages branch
+             */
+            runCommand(bufferDir, `git clone "${repositoryUrl}" .`);
+            runCommand(bufferDir, 'git branch gh-pages');
+            runCommand(bufferDir, 'git checkout gh-pages');
+            runCommand(bufferDir, 'git config --global core.autocrlf false');
+            runCommand(bufferDir, `echo "${repositoryName}" > README.md`);
+            runCommand(bufferDir, 'git add --all');
+            runCommand(bufferDir, 'git commit -m "Initial commit"');
+            runCommand(bufferDir, 'git push --set-upstream origin gh-pages');
+            const { error: ghPagesErrCreation } = runCommand(
+                bufferDir,
+                'git push -u origin gh-pages'
+            );
+
+            if (!ghPagesErrCreation) {
+                resolve(`https://${username}.github.io/${repositoryName}/`);
+            } else {
+                resolve('');
+            }
+        });
     };
 
     deploy = async (
@@ -156,9 +187,10 @@ class GithubProvider {
          */
         try {
             const bufferDir = configGet('paths.buffer');
-            const execSync = require('child_process').execSync;
-
-            execSync(`cd "${bufferDir}" && git clone "${repositoryUrl}" .`);
+            runCommand(bufferDir, `git clone "${repositoryUrl}" .`);
+            runCommand(bufferDir, 'git branch gh-pages');
+            runCommand(bufferDir, 'git checkout gh-pages');
+            runCommand(bufferDir, 'git push --set-upstream origin gh-pages');
 
             const buildRes = await build(
                 this.siteUUID,
@@ -177,14 +209,20 @@ class GithubProvider {
 
             await new Promise(resolve => {
                 setTimeout(() => {
-                    try {
-                        execSync(
-                            `cd "${bufferDir}" && git add --all && git commit -m "${commitMessage}" && git push`
-                        );
-                    } catch (e) {
+                    runCommand(
+                        bufferDir,
+                        'git config --global core.autocrlf false'
+                    );
+                    const { res: e, error: commitError } = runCommand(
+                        bufferDir,
+                        `git add --all && git commit -m "${commitMessage}" && git push`
+                    );
+
+                    if (commitError) {
                         modal.alert(e.message);
                         console.error(e);
                     }
+
                     resolve();
                 }, 1000);
             });
@@ -260,9 +298,10 @@ class GithubProvider {
          */
         try {
             const bufferDir = configGet('paths.buffer');
-            const execSync = require('child_process').execSync;
-
-            execSync(`cd "${bufferDir}" && git clone "${repoUrl}" .`);
+            runCommand(bufferDir, `git clone "${repoUrl}" .`);
+            runCommand(bufferDir, 'git branch gh-pages');
+            runCommand(bufferDir, 'git checkout gh-pages');
+            runCommand(bufferDir, 'git push --set-upstream origin gh-pages');
 
             if (bufferDir && bufferDir.includes('buffer')) {
                 await del([path.join(bufferDir, '*'), '!.git'], {
@@ -270,8 +309,10 @@ class GithubProvider {
                 });
             }
 
-            execSync(
-                `cd "${bufferDir}" && git add --all && git commit -m "Clearing for deployment" && git push`
+            runCommand(bufferDir, 'git config --global core.autocrlf false');
+            runCommand(
+                bufferDir,
+                'git add --all && git commit -m "Clearing for deployment" && git push'
             );
         } catch (e) {
             modal.alert(e.message);

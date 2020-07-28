@@ -1,9 +1,6 @@
 import { store } from './bootstrap';
 import strings from './strings.json';
 
-/**
- * Store
- */
 export const configSet = (...params) =>
     typeof params[0] === 'object'
         ? store.set(params[0])
@@ -12,6 +9,9 @@ export const configGet = (param: any) => store.get(param);
 export const configRem = (param: any) => store.delete(param);
 
 export const globalRequire = __non_webpack_require__;
+
+const execSync = require('child_process').execSync;
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
 export const getString = (id: string, replaceWith: string[] = []) => {
     let str = strings[id] || '';
@@ -31,9 +31,6 @@ export const toBase64 = file =>
         reader.onerror = error => reject(error);
     });
 
-/**
- * Store in localstorage
- */
 export const localStorageSet = async (key: string, value: string) => {
     window.localStorage.setItem(key, value);
 };
@@ -44,4 +41,21 @@ export const localStorageGet = async (key: string) => {
 
 export const localStorageDelete = async (key: string) => {
     window.localStorage.removeItem(key);
+};
+
+export const runCommand = (dir, cmd) => {
+    if (!dir) throw new Error('Working dir must be provided.');
+
+    try {
+        const res = execSync(`cd ${dir} && ${cmd}`).toString();
+        if (isDevelopment) {
+            console.log('runCommand', cmd, res);
+        }
+        return { res, error: false };
+    } catch (e) {
+        if (isDevelopment) {
+            console.error('runCommand', cmd, e);
+        }
+        return { res: e, error: true };
+    }
 };
