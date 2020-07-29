@@ -3,6 +3,7 @@ import { build } from '../build';
 import { error, confirmation } from '../utils';
 import { shell } from 'electron';
 import { getSite } from '../db';
+import { storeInt } from '../../../common/bootstrap';
 
 class FallbackProvider {
     private readonly siteUUID: string;
@@ -76,7 +77,7 @@ class FallbackProvider {
         }
 
         if (confirmationRes === 1) {
-            const bufferDir = configGet('paths.buffer');
+            const bufferDir = storeInt.get('paths.buffer');
 
             // if (providedBufferItems && providedBufferItems.length) {
             //     if (providedBufferItems.length > 1) {

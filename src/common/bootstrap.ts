@@ -7,6 +7,7 @@ import {
     getGithubSecureAuth,
     getPRSSConfig
 } from '../renderer/services/utils';
+import { getConfigPath } from './utils';
 
 const JSON_FIELDS = [
     'structure',
@@ -18,12 +19,16 @@ const JSON_FIELDS = [
 
 const { app } = require('electron').remote;
 
-const defaults = {
-    sites: {},
+const defaultsInt = {
     paths: {}
+} as IStoreInternal;
+
+const defaults = {
+    sites: {}
 } as IStore;
 
 let store;
+let storeInt;
 let db;
 let expressApp;
 let expressServer;
@@ -62,8 +67,8 @@ const getCache = name => cache[name];
 const deleteCache = name => delete cache[name];
 
 const initDb = async () => {
-    const storePath = await store.get('paths.db');
-    const dbFile = path.join(storePath || app.getPath('userData'), 'prss.db');
+    const storePath = await getConfigPath();
+    const dbFile = path.join(storePath, 'prss.db');
     const dbExists = fs.existsSync(dbFile);
 
     db = knex({
@@ -138,29 +143,44 @@ const initStore = () => {
             resolve();
         }
 
-        store = new Store({
-            name: 'prss',
-            defaults
-        });
+        /**
+         * StoreInt
+         */
+        storeInt = new Store({
+            name: 'prss-int',
+            defaultsInt
+        } as any);
 
-        const paths = (await store.get('paths')) || {};
+        const paths = (await storeInt.get('paths')) || {};
+
         const envPath = path.join(__static, 'env');
+        const configPath = await getConfigPath();
         const assetsPath = path.join(__static, 'assets');
         const themesPath = path.join(__static, 'themes');
         const bufferPath = path.join(__static, 'buffer');
         const publicPath = path.join(__static, 'public');
         const vendorPath = path.join(__static, 'vendor');
 
-        store.set({
+        storeInt.set({
             paths: {
                 ...paths,
                 env: envPath,
+                config: configPath,
                 assets: assetsPath,
                 buffer: bufferPath,
                 public: publicPath,
                 themes: themesPath,
                 vendor: vendorPath
             }
+        });
+
+        /**
+         * Store
+         */
+        store = new Store({
+            name: 'prss',
+            cwd: configPath,
+            defaults
         });
 
         /**
@@ -217,6 +237,7 @@ const init = async () => {
 export {
     init,
     store,
+    storeInt,
     db,
     expressApp,
     expressServer,

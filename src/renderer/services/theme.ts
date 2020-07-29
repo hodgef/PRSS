@@ -2,9 +2,13 @@ import fs from 'fs';
 import path from 'path';
 
 import { getDirPaths } from './files';
-import { configGet } from '../../common/utils';
 import { getJson, getUrl } from './utils';
-import { prssConfig, setCache, getCache } from '../../common/bootstrap';
+import {
+    prssConfig,
+    setCache,
+    getCache,
+    storeInt
+} from '../../common/bootstrap';
 
 export const getTemplate = async (templateId: string, extension: string) => {
     const theme = templateId.split('.')[0];
@@ -20,7 +24,7 @@ export const getTemplate = async (templateId: string, extension: string) => {
         const templatePathName = `${templateRelPath}.${extension}`;
 
         const templatePath = path.join(
-            await configGet('paths.themes'),
+            await storeInt.get('paths.themes'),
             templatePathName
         );
 
@@ -36,7 +40,7 @@ export const getThemeIndex = async (themeName: string) => {
         )) as string;
     } else {
         const themeDir = path.join(
-            await configGet('paths.themes'),
+            await storeInt.get('paths.themes'),
             themeName,
             'index.html'
         );
@@ -45,14 +49,14 @@ export const getThemeIndex = async (themeName: string) => {
 };
 
 export const getDefaultReadme = () => {
-    const assetsDir = configGet('paths.assets');
+    const assetsDir = storeInt.get('paths.assets');
     const readmePath = path.join(assetsDir, 'README.md');
     return fs.readFileSync(readmePath, 'utf8');
 };
 
 export const getThemeListDetails = async () => {
     const themeNameList = await getThemeList();
-    const themePath = await configGet('paths.themes');
+    const themePath = await storeInt.get('paths.themes');
 
     const manifestPromises = [];
 
@@ -73,7 +77,7 @@ export const getThemeListDetails = async () => {
 };
 
 export const getThemeList = async () => {
-    const themeDir = await configGet('paths.themes');
+    const themeDir = await storeInt.get('paths.themes');
     const templateList = getDirPaths(themeDir).map(filePath =>
         path.basename(filePath)
     );
@@ -100,7 +104,7 @@ export const getThemeManifest = async (theme: string) => {
     }
 
     const manifestPath = path.join(
-        await configGet('paths.themes'),
+        await storeInt.get('paths.themes'),
         theme,
         'manifest.json'
     );

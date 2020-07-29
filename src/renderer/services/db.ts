@@ -44,7 +44,7 @@ export const deleteSite = async (siteUUID: string) => {
     /**
      * Delete public folder
      */
-    // const publicDir = path.join(configGet('paths.public'), siteName);
+    // const publicDir = path.join(storeInt.get('paths.public'), siteName);
 
     // if (!fs.existsSync(publicDir)) {
     //     fs.mkdirSync(publicDir);

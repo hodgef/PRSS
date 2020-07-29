@@ -118,6 +118,10 @@ app.on('window-all-closed', () => {
   }
 });
 
+process.on('exit', () => {
+  app.quit();
+});
+
 app.on('activate', () => {
   // on macOS it is common to re-create a window even after all windows have been closed
   if (mainWindow === null) {

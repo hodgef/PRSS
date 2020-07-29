@@ -23,6 +23,7 @@ import { sequential } from './../utils';
 import { modal } from '../../components/Modal';
 import React from 'react';
 import { getSite } from '../db';
+import { storeInt } from '../../../common/bootstrap';
 
 class GithubProvider {
     private readonly siteUUID: string;
@@ -132,7 +133,7 @@ class GithubProvider {
      */
     prepareForFirstDeployment = async () => {
         return new Promise(async resolve => {
-            const bufferDir = configGet('paths.buffer');
+            const bufferDir = storeInt.get('paths.buffer');
             const username = await this.getUsername();
             const repositoryName = await this.getRepositoryName();
             const repositoryUrl = await this.getRepositoryUrl();
@@ -148,7 +149,7 @@ class GithubProvider {
             runCommand(bufferDir, `git clone "${repositoryUrl}" .`);
             runCommand(bufferDir, 'git branch gh-pages');
             runCommand(bufferDir, 'git checkout gh-pages');
-            runCommand(bufferDir, 'git config --global core.autocrlf false');
+            runCommand(bufferDir, 'git config --global core.safecrlf false');
             runCommand(bufferDir, `echo "${repositoryName}" > README.md`);
             runCommand(bufferDir, 'git add --all');
             runCommand(bufferDir, 'git commit -m "Initial commit"');
@@ -174,7 +175,7 @@ class GithubProvider {
         commitMessage = 'Build update'
     ) => {
         const repositoryUrl = await this.getRepositoryUrl();
-        const bufferDir = configGet('paths.buffer');
+        const bufferDir = storeInt.get('paths.buffer');
 
         /**
          * Clearing buffer
@@ -185,7 +186,7 @@ class GithubProvider {
          * Creating git repo in buffer
          */
         try {
-            const bufferDir = configGet('paths.buffer');
+            const bufferDir = storeInt.get('paths.buffer');
             runCommand(bufferDir, `git clone "${repositoryUrl}" .`);
             runCommand(bufferDir, 'git branch gh-pages');
             runCommand(bufferDir, 'git checkout gh-pages');
@@ -210,7 +211,7 @@ class GithubProvider {
                 setTimeout(() => {
                     runCommand(
                         bufferDir,
-                        'git config --global core.autocrlf false'
+                        'git config --global core.safecrlf false'
                     );
                     runCommand(bufferDir, 'git add --all');
                     const { res: e, error: commitError } = runCommand(
@@ -244,7 +245,7 @@ class GithubProvider {
             itemIdToDeploy
         );
 
-        const bufferDir = configGet('paths.buffer');
+        const bufferDir = storeInt.get('paths.buffer');
 
         const siteConfigFilePath = path.join(bufferDir, configFileName);
 
@@ -297,7 +298,7 @@ class GithubProvider {
          * Creating git repo in buffer
          */
         try {
-            const bufferDir = configGet('paths.buffer');
+            const bufferDir = storeInt.get('paths.buffer');
             runCommand(bufferDir, `git clone "${repoUrl}" .`);
             runCommand(bufferDir, 'git branch gh-pages');
             runCommand(bufferDir, 'git checkout gh-pages');
@@ -309,7 +310,7 @@ class GithubProvider {
                 });
             }
 
-            runCommand(bufferDir, 'git config --global core.autocrlf false');
+            runCommand(bufferDir, 'git config --global core.safecrlf false');
             runCommand(bufferDir, 'git add --all');
             runCommand(bufferDir, 'git commit -m "Clearing for deployment"');
             runCommand(bufferDir, 'git push -u origin gh-pages');

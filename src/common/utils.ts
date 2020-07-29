@@ -1,4 +1,4 @@
-import { store } from './bootstrap';
+import { store, storeInt } from './bootstrap';
 import strings from './strings.json';
 
 export const configSet = (...params) =>
@@ -10,6 +10,7 @@ export const configRem = (param: any) => store.delete(param);
 
 export const globalRequire = __non_webpack_require__;
 
+const { app } = require('electron').remote;
 const execSync = require('child_process').execSync;
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -58,4 +59,8 @@ export const runCommand = (dir, cmd) => {
         }
         return { res: e, error: true };
     }
+};
+
+export const getConfigPath = async () => {
+    return (await storeInt.get('paths.config')) || app.getPath('userData');
 };

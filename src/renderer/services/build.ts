@@ -19,6 +19,7 @@ import { modal } from '../components/Modal';
 import { getThemeManifest, getDefaultReadme } from './theme';
 import { getSite, getItems, getItem } from './db';
 import { getRootPost } from './hosting';
+import { storeInt } from '../../common/bootstrap';
 
 export const bufferPathFileNames = ['index.html' /*, 'index.js'*/];
 export const configFileName = 'config.js';
@@ -101,8 +102,8 @@ export const build = async (
 };
 
 export const createPublicDir = (dirPath: string) => {
-    const assetsDir = configGet('paths.assets');
-    const publicDir = configGet('paths.public');
+    const assetsDir = storeInt.get('paths.assets');
+    const publicDir = storeInt.get('paths.public');
 
     try {
         /**
@@ -145,7 +146,7 @@ export const createSiteMap = async (
     onUpdate?
 ) => {
     const { SitemapStream, streamToPromise } = require('sitemap');
-    const bufferDir = configGet('paths.buffer');
+    const bufferDir = storeInt.get('paths.buffer');
 
     if (onUpdate) {
         onUpdate('Generating Sitemap');
@@ -192,8 +193,8 @@ export const createSiteMap = async (
 };
 
 export const copyPublicToBuffer = siteName => {
-    const bufferDir = configGet('paths.buffer');
-    const publicDir = path.join(configGet('paths.public'), siteName);
+    const bufferDir = storeInt.get('paths.buffer');
+    const publicDir = path.join(storeInt.get('paths.public'), siteName);
 
     if (!fs.existsSync(publicDir)) {
         createPublicDir(publicDir);
@@ -260,7 +261,7 @@ export const getFilteredBufferItems = async (
 
 export const clearBuffer = (noExceptions = false) => {
     return new Promise(async resolve => {
-        const bufferDir = configGet('paths.buffer');
+        const bufferDir = storeInt.get('paths.buffer');
 
         if (bufferDir && bufferDir.includes('buffer')) {
             if (noExceptions) {
@@ -297,7 +298,7 @@ export const buildBufferSiteConfig = async (siteUUID: string) => {
         throw new Error('buildBufferSiteConfig: siteUUID must be a string');
     }
 
-    const bufferDir = configGet('paths.buffer');
+    const bufferDir = storeInt.get('paths.buffer');
     const site = await getSite(siteUUID);
 
     const { code } = minify(
@@ -314,7 +315,7 @@ export const buildBufferSiteConfig = async (siteUUID: string) => {
 };
 
 export const buildBufferSiteItemsConfig = async (siteUUID: string) => {
-    const bufferDir = configGet('paths.buffer');
+    const bufferDir = storeInt.get('paths.buffer');
     const items = await getItems(siteUUID);
     const { code } = minify(
         `var PRSSItems = ${JSON.stringify(sanitizeSiteItems(items))}`
@@ -340,7 +341,7 @@ export const buildBufferItem = async (bufferItem: IBufferItem) => {
         return false;
     }
 
-    const bufferDir = configGet('paths.buffer');
+    const bufferDir = storeInt.get('paths.buffer');
     const itemDir = path.join(bufferDir, itemPath);
     const outputFiles = (await handler(
         templateId,

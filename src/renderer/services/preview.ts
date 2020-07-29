@@ -1,5 +1,6 @@
-import { globalRequire, configGet } from './../../common/utils';
+import { globalRequire } from './../../common/utils';
 import { build } from './build';
+import { storeInt } from '../../common/bootstrap';
 
 export const previewServer = globalRequire('browser-sync').create('prss');
 
@@ -25,7 +26,7 @@ export const startPreview = (startPath = '/') => {
     stopPreview();
 
     if (!previewServer.active) {
-        const bufferDir = configGet('paths.buffer');
+        const bufferDir = storeInt.get('paths.buffer');
         previewServer.init({
             server: bufferDir,
             startPath

@@ -75,7 +75,6 @@ interface ISitesInternal {
 }
 
 interface IStoreInternal {
-    sites: ISitesInternal;
     paths: IPaths;
 }
 

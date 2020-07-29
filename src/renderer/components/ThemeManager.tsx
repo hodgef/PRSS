@@ -19,8 +19,8 @@ import { shell } from 'electron';
 import { getThemeListDetails } from '../services/theme';
 import defaultThumbnail from '../images/defaultThemeThumbnail.png';
 import { getSite, updateSite } from '../services/db';
-import { configSet, configGet } from '../../common/utils';
-import { prssConfig } from '../../common/bootstrap';
+import { configSet } from '../../common/utils';
+import { prssConfig, storeInt } from '../../common/bootstrap';
 
 interface IProps {
     setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -175,7 +175,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
             return;
         }
 
-        const themesDir = configGet('paths.themes');
+        const themesDir = storeInt.get('paths.themes');
         shell.openPath(themesDir);
     };
 

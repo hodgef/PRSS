@@ -20,6 +20,7 @@ import { getSite, updateSite } from '../services/db';
 import { shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
+import { storeInt } from '../../common/bootstrap';
 
 interface IProps {
     setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -102,7 +103,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
 
     const openPublicDir = async () => {
         const { name: siteName } = site;
-        const publicDir = path.join(configGet('paths.public'), siteName);
+        const publicDir = path.join(storeInt.get('paths.public'), siteName);
 
         if (fs.existsSync(publicDir)) {
             shell.openPath(publicDir);
@@ -208,7 +209,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
     };
 
     return (
-        <div className="CreatePost page">
+        <div className="SiteSettings page">
             <div className="content">
                 <h1>
                     <div className="left-align">

@@ -1,9 +1,14 @@
 import fs from 'fs';
-import { getString, configGet, configSet } from '../../common/utils';
+import { getString, configSet } from '../../common/utils';
 import { modal } from '../components/Modal';
 import stopwords from '../json/stopwords.json';
 import React from 'react';
-import { getApiUrl, getCache, setCache } from '../../common/bootstrap';
+import {
+    getApiUrl,
+    getCache,
+    setCache,
+    storeInt
+} from '../../common/bootstrap';
 
 export const merge = (var1, var2) => {
     if (Array.isArray(var1) && Array.isArray(var2)) {
@@ -185,7 +190,7 @@ export const checkDirs = async () => {
     /**
      * Ensure buffer exists
      */
-    const bufferDir = configGet('paths.buffer');
+    const bufferDir = storeInt.get('paths.buffer');
     if (!fs.existsSync(bufferDir)) {
         fs.mkdirSync(bufferDir);
     }
