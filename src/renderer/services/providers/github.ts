@@ -68,9 +68,21 @@ class GithubProvider {
         }
 
         /**
-         * Prepare repo for first deployment
+         * Deploy project to set up repo's master branch
          */
-        const siteUrl = (await this.prepareForFirstDeployment()) as string;
+        await this.deploy(
+            onUpdate,
+            null,
+            true,
+            false,
+            'Preparing',
+            'Initial Commit'
+        );
+
+        /**
+         * Enabling pages site
+         */
+        const siteUrl = await this.enablePagesSite();
 
         if (!siteUrl) {
             if (!modal.isShown()) {
@@ -124,7 +136,7 @@ class GithubProvider {
     getRepositoryUrl = async () => {
         const repositoryName = await this.getRepositoryName();
         const username = await this.getUsername();
-        return `https://${this.vars.baseUrl()}/${username}/${repositoryName}.git`;
+        return `https://${this.vars.baseUrl()}/${username}/${repositoryName}`;
     };
 
     /**
@@ -188,9 +200,6 @@ class GithubProvider {
         try {
             const bufferDir = storeInt.get('paths.buffer');
             runCommand(bufferDir, `git clone "${repositoryUrl}" .`);
-            runCommand(bufferDir, 'git branch gh-pages');
-            runCommand(bufferDir, 'git checkout gh-pages');
-            runCommand(bufferDir, 'git pull origin gh-pages');
 
             const buildRes = await build(
                 this.siteUUID,
@@ -209,21 +218,15 @@ class GithubProvider {
 
             await new Promise(resolve => {
                 setTimeout(() => {
-                    runCommand(
-                        bufferDir,
-                        'git config --global core.safecrlf false'
-                    );
-                    runCommand(bufferDir, 'git add --all');
                     const { res: e, error: commitError } = runCommand(
                         bufferDir,
-                        `git commit -m "${commitMessage}" && git push -u origin gh-pages`
+                        `git add --all && git commit -m "${commitMessage}" && git push`
                     );
 
                     if (commitError) {
                         modal.alert(e.message);
                         console.error(e);
                     }
-
                     resolve();
                 }, 1000);
             });
@@ -300,9 +303,6 @@ class GithubProvider {
         try {
             const bufferDir = storeInt.get('paths.buffer');
             runCommand(bufferDir, `git clone "${repoUrl}" .`);
-            runCommand(bufferDir, 'git branch gh-pages');
-            runCommand(bufferDir, 'git checkout gh-pages');
-            runCommand(bufferDir, 'git pull origin gh-pages');
 
             if (bufferDir && bufferDir.includes('buffer')) {
                 await del([path.join(bufferDir, '*'), '!.git'], {
@@ -310,10 +310,10 @@ class GithubProvider {
                 });
             }
 
-            runCommand(bufferDir, 'git config --global core.safecrlf false');
-            runCommand(bufferDir, 'git add --all');
-            runCommand(bufferDir, 'git commit -m "Clearing for deployment"');
-            runCommand(bufferDir, 'git push -u origin gh-pages');
+            runCommand(
+                bufferDir,
+                'git add --all && git commit -m "Clearing for deployment" && git push'
+            );
         } catch (e) {
             modal.alert(e.message);
             console.error(e);
