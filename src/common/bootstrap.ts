@@ -37,7 +37,7 @@ let prssConfig;
 const cache = {};
 
 const expressUrl = 'http://127.0.0.1:3001';
-const getApiUrl = (path = '/') => `https://app.prss.io/api${path}`;
+const getApiUrl = (path = '/') => `https://prss.co/api${path}`;
 
 const setHook = (name, fct) => {
     hooks[name] = fct;
