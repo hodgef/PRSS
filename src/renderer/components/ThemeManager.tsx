@@ -1,308 +1,287 @@
-import './styles/ThemeManager.scss';
+import "./styles/ThemeManager.css";
 
 import React, {
-    FunctionComponent,
-    Fragment,
-    useState,
-    useEffect,
-    ReactNode
-} from 'react';
-import { useHistory, useParams } from 'react-router-dom';
-import path from 'path';
-import fs from 'fs';
-import cx from 'classnames';
+  FunctionComponent,
+  Fragment,
+  useState,
+  useEffect,
+  ReactNode
+} from "react";
+import { useHistory, useParams } from "react-router-dom";
+import path from "path";
+import fs from "fs";
+import cx from "classnames";
 
-import { confirmation } from '../services/utils';
-import { toast } from 'react-toastify';
-import { modal } from './Modal';
-import { shell } from 'electron';
-import { getThemeListDetails } from '../services/theme';
-import defaultThumbnail from '../images/defaultThemeThumbnail.png';
-import { getSite, updateSite } from '../services/db';
-import { configSet } from '../../common/utils';
-import { prssConfig, storeInt } from '../../common/bootstrap';
+import { confirmation } from "../services/utils";
+import { toast } from "react-toastify";
+import { modal } from "./Modal";
+import { shell } from "electron";
+import { getThemeListDetails } from "../services/theme";
+import defaultThumbnail from "../images/defaultThemeThumbnail.png";
+import { getSite, updateSite } from "../services/db";
+import { configSet } from "../../common/utils";
+import { prssConfig, storeInt } from "../../common/bootstrap";
 
 interface IProps {
-    setHeaderLeftComponent: (comp?: ReactNode) => void;
+  setHeaderLeftComponent: (comp?: ReactNode) => void;
 }
 
 const ThemeManager: FunctionComponent<IProps> = ({
-    setHeaderLeftComponent
+  setHeaderLeftComponent
 }) => {
-    const { siteId } = useParams();
+  const { siteId } = useParams();
 
-    const [site, setSite] = useState(null);
-    const { title } = (site as ISite) || {};
+  const [site, setSite] = useState(null);
+  const { title } = (site as ISite) || {};
 
-    const [siteTheme, setSiteTheme] = useState(null);
-    const [themeList, setThemeList] = useState([]);
+  const [siteTheme, setSiteTheme] = useState(null);
+  const [themeList, setThemeList] = useState([]);
 
-    useEffect(() => {
-        if (!title) {
-            return;
-        }
-        setHeaderLeftComponent(
-            <Fragment>
-                <div className="align-center">
-                    <i className="material-icons">public</i>
-                    <a onClick={() => history.push(`/sites/${siteId}`)}>
-                        {title}
-                    </a>
-                </div>
-                <div className="align-center">
-                    <i className="material-icons">keyboard_arrow_right</i>
-                    <a onClick={() => history.push(`/sites/${siteId}/themes`)}>
-                        Themes
-                    </a>
-                </div>
-            </Fragment>
-        );
-    }, [title]);
+  useEffect(() => {
+    if (!title) {
+      return;
+    }
+    setHeaderLeftComponent(
+      <Fragment>
+        <div className="align-center">
+          <i className="material-icons">public</i>
+          <a onClick={() => history.push(`/sites/${siteId}`)}>{title}</a>
+        </div>
+        <div className="align-center">
+          <i className="material-icons">keyboard_arrow_right</i>
+          <a onClick={() => history.push(`/sites/${siteId}/themes`)}>Themes</a>
+        </div>
+      </Fragment>
+    );
+  }, [title]);
 
-    useEffect(() => {
-        const getData = async () => {
-            const siteRes = await getSite(siteId);
-            setSite(siteRes);
-            setSiteTheme(siteRes.theme);
-        };
-        getData();
-    }, []);
-
-    const getThemes = async (noToast?) => {
-        const themes = await getThemeListDetails();
-        setThemeList(themes);
-
-        if (!noToast) {
-            toast.success('Theme list refreshed!');
-        }
+  useEffect(() => {
+    const getData = async () => {
+      const siteRes = await getSite(siteId);
+      setSite(siteRes);
+      setSiteTheme(siteRes.theme);
     };
+    getData();
+  }, []);
 
-    useEffect(() => {
-        getThemes(true);
-    }, []);
+  const getThemes = async (noToast?) => {
+    const themes = await getThemeListDetails();
+    setThemeList(themes);
 
-    const history = useHistory();
+    if (!noToast) {
+      toast.success("Theme list refreshed!");
+    }
+  };
 
-    if (!site || !siteTheme) {
-        return null;
+  useEffect(() => {
+    getThemes(true);
+  }, []);
+
+  const history = useHistory();
+
+  if (!site || !siteTheme) {
+    return null;
+  }
+
+  const showThemeDetails = theme => {
+    modal.alert(
+      <Fragment>
+        <p>
+          <strong>Author:</strong> {theme.author}
+        </p>
+        <p>
+          <strong>Homepage:</strong>{" "}
+          <a
+            href={theme.homepage}
+            target="_blank"
+            title={theme.homepage}
+            rel="noopener noreferrer"
+          >
+            {theme.homepage}
+          </a>
+        </p>
+        <p>
+          <strong>Parser:</strong> {theme.parser}
+        </p>
+        <p>
+          <strong>License:</strong> {theme.license}
+        </p>
+      </Fragment>,
+      `${theme.title} v${theme.version}`,
+      "theme-details-content"
+    );
+  };
+
+  const handleSubmit = async themeName => {
+    if (!themeName) {
+      modal.alert("Your site must have a theme");
+      return;
     }
 
-    const showThemeDetails = theme => {
-        modal.alert(
-            <Fragment>
-                <p>
-                    <strong>Author:</strong> {theme.author}
-                </p>
-                <p>
-                    <strong>Homepage:</strong>{' '}
-                    <a
-                        href={theme.homepage}
-                        target="_blank"
-                        title={theme.homepage}
-                        rel="noopener noreferrer"
-                    >
-                        {theme.homepage}
-                    </a>
-                </p>
-                <p>
-                    <strong>Parser:</strong> {theme.parser}
-                </p>
-                <p>
-                    <strong>License:</strong> {theme.license}
-                </p>
-            </Fragment>,
-            `${theme.title} v${theme.version}`,
-            'theme-details-content'
-        );
+    const updatedAt = Date.now();
+    setSiteTheme(themeName);
+
+    const updatedSite = {
+      ...site,
+      theme: themeName,
+      updatedAt
     };
 
-    const handleSubmit = async themeName => {
-        if (!themeName) {
-            modal.alert('Your site must have a theme');
-            return;
-        }
+    await updateSite(siteId, {
+      theme: themeName,
+      updatedAt
+    });
 
-        const updatedAt = Date.now();
-        setSiteTheme(themeName);
+    await configSet(`sites.${siteId}.publishSuggested`, true);
 
-        const updatedSite = {
-            ...site,
-            theme: themeName,
-            updatedAt
-        };
+    setSite(updatedSite);
 
-        await updateSite(siteId, {
-            theme: themeName,
-            updatedAt
-        });
+    toast.success(
+      "Site updated! Please publish your changes from your Dashboard"
+    );
+  };
 
-        await configSet(`sites.${siteId}.publishSuggested`, true);
+  const addTheme = async () => {
+    const confirmationRes = await confirmation({
+      title: (
+        <Fragment>
+          <p>The PRSS theme directory will be opened.</p>
+          <p>You will need to add any theme files to that directory.</p>
+          <p>
+            Please ensure you get themes from trusted sources, such as the{" "}
+            <a
+              href="https://hodgef.com/prss/themes/"
+              title="https://hodgef.com/prss/themes/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <u>PRSS Themes</u>
+            </a>{" "}
+            page.
+          </p>
+          <p>Continue?</p>
+        </Fragment>
+      )
+    });
 
-        setSite(updatedSite);
+    if (confirmationRes !== 0) {
+      return;
+    }
 
-        toast.success(
-            'Site updated! Please publish your changes from your Dashboard'
-        );
-    };
+    const themesDir = storeInt.get("paths.themes");
+    shell.openPath(themesDir);
+  };
 
-    const addTheme = async () => {
-        const confirmationRes = await confirmation({
-            title: (
-                <Fragment>
-                    <p>The PRSS theme directory will be opened.</p>
-                    <p>
-                        You will need to add any theme files to that directory.
-                    </p>
-                    <p>
-                        Please ensure you get themes from trusted sources, such
-                        as the{' '}
-                        <a
-                            href="https://hodgef.com/prss/themes/"
-                            title="https://hodgef.com/prss/themes/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <u>PRSS Themes</u>
-                        </a>{' '}
-                        page.
-                    </p>
-                    <p>Continue?</p>
-                </Fragment>
-            )
-        });
+  return (
+    <div className="ThemeManager page">
+      <div className="content">
+        <h1>
+          <div className="left-align">
+            <i
+              className="material-icons clickable"
+              onClick={() => history.goBack()}
+            >
+              arrow_back
+            </i>
+            <span>Themes</span>
+          </div>
+          <div className="right-align">
+            <button
+              type="button"
+              className="btn btn-outline-primary"
+              onClick={() => getThemes()}
+            >
+              <i className="material-icons">refresh</i>
+            </button>
+          </div>
+        </h1>
 
-        if (confirmationRes !== 0) {
-            return;
-        }
+        <div className="theme-list">
+          {themeList.map(theme => {
+            const { name, title, author, url, type, themeDir } = theme;
+            let image = defaultThumbnail;
 
-        const themesDir = storeInt.get('paths.themes');
-        shell.openPath(themesDir);
-    };
+            const authorFormatted =
+              author === "Francisco Hodge" ? "PRSS" : author;
 
-    return (
-        <div className="ThemeManager page">
-            <div className="content">
-                <h1>
+            try {
+              if (prssConfig.themes[name]) {
+                image = prssConfig.themes[name] + "/thumbnail.png";
+              } else {
+                image =
+                  "data:image/png;base64," +
+                  fs.readFileSync(path.join(themeDir, "thumbnail.png"), {
+                    encoding: "base64"
+                  });
+              }
+            } catch (e) {
+              console.error(e);
+            }
+
+            return (
+              <div
+                className={cx("theme-list-item", {
+                  "selected-theme": name === siteTheme
+                })}
+                key={`option-${name}`}
+              >
+                <div
+                  onClick={() =>
+                    name === siteTheme
+                      ? showThemeDetails(theme)
+                      : handleSubmit(name)
+                  }
+                  className="theme-list-item-image clickable"
+                  style={{
+                    backgroundImage: `url(${image})`
+                  }}
+                ></div>
+                <div className="theme-list-item-desc">
+                  <div className="theme-name">
                     <div className="left-align">
-                        <i
-                            className="material-icons clickable"
-                            onClick={() => history.goBack()}
-                        >
-                            arrow_back
-                        </i>
-                        <span>Themes</span>
+                      <span>{title || name}</span>
                     </div>
                     <div className="right-align">
-                        <button
-                            type="button"
-                            className="btn btn-outline-primary"
-                            onClick={() => getThemes()}
-                        >
-                            <i className="material-icons">refresh</i>
-                        </button>
+                      {prssConfig.themes[name] && (
+                        <span className="material-icons" title="Official Theme">
+                          star
+                        </span>
+                      )}
                     </div>
-                </h1>
-
-                <div className="theme-list">
-                    {themeList.map(theme => {
-                        const {
-                            name,
-                            title,
-                            author,
-                            url,
-                            type,
-                            themeDir
-                        } = theme;
-                        let image = defaultThumbnail;
-
-                        const authorFormatted =
-                            author === 'Francisco Hodge' ? 'PRSS' : author;
-
-                        try {
-                            if (prssConfig.themes[name]) {
-                                image =
-                                    prssConfig.themes[name] + '/thumbnail.png';
-                            } else {
-                                image =
-                                    'data:image/png;base64,' +
-                                    fs.readFileSync(
-                                        path.join(themeDir, 'thumbnail.png'),
-                                        { encoding: 'base64' }
-                                    );
-                            }
-                        } catch (e) {
-                            console.error(e);
-                        }
-
-                        return (
-                            <div
-                                className={cx('theme-list-item', {
-                                    'selected-theme': name === siteTheme
-                                })}
-                                key={`option-${name}`}
-                            >
-                                <div
-                                    onClick={() =>
-                                        name === siteTheme
-                                            ? showThemeDetails(theme)
-                                            : handleSubmit(name)
-                                    }
-                                    className="theme-list-item-image clickable"
-                                    style={{
-                                        backgroundImage: `url(${image})`
-                                    }}
-                                ></div>
-                                <div className="theme-list-item-desc">
-                                    <div className="theme-name">
-                                        <div className="left-align">
-                                            <span>{title || name}</span>
-                                        </div>
-                                        <div className="right-align">
-                                            {prssConfig.themes[name] && (
-                                                <span
-                                                    className="material-icons"
-                                                    title="Official Theme"
-                                                >
-                                                    star
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                    {authorFormatted && (
-                                        <div className="theme-author">
-                                            <div className="left-align">
-                                                {url ? (
-                                                    <a
-                                                        href={url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        title={url}
-                                                    >
-                                                        {authorFormatted}
-                                                    </a>
-                                                ) : (
-                                                    <span>
-                                                        {authorFormatted}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="right-align"></div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
-                    <div
-                        className="theme-list-item add-new-theme-btn clickable"
-                        onClick={() => addTheme()}
-                    >
-                        <i className="material-icons">add_circle</i>
+                  </div>
+                  {authorFormatted && (
+                    <div className="theme-author">
+                      <div className="left-align">
+                        {url ? (
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title={url}
+                          >
+                            {authorFormatted}
+                          </a>
+                        ) : (
+                          <span>{authorFormatted}</span>
+                        )}
+                      </div>
+                      <div className="right-align"></div>
                     </div>
+                  )}
                 </div>
-            </div>
+              </div>
+            );
+          })}
+          <div
+            className="theme-list-item add-new-theme-btn clickable"
+            onClick={() => addTheme()}
+          >
+            <i className="material-icons">add_circle</i>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default ThemeManager;

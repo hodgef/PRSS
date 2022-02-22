@@ -1,0 +1,118 @@
+header {
+  box-sizing: border-box;
+  width: 100%;
+  z-index: 999999999999999;
+  border-bottom: 1px solid #efefef 9e;
+  height: 50px;
+  padding: 2px;
+  user-select: none;
+  background-color: white;
+}
+header .logo {
+  -webkit-app-region: none;
+  display: inline-block;
+}
+header .logo img {
+  pointer-events: none;
+}
+header .back-overlay {
+  background: #020202 d1;
+  position: fixed;
+  left: 0;
+  top: 50px;
+  width: 100%;
+  height: 100%;
+}
+header .header-cont {
+  display: flex;
+  height: 100%;
+}
+header .header-cont.title-mode {
+  -webkit-app-region: drag;
+}
+header .header-cont .left-align {
+  flex: 1;
+  align-items: center;
+  display: flex;
+  padding-left: 15px;
+}
+header .header-cont .right-align {
+  -webkit-app-region: none;
+  display: inline-flex;
+  justify-content: flex-end;
+}
+header .header-cont .right-align button {
+  display: flex;
+  height: 40px;
+}
+header .header-cont .right-align button span.material-icons {
+  font-size: 25px;
+}
+header .header-cont .right-align .btn {
+  outline: none !important;
+  box-shadow: none !important;
+}
+header .header-cont .right-align .header-more {
+  position: relative;
+}
+header .header-cont .right-align .drop-menu {
+  position: absolute;
+  top: calc(100% + 2px);
+  right: 0;
+  width: 200px;
+  background: white;
+  margin: 0;
+  padding: 0;
+}
+header .header-cont .right-align .drop-menu li {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #e8e8e8 4d;
+}
+header .header-cont .right-align .drop-menu li a {
+  display: flex;
+  align-items: center;
+}
+header .header-cont .right-align .drop-menu li .material-icons {
+  margin-right: 10px;
+}
+header .header-cont .right-align .window-controls {
+  display: flex;
+  align-items: center;
+}
+header .header-cont .right-align .window-controls div img {
+  width: 12px;
+  height: auto;
+}
+header .header-cont:not(.title-mode) .window-controls {
+  display: none !important;
+}
+header .header-subtitle {
+  color: #252525;
+  padding: 5px 15px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  -webkit-app-region: none;
+  background: #f6f6f6;
+  margin-left: 20px;
+  border-radius: 30px;
+}
+header .header-subtitle span {
+  max-width: 400px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+header .header-subtitle .material-icons {
+  margin: 0 5px;
+  font-size: 20px;
+}
+header .header-subtitle > div:first-child .material-icons:first-child {
+  margin-left: 0;
+}
+header .expanded .material-icons {
+  transform: rotate(180deg);
+}

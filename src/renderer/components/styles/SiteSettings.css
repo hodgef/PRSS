@@ -1,0 +1,4 @@
+.SiteSettings .form-group {
+  display: flex;
+  flex-flow: column;
+}

@@ -1,0 +1,31 @@
+#app .SiteHostingSwitcher.page .content {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-flow: column;
+  justify-content: flex-start;
+  padding-top: 60px;
+}
+#app .SiteHostingSwitcher.page .content .input-group {
+  margin-bottom: 10px;
+}
+#app .SiteHostingSwitcher.page .content button {
+  width: 100%;
+}
+#app .SiteHostingSwitcher.page .content select {
+  -webkit-appearance: none;
+}
+#app .SiteHostingSwitcher.page .content .id-info {
+  height: 20px;
+  font-size: 12px;
+  margin: 5px 0;
+}
+#app .SiteHostingSwitcher.page .content .id-info span {
+  background: #efefef;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin-right: 5px;
+}

@@ -1,0 +1,53 @@
+.editor-sidebar {
+  width: 250px;
+  margin-left: 20px;
+  display: flex;
+  flex-flow: column;
+}
+.editor-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.editor-sidebar ul.editor-sidebar-featured {
+  background: #f7f7f7;
+  border-radius: 10px;
+  padding: 10px 20px;
+}
+.editor-sidebar ul li {
+  padding: 15px 0;
+  border-bottom: 1px dashed #e6e6e6;
+  display: flex;
+  color: #565656;
+  font-size: 15px;
+}
+.editor-sidebar ul li:last-child {
+  border-bottom: none;
+}
+.editor-sidebar ul li .material-icons {
+  margin-right: 5px;
+}
+.editor-sidebar #theme-selector {
+  text-transform: capitalize;
+}
+.editor-sidebar #theme-selector option {
+  text-transform: capitalize;
+}
+.editor-sidebar .sidebar-more-toggle {
+  display: flex;
+  margin: 10px 0;
+  align-items: center;
+  opacity: 0.7;
+}
+.editor-sidebar .sidebar-more-toggle .material-icons {
+  margin-right: 5px;
+}
+.editor-sidebar .editor-sidebar-more {
+  padding: 0 20px;
+  border: 1px solid #e6e6e6;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top: none;
+  margin-top: -10px;
+  padding-top: 10px;
+}

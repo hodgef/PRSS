@@ -1,0 +1,91 @@
+.Loading {
+  display: flex;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-flow: column;
+  z-index: 999;
+  animation: fadeIn 0.3s linear forwards;
+  overflow: hidden;
+}
+.Loading .title {
+  font-size: 30px;
+}
+.Loading .subtitle {
+  font-size: 25px;
+  margin-top: 5px;
+  opacity: 0.8;
+  font-weight: 300;
+}
+.Loading.block {
+  background: rgba(255, 255, 255, 0.8);
+}
+.Loading .spinner {
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.Loading .spinner:after {
+  animation: spinner 0.8s linear infinite;
+  display: block;
+  content: "⠋";
+  font-size: 80px;
+}
+.Loading.loading-small {
+  position: unset;
+  width: 24px;
+  height: 24px;
+}
+.Loading.loading-small .spinner:after {
+  font-size: 28px;
+}
+.Loading.loading-medium {
+  position: unset;
+  width: 40px;
+  height: 40px;
+}
+.Loading.loading-medium .spinner:after {
+  font-size: 40px;
+}
+@keyframes spinner {
+  10% {
+    content: "⠙";
+  }
+  20% {
+    content: "⠹";
+  }
+  30% {
+    content: "⠸";
+  }
+  40% {
+    content: "⠼";
+  }
+  50% {
+    content: "⠴";
+  }
+  60% {
+    content: "⠦";
+  }
+  70% {
+    content: "⠧";
+  }
+  80% {
+    content: "⠇";
+  }
+  90% {
+    content: "⠏";
+  }
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

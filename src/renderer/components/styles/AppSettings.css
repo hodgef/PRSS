@@ -1,0 +1,7 @@
+.AppSettings .form-group {
+  display: flex;
+  flex-flow: column;
+}
+.AppSettings button.btn.btn-outline-primary {
+  display: flex;
+}

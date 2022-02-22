@@ -1,0 +1,25 @@
+.title-editor {
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+}
+.title-editor:not(.editing) {
+  align-items: center;
+}
+.title-editor span {
+  margin-right: 10px;
+  max-width: calc(100% - 40px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.title-editor input {
+  height: 36px;
+  margin-right: 10px;
+  flex: 1;
+  padding: 0 5px;
+  font-size: 20px;
+}
+.title-editor .material-icons {
+  margin-right: 0 !important;
+}

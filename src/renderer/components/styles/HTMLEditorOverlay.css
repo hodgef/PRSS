@@ -1,0 +1,64 @@
+.html-editor-overlay {
+  position: fixed;
+  top: 50px;
+  width: 100%;
+  background: #020202 d1;
+  height: 100%;
+  z-index: 100;
+}
+.html-editor-overlay .editor-content {
+  margin: 0 auto;
+  width: 80%;
+  background: white;
+  padding: 20px;
+  box-sizing: border-box;
+  height: calc(100% - 100px);
+  overflow: hidden;
+  border-radius: 10px;
+  margin-top: 20px;
+  flex-flow: column;
+  overflow-y: auto !important;
+}
+.html-editor-overlay .editor-content .ace_editor {
+  min-height: 400px;
+}
+.html-editor-overlay .editor-content h2 {
+  display: flex;
+  align-items: center;
+}
+.html-editor-overlay .editor-content h2:first-child {
+  margin-top: 0 !important;
+}
+.html-editor-overlay .editor-content h2 .left-align {
+  flex: 1;
+}
+.html-editor-overlay .editor-content h2 .right-align {
+  display: flex;
+  height: 40px;
+}
+.html-editor-overlay .editor-content h2 .right-align button {
+  display: flex;
+}
+.html-editor-overlay .editor-content .title-label {
+  display: flex;
+  margin-bottom: 10px;
+}
+.html-editor-overlay .editor-content .title-label .left-align {
+  flex: 1;
+}
+.html-editor-overlay .editor-content .title-label .right-align {
+  display: flex;
+  align-items: center;
+}
+.html-editor-overlay
+  .editor-content
+  .title-label
+  .right-align.available-parameters {
+  color: #0093ff d1;
+}
+.parameters-info-content {
+  max-width: 600px !important;
+}
+.parameters-info-content .parameters-info-inner-content .code-dark {
+  max-height: 370px;
+}

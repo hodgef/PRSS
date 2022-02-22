@@ -1,0 +1,79 @@
+.Dashboard .content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  width: 100%;
+  flex-wrap: wrap;
+}
+.Dashboard .content ul li {
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  border-bottom-width: 3px;
+  display: flex;
+  padding: 0 20px;
+  height: 60px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.Dashboard .content ul .left-align {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+.Dashboard .content ul .left-align > .material-icons {
+  margin-right: 10px;
+}
+.Dashboard .content ul .left-align .form-check {
+  margin-right: 10px;
+}
+.Dashboard .content ul .left-align .site-title.clickable {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.Dashboard .content ul .right-align {
+  display: flex;
+  margin-left: 20px;
+}
+.Dashboard .content ul li {
+  width: calc(50% - 10px);
+  margin-bottom: 20px;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-flow: column;
+}
+.Dashboard .content ul li:nth-child(2n + 1) {
+  margin-right: 20px;
+}
+.Dashboard .content ul li {
+  width: calc(33% - 10px);
+  margin-right: 20px;
+}
+.Dashboard .content ul li:nth-child(2n + 1) {
+  margin-right: auto;
+}
+.Dashboard .content ul li:nth-child(3n) {
+  margin-right: 0;
+}
+.Dashboard .content ul .box-highlight {
+  box-shadow: 0 0 10px #ffc107;
+  border-color: #e8c55f;
+}
+.Dashboard .content ul .material-icons {
+  font-size: 40px;
+  margin-bottom: 10px;
+  color: #464646;
+}
+.Dashboard .content ul .feature-title {
+  font-size: 23px;
+}
+.Dashboard .content ul .feature-description {
+  opacity: 0.5;
+  text-align: center;
+}

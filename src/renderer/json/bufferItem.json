@@ -1,61 +1,61 @@
 {
-    "path": "/test",
-    "templateId": "press.post",
-    "parser": "react",
-    "item": {
+  "path": "/test",
+  "templateId": "press.post",
+  "parser": "react",
+  "item": {
+    "id": "fdf9f450-a6d9-478d-a56d-ef30c8f24f18",
+    "title": "test",
+    "slug": "test",
+    "content": "Test",
+    "template": "post",
+    "updatedAt": 1586000000000,
+    "createdAt": 1586000000000
+  },
+  "site": {
+    "id": "test",
+    "title": "test",
+    "url": "https://test",
+    "theme": "slate",
+    "updatedAt": 1586000000000,
+    "publishedAt": null,
+    "items": [
+      {
+        "id": "c7d898e8-0f6b-4516-8ae7-9b0c210f28c8",
+        "slug": "home",
+        "title": "Hello World!",
+        "content": "Truncated content",
+        "template": "home",
+        "headHtml": null,
+        "footerHtml": null,
+        "updatedAt": null,
+        "createdAt": 1586000000000
+      },
+      {
         "id": "fdf9f450-a6d9-478d-a56d-ef30c8f24f18",
         "title": "test",
         "slug": "test",
-        "content": "Test",
+        "content": "Truncated content",
         "template": "post",
         "updatedAt": 1586000000000,
         "createdAt": 1586000000000
-    },
-    "site": {
-        "id": "test",
-        "title": "test",
-        "url": "https://test",
-        "theme": "slate",
-        "updatedAt": 1586000000000,
-        "publishedAt": null,
-        "items": [
-            {
-                "id": "c7d898e8-0f6b-4516-8ae7-9b0c210f28c8",
-                "slug": "home",
-                "title": "Hello World!",
-                "content": "Truncated content",
-                "template": "home",
-                "headHtml": null,
-                "footerHtml": null,
-                "updatedAt": null,
-                "createdAt": 1586000000000
-            },
-            {
-                "id": "fdf9f450-a6d9-478d-a56d-ef30c8f24f18",
-                "title": "test",
-                "slug": "test",
-                "content": "Truncated content",
-                "template": "post",
-                "updatedAt": 1586000000000,
-                "createdAt": 1586000000000
-            }
-        ],
-        "headHtml": "<title>%item.title% - %site.title%</title>",
-        "footerHtml": "",
-        "structure": [
-            {
-                "key": "c7d898e8-0f6b-4516-8ae7-9b0c210f28c8",
-                "children": [
-                    {
-                        "key": "fdf9f450-a6d9-478d-a56d-ef30c8f24f18",
-                        "children": []
-                    }
-                ]
-            }
+      }
+    ],
+    "headHtml": "<title>%item.title% - %site.title%</title>",
+    "footerHtml": "",
+    "structure": [
+      {
+        "key": "c7d898e8-0f6b-4516-8ae7-9b0c210f28c8",
+        "children": [
+          {
+            "key": "fdf9f450-a6d9-478d-a56d-ef30c8f24f18",
+            "children": []
+          }
         ]
-    },
-    "rootPath": "../",
-    "vars": {
-        "hello": "mytest"
-    }
+      }
+    ]
+  },
+  "rootPath": "../",
+  "vars": {
+    "hello": "mytest"
+  }
 }

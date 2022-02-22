@@ -1,54 +1,54 @@
-import { getMenuHtml } from './menus';
+import { getMenuHtml } from "./menus";
 
 const shortcodeRegex = /\[([a-zA-Z]+)=?([a-zA-Z0-9]+)?\](.+?)\[\/[a-zA-Z]+\]?/gi;
 
-export const parseShortcodes = async (str = '', data: IBufferItem) => {
-    const matches = [...str.matchAll(shortcodeRegex)];
-    let output = str;
+export const parseShortcodes = async (str = "", data: IBufferItem) => {
+  const matches = [...str.matchAll(shortcodeRegex)];
+  let output = str;
 
-    const matchPromises = [];
-    const matchArr = [];
+  const matchPromises = [];
+  const matchArr = [];
 
-    matches.forEach(match => {
-        const [fullMatch, fn, param, value] = match;
-        matchPromises.push(execShortcode(fn, value, param, data));
-        matchArr.push(match);
-    });
+  matches.forEach(match => {
+    const [fullMatch, fn, param, value] = match;
+    matchPromises.push(execShortcode(fn, value, param, data));
+    matchArr.push(match);
+  });
 
-    const resArr = await Promise.all(matchPromises);
+  const resArr = await Promise.all(matchPromises);
 
-    resArr.forEach((res, index) => {
-        const [fullMatch] = matchArr[index];
+  resArr.forEach((res, index) => {
+    const [fullMatch] = matchArr[index];
 
-        if (res) {
-            output = output.replace(fullMatch, res);
-        }
-    });
+    if (res) {
+      output = output.replace(fullMatch, res);
+    }
+  });
 
-    return output;
+  return output;
 };
 
 export const execShortcode = async (
-    fn,
-    value,
-    param,
-    bufferItem: IBufferItem
+  fn,
+  value,
+  param,
+  bufferItem: IBufferItem
 ) => {
-    let output = '';
-    const {
-        site: { uuid: siteUUID }
-    } = bufferItem;
+  let output = "";
+  const {
+    site: { uuid: siteUUID }
+  } = bufferItem;
 
-    if (!fn || !value) return output;
+  if (!fn || !value) return output;
 
-    switch (fn) {
-        case 'menu':
-            output = await getMenuHtml(value, siteUUID);
-            break;
+  switch (fn) {
+    case "menu":
+      output = await getMenuHtml(value, siteUUID);
+      break;
 
-        default:
-            break;
-    }
+    default:
+      break;
+  }
 
-    return output;
+  return output;
 };

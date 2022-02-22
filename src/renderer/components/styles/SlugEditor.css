@@ -1,0 +1,23 @@
+.slug-editor {
+  font-size: 16px;
+  display: flex;
+  max-height: 35px;
+  margin-bottom: 10px;
+}
+.slug-editor a {
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.slug-editor:not(.editing) {
+  align-items: center;
+}
+.slug-editor .material-icons {
+  font-size: 20px;
+}
+.slug-editor input {
+  flex: 1;
+  width: 100px;
+  padding: 0 5px;
+}

@@ -1,0 +1,17 @@
+.CreateSelector .content {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+}
+.CreateSelector .content button {
+  min-width: 250px;
+}
+.CreateSelector .content .button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-flow: column;
+  margin: 0 auto;
+  flex: 1;
+}

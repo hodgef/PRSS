@@ -1,446 +1,440 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
 class Modal extends Component {
-    state = {
-        title: null,
-        message: null,
-        show: false,
-        buttons: [],
-        showCancel: true,
-        mode: null,
-        onCancel: () => {},
-        contentClassName: '',
-        innerContentClassName: '',
-        renderInput: null
-    };
+  state = {
+    title: null,
+    message: null,
+    show: false,
+    buttons: [],
+    showCancel: true,
+    mode: null,
+    onCancel: () => {},
+    contentClassName: "",
+    innerContentClassName: "",
+    renderInput: null
+  };
 
-    initialState = { ...this.state };
+  initialState = { ...this.state };
 
-    isShown = () => !!this.state.show;
+  isShown = () => !!this.state.show;
 
-    confirm = ({
-        title,
-        buttons = [],
-        showCancel = false,
-        onCancel = () => {},
-        contentClassName = ''
-    }) => {
-        this.setState({
-            mode: 'confirm',
-            show: true,
-            title,
-            buttons,
-            showCancel,
-            onCancel,
-            contentClassName
-        });
-    };
+  confirm = ({
+    title,
+    buttons = [],
+    showCancel = false,
+    onCancel = () => {},
+    contentClassName = ""
+  }) => {
+    this.setState({
+      mode: "confirm",
+      show: true,
+      title,
+      buttons,
+      showCancel,
+      onCancel,
+      contentClassName
+    });
+  };
 
-    alert = (
-        message,
-        title?,
-        contentClassName = '',
-        innerContentClassName = ''
-    ) => {
-        this.setState({
-            mode: 'alert',
-            show: true,
-            title,
-            message,
-            contentClassName,
-            innerContentClassName
-        });
-    };
+  alert = (
+    message,
+    title?,
+    contentClassName = "",
+    innerContentClassName = ""
+  ) => {
+    this.setState({
+      mode: "alert",
+      show: true,
+      title,
+      message,
+      contentClassName,
+      innerContentClassName
+    });
+  };
 
-    prompt = ({
-        title,
-        message,
-        buttons = [],
-        showCancel = false,
-        onCancel = () => {},
-        renderInput
-    }) => {
-        this.setState({
-            mode: 'prompt',
-            show: true,
-            title,
-            message,
-            buttons,
-            showCancel,
-            onCancel,
-            renderInput
-        });
-    };
+  prompt = ({
+    title,
+    message,
+    buttons = [],
+    showCancel = false,
+    onCancel = () => {},
+    renderInput
+  }) => {
+    this.setState({
+      mode: "prompt",
+      show: true,
+      title,
+      message,
+      buttons,
+      showCancel,
+      onCancel,
+      renderInput
+    });
+  };
 
-    close = () => {
-        this.setState(this.initialState);
-    };
+  close = () => {
+    this.setState(this.initialState);
+  };
 
-    getLayout = () => {
-        const { title, buttons, showCancel, mode, message } = this.state;
+  getLayout = () => {
+    const { title, buttons, showCancel, mode, message } = this.state;
 
-        if (mode === 'confirm') {
-            return (
-                <div
-                    className="standard-modal"
-                    style={{
-                        position: 'fixed',
-                        backgroundColor: 'rgba(0,0,0,0.9)',
-                        height: '100%',
-                        width: '101%',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        top: 0,
-                        left: 0,
-                        display: 'flex',
-                        zIndex: 9999,
-                        paddingTop: '40px'
-                    }}
+    if (mode === "confirm") {
+      return (
+        <div
+          className="standard-modal"
+          style={{
+            position: "fixed",
+            backgroundColor: "rgba(0,0,0,0.9)",
+            height: "100%",
+            width: "101%",
+            alignItems: "center",
+            justifyContent: "center",
+            top: 0,
+            left: 0,
+            display: "flex",
+            zIndex: 9999,
+            paddingTop: "40px"
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 300,
+              overflow: "hidden"
+            }}
+            className={this.state.contentClassName}
+          >
+            {title && (
+              <div
+                className="standard-modal-title"
+                style={{
+                  paddingBottom: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  display: "flex"
+                }}
+              >
+                <span
+                  style={{
+                    color: "white",
+                    fontSize: 22,
+                    fontWeight: 300
+                  }}
                 >
+                  {title}
+                </span>
+              </div>
+            )}
+
+            <div
+              style={{
+                backgroundColor: "white",
+                borderRadius: 20
+              }}
+            >
+              {!!buttons.length &&
+                buttons.map((button, index) => {
+                  const { label, action = () => {} } = button;
+
+                  return (
                     <div
-                        style={{
-                            width: '100%',
-                            maxWidth: 300,
-                            overflow: 'hidden'
-                        }}
-                        className={this.state.contentClassName}
+                      key={`stdmodalbtn-${index}`}
+                      onClick={() => action()}
+                      style={{
+                        padding: 20,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1px solid rgba(0,0,0,0.1)",
+                        display: "flex",
+                        cursor: "pointer"
+                      }}
                     >
-                        {title && (
-                            <div
-                                className="standard-modal-title"
-                                style={{
-                                    paddingBottom: 20,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    display: 'flex'
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        color: 'white',
-                                        fontSize: 22,
-                                        fontWeight: 300
-                                    }}
-                                >
-                                    {title}
-                                </span>
-                            </div>
-                        )}
-
-                        <div
-                            style={{
-                                backgroundColor: 'white',
-                                borderRadius: 20
-                            }}
-                        >
-                            {!!buttons.length &&
-                                buttons.map((button, index) => {
-                                    const { label, action = () => {} } = button;
-
-                                    return (
-                                        <div
-                                            key={`stdmodalbtn-${index}`}
-                                            onClick={() => action()}
-                                            style={{
-                                                padding: 20,
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                border:
-                                                    '1px solid rgba(0,0,0,0.1)',
-                                                display: 'flex',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            <span
-                                                style={{
-                                                    fontSize: 18
-                                                }}
-                                            >
-                                                {label}
-                                            </span>
-                                        </div>
-                                    );
-                                })}
-
-                            {showCancel && (
-                                <div
-                                    onClick={() => {
-                                        this.close();
-                                        this.state.onCancel();
-                                    }}
-                                    style={{
-                                        padding: 20,
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        border: '1px solid rgba(0,0,0,0.1)',
-                                        display: 'flex',
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    <span
-                                        style={{
-                                            fontSize: 18
-                                        }}
-                                    >
-                                        Cancel
-                                    </span>
-                                </div>
-                            )}
-                        </div>
+                      <span
+                        style={{
+                          fontSize: 18
+                        }}
+                      >
+                        {label}
+                      </span>
                     </div>
-                </div>
-            );
-        } else if (mode === 'alert') {
-            return (
+                  );
+                })}
+
+              {showCancel && (
                 <div
-                    style={{
-                        position: 'fixed',
-                        backgroundColor: 'rgba(0,0,0,0.9)',
-                        height: '100%',
-                        width: '101%',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        top: 0,
-                        left: 0,
-                        display: 'flex',
-                        zIndex: 9999
-                    }}
+                  onClick={() => {
+                    this.close();
+                    this.state.onCancel();
+                  }}
+                  style={{
+                    padding: 20,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid rgba(0,0,0,0.1)",
+                    display: "flex",
+                    cursor: "pointer"
+                  }}
                 >
-                    <div
-                        style={{
-                            width: '100%',
-                            maxWidth: 300,
-                            overflow: 'hidden'
-                        }}
-                        className={this.state.contentClassName}
-                    >
-                        {title && (
-                            <div
-                                className="standard-modal-title"
-                                style={{
-                                    paddingBottom: 20,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    display: 'flex'
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        color: 'white',
-                                        fontSize: 22,
-                                        fontWeight: 300
-                                    }}
-                                >
-                                    {title}
-                                </span>
-                            </div>
-                        )}
-
-                        <div
-                            className="standard-modal-content"
-                            style={{
-                                backgroundColor: 'white',
-                                borderRadius: 20
-                            }}
-                        >
-                            {message && (
-                                <div
-                                    style={{
-                                        padding: 20,
-                                        // minHeight: 100,
-                                        //alignItems: 'center',
-                                        //justifyContent: 'center',
-                                        display: 'flex'
-                                    }}
-                                    className={this.state.innerContentClassName}
-                                >
-                                    <div
-                                        style={{
-                                            fontSize: 18,
-                                            width: '100%'
-                                        }}
-                                    >
-                                        {message}
-                                    </div>
-                                </div>
-                            )}
-
-                            <div
-                                onClick={() => this.close()}
-                                style={{
-                                    padding: 20,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: '1px solid rgba(0,0,0,0.1)',
-                                    display: 'flex',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        fontSize: 18
-                                    }}
-                                >
-                                    OK
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                  <span
+                    style={{
+                      fontSize: 18
+                    }}
+                  >
+                    Cancel
+                  </span>
                 </div>
-            );
-        } else if (mode === 'prompt') {
-            let value = '';
-            return (
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    } else if (mode === "alert") {
+      return (
+        <div
+          style={{
+            position: "fixed",
+            backgroundColor: "rgba(0,0,0,0.9)",
+            height: "100%",
+            width: "101%",
+            alignItems: "center",
+            justifyContent: "center",
+            top: 0,
+            left: 0,
+            display: "flex",
+            zIndex: 9999
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 300,
+              overflow: "hidden"
+            }}
+            className={this.state.contentClassName}
+          >
+            {title && (
+              <div
+                className="standard-modal-title"
+                style={{
+                  paddingBottom: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  display: "flex"
+                }}
+              >
+                <span
+                  style={{
+                    color: "white",
+                    fontSize: 22,
+                    fontWeight: 300
+                  }}
+                >
+                  {title}
+                </span>
+              </div>
+            )}
+
+            <div
+              className="standard-modal-content"
+              style={{
+                backgroundColor: "white",
+                borderRadius: 20
+              }}
+            >
+              {message && (
                 <div
-                    style={{
-                        position: 'fixed',
-                        backgroundColor: 'rgba(0,0,0,0.9)',
-                        height: '100%',
-                        width: '101%',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        top: 0,
-                        left: 0,
-                        display: 'flex',
-                        zIndex: 9999
-                    }}
+                  style={{
+                    padding: 20,
+                    // minHeight: 100,
+                    //alignItems: 'center',
+                    //justifyContent: 'center',
+                    display: "flex"
+                  }}
+                  className={this.state.innerContentClassName}
                 >
-                    <div
-                        style={{
-                            width: '100%',
-                            maxWidth: 300,
-                            overflow: 'hidden'
-                        }}
-                        className={this.state.contentClassName}
-                    >
-                        {title && (
-                            <div
-                                className="standard-modal-title"
-                                style={{
-                                    paddingBottom: 20,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    display: 'flex'
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        color: 'white',
-                                        fontSize: 22,
-                                        fontWeight: 300
-                                    }}
-                                >
-                                    {title}
-                                </span>
-                            </div>
-                        )}
-
-                        <div
-                            className="standard-modal-content"
-                            style={{
-                                backgroundColor: 'white',
-                                borderRadius: 20
-                            }}
-                        >
-                            <div
-                                style={{
-                                    padding: 20,
-                                    display: 'flex'
-                                }}
-                                className={this.state.innerContentClassName}
-                            >
-                                <div
-                                    style={{
-                                        fontSize: 18,
-                                        width: '100%'
-                                    }}
-                                >
-                                    {message}
-                                    {this.state.renderInput ? (
-                                        this.state.renderInput(
-                                            e => (value = e.target.value)
-                                        )
-                                    ) : (
-                                        <input
-                                            className="form-control mt-2"
-                                            type="text"
-                                            onChange={e =>
-                                                (value = e.target.value)
-                                            }
-                                        />
-                                    )}
-                                </div>
-                            </div>
-
-                            {!!buttons.length &&
-                                buttons.map((button, index) => {
-                                    const { label, action = () => {} } = button;
-
-                                    return (
-                                        <div
-                                            key={`stdmodalbtn-${index}`}
-                                            onClick={() => {
-                                                action(value);
-                                                this.close();
-                                            }}
-                                            style={{
-                                                padding: 20,
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                border:
-                                                    '1px solid rgba(0,0,0,0.1)',
-                                                display: 'flex',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            <span
-                                                style={{
-                                                    fontSize: 18
-                                                }}
-                                            >
-                                                {label}
-                                            </span>
-                                        </div>
-                                    );
-                                })}
-
-                            {showCancel && (
-                                <div
-                                    onClick={() => {
-                                        this.close();
-                                        this.state.onCancel();
-                                    }}
-                                    style={{
-                                        padding: 20,
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        border: '1px solid rgba(0,0,0,0.1)',
-                                        display: 'flex',
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    <span
-                                        style={{
-                                            fontSize: 18
-                                        }}
-                                    >
-                                        Cancel
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                  <div
+                    style={{
+                      fontSize: 18,
+                      width: "100%"
+                    }}
+                  >
+                    {message}
+                  </div>
                 </div>
-            );
-        } else {
-            return <div />;
-        }
-    };
+              )}
 
-    render() {
-        const { show, mode } = this.state;
-        return show && mode && this.getLayout();
+              <div
+                onClick={() => this.close()}
+                style={{
+                  padding: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "1px solid rgba(0,0,0,0.1)",
+                  display: "flex",
+                  cursor: "pointer"
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 18
+                  }}
+                >
+                  OK
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    } else if (mode === "prompt") {
+      let value = "";
+      return (
+        <div
+          style={{
+            position: "fixed",
+            backgroundColor: "rgba(0,0,0,0.9)",
+            height: "100%",
+            width: "101%",
+            alignItems: "center",
+            justifyContent: "center",
+            top: 0,
+            left: 0,
+            display: "flex",
+            zIndex: 9999
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 300,
+              overflow: "hidden"
+            }}
+            className={this.state.contentClassName}
+          >
+            {title && (
+              <div
+                className="standard-modal-title"
+                style={{
+                  paddingBottom: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  display: "flex"
+                }}
+              >
+                <span
+                  style={{
+                    color: "white",
+                    fontSize: 22,
+                    fontWeight: 300
+                  }}
+                >
+                  {title}
+                </span>
+              </div>
+            )}
+
+            <div
+              className="standard-modal-content"
+              style={{
+                backgroundColor: "white",
+                borderRadius: 20
+              }}
+            >
+              <div
+                style={{
+                  padding: 20,
+                  display: "flex"
+                }}
+                className={this.state.innerContentClassName}
+              >
+                <div
+                  style={{
+                    fontSize: 18,
+                    width: "100%"
+                  }}
+                >
+                  {message}
+                  {this.state.renderInput ? (
+                    this.state.renderInput(e => (value = e.target.value))
+                  ) : (
+                    <input
+                      className="form-control mt-2"
+                      type="text"
+                      onChange={e => (value = e.target.value)}
+                    />
+                  )}
+                </div>
+              </div>
+
+              {!!buttons.length &&
+                buttons.map((button, index) => {
+                  const { label, action = () => {} } = button;
+
+                  return (
+                    <div
+                      key={`stdmodalbtn-${index}`}
+                      onClick={() => {
+                        action(value);
+                        this.close();
+                      }}
+                      style={{
+                        padding: 20,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1px solid rgba(0,0,0,0.1)",
+                        display: "flex",
+                        cursor: "pointer"
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 18
+                        }}
+                      >
+                        {label}
+                      </span>
+                    </div>
+                  );
+                })}
+
+              {showCancel && (
+                <div
+                  onClick={() => {
+                    this.close();
+                    this.state.onCancel();
+                  }}
+                  style={{
+                    padding: 20,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid rgba(0,0,0,0.1)",
+                    display: "flex",
+                    cursor: "pointer"
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 18
+                    }}
+                  >
+                    Cancel
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      return <div />;
     }
+  };
+
+  render() {
+    const { show, mode } = this.state;
+    return show && mode && this.getLayout();
+  }
 }
 
 let modal: Modal;

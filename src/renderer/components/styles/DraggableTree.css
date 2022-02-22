@@ -1,0 +1,69 @@
+.draggable-tree
+  .ant-tree.draggable-tree
+  .ant-tree-switcher
+  .ant-tree-switcher-icon {
+  font-size: 25px;
+}
+.draggable-tree .ant-tree.draggable-tree .ant-tree-checkbox {
+  margin: 3px 10px 0;
+}
+.draggable-tree .ant-tree.draggable-tree .ant-tree-treenode {
+  align-items: center;
+}
+.draggable-tree
+  .ant-tree.draggable-tree
+  .ant-tree-treenode.drag-over
+  .ant-tree-node-content-wrapper {
+  background-color: #f7f7f7;
+  color: black;
+  font-weight: 700;
+}
+.draggable-tree
+  .ant-tree.draggable-tree
+  .ant-tree-treenode
+  .ant-tree-node-selected:hover.ant-tree-node-content-wrapper {
+  background-color: #f7f7f7;
+  color: black;
+}
+.draggable-tree .ant-tree.draggable-tree .ant-tree-indent-unit:before {
+  display: none;
+}
+.draggable-tree .ant-tree.draggable-tree .ant-tree-node-content-wrapper {
+  margin: 3px;
+  padding: 15px;
+  border: 1px solid #ececec;
+  line-height: unset;
+  margin-left: -1px;
+  border-bottom-width: 3px;
+  border-radius: 5px;
+  color: black;
+  margin-left: 5px;
+}
+.draggable-tree
+  .ant-tree.draggable-tree
+  .ant-tree-node-content-wrapper.ant-tree-node-selected {
+  background-color: unset;
+}
+.draggable-tree
+  .ant-tree.draggable-tree
+  .ant-tree-treenode-disabled
+  .ant-tree-node-content-wrapper {
+  color: black;
+}
+.draggable-tree .ant-tree.draggable-tree .drag-over-gap-top {
+  border-top: 2px solid #87d0f1;
+}
+.draggable-tree .ant-tree.draggable-tree .drag-over-gap-bottom {
+  border-bottom: 2px solid #87d0f1;
+}
+.draggable-tree
+  .ant-tree.draggable-tree
+  .ant-tree-treenode:first-child
+  + .drag-over-gap-top,
+.draggable-tree
+  .ant-tree.draggable-tree
+  .ant-tree-treenode:first-child
+  + .drag-over-gap-bottom {
+  border-bottom: unset;
+  border-top: unset;
+}

@@ -1,0 +1,60 @@
+.ListPosts .content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.ListPosts .content ul li {
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  border-bottom-width: 3px;
+  display: flex;
+  padding: 0 20px;
+  height: 60px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.ListPosts .content ul .left-align {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+.ListPosts .content ul .left-align > .material-icons {
+  margin-right: 10px;
+}
+.ListPosts .content ul .left-align .form-check {
+  margin-right: 10px;
+}
+.ListPosts .content ul .left-align .site-title.clickable {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.ListPosts .content ul .right-align {
+  display: flex;
+  margin-left: 20px;
+}
+.ListPosts .content .left-align {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.ListPosts .content .left-align > .material-icons {
+  margin-right: 10px;
+}
+.ListPosts .site-post {
+  font-size: 20px;
+}
+.ListPosts .post-tag {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  padding: 5px 10px;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.ListPosts .items {
+  flex: 1;
+  overflow-y: auto;
+}
