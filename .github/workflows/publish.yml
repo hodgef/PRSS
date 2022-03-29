@@ -22,6 +22,11 @@ jobs:
         with:
           node-version: 17
 
+      - name: Install build tools
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          npm config set msvs_version 2017
+
       - name: Prepare for app notarization
         if: startsWith(matrix.os, 'macos')
         run: |
