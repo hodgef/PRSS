@@ -24,7 +24,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
   items,
   url,
   onSave,
-  previewMode
+  previewMode,
 }) => {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(post.slug);
@@ -40,7 +40,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
   }, [site, post]);
 
   const bufferItem = bufferItems
-    ? bufferItems.find(bufferItem => bufferItem.item.uuid === post.uuid)
+    ? bufferItems.find((bufferItem) => bufferItem.item.uuid === post.uuid)
     : null;
 
   if (!site || !items || !post || !bufferItem) {
@@ -102,7 +102,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
         <Fragment>
           <input
             value={value}
-            onChange={e => setValue(e.target.value)}
+            onChange={(e) => setValue(e.target.value)}
             className="mr-2"
           />
           <button

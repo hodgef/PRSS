@@ -5,7 +5,7 @@ import React, {
   Fragment,
   useState,
   useEffect,
-  ReactNode
+  ReactNode,
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import path from "path";
@@ -27,9 +27,9 @@ interface IProps {
 }
 
 const ThemeManager: FunctionComponent<IProps> = ({
-  setHeaderLeftComponent
+  setHeaderLeftComponent,
 }) => {
-  const { siteId } = useParams();
+  const { siteId } = useParams() as any;
 
   const [site, setSite] = useState(null);
   const { title } = (site as ISite) || {};
@@ -83,7 +83,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
     return null;
   }
 
-  const showThemeDetails = theme => {
+  const showThemeDetails = (theme) => {
     modal.alert(
       <Fragment>
         <p>
@@ -112,7 +112,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
     );
   };
 
-  const handleSubmit = async themeName => {
+  const handleSubmit = async (themeName) => {
     if (!themeName) {
       modal.alert("Your site must have a theme");
       return;
@@ -124,12 +124,12 @@ const ThemeManager: FunctionComponent<IProps> = ({
     const updatedSite = {
       ...site,
       theme: themeName,
-      updatedAt
+      updatedAt,
     };
 
     await updateSite(siteId, {
       theme: themeName,
-      updatedAt
+      updatedAt,
     });
 
     await configSet(`sites.${siteId}.publishSuggested`, true);
@@ -161,7 +161,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
           </p>
           <p>Continue?</p>
         </Fragment>
-      )
+      ),
     });
 
     if (confirmationRes !== 0) {
@@ -197,7 +197,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
         </h1>
 
         <div className="theme-list">
-          {themeList.map(theme => {
+          {themeList.map((theme) => {
             const { name, title, author, url, type, themeDir } = theme;
             let image = defaultThumbnail;
 
@@ -211,7 +211,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
                 image =
                   "data:image/png;base64," +
                   fs.readFileSync(path.join(themeDir, "thumbnail.png"), {
-                    encoding: "base64"
+                    encoding: "base64",
                   });
               }
             } catch (e) {
@@ -221,7 +221,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
             return (
               <div
                 className={cx("theme-list-item", {
-                  "selected-theme": name === siteTheme
+                  "selected-theme": name === siteTheme,
                 })}
                 key={`option-${name}`}
               >
@@ -233,7 +233,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
                   }
                   className="theme-list-item-image clickable"
                   style={{
-                    backgroundImage: `url(${image})`
+                    backgroundImage: `url(${image})`,
                   }}
                 ></div>
                 <div className="theme-list-item-desc">

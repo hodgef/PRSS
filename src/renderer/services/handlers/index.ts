@@ -1,13 +1,13 @@
 import { objGet } from "../utils";
 import { reactHandler, reactHandlerExtension } from "../handlers/react";
-import { globalRequire } from "../../../common/utils";
-const htmlMinifier = globalRequire("html-minifier-terser");
+
+const htmlMinifier = require("html-minifier-terser");
 const Terser = require("terser");
 
-export const parseHtmlParams = (html: string = "", bufferItem: IBufferItem) => {
+export const parseHtmlParams = (html = "", bufferItem: IBufferItem) => {
   let output = html;
 
-  const matches = output.match(/%[0-9a-zA-Z\.]+%/g);
+  const matches = output.match(/%[0-9a-zA-Z.]+%/g);
 
   if (matches) {
     matches.forEach((match: string) => {
@@ -20,7 +20,7 @@ export const parseHtmlParams = (html: string = "", bufferItem: IBufferItem) => {
     });
   }
 
-  const matchesEscaped = output.match(/\\%[0-9a-zA-Z\.]+\\%/g);
+  const matchesEscaped = output.match(/\\%[0-9a-zA-Z.]+\\%/g);
 
   if (matchesEscaped) {
     matchesEscaped.forEach((match: string) => {
@@ -32,7 +32,7 @@ export const parseHtmlParams = (html: string = "", bufferItem: IBufferItem) => {
   return output;
 };
 
-export const getParserHandler = parser => {
+export const getParserHandler = (parser) => {
   let handler: handlerType;
 
   switch (parser) {
@@ -48,7 +48,7 @@ export const getParserHandler = parser => {
   return handler;
 };
 
-export const getParserTemplateExtension = parser => {
+export const getParserTemplateExtension = (parser) => {
   let extensions: string;
 
   switch (parser) {
@@ -64,11 +64,11 @@ export const getParserTemplateExtension = parser => {
   return extensions;
 };
 
-export const minifyJS = code => {
+export const minifyJS = (code) => {
   const res = Terser.minify(code, {
     ecma: 5,
     compress: true,
-    mangle: true
+    mangle: true,
   });
 
   return !res.error ? res.code : "";
@@ -80,7 +80,7 @@ export const minifyHTML = (code = "") => {
     minifyJS: (text, inline) => minifyJS(text),
     removeComments: true,
     collapseWhitespace: true,
-    collapseInlineTagWhitespace: true
+    collapseInlineTagWhitespace: true,
   };
 
   return htmlMinifier.minify(code, minifierOptions);

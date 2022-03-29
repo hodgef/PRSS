@@ -1,105 +1,136 @@
 {
   "name": "prss",
-  "version": "1.6.2",
+  "version": "1.7.0",
   "description": "Powerful Blogging",
   "license": "GPL-3.0-or-later",
+  "main": "build/index.js",
+  "types": "build/types/index.d.ts",
   "scripts": {
-    "start": "electron-webpack dev",
-    "build": "electron-webpack",
+    "start": "cross-env NODE_ENV=development node scripts/start.js",
+    "serve:dist": "npm run build && electron ./build",
+    "build": "cross-env NODE_ENV=production node scripts/build.js",
+    "pack": "npm run build && electron-builder --dir",
     "dist": "npm run build && electron-builder",
-    "dist:dir": "npm run dist --dir -c.compression=store -c.mac.identity=null",
-    "rebuild": "electron-rebuild -f -w sqlite3",
-    "licenses": "npm-license-crawler -onlyDirectDependencies -json src/renderer/json/licenses.json",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "rebuild": "electron-rebuild",
+    "test": "cross-env ELECTRON_RUN_AS_NODE=true electron ./node_modules/jest-cli/bin/jest.js --silent",
+    "test:verbose": "cross-env ELECTRON_RUN_AS_NODE=true electron ./node_modules/jest-cli/bin/jest.js --verbose",
+    "coverage": "npm run test -- --coverage",
+    "trypublish": "npm publish || true"
   },
-  "author": {
-    "name": "Francisco Hodge",
-    "email": "hello@franciscohodge.com",
-    "url": "https://github.com/hodgef"
+  "author": "Francisco Hodge <hello@franciscohodge.com> (https://github.com/hodgef)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hodgef/PRSS"
   },
   "dependencies": {
-    "browser-sync": "^2.26.7",
+    "@typescript-eslint/parser": "^5.8.0",
+    "browser-sync": "^2.27.9",
     "electron-log": "^4.2.2",
-    "electron-store": "^5.1.1",
-    "electron-updater": "^4.3.1",
-    "express": "^4.17.1",
+    "electron-store": "^8.0.1",
+    "electron-updater": "4.6.5",
+    "express": "^4.17.3",
     "html-minifier-terser": "^5.1.1",
+    "jodit-react": "^1.0.42",
     "knex": "^0.21.1",
+    "pretty": "^2.0.0",
     "sitemap": "^6.1.5",
     "source-map-support": "^0.5.12",
     "sqlite3": "^5.0.0"
   },
   "devDependencies": {
-    "@babel/preset-react": "^7.8.3",
-    "@types/react": "^16.9.23",
-    "@types/react-dom": "^16.9.5",
-    "@types/styled-components": "^5.0.1",
-    "@typescript-eslint/eslint-plugin": "^3.6.1",
-    "@typescript-eslint/parser": "^3.6.1",
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.5",
+    "@babel/plugin-proposal-class-properties": "^7.16.0",
+    "@babel/plugin-transform-typescript": "^7.16.8",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "@babel/preset-typescript": "^7.16.0",
+    "@electron/remote": "^2.0.5",
+    "@types/enzyme": "^3.10.11",
+    "@types/jest": "^27.4.1",
+    "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.10",
+    "@types/react-router-dom": "^5.3.3",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.33.0",
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.6",
     "ace-builds": "^1.4.8",
     "antd": "^4.0.3",
     "axios": "^0.19.2",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.2.3",
     "babel-minify": "^0.5.1",
-    "bootstrap": "^4.4.1",
+    "babel-preset-minify": "^0.5.0",
     "classnames": "^2.2.6",
+    "cross-env": "7.0.3",
+    "css-loader": "^6.6.0",
     "del": "^5.1.0",
-    "electron": "9.1.0",
-    "electron-builder": "^22.7.0",
-    "electron-builder-notarize": "^1.2.0",
-    "electron-notarize": "^1.0.0",
-    "electron-rebuild": "^1.11.0",
-    "electron-webpack": "^2.8.2",
-    "electron-webpack-eslint": "^6.0.0",
-    "electron-webpack-ts": "^4.0.1",
-    "eslint": "^7.4.0",
-    "eslint-plugin-react": "^7.20.3",
-    "eslint-plugin-simple-import-sort": "^5.0.3",
+    "dotenv": "^16.0.0",
+    "electron": "^17.1.0",
+    "electron-builder": "^22.14.13",
+    "electron-builder-notarize": "^1.4.0",
+    "electron-notarize": "^1.1.1",
+    "electron-rebuild": "^3.2.7",
+    "enzyme": "^3.11.0",
+    "eslint": "^7.32.0",
+    "file-loader": "^6.2.0",
     "fs-extra": "^8.1.0",
     "glob": "^7.1.6",
     "globby": "^11.0.0",
-    "history": "^4.10.1",
-    "jodit-react": "^1.0.42",
-    "lockfile": "^1.0.4",
-    "prettier": "^1.19.1",
+    "html-webpack-plugin": "^5.5.0",
+    "jest": "^27.5.1",
+    "live-server": "^1.2.1",
+    "mini-css-extract-plugin": "^2.6.0",
+    "optimize-css-assets-webpack-plugin": "^6.0.1",
+    "prettier": "^2.5.1",
     "prettier-webpack-plugin": "^1.2.0",
-    "pretty": "^2.0.0",
-    "raw-loader": "^4.0.0",
-    "react": "^16.13.0",
+    "react": "^17.0.0",
     "react-ace": "^8.1.0",
-    "react-dom": "^16.13.0",
+    "react-dom": "^17.0.0",
     "react-router-dom": "^5.1.2",
     "react-toastify": "^5.5.0",
     "request": "^2.88.2",
     "rimraf": "^3.0.2",
-    "sass-loader": "^8.0.2",
     "semver-compare": "^1.0.0",
     "simple-git": "^1.132.0",
+    "simple-git-hooks": "2.7.0",
     "slash": "^3.0.0",
-    "styled-components": "^5.0.1",
+    "string-replace-loader": "^3.1.0",
+    "style-loader": "^3.3.1",
     "terser": "^4.8.0",
-    "typescript": "^3.9.3",
+    "terser-webpack-plugin": "^5.3.1",
+    "ts-jest": "^27.1.3",
+    "typescript": "^4.6.2",
+    "url-loader": "^4.1.1",
     "uuid": "^3.4.0",
-    "webpack": "~4.35.3"
+    "webpack": "^5.70.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "4.7.4"
   },
-  "electronWebpack": {
-    "title": "PRSS - Powerful Blogging",
-    "whiteListedModules": [],
-    "main": {
-      "webpackConfig": "webpack.main.js"
-    },
-    "renderer": {
-      "template": "src/renderer/index.html",
-      "webpackConfig": "webpack.renderer.js"
-    }
+  "bugs": {
+    "url": "https://github.com/hodgef/PRSS/issues"
   },
+  "homepage": "https://github.com/hodgef/PRSS",
   "build": {
+    "extends": null,
     "productName": "PRSS",
     "appId": "io.prss.app",
-    "copyright": "2020-present, Francisco Hodge",
+    "copyright": "2022-present, Francisco Hodge",
     "artifactName": "${productName}-${platform}.${ext}",
     "files": [
-      "build/*",
+      "build/**/*",
       "embedded.provisionprofile"
+    ],
+    "extraFiles": [
+      {
+        "from": "static/icons",
+        "to": "resources/static/icons",
+        "filter": [
+          "**/*"
+        ]
+      }
     ],
     "publish": [
       {
@@ -108,36 +139,52 @@
         "repo": "PRSS"
       }
     ],
+    "appx": {
+      "applicationId": "PRSS",
+      "identityName": "electron-webpack",
+      "publisher": "CN=Francisco Hodge, O=Francisco Hodge, L=Vancouver, S=British Columbia, C=CA"
+    },
     "win": {
-      "icon": "static/icons/icon.ico",
-      "target": "nsis",
+      "icon": "public/icons/icon.ico",
+      "target": [
+        "appx",
+        "nsis"
+      ],
       "publisherName": "Francisco Hodge"
     },
     "linux": {
-      "icon": "static/icons/icon.png",
+      "icon": "public/icons/icon.png",
       "target": "zip"
     },
-    "afterSign": "electron-builder-notarize",
+    "afterAllArtifactBuild": "scripts/afterSignHook.js",
     "mac": {
       "category": "public.app-category.productivity",
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "./build/entitlements.mac.plist",
-      "icon": "static/icons/icon.icns",
+      "entitlements": "public/entitlements.mac.plist",
+      "entitlementsInherit": "./public/entitlements.mac.plist",
+      "identity": "F7735AA14D8A32CE021D86077797AE9457C53603",
+      "icon": "public/icons/icon.icns",
       "target": [
-        "dmg",
-        "zip",
-        "mas"
+        "dmg"
       ],
       "hardenedRuntime": true,
       "provisioningProfile": "embedded.provisionprofile"
     },
-    "mas": {
-      "entitlements": "./build/entitlements.mas.plist",
-      "entitlementsInherit": "./build/entitlements.mas.inherit.plist",
-      "hardenedRuntime": false
-    },
     "dmg": {
       "icon": false
     }
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "jest-environment-jsdom",
+    "transform": {
+      "node_modules/variables/.+\\.(j|t)sx?$": "ts-jest"
+    },
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/scripts/testMock.js",
+      "\\.(css|less)$": "<rootDir>/scripts/testMock.js"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!variables/.*)"
+    ]
   }
 }

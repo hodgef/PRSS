@@ -5,20 +5,20 @@ import React, {
   FunctionComponent,
   useEffect,
   useState,
-  ReactNode
+  ReactNode,
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   walkStructure,
   findInStructureCondition,
-  findParentInStructure
+  findParentInStructure,
 } from "../services/build";
 import {
   deletePosts,
   updateSiteStructure,
   buildAndDeploy,
-  clonePosts
+  clonePosts,
 } from "../services/hosting";
 import DraggableTree from "./DraggableTree";
 import Footer from "./Footer";
@@ -32,7 +32,7 @@ interface IProps {
 }
 
 const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
-  const { siteId } = useParams();
+  const { siteId } = useParams() as any;
 
   const [site, setSite] = useState(null);
   const [items, setItems] = useState(null);
@@ -48,7 +48,7 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const [showPublishButton] = useState(publishSuggested);
 
   const renderItem = ({ title }) => ({
-    title
+    title,
   });
 
   useEffect(() => {
@@ -130,11 +130,11 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     }
   };
 
-  const onItemClick = itemId => {
+  const onItemClick = (itemId) => {
     history.push(`/sites/${siteId}/posts/editor/${itemId}`);
   };
 
-  const onStructureUpdate = async data => {
+  const onStructureUpdate = async (data) => {
     const updatedStructure = await walkStructure(siteId, data);
     updateSiteStructure(siteId, updatedStructure);
     setStructureState(
@@ -167,14 +167,14 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
    * Cancel if item with same slug exists at drop point.
    */
   const onDropItemCheck = async (newData, draggedNodeUUID) => {
-    const draggedItem = items.find(item => item.uuid === draggedNodeUUID);
+    const draggedItem = items.find((item) => item.uuid === draggedNodeUUID);
     const draggedItemParent = findParentInStructure(
       draggedNodeUUID,
       structureState
     );
 
-    const hasSlugDuplicates = findInStructureCondition(newData, node => {
-      const nodeItem = items.find(item => item.uuid === node.key);
+    const hasSlugDuplicates = findInStructureCondition(newData, (node) => {
+      const nodeItem = items.find((item) => item.uuid === node.key);
       const nodeParent = findParentInStructure(node.key, structureState) || {};
 
       const hasSameSlug = nodeItem.slug === draggedItem.slug;
@@ -263,13 +263,13 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
           <DraggableTree
             checkable={selectEnabled}
             data={structureState}
-            onUpdate={data => {
+            onUpdate={(data) => {
               onStructureUpdate(data);
             }}
             onDropCheck={onDropItemCheck}
-            onSelect={items => items[0] && onItemClick(items[0])}
+            onSelect={(items) => items[0] && onItemClick(items[0])}
             checkedKeys={selectedItems}
-            onCheck={items => {
+            onCheck={(items) => {
               setSelectedItems(items);
             }}
             checkStrictly

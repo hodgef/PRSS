@@ -1,11 +1,11 @@
 import Store from "electron-store";
-import path from "path";
+const path = require("path");
 import fs from "fs";
 import knex from "knex";
 import {
   mapFieldsFromJSON,
   getGithubSecureAuth,
-  getPRSSConfig
+  getPRSSConfig,
 } from "../renderer/services/utils";
 import { getConfigPath } from "./utils";
 
@@ -14,17 +14,15 @@ const JSON_FIELDS = [
   "menus",
   "vars",
   "exclusiveVars",
-  "isContentRaw"
+  "isContentRaw",
 ];
 
-const { app } = require("electron").remote;
-
 const defaultsInt = {
-  paths: {}
+  paths: {},
 } as IStoreInternal;
 
 const defaults = {
-  sites: {}
+  sites: {},
 } as IStore;
 
 let store;
@@ -62,9 +60,9 @@ const setCache = (name, val) => {
   cache[name] = val;
 };
 
-const getCache = name => cache[name];
+const getCache = (name) => cache[name];
 
-const deleteCache = name => delete cache[name];
+const deleteCache = (name) => delete cache[name];
 
 const initDb = async () => {
   const storePath = await getConfigPath();
@@ -74,13 +72,15 @@ const initDb = async () => {
   db = knex({
     client: "sqlite3",
     connection: {
-      filename: dbFile
+      filename: dbFile,
     },
     useNullAsDefault: true,
     postProcessResponse: (result, queryContext) => {
       if (Array.isArray(result)) {
         if (result && typeof result[0] === "object") {
-          const output = result.map(res => mapFieldsFromJSON(JSON_FIELDS, res));
+          const output = result.map((res) =>
+            mapFieldsFromJSON(JSON_FIELDS, res)
+          );
           return output;
         } else {
           return result;
@@ -91,12 +91,12 @@ const initDb = async () => {
       } else {
         return result;
       }
-    }
+    },
   });
 
   if (!dbExists) {
     return db.schema
-      .createTable("sites", table => {
+      .createTable("sites", (table) => {
         table.increments("id");
         table.string("uuid");
         table.string("name");
@@ -113,7 +113,7 @@ const initDb = async () => {
         table.string("vars");
         table.string("menus");
       })
-      .createTable("items", table => {
+      .createTable("items", (table) => {
         table.increments("id");
         table.string("uuid");
         table.string("siteId");
@@ -136,9 +136,9 @@ const initDb = async () => {
 };
 
 const initStore = () => {
-  return new Promise(async resolve => {
+  return new Promise(async (resolve) => {
     if (store) {
-      resolve();
+      resolve(null);
     }
 
     /**
@@ -146,7 +146,7 @@ const initStore = () => {
      */
     storeInt = new Store({
       name: "prss-int",
-      defaultsInt
+      defaultsInt,
     } as any);
 
     const paths = (await storeInt.get("paths")) || {};
@@ -168,8 +168,8 @@ const initStore = () => {
         buffer: bufferPath,
         public: publicPath,
         themes: themesPath,
-        vendor: vendorPath
-      }
+        vendor: vendorPath,
+      },
     });
 
     /**
@@ -178,7 +178,7 @@ const initStore = () => {
     store = new Store({
       name: "prss",
       cwd: configPath,
-      defaults
+      defaults,
     });
 
     /**
@@ -188,7 +188,7 @@ const initStore = () => {
       fs.mkdirSync(themesPath);
     }
 
-    resolve();
+    resolve(null);
   });
 };
 
@@ -199,13 +199,13 @@ const initExpress = async () => {
   const express = require("express");
   expressApp = express();
 
-  expressServer = expressApp.listen(3001, function() {
+  expressServer = expressApp.listen(3001, function () {
     console.log(
       "Express server listening on port " + expressServer.address().port
     );
   });
 
-  expressApp.get("/", function(req, res) {
+  expressApp.get("/", function (req, res) {
     res.send("PRSS");
   });
 
@@ -221,7 +221,7 @@ const initExpress = async () => {
   });
 };
 
-const expressOpen = path => {
+const expressOpen = (path) => {
   window.open(expressUrl + path);
 };
 
@@ -249,5 +249,5 @@ export {
   runHook,
   getHooks,
   clearHooks,
-  JSON_FIELDS
+  JSON_FIELDS,
 };

@@ -7,7 +7,7 @@ import {
   getApiUrl,
   getCache,
   setCache,
-  storeInt
+  storeInt,
 } from "../../common/bootstrap";
 
 export const merge = (var1, var2) => {
@@ -24,11 +24,11 @@ export const normalizeStrict = (str: string) => {
     .toLowerCase()
     .normalize("NFD")
     .replace(/\s+/g, "-")
-    .replace(/[^\w\-]+/g, "")
-    .replace(/\-\-+/g, "-")
+    .replace(/[^\w-]+/g, "")
+    .replace(/--+/g, "-")
     .replace(/^-+/, "")
     .replace(/-+$/, "")
-    .replace(/[^\w\s-\.]/gi, "");
+    .replace(/[^\w\s-.]/gi, "");
 };
 
 export const normalize = (str: string) => {
@@ -37,12 +37,12 @@ export const normalize = (str: string) => {
     .toLowerCase()
     .normalize("NFD")
     .replace(/\s+/g, "-")
-    .replace(/[^\w!.\-]+/g, "")
-    .replace(/\-\-+/g, "-")
+    .replace(/[^\w!.-]+/g, "")
+    .replace(/--+/g, "-")
     .replace(/\.\.+/g, ".")
     .replace(/^-+/, "")
     .replace(/-+$/, "")
-    .replace(/[^\w\s-\.]/gi, "");
+    .replace(/[^\w\s-.]/gi, "");
 };
 
 export const camelCase = (str: string) => {
@@ -50,7 +50,7 @@ export const camelCase = (str: string) => {
     .toString()
     .replace(/[^\w]+/g, "")
     .normalize("NFD")
-    .replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+    .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
       return index === 0 ? word.toLowerCase() : word.toUpperCase();
     })
     .replace(/\s+/g, "");
@@ -58,7 +58,7 @@ export const camelCase = (str: string) => {
 
 export const getJson = (url, cache = false) => {
   const userAgent = process.env.NODE_ENV !== "production" ? "PRSS_DEV" : "PRSS";
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     if (cache && getCache(url)) {
       resolve(getCache(url));
     } else {
@@ -66,9 +66,9 @@ export const getJson = (url, cache = false) => {
         {
           url: url,
           json: true,
-          headers: { "User-Agent": userAgent }
+          headers: { "User-Agent": userAgent },
         },
-        function(error, response, body) {
+        function (error, response, body) {
           cache && setCache(url, body);
           resolve(body);
         }
@@ -79,7 +79,7 @@ export const getJson = (url, cache = false) => {
 
 export const getUrl = (url, cache = false) => {
   const userAgent = process.env.NODE_ENV !== "production" ? "PRSS_DEV" : "PRSS";
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     if (cache && getCache(url)) {
       resolve(getCache(url));
     } else {
@@ -87,9 +87,9 @@ export const getUrl = (url, cache = false) => {
         {
           url: url,
           json: false,
-          headers: { "User-Agent": userAgent }
+          headers: { "User-Agent": userAgent },
         },
-        function(error, response, body) {
+        function (error, response, body) {
           cache && setCache(url, body);
           resolve(body);
         }
@@ -114,9 +114,9 @@ export const confirmation = ({
   title,
   buttons = [{ label: "Yes", action: () => {} }] as any,
   showCancel = true,
-  contentClassName = ""
+  contentClassName = "",
 }) => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const mappedButtons = buttons.map(({ label, action = () => {} }, index) => {
       return {
         label,
@@ -124,7 +124,7 @@ export const confirmation = ({
           action();
           resolve(index);
           modal.close();
-        }
+        },
       };
     });
 
@@ -135,7 +135,7 @@ export const confirmation = ({
       onCancel: () => {
         resolve(-1);
       },
-      contentClassName
+      contentClassName,
     });
   });
 };
@@ -145,17 +145,17 @@ export const ask = ({
   message,
   buttons,
   showCancel = false,
-  renderInput = null
+  renderInput = null,
 }) => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const mappedButtons = buttons.map(({ label, action = (res?) => {} }) => {
       return {
         label,
-        action: res => {
+        action: (res) => {
           action(res);
           resolve(res);
           modal.close();
-        }
+        },
       };
     });
 
@@ -167,13 +167,13 @@ export const ask = ({
       onCancel: () => {
         resolve(-1);
       },
-      renderInput
+      renderInput,
     });
   });
 };
 
 export const stringReplace = (str = "", replaceWith = {}) => {
-  Object.keys(replaceWith).forEach(key => {
+  Object.keys(replaceWith).forEach((key) => {
     str = str.replace(`{{${key}}}`, replaceWith[key]);
   });
 
@@ -192,17 +192,17 @@ export const checkDirs = async () => {
 
 export const noop = () => {};
 
-export const toJson = o => JSON.stringify(o);
+export const toJson = (o) => JSON.stringify(o);
 export const fromJson = (s: string) => JSON.parse(s);
 
-export const valuesToJson = input => {
+export const valuesToJson = (input) => {
   let out;
 
   if (Array.isArray(input)) {
-    out = input.map(i => valuesToJson(i));
+    out = input.map((i) => valuesToJson(i));
   } else if (typeof input === "object") {
     out = {};
-    Object.keys(input).forEach(key => {
+    Object.keys(input).forEach((key) => {
       out[key] = input[key] ? toJson(input[key]) : input[key];
     });
   } else {
@@ -212,14 +212,14 @@ export const valuesToJson = input => {
   return out;
 };
 
-export const valuesFromJson = input => {
+export const valuesFromJson = (input) => {
   let out;
 
   if (Array.isArray(input)) {
-    out = input.map(i => valuesFromJson(i));
+    out = input.map((i) => valuesFromJson(i));
   } else if (typeof input === "object") {
     out = {};
-    Object.keys(input).forEach(key => {
+    Object.keys(input).forEach((key) => {
       out[key] = input[key] ? valuesFromJson(input[key]) : input[key];
     });
   } else {
@@ -231,7 +231,7 @@ export const valuesFromJson = input => {
 
 export const mapFieldsFromJSON = (fields = [], obj) => {
   const newObj = { ...obj };
-  fields.forEach(field => {
+  fields.forEach((field) => {
     if (newObj[field]) {
       newObj[field] = JSON.parse(newObj[field]);
     }
@@ -241,7 +241,7 @@ export const mapFieldsFromJSON = (fields = [], obj) => {
 
 export const mapFieldsToJSON = (fields = [], obj) => {
   const newObj = { ...obj };
-  fields.forEach(field => {
+  fields.forEach((field) => {
     if (newObj[field]) {
       newObj[field] = JSON.stringify(newObj[field]);
     }
@@ -264,11 +264,11 @@ export const sequential = (
     : asyncFn(arr[index]);
   if (!isPromise(asyncFnPromise)) throw new Error("asyncFn must be a promise!");
 
-  return asyncFnPromise.then(r => {
+  return asyncFnPromise.then((r) => {
     const progress = parseInt("" + ((index + 1) * 100) / arr.length);
     if (onUpdate) onUpdate(progress, r);
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const timeout = setTimeout(async () => {
         clearTimeout(timeout);
         const res = await sequential(
@@ -289,7 +289,7 @@ export const sequential = (
 export const exclude = (obj = {}, keys = []) => {
   const newObj = { ...obj };
 
-  keys.forEach(key => {
+  keys.forEach((key) => {
     delete newObj[key];
   });
 
@@ -299,10 +299,10 @@ export const exclude = (obj = {}, keys = []) => {
 export const objGet = (s, obj) =>
   s.split(".").reduce((a, b) => (a ? a[b] : ""), obj);
 
-export const isPromise = value =>
+export const isPromise = (value) =>
   Boolean(value && typeof value.then === "function");
 
-export const sanitizeSite = siteObj => {
+export const sanitizeSite = (siteObj) => {
   const newObj = JSON.parse(JSON.stringify(siteObj));
 
   /**
@@ -317,8 +317,8 @@ export const sanitizeSite = siteObj => {
     "headHtml",
     "footerHtml",
     "sidebarHtml",
-    "vars"
-  ].forEach(field => {
+    "vars",
+  ].forEach((field) => {
     delete newObj[field];
   });
 
@@ -335,7 +335,7 @@ export const getLatestVersion = async () => {
   return res;
 };
 
-export const getGithubSecureAuth = async code => {
+export const getGithubSecureAuth = async (code) => {
   const res = ((await getJson(getApiUrl(`/login/github/verify/${code}`))) ||
     {}) as any;
   return res;
@@ -343,7 +343,7 @@ export const getGithubSecureAuth = async code => {
 
 export const getCurrentVersion = () => {
   const isDevelopment = process.env.NODE_ENV !== "production";
-  const { app } = require("electron").remote;
+  const { app } = require("@electron/remote");
   let currentVersion;
 
   if (isDevelopment) {
@@ -355,7 +355,7 @@ export const getCurrentVersion = () => {
   return currentVersion;
 };
 
-export const notifyNewVersion = async newVersion => {
+export const notifyNewVersion = async (newVersion) => {
   const response = await confirmation({
     title: [
       React.createElement(
@@ -367,10 +367,10 @@ export const notifyNewVersion = async newVersion => {
         "p",
         { key: "ver-1b" },
         "Update to the latest version to have the latest improvements and bug fixes."
-      )
+      ),
     ],
     buttons: [{ label: "Update" }, { label: "Remind me later" }],
-    contentClassName: "prss-update"
+    contentClassName: "prss-update",
   });
 
   /**
@@ -386,17 +386,17 @@ export const notifyNewVersion = async newVersion => {
   }
 };
 
-export const sanitizeSiteItems = items => {
+export const sanitizeSiteItems = (items) => {
   /**
    * Update items
    */
-  return items.map(item => {
+  return items.map((item) => {
     item.content = truncateString(stripTags(item.content));
     return sanitizeItem(item);
   });
 };
 
-export const sanitizeItem = itemObj => {
+export const sanitizeItem = (itemObj) => {
   const newObj = JSON.parse(JSON.stringify(itemObj));
   [
     "id",
@@ -405,8 +405,8 @@ export const sanitizeItem = itemObj => {
     "sidebarHtml",
     "exclusiveVars",
     "isContentRaw",
-    "siteId"
-  ].forEach(field => {
+    "siteId",
+  ].forEach((field) => {
     delete newObj[field];
   });
   return newObj;
@@ -420,10 +420,7 @@ export const sanitizeBufferItem = (itemObj, mergeObj = {}) => {
 };
 
 export const truncateString = (str = "", maxLength = 50) => {
-  const output = str
-    .replace(/"/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
+  const output = str.replace(/"/g, "").replace(/\s+/g, " ").trim();
   if (!output) return null;
   if (output.length <= maxLength) return output;
   return `${output.substring(0, maxLength)}...`;
@@ -438,22 +435,23 @@ export const appendSlash = (str = "/") => {
 };
 
 export const removeTagsFromElem = (doc, tags) =>
-  tags.forEach(tag =>
-    doc.querySelectorAll(tag).forEach(elem => (elem.innerHTML = ""))
+  tags.forEach((tag) =>
+    doc.querySelectorAll(tag).forEach((elem) => (elem.innerHTML = ""))
   );
 
-export const stripTags = html => {
+export const stripTags = (html) => {
   const rawHtml = stripShortcodes(html);
   const doc = new DOMParser().parseFromString(rawHtml, "text/html");
   removeTagsFromElem(doc, ["pre", "h1", "h2"]);
   return doc.body.textContent || "";
 };
 
-export const stripShortcodes = html => {
+export const stripShortcodes = (html) => {
   let output = html;
-  const shortcodeRegex = /\[([a-zA-Z]+)=?([a-zA-Z0-9]+)?\](.+?)\[\/[a-zA-Z]+\]?/gi;
+  const shortcodeRegex =
+    /\[([a-zA-Z]+)=?([a-zA-Z0-9]+)?\](.+?)\[\/[a-zA-Z]+\]?/gi;
   const matches = [...output.matchAll(shortcodeRegex)];
-  matches.forEach(match => {
+  matches.forEach((match) => {
     const [fullMatch] = match;
 
     if (fullMatch) {
@@ -468,6 +466,6 @@ export const isHtml = RegExp.prototype.test.bind(/(<([^>]+)>)/i);
 export const removeStopWords = (str = "") => {
   const words = str.split(" ");
   return words
-    .filter(word => !stopwords.includes(word.toLowerCase()))
+    .filter((word) => !stopwords.includes(word.toLowerCase()))
     .join(" ");
 };

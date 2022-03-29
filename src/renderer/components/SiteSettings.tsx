@@ -5,7 +5,7 @@ import React, {
   Fragment,
   useState,
   useEffect,
-  ReactNode
+  ReactNode,
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
@@ -27,13 +27,13 @@ interface IProps {
 }
 
 const SiteSettings: FunctionComponent<IProps> = ({
-  setHeaderLeftComponent
+  setHeaderLeftComponent,
 }) => {
-  const { siteId } = useParams();
+  const { siteId } = useParams() as any;
 
   const siteInt = configGet(`sites.${siteId}`) as ISiteInternal;
   const {
-    hosting: { name: hostingName = "none" }
+    hosting: { name: hostingName = "none" },
   } = siteInt;
 
   const [site, setSite] = useState(null);
@@ -44,14 +44,11 @@ const SiteSettings: FunctionComponent<IProps> = ({
   const [siteTheme, setSiteTheme] = useState("");
   const [siteUrl, setSiteUrl] = useState("");
 
-  const [showRawHTMLEditorOverlay, setShowRawHTMLEditorOverlay] = useState(
-    false
-  );
+  const [showRawHTMLEditorOverlay, setShowRawHTMLEditorOverlay] =
+    useState(false);
 
-  const [
-    showSiteVariablesEditorOverlay,
-    setShowSiteVariablesEditorOverlay
-  ] = useState(false);
+  const [showSiteVariablesEditorOverlay, setShowSiteVariablesEditorOverlay] =
+    useState(false);
 
   const [themeList, setThemeList] = useState(null);
   const history = useHistory();
@@ -138,12 +135,12 @@ const SiteSettings: FunctionComponent<IProps> = ({
       title: siteTitle,
       theme: siteTheme,
       url: siteUrl,
-      updatedAt
+      updatedAt,
     };
 
     const updatedSiteInt = {
       ...siteInt,
-      publishSuggested: true
+      publishSuggested: true,
     };
 
     /**
@@ -154,7 +151,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
       title: siteTitle,
       theme: siteTheme,
       url: siteUrl,
-      updatedAt
+      updatedAt,
     });
 
     await configSet(`sites.${siteId}`, updatedSiteInt);
@@ -179,7 +176,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
         headHtml,
         footerHtml,
         sidebarHtml,
-        updatedAt
+        updatedAt,
       };
 
       /**
@@ -189,7 +186,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
         headHtml,
         footerHtml,
         sidebarHtml,
-        updatedAt
+        updatedAt,
       });
 
       await configSet(`sites.${siteId}.publishSuggested`, true);
@@ -236,7 +233,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
                   type="text"
                   className="form-control"
                   value={siteTitle}
-                  onChange={e => setSiteTitle(e.target.value)}
+                  onChange={(e) => setSiteTitle(e.target.value)}
                 />
               </div>
             </div>
@@ -249,7 +246,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
                   type="text"
                   className="form-control"
                   value={editedSiteName}
-                  onChange={e => setEditedSiteName(e.target.value)}
+                  onChange={(e) => setEditedSiteName(e.target.value)}
                   onBlur={() =>
                     setEditedSiteName(normalizeStrict(editedSiteName))
                   }
@@ -264,10 +261,10 @@ const SiteSettings: FunctionComponent<IProps> = ({
                 <select
                   className="custom-select"
                   id="theme-selector"
-                  onChange={e => setSiteTheme(e.target.value)}
+                  onChange={(e) => setSiteTheme(e.target.value)}
                   value={siteTheme}
                 >
-                  {themeList.map(themeName => (
+                  {themeList.map((themeName) => (
                     <option key={`option-${themeName}`} value={themeName}>
                       {themeName}
                     </option>
@@ -284,8 +281,8 @@ const SiteSettings: FunctionComponent<IProps> = ({
                   type="text"
                   className="form-control"
                   value={siteUrl}
-                  onChange={e => setSiteUrl(e.target.value)}
-                  onBlur={e => setSiteUrl(appendSlash(e.target.value))}
+                  onChange={(e) => setSiteUrl(e.target.value)}
+                  onBlur={(e) => setSiteUrl(appendSlash(e.target.value))}
                 />
               </div>
             </div>

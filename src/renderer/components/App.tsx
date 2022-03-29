@@ -29,12 +29,12 @@ const App: FunctionComponent = () => {
   const [history, setHistory] = useState(null);
 
   const commonProps = {
-    setHeaderLeftComponent: value => {
+    setHeaderLeftComponent: (value) => {
       setHeaderLeft(value);
     },
-    setAppClass: value => {
+    setAppClass: (value) => {
       setAppClass(value);
-    }
+    },
   };
 
   const handleRoute = (RouteComponent, props) => {
@@ -57,73 +57,73 @@ const App: FunctionComponent = () => {
           <Route
             exact
             path="/sites"
-            render={props => handleRoute(ListSites, props)}
+            render={(props) => handleRoute(ListSites, props)}
           />
 
           <Route
             exact
             path="/settings"
-            render={props => handleRoute(AppSettings, props)}
+            render={(props) => handleRoute(AppSettings, props)}
           />
 
           <Route
             exact
             path="/sites/create"
-            render={props => handleRoute(SiteSetup, props)}
+            render={(props) => handleRoute(SiteSetup, props)}
           />
 
           <Route
             exact
             path="/sites/:siteId/posts"
-            render={props => handleRoute(ListPosts, props)}
+            render={(props) => handleRoute(ListPosts, props)}
           />
 
           <Route
             exact
             path="/sites/:siteId/themes"
-            render={props => handleRoute(ThemeManager, props)}
+            render={(props) => handleRoute(ThemeManager, props)}
           />
 
           <Route
             exact
             path="/sites/:siteId/settings"
-            render={props => handleRoute(SiteSettings, props)}
+            render={(props) => handleRoute(SiteSettings, props)}
           />
 
           <Route
             exact
             path="/sites/:siteId/menus"
-            render={props => handleRoute(ListMenus, props)}
+            render={(props) => handleRoute(ListMenus, props)}
           />
 
           <Route
             exact
             path="/sites/:siteId/menus/:menuId"
-            render={props => handleRoute(MenuEditor, props)}
+            render={(props) => handleRoute(MenuEditor, props)}
           />
 
           <Route
             exact
             path="/sites/:siteId/hosting"
-            render={props => handleRoute(SiteSetup, props)}
+            render={(props) => handleRoute(SiteSetup, props)}
           />
 
           <Route
             exact
             path="/sites/:siteId/posts/editor/:postId"
-            render={props => handleRoute(PostEditor, props)}
+            render={(props) => handleRoute(PostEditor, props)}
           />
 
           <Route
             exact
             path="/sites/:siteId/posts/create"
-            render={props => handleRoute(CreatePost, props)}
+            render={(props) => handleRoute(CreatePost, props)}
           />
 
           <Route
             exact
             path="/sites/:siteId"
-            render={props => handleRoute(Dashboard, props)}
+            render={(props) => handleRoute(Dashboard, props)}
           />
 
           <Route

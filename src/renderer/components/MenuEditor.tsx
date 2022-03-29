@@ -5,7 +5,7 @@ import React, {
   FunctionComponent,
   useState,
   useEffect,
-  ReactNode
+  ReactNode,
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import {
   walkStructure,
   structureHasItem,
-  findInStructure
+  findInStructure,
 } from "../services/build";
 import { deleteMenuEntries } from "../services/hosting";
 import DraggableTree from "./DraggableTree";
@@ -26,7 +26,7 @@ interface IProps {
 }
 
 const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
-  const { siteId, menuId } = useParams();
+  const { siteId, menuId } = useParams() as any;
 
   const [site, setSite] = useState(null);
   const [items, setItems] = useState(null);
@@ -77,7 +77,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       setItems(itemsRes);
       setFormattedStructure(
         await walkStructure(siteId, siteRes.structure, ({ title }) => ({
-          title
+          title,
         }))
       );
       handleMenuUpdate(menu);
@@ -85,7 +85,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     getData();
   }, []);
 
-  const handleMenuUpdate = async menuState => {
+  const handleMenuUpdate = async (menuState) => {
     let count = 0;
     setMenuState(menuState);
     setFormattedMenuStructure(
@@ -95,7 +95,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         ({ title }, { title: nodeTitle }) => {
           count++;
           return {
-            title: nodeTitle || title
+            title: nodeTitle || title,
           };
         }
       )
@@ -122,13 +122,13 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     }
   };
 
-  const onItemClick = async itemId => {
+  const onItemClick = async (itemId) => {
     const structureItem = await findInStructure(itemId, menuState);
     const post = await getItem(siteId, itemId);
 
     if (!structureItem || !post) return;
 
-    const renderInput = onChange => (
+    const renderInput = (onChange) => (
       <div>
         <label>Display Name:</label>
         <input
@@ -143,7 +143,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       title: "Edit Menu Entry",
       message: "",
       buttons: [{ label: "Change" }],
-      renderInput
+      renderInput,
     });
 
     if (!itemTitleRes) return;
@@ -154,11 +154,11 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       ({ title: postTitle }, { key, title: nodeTitle = "" }) => {
         if (key === itemId) {
           return {
-            title: itemTitleRes
+            title: itemTitleRes,
           };
         } else {
           return {
-            title: nodeTitle
+            title: nodeTitle,
           };
         }
       }
@@ -184,7 +184,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     );
 
     if (node.children) {
-      node.children.forEach(childrenNode => {
+      node.children.forEach((childrenNode) => {
         formatStructureOptions(childrenNode, options, [...parents, node.key]);
       });
     }
@@ -197,7 +197,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     : null;
 
   const addNew = async () => {
-    const renderInput = onChange => {
+    const renderInput = (onChange) => {
       return (
         <select
           className="form-control form-control custom-select mt-2"
@@ -213,7 +213,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       title: "",
       message: <Fragment>Select a post to add:</Fragment>,
       buttons: [{ label: "Continue" }],
-      renderInput
+      renderInput,
     })) as string;
 
     if (!postId.trim()) {
@@ -225,8 +225,8 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       ...menuState,
       {
         key: postId,
-        children: []
-      }
+        children: [],
+      },
     ];
 
     handleMenuUpdate(newMenuState);
@@ -247,7 +247,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
      */
     await updateSite(siteId, {
       menus: updatedMenus,
-      updatedAt
+      updatedAt,
     });
 
     setSite(updatedSite);
@@ -257,7 +257,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     toast.success("Menu saved successfully");
   };
 
-  const onMenuUpdate = data => {
+  const onMenuUpdate = (data) => {
     handleMenuUpdate(data);
     setMenuChanged(true);
   };
@@ -319,7 +319,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
           <DraggableTree
             checkable={selectEnabled}
             data={formattedMenuStructure}
-            onSelect={items => items[0] && onItemClick(items[0])}
+            onSelect={(items) => items[0] && onItemClick(items[0])}
             onUpdate={onMenuUpdate}
             checkedKeys={selectedItems}
             onCheck={setSelectedItems}

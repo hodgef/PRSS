@@ -5,7 +5,7 @@ import React, {
   Fragment,
   useState,
   useEffect,
-  ReactNode
+  ReactNode,
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -21,7 +21,7 @@ interface IProps {
 }
 
 const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
-  const { siteId } = useParams();
+  const { siteId } = useParams() as any;
 
   const [site, setSite] = useState(null);
   const [items, setItems] = useState(null);
@@ -63,7 +63,7 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       const itemsRes = await getItems(siteId);
       setFormattedStructure(
         await walkStructure(siteId, siteRes.structure, ({ title }) => ({
-          title
+          title,
         }))
       );
 
@@ -88,7 +88,7 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     );
 
     if (node.children) {
-      node.children.forEach(childrenNode => {
+      node.children.forEach((childrenNode) => {
         formatStructureOptions(childrenNode, options, [...parents, node.key]);
       });
     }
@@ -139,12 +139,12 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       template: "post",
       updatedAt: null,
       createdAt: Date.now(),
-      vars: {}
+      vars: {},
     };
 
     const structureItem = {
       key: postId,
-      children: []
+      children: [],
     };
 
     /**
@@ -155,7 +155,7 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     if (!postParent) {
       newStructure[0].children.push(structureItem);
     } else {
-      newStructure = newStructure.map(node =>
+      newStructure = newStructure.map((node) =>
         insertStructureChildren(node, structureItem, postParent)
       );
     }
@@ -164,7 +164,7 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
      * Saving
      */
     await updateSite(siteId, {
-      structure: newStructure
+      structure: newStructure,
     });
 
     await createItems([newItem]);
@@ -206,7 +206,7 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                 type="text"
                 placeholder="Post Title"
                 value={postTitle}
-                onChange={e => setPostTitle(e.target.value)}
+                onChange={(e) => setPostTitle(e.target.value)}
               ></input>
             </div>
           </div>
@@ -217,8 +217,8 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                 type="text"
                 placeholder="URL Slug (Optional)"
                 value={postSlug}
-                onChange={e => setPostSlug(e.target.value)}
-                onBlur={e => setPostSlug(normalize(e.target.value))}
+                onChange={(e) => setPostSlug(e.target.value)}
+                onBlur={(e) => setPostSlug(normalize(e.target.value))}
               ></input>
             </div>
           </div>
@@ -227,7 +227,7 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
               <select
                 className="form-control form-control custom-select mb-3"
                 value={postParent}
-                onChange={e => setPostParent(e.target.value)}
+                onChange={(e) => setPostParent(e.target.value)}
               >
                 <option value="">Parent (Optional)</option>
                 {formattedStructureOptions}

@@ -29,30 +29,30 @@ export const getSampleSiteStructure = (): {
               children: [
                 {
                   key: post.uuid,
-                  children: []
-                }
-              ]
-            }
-          ]
-        }
+                  children: [],
+                },
+              ],
+            },
+          ],
+        },
       ],
       vars: {},
       menus: {
         header: [
           {
             key: home.uuid,
-            children: []
+            children: [],
           },
           {
             key: blog.uuid,
-            children: []
-          }
+            children: [],
+          },
         ],
         footer: [],
-        sidebar: []
-      } as ISiteMenus
+        sidebar: [],
+      } as ISiteMenus,
     } as ISite,
-    items: [home, blog, post]
+    items: [home, blog, post],
   };
 };
 
@@ -63,7 +63,7 @@ export const getSampleSiteItems = (siteUUID: string) => {
     sidebarHtml: null,
     updatedAt: null,
     createdAt: Date.now(),
-    vars: {}
+    vars: {},
   };
 
   return {
@@ -77,9 +77,9 @@ export const getSampleSiteItems = (siteUUID: string) => {
       template: "home",
       vars: {
         heroTitle: "Welcome",
-        heroMessage: getString("theme_default_hero_message")
+        heroMessage: getString("theme_default_hero_message"),
       },
-      exclusiveVars: ["heroTitle", "heroMessage"]
+      exclusiveVars: ["heroTitle", "heroMessage"],
     },
     blog: {
       ...commonProps,
@@ -88,7 +88,7 @@ export const getSampleSiteItems = (siteUUID: string) => {
       slug: "blog",
       title: "Blog",
       content: "<p>Explore the latest posts</p>",
-      template: "blog"
+      template: "blog",
     },
     post: {
       ...commonProps,
@@ -97,13 +97,13 @@ export const getSampleSiteItems = (siteUUID: string) => {
       slug: "my-post",
       title: "My Post",
       content: "<p>This is my first post.</p>",
-      template: "post"
-    }
+      template: "post",
+    },
   };
 };
 
 export const getSampleSiteIntStructure = () => {
   return {
-    publishSuggested: false
+    publishSuggested: false,
   };
 };

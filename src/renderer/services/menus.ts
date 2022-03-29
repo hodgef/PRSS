@@ -13,8 +13,10 @@ export const getMenuHtml = async (name, siteId) => {
 
   if (!menu) return "";
 
-  const parseNode = node => {
-    const bufferItem = bufferItems.find(bItem => bItem.item.uuid === node.key);
+  const parseNode = (node) => {
+    const bufferItem = bufferItems.find(
+      (bItem) => bItem.item.uuid === node.key
+    );
     const nodeItem = bufferItem.item;
     const parsedChildren = node.children ? node.children.map(parseNode) : [];
     const nodePath =
@@ -22,8 +24,9 @@ export const getMenuHtml = async (name, siteId) => {
         ? bufferItem.path.substring(1)
         : bufferItem.path;
 
-    return `<li><a href="#" data-prss-path="${nodePath}">${node.title ||
-      nodeItem.title}</a> ${
+    return `<li><a href="#" data-prss-path="${nodePath}">${
+      node.title || nodeItem.title
+    }</a> ${
       parsedChildren.length ? "<ul>" + parsedChildren.join("") + "</ul>" : ""
     }</li>`;
   };

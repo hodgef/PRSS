@@ -8,28 +8,26 @@ export const configSet = (...params) =>
 export const configGet = (param: any) => store.get(param);
 export const configRem = (param: any) => store.delete(param);
 
-export const globalRequire = __non_webpack_require__;
-
-const { app } = require("electron").remote;
+const { app } = require("@electron/remote");
 const execSync = require("child_process").execSync;
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 export const getString = (id: string, replaceWith: string[] = []) => {
   let str = strings[id] || "";
 
-  replaceWith.forEach(replacement => {
+  replaceWith.forEach((replacement) => {
     str = str.replace("%s", replacement);
   });
 
   return str;
 };
 
-export const toBase64 = file =>
+export const toBase64 = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
+    reader.onerror = (error) => reject(error);
   });
 
 export const localStorageSet = async (key: string, value: string) => {

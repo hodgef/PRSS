@@ -5,7 +5,7 @@ import React, {
   useState,
   useRef,
   Fragment,
-  useEffect
+  useEffect,
 } from "react";
 import { Link } from "react-router-dom";
 import cx from "classnames";
@@ -30,7 +30,7 @@ interface IProps {
 const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
   siteId,
   postId,
-  onClose = noop
+  onClose = noop,
 }) => {
   const [site, setSite] = useState(null);
   const [items, setItems] = useState(null);
@@ -56,12 +56,14 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
 
       const bufferItems = await getBufferItems(siteRes);
 
-      const post = postId ? itemsRes.find(item => item.uuid === postId) : null;
+      const post = postId
+        ? itemsRes.find((item) => item.uuid === postId)
+        : null;
       setPost(post);
 
       const bufferItem =
         bufferItems && post
-          ? bufferItems.find(bufferItem => bufferItem.item.uuid === post.uuid)
+          ? bufferItems.find((bufferItem) => bufferItem.item.uuid === post.uuid)
           : null;
 
       setBufferItem(bufferItem);
@@ -95,7 +97,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
   }
 
   const addNew = () => {
-    setVariables(prevVars => [...prevVars, { name: "", content: "" }]);
+    setVariables((prevVars) => [...prevVars, { name: "", content: "" }]);
   };
 
   const setVar = (
@@ -109,7 +111,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
     if (varIndex > -1) {
       newVars[varIndex] = {
         ...newVars[varIndex],
-        [fieldName]: isNormalized ? camelCase(e.target.value) : e.target.value
+        [fieldName]: isNormalized ? camelCase(e.target.value) : e.target.value,
       };
 
       variablesBuffer;
@@ -121,7 +123,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
     const newVars = [...variables];
     delete newVars[varIndex];
 
-    return setVariables([...newVars.filter(variable => !!variable)]);
+    return setVariables([...newVars.filter((variable) => !!variable)]);
   };
 
   const preventVarToggle = (varIndex: number) => {
@@ -136,13 +138,13 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
        */
       return setExclusiveVariables([
         ...exclusiveVariables.filter(
-          variable => variable !== selectedVariableName
-        )
+          (variable) => variable !== selectedVariableName
+        ),
       ]);
     } else {
       return setExclusiveVariables([
         ...exclusiveVariables,
-        newVars[varIndex].name
+        newVars[varIndex].name,
       ]);
     }
   };
@@ -153,7 +155,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
     /**
      * Removing empty vars
      */
-    const varsArray = variables.filter(varItem => !!varItem.name.trim());
+    const varsArray = variables.filter((varItem) => !!varItem.name.trim());
 
     /**
      * Removing orphan exclusiveVars or duplicated
@@ -169,12 +171,12 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
       /**
        * Filter orphans
        */
-      return varsArray.some(varItem => varItem.name === varName);
+      return varsArray.some((varItem) => varItem.name === varName);
     });
 
     const varObj = {};
 
-    varsArray.forEach(varItem => {
+    varsArray.forEach((varItem) => {
       varObj[varItem.name] = varItem.content;
     });
 
@@ -186,7 +188,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
         ...post,
         vars: varObj,
         exclusiveVars: newExclusiveVarsArr,
-        updatedAt
+        updatedAt,
       };
 
       /**
@@ -195,7 +197,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
       await updateItem(siteId, postId, {
         vars: varObj,
         exclusiveVars: newExclusiveVarsArr,
-        updatedAt
+        updatedAt,
       });
 
       setPost(updatedItem);
@@ -207,7 +209,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
       const updatedSite = {
         ...site,
         vars: varObj,
-        updatedAt
+        updatedAt,
       };
 
       /**
@@ -215,7 +217,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
        */
       await updateSite(siteId, {
         vars: varObj,
-        updatedAt
+        updatedAt,
       });
 
       setSite(updatedSite);
@@ -305,7 +307,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                 <li
                   key={`${variable}-${index}`}
                   className={cx("mb-2", {
-                    "restricted-var": isRestricted
+                    "restricted-var": isRestricted,
                   })}
                 >
                   <div className="input-group input-group-lg">
@@ -315,15 +317,15 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                       placeholder="Name"
                       value={variable.name}
                       maxLength={20}
-                      onChange={e => setVar(e, index, "name")}
-                      onBlur={e => setVar(e, index, "name", true)}
+                      onChange={(e) => setVar(e, index, "name")}
+                      onBlur={(e) => setVar(e, index, "name", true)}
                     />
                     <input
                       type="text"
                       className="form-control"
                       placeholder="Content"
                       value={variable.content}
-                      onChange={e => setVar(e, index, "content")}
+                      onChange={(e) => setVar(e, index, "content")}
                     />
                     {post && (
                       <button
@@ -332,7 +334,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                         className={cx(
                           "btn btn-outline-primary ml-2 restrict-btn",
                           {
-                            "bg-dark text-white": isRestricted
+                            "bg-dark text-white": isRestricted,
                           }
                         )}
                         onClick={() => preventVarToggle(index)}

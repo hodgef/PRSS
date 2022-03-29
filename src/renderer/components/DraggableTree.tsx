@@ -29,11 +29,11 @@ class DraggableTree extends React.Component<IProps, IState> {
 
     this.state = {
       gData: props.data,
-      expandedKeys: []
+      expandedKeys: [],
     };
   }
 
-  onDragEnter = info => {};
+  onDragEnter = (info) => {};
 
   componentDidUpdate(nextProps) {
     const { data } = this.props;
@@ -44,7 +44,7 @@ class DraggableTree extends React.Component<IProps, IState> {
     }
   }
 
-  onDrop = async info => {
+  onDrop = async (info) => {
     const dropKey = info.node.props.eventKey;
     const dragKey = info.dragNode.props.eventKey;
     const dropPos = info.node.props.pos.split("-");
@@ -77,7 +77,7 @@ class DraggableTree extends React.Component<IProps, IState> {
     });
 
     if (!info.dropToGap) {
-      loop(data, dropKey, item => {
+      loop(data, dropKey, (item) => {
         item.children = item.children || [];
         item.children.push(dragObj);
       });
@@ -86,7 +86,7 @@ class DraggableTree extends React.Component<IProps, IState> {
       info.node.props.expanded &&
       dropPosition === 1
     ) {
-      loop(data, dropKey, item => {
+      loop(data, dropKey, (item) => {
         item.children = item.children || [];
         item.children.unshift(dragObj);
       });
@@ -116,7 +116,7 @@ class DraggableTree extends React.Component<IProps, IState> {
     } else {
       this.setState(
         {
-          gData: data
+          gData: data,
         },
         this.props.onUpdate && this.props.onUpdate(data, dragKey)
       );
@@ -129,7 +129,7 @@ class DraggableTree extends React.Component<IProps, IState> {
       onSelect = noop,
       checkable,
       checkedKeys = [],
-      checkStrictly
+      checkStrictly,
     } = this.props;
 
     return (

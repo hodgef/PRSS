@@ -5,7 +5,7 @@ import React, {
   Fragment,
   useEffect,
   useState,
-  ReactNode
+  ReactNode,
 } from "react";
 import { useHistory } from "react-router-dom";
 import path from "path";
@@ -13,7 +13,7 @@ import { getString, getConfigPath } from "../../common/utils";
 import { error, confirmation } from "../services/utils";
 import { modal } from "./Modal";
 import { storeInt } from "../../common/bootstrap";
-const { app, dialog } = require("electron").remote;
+const { app, dialog } = require("@electron/remote");
 const fs = require("fs-extra");
 
 interface IProps {
@@ -42,7 +42,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   const handleChangeConfigDir = async () => {
     const pathObj = await dialog.showOpenDialog({
-      properties: ["openDirectory"]
+      properties: ["openDirectory"],
     });
 
     if (pathObj?.filePaths?.length) {
@@ -62,7 +62,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
               <p>PRSS will now restart.</p>
               <p>Continue?</p>
             </Fragment>
-          )
+          ),
         });
 
         if (confirmationRes !== 0) {

@@ -6,10 +6,10 @@ import React, {
   ReactNode,
   useState,
   useEffect,
-  useRef
+  useRef,
 } from "react";
 const isFrameless = process.platform !== "darwin";
-const remote = require("electron").remote;
+const remote = require("@electron/remote");
 const win = remote.getCurrentWindow();
 
 import PRSSLogo from "../images/prss-sm.png";
@@ -66,13 +66,13 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
     <header className={cx({ "has-header-left": headerLeft })}>
       <div
         className={cx("header-cont", {
-          "title-mode": isFrameless
+          "title-mode": isFrameless,
         })}
       >
         <div className="left-align">
           <div
             className={cx("logo", {
-              clickable: Object.keys(hasSites).length
+              clickable: Object.keys(hasSites).length,
             })}
             onClick={() =>
               Object.keys(hasSites).length && history.push("/sites")
@@ -87,7 +87,7 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
             <button
               type="button"
               className={cx("btn btn-transparent btn-lg", {
-                expanded: showMoreMenu
+                expanded: showMoreMenu,
               })}
               onClick={() => setShowMoreMenu(!showMoreMenu)}
             >

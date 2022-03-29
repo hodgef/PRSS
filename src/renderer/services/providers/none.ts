@@ -10,7 +10,7 @@ class FallbackProvider {
   public readonly vars = {};
   public static hostingTypeDef = {
     title: "None (Manual deployment)",
-    fields: []
+    fields: [],
   };
 
   constructor(siteUUID: string) {
@@ -25,7 +25,7 @@ class FallbackProvider {
     return configGet(`sites.${this.siteUUID}`);
   };
 
-  setup = async onUpdate => {
+  setup = async (onUpdate) => {
     /**
      * Build project
      */
@@ -53,20 +53,20 @@ class FallbackProvider {
       buttons: [
         {
           label: "Change hosting",
-          action: () => {}
+          action: () => {},
         },
         {
           label: "View Files",
-          action: () => {}
-        }
+          action: () => {},
+        },
       ],
-      showCancel: true
+      showCancel: true,
     });
 
     if (confirmationRes === 0) {
       return {
         type: "redirect",
-        value: `/sites/${this.siteUUID}/hosting`
+        value: `/sites/${this.siteUUID}/hosting`,
       };
     }
 

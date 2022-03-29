@@ -5,7 +5,7 @@ import React, {
   useState,
   Fragment,
   useEffect,
-  ReactNode
+  ReactNode,
 } from "react";
 import { useHistory, useParams, useLocation } from "react-router-dom";
 
@@ -21,7 +21,7 @@ interface IProps {
 }
 
 const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
-  const { siteId } = useParams();
+  const { siteId } = useParams() as any;
   const { state = {} } = useLocation();
 
   const [site, setSite] = useState(null);
@@ -68,11 +68,13 @@ const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   const deleteSelectedMenus = async () => {
     if (
-      selectedItems.some(item => ["header", "sidebar", "footer"].includes(item))
+      selectedItems.some((item) =>
+        ["header", "sidebar", "footer"].includes(item)
+      )
     ) {
       toast.error("You cannot delete the header, sidebar or footer menus");
-      setSelectedItems(prevItems => [
-        ...prevItems.filter(item => item !== "default")
+      setSelectedItems((prevItems) => [
+        ...prevItems.filter((item) => item !== "default"),
       ]);
       return;
     }
@@ -93,7 +95,7 @@ const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const menuName = (await ask({
       title: "",
       message: <Fragment>Menu name:</Fragment>,
-      buttons: [{ label: "Continue" }]
+      buttons: [{ label: "Continue" }],
     })) as string;
 
     if (!menuName.trim()) {
@@ -129,7 +131,7 @@ const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
      */
     await updateSite(siteId, {
       menus: updatedMenus,
-      updatedAt
+      updatedAt,
     });
 
     /**
@@ -142,7 +144,7 @@ const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   const formatMenus = (rawMenusObj: any) => {
     const keys = Object.keys(rawMenusObj) as [];
-    return keys.map(name => ({
+    return keys.map((name) => ({
       key: name,
       title: (
         <Fragment>
@@ -152,11 +154,11 @@ const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
           <div className="right-align"></div>
         </Fragment>
       ),
-      children: []
+      children: [],
     }));
   };
 
-  const onItemClick = itemId => {
+  const onItemClick = (itemId) => {
     history.push(`/sites/${siteId}/menus/${itemId}`);
   };
 
@@ -206,7 +208,7 @@ const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
           <DraggableTree
             checkable={selectEnabled}
             data={formatMenus(menus) as any}
-            onSelect={items => items[0] && onItemClick(items[0])}
+            onSelect={(items) => items[0] && onItemClick(items[0])}
             checkedKeys={selectedItems}
             onCheck={setSelectedItems}
             draggable={false}

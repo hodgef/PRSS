@@ -7,17 +7,19 @@ import React, {
   useRef,
   useState,
   useEffect,
-  ReactNode
+  ReactNode,
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { getString, configGet, configSet } from "../../common/utils";
-import Footer from "./Footer";
 import { modal } from "./Modal";
 import { toast } from "react-toastify";
 import {
-  previewServer,
   stopPreview,
-  bufferAndStartPreview
+  bufferAndStartPreview,
+  isPreviewActive,
+  reloadPreview,
+  resumePreview,
+  pausePreview,
 } from "../services/preview";
 import { build } from "../services/build";
 import { buildAndDeploy } from "../services/hosting";
@@ -29,7 +31,7 @@ import SiteVariablesEditorOverlay from "./SiteVariablesEditorOverlay";
 import { getSite, getItems, updateItem, updateSite } from "../services/db";
 import { editorOptions } from "../services/editor";
 import { truncateString } from "../services/utils";
-const remote = require("electron").remote;
+const remote = require("@electron/remote");
 const win = remote.getCurrentWindow();
 
 require("jodit");
@@ -40,7 +42,7 @@ interface IProps {
 }
 
 const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
-  const { siteId, postId } = useParams();
+  const { siteId, postId } = useParams() as any;
   const [publishSuggested, setPublishSuggested] = useState(null);
 
   const [site, setSite] = useState(null);
@@ -52,19 +54,16 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const history = useHistory();
   const editorContent = useRef("");
   const editorMode = useRef("");
-  const itemIndex = post ? items.findIndex(item => item.uuid === postId) : -1;
+  const itemIndex = post ? items.findIndex((item) => item.uuid === postId) : -1;
 
   const editorChangedContent = useRef("");
 
-  const [previewStarted, setPreviewStarted] = useState(previewServer.active);
-  const [showRawHTMLEditorOverlay, setShowRawHTMLEditorOverlay] = useState(
-    false
-  );
+  const [previewStarted, setPreviewStarted] = useState(isPreviewActive());
+  const [showRawHTMLEditorOverlay, setShowRawHTMLEditorOverlay] =
+    useState(false);
 
-  const [
-    showSiteVariablesEditorOverlay,
-    setShowSiteVariablesEditorOverlay
-  ] = useState(false);
+  const [showSiteVariablesEditorOverlay, setShowSiteVariablesEditorOverlay] =
+    useState(false);
 
   const [editorChanged, setEditorChanged] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -113,7 +112,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       const itemsRes = await getItems(siteId);
       setSite(siteRes);
       setItems(itemsRes);
-      const post = itemsRes.find(item => item.uuid === postId);
+      const post = itemsRes.find((item) => item.uuid === postId);
 
       setPost(post);
 
@@ -167,14 +166,14 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
        */
       await updateItem(siteId, postId, {
         content,
-        updatedAt
+        updatedAt,
       });
 
       /**
        * Update site updatedAt
        */
       await updateSite(siteId, {
-        updatedAt
+        updatedAt,
       });
 
       setPost(updatedItem);
@@ -183,9 +182,9 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       if (isAutosave) {
         toast.success("Post autosaved");
       } else {
-        if (previewServer.active) {
+        if (isPreviewActive()) {
           await buildPost(buildAll ? null : postId, setLoadingStatus);
-          previewServer.reload();
+          reloadPreview();
 
           if (buildAll) {
             toast.success(
@@ -225,7 +224,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     await updateItem(siteId, postId, {
       title,
       slug: itemSlug,
-      updatedAt
+      updatedAt,
     });
 
     setPost(updatedItem);
@@ -244,7 +243,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
      */
     await updateItem(siteId, postId, {
       slug,
-      updatedAt
+      updatedAt,
     });
 
     setPost(updatedItem);
@@ -257,7 +256,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     }
   };
 
-  const changePostTemplate = async template => {
+  const changePostTemplate = async (template) => {
     if (!template || itemIndex === -1) return;
     const updatedItem = { ...post, template };
     const updatedAt = Date.now();
@@ -297,12 +296,12 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   };
 
   const buildPost = async (postId = null, onUpdate = null) => {
-    if (previewServer.active) {
-      previewServer.pause();
+    if (isPreviewActive()) {
+      pausePreview();
     }
     await build(siteId, onUpdate, postId, postId ? true : false);
-    if (previewServer.active) {
-      previewServer.resume();
+    if (isPreviewActive()) {
+      resumePreview();
     }
   };
 
@@ -395,7 +394,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         ...post,
         headHtml,
         footerHtml,
-        sidebarHtml
+        sidebarHtml,
       };
 
       /**
@@ -405,7 +404,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         headHtml,
         footerHtml,
         sidebarHtml,
-        updatedAt
+        updatedAt,
       });
 
       setPost(updatedItem);
@@ -458,7 +457,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
             <Editor
               value={post ? post.content : ""}
               config={editorOptions}
-              onChange={content => {
+              onChange={(content) => {
                 editorContent.current = content;
 
                 if (!editorChangedContent.current) {

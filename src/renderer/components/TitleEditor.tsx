@@ -18,7 +18,7 @@ const TitleEditor: FunctionComponent<IProps> = ({
   siteId,
   postId,
   initValue = "",
-  onSave
+  onSave,
 }) => {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(initValue);
@@ -69,7 +69,7 @@ const TitleEditor: FunctionComponent<IProps> = ({
     <div className={cx("title-editor mr-4", { editing })}>
       {editing ? (
         <Fragment>
-          <input value={value} onChange={e => setValue(e.target.value)} />
+          <input value={value} onChange={(e) => setValue(e.target.value)} />
           <button
             type="button"
             className="btn btn-outline-primary btn-sm"

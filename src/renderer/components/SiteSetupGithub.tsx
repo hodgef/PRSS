@@ -24,10 +24,10 @@ const SiteSetupGithub: FunctionComponent<IProps> = ({ onChange }) => {
         "span",
         {
           className: "code-dark-inline",
-          key: "github-repo-info-1b-span-2"
+          key: "github-repo-info-1b-span-2",
         },
         "myRepo"
-      )
+      ),
     ]),
     React.createElement(
       "p",
@@ -44,16 +44,16 @@ const SiteSetupGithub: FunctionComponent<IProps> = ({ onChange }) => {
         "span",
         {
           className: "code-dark-inline",
-          key: "github-repo-info-2b-span-2"
+          key: "github-repo-info-2b-span-2",
         },
         "username/repoName"
-      )
+      ),
     ]),
     React.createElement(
       "p",
       { key: "github-repo-info-3" },
       getString("github_repo_info_3")
-    )
+    ),
   ];
 
   return (
@@ -64,10 +64,10 @@ const SiteSetupGithub: FunctionComponent<IProps> = ({ onChange }) => {
           placeholder="Repository Name (optional)"
           className="form-control"
           value={repo}
-          onChange={e => setRepo(e.target.value)}
+          onChange={(e) => setRepo(e.target.value)}
           onBlur={() => {
             onChange({
-              repository: repo
+              repository: repo,
             });
           }}
         />

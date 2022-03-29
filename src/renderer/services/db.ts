@@ -10,16 +10,11 @@ export const getSites = () => {
 };
 
 export const getSite = (siteUUID: string) => {
-  return getSites()
-    .where("uuid", siteUUID)
-    .first();
+  return getSites().where("uuid", siteUUID).first();
 };
 
 export const getSiteUUIDById = async (siteId: string) => {
-  const { uuid } = await getSites()
-    .select("uuid")
-    .where("id", siteId)
-    .first();
+  const { uuid } = await getSites().select("uuid").where("id", siteId).first();
   return uuid;
 };
 
@@ -36,9 +31,7 @@ export const updateSite = async (siteUUID: string, fields: Partial<ISite>) => {
 
 export const deleteSite = async (siteUUID: string) => {
   //const { name: siteName } = await getSite(siteUUID);
-  await getSites()
-    .where("uuid", siteUUID)
-    .del();
+  await getSites().where("uuid", siteUUID).del();
   await deleteAllSiteItems(siteUUID);
 
   /**
@@ -54,7 +47,7 @@ export const deleteSite = async (siteUUID: string) => {
 /**
  * Map sites
  */
-export const sitesToDB = sitesJS => {
+export const sitesToDB = (sitesJS) => {
   const output = mapFieldsToJSON(JSON_FIELDS, sitesJS);
   return output;
 };
@@ -67,9 +60,7 @@ export const getItems = (siteUUID: string) => {
 };
 
 export const getItem = (siteUUID: string, itemUUID: string) => {
-  return getItems(siteUUID)
-    .where("uuid", itemUUID)
-    .first();
+  return getItems(siteUUID).where("uuid", itemUUID).first();
 };
 
 export const getItemUUIDById = async (siteUUID: string, itemId: string) => {
@@ -96,9 +87,7 @@ export const updateItem = async (
 };
 
 export const deleteItem = async (siteUUID: string, itemUUID: string) => {
-  const res = await getItems(siteUUID)
-    .where("uuid", itemUUID)
-    .del();
+  const res = await getItems(siteUUID).where("uuid", itemUUID).del();
   return res;
 };
 
@@ -110,7 +99,7 @@ export const deleteAllSiteItems = async (siteUUID: string) => {
 /**
  * Map sites
  */
-export const itemsToDB = sitesDb => {
+export const itemsToDB = (sitesDb) => {
   const output = mapFieldsToJSON(JSON_FIELDS, sitesDb);
   return output;
 };

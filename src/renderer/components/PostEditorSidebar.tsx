@@ -48,10 +48,10 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
   onStopPreview = noop,
   onStartPreview = noop,
   onPublish = noop,
-  onChangePostTemplate = t => {},
+  onChangePostTemplate = (t) => {},
   onOpenRawHTMLOverlay = noop,
   onOpenVarEditorOverlay = noop,
-  onToggleRawHTMLOnly = noop
+  onToggleRawHTMLOnly = noop,
 }) => {
   const themeName = site.theme;
   const currentTemplate = item.template;
@@ -60,7 +60,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
   const [templateList, setTemplateList] = useState(null);
 
   useEffect(() => {
-    getTemplateList(themeName).then(res => {
+    getTemplateList(themeName).then((res) => {
       setTemplateList(res);
     });
   }, []);
@@ -72,7 +72,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
   const toggleForceRawHTML = async () => {
     if (forceRawHTMLEditing) {
       const confirmationRes = await confirmation({
-        title: getString("warn_force_raw_html_disable")
+        title: getString("warn_force_raw_html_disable"),
       });
 
       if (confirmationRes !== 0) {
@@ -165,7 +165,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
         <li
           title={editorChanged ? getString("warn_unsaved_changes") : ""}
           className={cx("clickable", {
-            disabled: editorChanged
+            disabled: editorChanged,
           })}
           onClick={() => {
             if (!editorChanged) {
@@ -204,10 +204,10 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
               <select
                 className="custom-select"
                 id="theme-selector"
-                onChange={e => onChangePostTemplate(e.target.value)}
+                onChange={(e) => onChangePostTemplate(e.target.value)}
                 value={currentTemplate}
               >
-                {templateList.map(templateName => (
+                {templateList.map((templateName) => (
                   <option key={`option-${templateName}`} value={templateName}>
                     {templateName}
                   </option>

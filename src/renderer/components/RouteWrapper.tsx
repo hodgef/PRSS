@@ -3,7 +3,7 @@ import React, {
   Fragment,
   ReactElement,
   useLayoutEffect,
-  ReactNode
+  ReactNode,
 } from "react";
 import { clearHooks } from "../../common/bootstrap";
 
@@ -13,7 +13,7 @@ interface IProps {
   history: any;
 }
 
-const RouteWrapper: FunctionComponent<IProps> = props => {
+const RouteWrapper: FunctionComponent<IProps> = (props) => {
   const { setAppClass, RouteComponent, history } = props;
 
   /**

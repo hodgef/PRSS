@@ -43,9 +43,9 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
 
   const configPath = data.rootPath + configFileName;
 
-  const parseVars = vars => {
+  const parseVars = (vars) => {
     const parsedVars = {};
-    Object.keys(vars).forEach(varName => {
+    Object.keys(vars).forEach((varName) => {
       parsedVars[varName] = parseHtmlParams(vars[varName], data);
     });
     return parsedVars;
@@ -67,7 +67,7 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
     metaTitle = data.item.title,
     metaUrl,
     metaSiteName = data.site.title,
-    metaImage = data.vars?.featuredImageUrl
+    metaImage = data.vars?.featuredImageUrl,
   } = parsedVars;
 
   const parsedHtml = parseHtmlParams(templateIndex, data)
@@ -142,13 +142,13 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
     ...data,
     item: {
       ...data.item,
-      content: parsedContent
+      content: parsedContent,
     },
-    vars: parsedVars
+    vars: parsedVars,
   };
 
   const sanitizedBufferItem = sanitizeBufferItem(parsedData, {
-    sidebarHtml
+    sidebarHtml,
   });
 
   const js = minifyJS(
@@ -166,7 +166,7 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
   );
 
   const output = [
-    { name: "index.html", content: html, path: "./" }
+    { name: "index.html", content: html, path: "./" },
     //{ name: 'index.js', content: js, path: './' },
   ];
 
@@ -174,7 +174,7 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
     output.push({
       name: `${templateName}.js`,
       content: templateJs,
-      path: baseTemplatePath
+      path: baseTemplatePath,
     });
   }
 

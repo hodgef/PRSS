@@ -9,12 +9,10 @@ import "ace-builds/webpack-resolver";
 import "ace-builds/src-noconflict/mode-html";
 import "ace-builds/src-noconflict/theme-github";
 import pretty from "pretty";
-import { globalRequire } from "../../common/utils";
 import { toast } from "react-toastify";
 import { modal } from "./Modal";
 import bufferItemMockJson from "../json/bufferItem.json";
-const htmlMinifier = globalRequire("html-minifier-terser");
-
+const htmlMinifier = require("html-minifier-terser");
 interface IProps {
   headDefaultValue?: string;
   footerDefaultValue?: string;
@@ -28,7 +26,7 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
   footerDefaultValue = "",
   sidebarDefaultValue = "",
   onSave = (h, f, s) => {},
-  onClose = noop
+  onClose = noop,
 }) => {
   const headHTMLState = useRef(headDefaultValue);
   const footerHTMLState = useRef(footerDefaultValue);
@@ -116,7 +114,7 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
           showGutter
           fontSize={17}
           value={pretty(headHTMLState.current)}
-          onChange={html => {
+          onChange={(html) => {
             headHTMLState.current = html;
           }}
           name="html-editor-component"
@@ -139,7 +137,7 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
           showGutter
           fontSize={17}
           value={pretty(footerHTMLState.current)}
-          onChange={html => {
+          onChange={(html) => {
             footerHTMLState.current = html;
           }}
           name="html-editor-component"
@@ -162,7 +160,7 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
           showGutter
           fontSize={17}
           value={pretty(sidebarHTMLState.current)}
-          onChange={html => {
+          onChange={(html) => {
             sidebarHTMLState.current = html;
           }}
           name="html-editor-component"

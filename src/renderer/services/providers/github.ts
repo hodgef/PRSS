@@ -2,7 +2,7 @@ import { updateSite } from "./../db";
 import {
   localStorageGet,
   configGet,
-  runCommand
+  runCommand,
 } from "./../../../common/utils";
 import axios from "axios";
 import fs from "fs";
@@ -16,7 +16,7 @@ import {
   build,
   configFileName,
   getFilteredBufferItems,
-  clearBuffer
+  clearBuffer,
 } from "../build";
 import { confirmation, error } from "../utils";
 import { sequential } from "./../utils";
@@ -29,16 +29,16 @@ class GithubProvider {
   private readonly siteUUID: string;
   public readonly vars = {
     baseUrl: () => "github.com",
-    baseApiUrl: () => "api.github.com"
+    baseApiUrl: () => "api.github.com",
   };
   public static hostingTypeDef = {
     title: "Github",
     fields: [
       {
         name: "repository",
-        optional: true
-      }
-    ]
+        optional: true,
+      },
+    ],
   };
 
   constructor(siteUUID: string) {
@@ -53,7 +53,7 @@ class GithubProvider {
     return configGet(`sites.${this.siteUUID}`);
   };
 
-  setup = async onUpdate => {
+  setup = async (onUpdate) => {
     /**
      * Creating repo
      */
@@ -95,7 +95,7 @@ class GithubProvider {
      * Save site url
      */
     await updateSite(this.siteUUID, {
-      url: siteUrl
+      url: siteUrl,
     });
 
     /**
@@ -119,7 +119,7 @@ class GithubProvider {
   getRepositoryName = async () => {
     const {
       name,
-      hosting: { repository }
+      hosting: { repository },
     } = await this.fetchSiteConfig();
 
     if (repository) {
@@ -144,7 +144,7 @@ class GithubProvider {
    * https://github.community/t/cannot-enable-github-pages-via-api-blank-500-error/124406/6
    */
   prepareForFirstDeployment = async () => {
-    return new Promise(async resolve => {
+    return new Promise(async (resolve) => {
       const bufferDir = storeInt.get("paths.buffer");
       const username = await this.getUsername();
       const repositoryName = await this.getRepositoryName();
@@ -179,7 +179,7 @@ class GithubProvider {
   };
 
   deploy = async (
-    onUpdate = s => {},
+    onUpdate = (s) => {},
     itemIdToDeploy?,
     clearRemote?,
     generateSiteMap = true,
@@ -216,7 +216,7 @@ class GithubProvider {
 
       onUpdate(deployText);
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(() => {
           const { res: e, error: commitError } = runCommand(
             bufferDir,
@@ -227,7 +227,7 @@ class GithubProvider {
             modal.alert(e.message);
             console.error(e);
           }
-          resolve();
+          resolve(null);
         }, 1000);
       });
     } catch (e) {
@@ -254,10 +254,10 @@ class GithubProvider {
 
     const bufferFilePaths = [siteConfigFilePath];
 
-    itemsToLoad.forEach(item => {
+    itemsToLoad.forEach((item) => {
       const baseFilePath = path.join(bufferDir, item.path);
 
-      bufferPathFileNames.forEach(bufferPathFileName => {
+      bufferPathFileNames.forEach((bufferPathFileName) => {
         const filePath = path.join(baseFilePath, bufferPathFileName);
 
         try {
@@ -270,7 +270,7 @@ class GithubProvider {
       });
     });
 
-    return this.uploadFiles(bufferFilePaths, bufferDir, progress => {
+    return this.uploadFiles(bufferFilePaths, bufferDir, (progress) => {
       onUpdate && onUpdate(getString("deploying_progress", [progress]));
     });
   };
@@ -282,7 +282,7 @@ class GithubProvider {
   wipe = async (onUpdate?) => {
     const repoUrl = await this.getRepositoryUrl();
     const confirmationRes = await confirmation({
-      title: `This operation requires clearing all files in "${repoUrl}". Continue?`
+      title: `This operation requires clearing all files in "${repoUrl}". Continue?`,
     });
 
     if (confirmationRes !== 0) {
@@ -306,7 +306,7 @@ class GithubProvider {
 
       if (bufferDir && bufferDir.includes("buffer")) {
         await del([path.join(bufferDir, "*"), "!.git"], {
-          force: true
+          force: true,
         });
       }
 
@@ -341,8 +341,8 @@ class GithubProvider {
         {
           source: {
             branch: "master",
-            directory: "/"
-          }
+            directory: "/",
+          },
         },
         { Accept: "application/vnd.github.switcheroo-preview+json" }
       )) || {};
@@ -356,7 +356,7 @@ class GithubProvider {
     const repositoryName = await this.getRepositoryName();
     const username = await this.getUsername();
 
-    const fileRequests = filePaths.map(filePath => {
+    const fileRequests = filePaths.map((filePath) => {
       const normalizedBasePath = slash(basePath);
       const normalizedFilePath = slash(filePath);
       const remoteFilePath = normalizedFilePath.replace(
@@ -368,8 +368,8 @@ class GithubProvider {
         "DELETE",
         `repos/${username}/${repositoryName}/contents/${remoteFilePath}`,
         {
-          message: `Added ${remoteFilePath}`
-        }
+          message: `Added ${remoteFilePath}`,
+        },
       ];
     });
 
@@ -382,7 +382,7 @@ class GithubProvider {
     const repositoryName = await this.getRepositoryName();
     const username = await this.getUsername();
 
-    const fileRequests = filePaths.map(filePath => {
+    const fileRequests = filePaths.map((filePath) => {
       const normalizedBasePath = slash(basePath);
       const normalizedFilePath = slash(filePath);
       const remoteFilePath = normalizedFilePath.replace(
@@ -395,8 +395,8 @@ class GithubProvider {
         `repos/${username}/${repositoryName}/contents/${remoteFilePath}`,
         {
           message: `Added ${remoteFilePath}`,
-          content: btoa(fs.readFileSync(filePath, "utf8"))
-        }
+          content: btoa(fs.readFileSync(filePath, "utf8")),
+        },
       ];
     });
 
@@ -429,7 +429,7 @@ class GithubProvider {
           method === "DELETE"
             ? "Deleted"
             : data.message.replace("Added", "Updated"),
-        sha: existingFile.sha
+        sha: existingFile.sha,
       };
     }
 
@@ -445,7 +445,7 @@ class GithubProvider {
       `repos/${username}/${repositoryName}/contents/${path}`,
       {
         message: `Added ${path}`,
-        content: btoa(content)
+        content: btoa(content),
       }
     );
   };
@@ -456,7 +456,7 @@ class GithubProvider {
     if (repo) {
       const confirmationRes = await confirmation({
         title:
-          "The repository already exists. Do you want to use it? (Contents will be removed)"
+          "The repository already exists. Do you want to use it? (Contents will be removed)",
       });
 
       if (confirmationRes !== 0) {
@@ -474,7 +474,7 @@ class GithubProvider {
         name: repositoryName,
         description: getString("created_with"),
         homepage: getString("prss_domain"),
-        auto_init: true
+        auto_init: true,
       })) || {};
 
     if (!created_at) {
@@ -496,7 +496,7 @@ class GithubProvider {
     }
 
     const repositoryName = await this.getRepositoryName();
-    const repo = repos.find(item => item.name === repositoryName);
+    const repo = repos.find((item) => item.name === repositoryName);
     return repo;
   };
 
@@ -511,10 +511,10 @@ class GithubProvider {
       url,
       auth: { username, password },
       data,
-      headers
+      headers,
     })
-      .then(response => response.data)
-      .catch(res => res);
+      .then((response) => response.data)
+      .catch((res) => res);
   };
 }
 

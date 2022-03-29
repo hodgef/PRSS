@@ -1,14 +1,14 @@
 //import draftToHtml from 'draftjs-to-html';
 
-export const imageUploadCallback = file => {
+export const imageUploadCallback = (file) => {
   new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     const img = new Image() as any;
-    reader.onload = function(e) {
+    reader.onload = function (e) {
       img.src = this.result;
     };
-    img.onload = function() {
+    img.onload = function () {
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
 
@@ -45,8 +45,8 @@ export const imageUploadCallback = file => {
 
       resolve({
         data: {
-          link: newUrl
-        }
+          link: newUrl,
+        },
       });
 
       // For uploading
@@ -57,7 +57,7 @@ export const imageUploadCallback = file => {
   });
 };
 
-const convertImages = htmlText => {
+const convertImages = (htmlText) => {
   const regex = /<img\s[^>]*?style\s*=\s*['\"]float([^'\"]*?)['\"][^>]*?>/g;
   let m;
   while ((m = regex.exec(htmlText)) !== null) {
@@ -96,7 +96,7 @@ const convertImages = htmlText => {
 export const editorOptions = {
   autofocus: true,
   uploader: {
-    insertImageAsBase64URI: true
+    insertImageAsBase64URI: true,
   },
   mediaBlocks: [],
   buttons:
@@ -110,6 +110,6 @@ export const editorOptions = {
   cleanHTML: {
     removeEmptyElements: false,
     fillEmptyParagraph: false,
-    replaceNBSP: false
-  }
+    replaceNBSP: false,
+  },
 };

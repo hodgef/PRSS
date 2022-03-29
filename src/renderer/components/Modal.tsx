@@ -11,7 +11,7 @@ class Modal extends Component {
     onCancel: () => {},
     contentClassName: "",
     innerContentClassName: "",
-    renderInput: null
+    renderInput: null,
   };
 
   initialState = { ...this.state };
@@ -23,7 +23,7 @@ class Modal extends Component {
     buttons = [],
     showCancel = false,
     onCancel = () => {},
-    contentClassName = ""
+    contentClassName = "",
   }) => {
     this.setState({
       mode: "confirm",
@@ -32,7 +32,7 @@ class Modal extends Component {
       buttons,
       showCancel,
       onCancel,
-      contentClassName
+      contentClassName,
     });
   };
 
@@ -48,7 +48,7 @@ class Modal extends Component {
       title,
       message,
       contentClassName,
-      innerContentClassName
+      innerContentClassName,
     });
   };
 
@@ -58,7 +58,7 @@ class Modal extends Component {
     buttons = [],
     showCancel = false,
     onCancel = () => {},
-    renderInput
+    renderInput,
   }) => {
     this.setState({
       mode: "prompt",
@@ -68,7 +68,7 @@ class Modal extends Component {
       buttons,
       showCancel,
       onCancel,
-      renderInput
+      renderInput,
     });
   };
 
@@ -94,14 +94,14 @@ class Modal extends Component {
             left: 0,
             display: "flex",
             zIndex: 9999,
-            paddingTop: "40px"
+            paddingTop: "40px",
           }}
         >
           <div
             style={{
               width: "100%",
               maxWidth: 300,
-              overflow: "hidden"
+              overflow: "hidden",
             }}
             className={this.state.contentClassName}
           >
@@ -112,14 +112,14 @@ class Modal extends Component {
                   paddingBottom: 20,
                   alignItems: "center",
                   justifyContent: "center",
-                  display: "flex"
+                  display: "flex",
                 }}
               >
                 <span
                   style={{
                     color: "white",
                     fontSize: 22,
-                    fontWeight: 300
+                    fontWeight: 300,
                   }}
                 >
                   {title}
@@ -130,7 +130,7 @@ class Modal extends Component {
             <div
               style={{
                 backgroundColor: "white",
-                borderRadius: 20
+                borderRadius: 20,
               }}
             >
               {!!buttons.length &&
@@ -147,12 +147,12 @@ class Modal extends Component {
                         justifyContent: "center",
                         border: "1px solid rgba(0,0,0,0.1)",
                         display: "flex",
-                        cursor: "pointer"
+                        cursor: "pointer",
                       }}
                     >
                       <span
                         style={{
-                          fontSize: 18
+                          fontSize: 18,
                         }}
                       >
                         {label}
@@ -173,12 +173,12 @@ class Modal extends Component {
                     justifyContent: "center",
                     border: "1px solid rgba(0,0,0,0.1)",
                     display: "flex",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   <span
                     style={{
-                      fontSize: 18
+                      fontSize: 18,
                     }}
                   >
                     Cancel
@@ -202,14 +202,14 @@ class Modal extends Component {
             top: 0,
             left: 0,
             display: "flex",
-            zIndex: 9999
+            zIndex: 9999,
           }}
         >
           <div
             style={{
               width: "100%",
               maxWidth: 300,
-              overflow: "hidden"
+              overflow: "hidden",
             }}
             className={this.state.contentClassName}
           >
@@ -220,14 +220,14 @@ class Modal extends Component {
                   paddingBottom: 20,
                   alignItems: "center",
                   justifyContent: "center",
-                  display: "flex"
+                  display: "flex",
                 }}
               >
                 <span
                   style={{
                     color: "white",
                     fontSize: 22,
-                    fontWeight: 300
+                    fontWeight: 300,
                   }}
                 >
                   {title}
@@ -239,7 +239,7 @@ class Modal extends Component {
               className="standard-modal-content"
               style={{
                 backgroundColor: "white",
-                borderRadius: 20
+                borderRadius: 20,
               }}
             >
               {message && (
@@ -249,14 +249,14 @@ class Modal extends Component {
                     // minHeight: 100,
                     //alignItems: 'center',
                     //justifyContent: 'center',
-                    display: "flex"
+                    display: "flex",
                   }}
                   className={this.state.innerContentClassName}
                 >
                   <div
                     style={{
                       fontSize: 18,
-                      width: "100%"
+                      width: "100%",
                     }}
                   >
                     {message}
@@ -272,12 +272,12 @@ class Modal extends Component {
                   justifyContent: "center",
                   border: "1px solid rgba(0,0,0,0.1)",
                   display: "flex",
-                  cursor: "pointer"
+                  cursor: "pointer",
                 }}
               >
                 <span
                   style={{
-                    fontSize: 18
+                    fontSize: 18,
                   }}
                 >
                   OK
@@ -301,14 +301,14 @@ class Modal extends Component {
             top: 0,
             left: 0,
             display: "flex",
-            zIndex: 9999
+            zIndex: 9999,
           }}
         >
           <div
             style={{
               width: "100%",
               maxWidth: 300,
-              overflow: "hidden"
+              overflow: "hidden",
             }}
             className={this.state.contentClassName}
           >
@@ -319,14 +319,14 @@ class Modal extends Component {
                   paddingBottom: 20,
                   alignItems: "center",
                   justifyContent: "center",
-                  display: "flex"
+                  display: "flex",
                 }}
               >
                 <span
                   style={{
                     color: "white",
                     fontSize: 22,
-                    fontWeight: 300
+                    fontWeight: 300,
                   }}
                 >
                   {title}
@@ -338,30 +338,30 @@ class Modal extends Component {
               className="standard-modal-content"
               style={{
                 backgroundColor: "white",
-                borderRadius: 20
+                borderRadius: 20,
               }}
             >
               <div
                 style={{
                   padding: 20,
-                  display: "flex"
+                  display: "flex",
                 }}
                 className={this.state.innerContentClassName}
               >
                 <div
                   style={{
                     fontSize: 18,
-                    width: "100%"
+                    width: "100%",
                   }}
                 >
                   {message}
                   {this.state.renderInput ? (
-                    this.state.renderInput(e => (value = e.target.value))
+                    this.state.renderInput((e) => (value = e.target.value))
                   ) : (
                     <input
                       className="form-control mt-2"
                       type="text"
-                      onChange={e => (value = e.target.value)}
+                      onChange={(e) => (value = e.target.value)}
                     />
                   )}
                 </div>
@@ -384,12 +384,12 @@ class Modal extends Component {
                         justifyContent: "center",
                         border: "1px solid rgba(0,0,0,0.1)",
                         display: "flex",
-                        cursor: "pointer"
+                        cursor: "pointer",
                       }}
                     >
                       <span
                         style={{
-                          fontSize: 18
+                          fontSize: 18,
                         }}
                       >
                         {label}
@@ -410,12 +410,12 @@ class Modal extends Component {
                     justifyContent: "center",
                     border: "1px solid rgba(0,0,0,0.1)",
                     display: "flex",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   <span
                     style={{
-                      fontSize: 18
+                      fontSize: 18,
                     }}
                   >
                     Cancel
@@ -438,5 +438,5 @@ class Modal extends Component {
 }
 
 let modal: Modal;
-const StandardModal = () => <Modal ref={r => (modal = r)} />;
+const StandardModal = () => <Modal ref={(r) => (modal = r)} />;
 export { StandardModal, modal };

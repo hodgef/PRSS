@@ -1,10 +1,9 @@
 ---
 name: Bug report
 about: Create a report to help improve PRSS
-title: ''
-labels: ''
+title: ""
+labels: ""
 assignees: hodgef
-
 ---
 
 **PRSS version**

@@ -1,6 +1,7 @@
 import { getMenuHtml } from "./menus";
 
-const shortcodeRegex = /\[([a-zA-Z]+)=?([a-zA-Z0-9]+)?\](.+?)\[\/[a-zA-Z]+\]?/gi;
+const shortcodeRegex =
+  /\[([a-zA-Z]+)=?([a-zA-Z0-9]+)?\](.+?)\[\/[a-zA-Z]+\]?/gi;
 
 export const parseShortcodes = async (str = "", data: IBufferItem) => {
   const matches = [...str.matchAll(shortcodeRegex)];
@@ -9,7 +10,7 @@ export const parseShortcodes = async (str = "", data: IBufferItem) => {
   const matchPromises = [];
   const matchArr = [];
 
-  matches.forEach(match => {
+  matches.forEach((match) => {
     const [fullMatch, fn, param, value] = match;
     matchPromises.push(execShortcode(fn, value, param, data));
     matchArr.push(match);
@@ -36,7 +37,7 @@ export const execShortcode = async (
 ) => {
   let output = "";
   const {
-    site: { uuid: siteUUID }
+    site: { uuid: siteUUID },
   } = bufferItem;
 
   if (!fn || !value) return output;

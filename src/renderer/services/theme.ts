@@ -7,7 +7,7 @@ import {
   prssConfig,
   setCache,
   getCache,
-  storeInt
+  storeInt,
 } from "../../common/bootstrap";
 
 export const getTemplate = async (templateId: string, extension: string) => {
@@ -60,7 +60,7 @@ export const getThemeListDetails = async () => {
 
   const manifestPromises = [];
 
-  themeNameList.forEach(themeName => {
+  themeNameList.forEach((themeName) => {
     manifestPromises.push(getThemeManifest(themeName));
   });
 
@@ -71,26 +71,26 @@ export const getThemeListDetails = async () => {
     return {
       ...(promiseValues[index] || {}),
       name: themeName,
-      themeDir: themeDir
+      themeDir: themeDir,
     };
   });
 };
 
 export const getThemeList = async () => {
   const themeDir = await storeInt.get("paths.themes");
-  const templateList = getDirPaths(themeDir).map(filePath =>
+  const templateList = getDirPaths(themeDir).map((filePath) =>
     path.basename(filePath)
   );
 
   const officialThemes = Object.keys(prssConfig.themes || {});
   const localThemes = templateList.filter(
-    theme => !officialThemes.includes(theme)
+    (theme) => !officialThemes.includes(theme)
   );
 
   return [...officialThemes, ...localThemes].sort();
 };
 
-export const getTemplateList = async themeName => {
+export const getTemplateList = async (themeName) => {
   const res =
     getCache(`manifest-${themeName}`) ||
     ((await getThemeManifest(themeName)) as any) ||

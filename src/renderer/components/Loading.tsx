@@ -16,13 +16,13 @@ const Loading: FunctionComponent<ILoading> = ({
   message,
   small,
   medium,
-  classNames = ""
+  classNames = "",
 }) => {
   return (
     <div
       className={cx("Loading", classNames, {
         "loading-small": small,
-        "loading-medium": medium
+        "loading-medium": medium,
       })}
     >
       <div className="spinner" />

@@ -1,8 +1,19 @@
-import { globalRequire } from "./../../common/utils";
 import { build } from "./build";
 import { storeInt } from "../../common/bootstrap";
+const remote = require("@electron/remote");
 
-export const previewServer = globalRequire("browser-sync").create("prss");
+export const startPreview = (startPath = "/") => {
+  const bufferDir = storeInt.get("paths.buffer");
+  remote.getGlobal("startPreview")({
+    server: bufferDir,
+    startPath,
+  });
+};
+export const stopPreview = remote.getGlobal("stopPreview");
+export const reloadPreview = remote.getGlobal("reloadPreview");
+export const pausePreview = remote.getGlobal("pausePreview");
+export const resumePreview = remote.getGlobal("resumePreview");
+export const isPreviewActive = remote.getGlobal("isPreviewActive");
 
 export const bufferAndStartPreview = async (
   siteUUID: string,
@@ -14,32 +25,10 @@ export const bufferAndStartPreview = async (
 
   if (buildRes && buildRes.length) {
     const bufferItem = openPostId
-      ? buildRes.find(bItem => bItem.item.uuid === openPostId)
+      ? buildRes.find((bItem) => bItem.item.uuid === openPostId)
       : buildRes[0];
     startPreview(bufferItem.path);
   }
 
   return buildRes;
-};
-
-export const startPreview = (startPath = "/") => {
-  stopPreview();
-
-  if (!previewServer.active) {
-    const bufferDir = storeInt.get("paths.buffer");
-    previewServer.init({
-      server: bufferDir,
-      startPath
-    });
-    // previewServer.watch('*').on('change', previewServer.reload);
-    previewServer.notify("PRSS Preview Started", 3000);
-    // toast.success('Starting PRSS Preview');
-  }
-};
-
-export const stopPreview = () => {
-  if (previewServer.active) {
-    previewServer.notify("PRSS Preview Stopped", 3000);
-    previewServer.exit();
-  }
 };

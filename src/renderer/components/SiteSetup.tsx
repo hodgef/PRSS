@@ -5,7 +5,7 @@ import React, {
   FunctionComponent,
   useState,
   useEffect,
-  ReactNode
+  ReactNode,
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import cx from "classnames";
@@ -18,7 +18,7 @@ import {
   getHostingTypes,
   validateHostingFields,
   setSiteConfig,
-  setupRemote
+  setupRemote,
 } from "../services/hosting";
 import { toast } from "react-toastify";
 import Loading from "./Loading";
@@ -27,7 +27,7 @@ import {
   createSite,
   createItems,
   deleteSite,
-  deleteAllSiteItems
+  deleteAllSiteItems,
 } from "../services/db";
 import ghImage from "../images/gh-mark.png";
 import { setHook, getApiUrl } from "../../common/bootstrap";
@@ -35,7 +35,7 @@ import SiteSetupGithub from "./SiteSetupGithub";
 import { error, normalizeStrict } from "../services/utils";
 import {
   getSampleSiteStructure,
-  getSampleSiteIntStructure
+  getSampleSiteIntStructure,
 } from "../services/site";
 
 interface IProps {
@@ -45,9 +45,9 @@ interface IProps {
 
 const SiteSetup: FunctionComponent<IProps> = ({
   setAppClass,
-  setHeaderLeftComponent
+  setHeaderLeftComponent,
 }) => {
-  const { siteId } = useParams();
+  const { siteId } = useParams() as any;
 
   const sites = configGet("sites");
   const hasSites = !!(Object.keys(sites) && Object.keys(sites).length);
@@ -123,7 +123,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
       const parsedHostingFields = await handleHostingFields({
         name: "github",
         username,
-        token
+        token,
       });
 
       setHostingFields(parsedHostingFields);
@@ -152,7 +152,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
       tooltip: "",
       onClick: () => {
         window.open(getApiUrl("/login/github"));
-      }
+      },
     },
     {
       id: "none",
@@ -168,10 +168,10 @@ const SiteSetup: FunctionComponent<IProps> = ({
       tooltip: "",
       onClick: async () => {
         setHostingFields({
-          name: "none"
+          name: "none",
         });
-      }
-    }
+      },
+    },
   ];
 
   const handleSubmit = async () => {
@@ -182,7 +182,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
 
     const parsedHosting = (await handleHostingFields({
       ...hostingFields,
-      ...extraHostingFields
+      ...extraHostingFields,
     })) as IHosting;
 
     console.log(
@@ -214,23 +214,21 @@ const SiteSetup: FunctionComponent<IProps> = ({
        */
       const siteName = normalizeStrict(title);
 
-      const {
-        site: siteStructure,
-        items: siteItems
-      } = getSampleSiteStructure();
+      const { site: siteStructure, items: siteItems } =
+        getSampleSiteStructure();
       const siteUUID = siteStructure.uuid;
 
       const baseSiteDB = {
         ...siteStructure,
         name: siteName,
-        title
+        title,
       } as ISite;
 
       const baseSiteConfig = {
         ...getSampleSiteIntStructure(),
         uuid: siteStructure.uuid,
         name: siteName,
-        hosting: parsedHosting
+        hosting: parsedHosting,
       } as ISiteInternal;
 
       /**
@@ -273,7 +271,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
 
       const baseSiteInternal = {
         ...siteInt,
-        hosting: parsedHosting
+        hosting: parsedHosting,
       } as ISiteInternal;
 
       await configSet(`sites.${siteId}`, baseSiteInternal);
@@ -347,7 +345,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
                     //disabled,
                     onClick = () => {},
                     className = "",
-                    tooltip
+                    tooltip,
                   } = item;
                   return (
                     <li
@@ -409,7 +407,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
                 placeholder="Site Title"
                 className="form-control mb-3"
                 value={title}
-                onChange={e => setTitle(e.target.value)}
+                onChange={(e) => setTitle(e.target.value)}
               />
             </div>
             {hostingFields.name === "github" && (

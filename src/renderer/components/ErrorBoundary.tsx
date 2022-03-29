@@ -10,7 +10,7 @@ class ErrorBoundary extends React.Component<IProps> {
     super(props);
   }
 
-  onError = error => {
+  onError = (error) => {
     console.error(error);
     modal &&
       error &&
@@ -26,7 +26,7 @@ class ErrorBoundary extends React.Component<IProps> {
   };
 
   componentDidMount() {
-    window.onunhandledrejection = error => {
+    window.onunhandledrejection = (error) => {
       error && this.onError(error);
     };
   }

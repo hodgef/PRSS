@@ -13,7 +13,7 @@ import {
   objGet,
   sanitizeSiteItems,
   toJson,
-  appendSlash
+  appendSlash,
 } from "./utils";
 import { modal } from "../components/Modal";
 import { getThemeManifest, getDefaultReadme } from "./theme";
@@ -72,16 +72,13 @@ export const build = async (
   /**
    * Buffer items
    */
-  const {
-    itemsToLoad,
-    mainBufferItem,
-    bufferItems
-  } = await getFilteredBufferItems(siteUUID, itemIdToLoad);
+  const { itemsToLoad, mainBufferItem, bufferItems } =
+    await getFilteredBufferItems(siteUUID, itemIdToLoad);
 
   /**
    * Load buffer
    */
-  const loadBufferRes = await loadBuffer(itemsToLoad, progress => {
+  const loadBufferRes = await loadBuffer(itemsToLoad, (progress) => {
     onUpdate && onUpdate(getString("building_progress", [progress]));
   });
 
@@ -149,7 +146,7 @@ export const createSiteMap = async (
 
   const stream = new SitemapStream({ hostname: siteUrl });
 
-  bufferItems.forEach(bufferItem => {
+  bufferItems.forEach((bufferItem) => {
     const post = bufferItem.item;
     const postLastUpdated = post.updatedAt || post.createdAt;
     const postPath = appendSlash(bufferItem.path);
@@ -157,7 +154,7 @@ export const createSiteMap = async (
     stream.write({
       url: postPath,
       lastmod: new Date(postLastUpdated).toISOString(),
-      changefreq: "daily"
+      changefreq: "daily",
     });
   });
 
@@ -187,7 +184,7 @@ export const createSiteMap = async (
   }
 };
 
-export const copyPublicToBuffer = siteName => {
+export const copyPublicToBuffer = (siteName) => {
   const bufferDir = storeInt.get("paths.buffer");
   const publicDir = path.join(storeInt.get("paths.public"), siteName);
 
@@ -201,7 +198,7 @@ export const copyPublicToBuffer = siteName => {
 export const getParentIds = (itemUUID: string, nodes: IStructureItem[]) => {
   const parentIds = [];
 
-  const parseNode = node => {
+  const parseNode = (node) => {
     const nodeChildren = node && node.children ? node.children : [];
 
     if (node.key === itemUUID) return true;
@@ -233,7 +230,7 @@ export const getFilteredBufferItems = async (
 
   if (itemIdToLoad) {
     mainBufferItem = bufferItems.find(
-      bufferItem => itemIdToLoad === bufferItem.item.uuid
+      (bufferItem) => itemIdToLoad === bufferItem.item.uuid
     );
 
     /**
@@ -242,7 +239,7 @@ export const getFilteredBufferItems = async (
     const predecessorIds = getParentIds(itemIdToLoad, site.structure) || [];
     const itemIdsToLoad = [...predecessorIds, itemIdToLoad];
 
-    itemsToLoad = bufferItems.filter(bufferItem =>
+    itemsToLoad = bufferItems.filter((bufferItem) =>
       itemIdsToLoad.includes(bufferItem.item.uuid)
     );
   }
@@ -250,32 +247,32 @@ export const getFilteredBufferItems = async (
   return {
     mainBufferItem,
     itemsToLoad,
-    bufferItems
+    bufferItems,
   };
 };
 
 export const clearBuffer = (noExceptions = false) => {
-  return new Promise(async resolve => {
+  return new Promise(async (resolve) => {
     const bufferDir = storeInt.get("paths.buffer");
 
     if (bufferDir && bufferDir.includes("buffer")) {
       if (noExceptions) {
         await del([path.join(bufferDir, "*"), path.join(bufferDir, ".git")], {
-          force: true
+          force: true,
         });
       } else {
         await del(
           [
             path.join(bufferDir, "*"),
             `!${bufferDir}`,
-            `!${path.join(bufferDir, ".git")}`
+            `!${path.join(bufferDir, ".git")}`,
           ],
           { force: true }
         );
       }
-      resolve();
+      resolve(null);
     } else {
-      resolve();
+      resolve(null);
     }
   });
 };
@@ -345,7 +342,7 @@ export const buildBufferItem = async (bufferItem: IBufferItem) => {
   /**
    * Creating files
    */
-  outputFiles.forEach(file => {
+  outputFiles.forEach((file) => {
     try {
       fse.outputFileSync(
         path.join(itemDir, file.path, file.name),
@@ -380,11 +377,11 @@ export const getBufferItems = async (
 
   const posts = await structureToBufferItems(structurePaths, site.uuid);
 
-  structurePaths.forEach(item => {
+  structurePaths.forEach((item) => {
     const path = item.split("/");
     let post;
 
-    const mappedPath = path.map(postId => {
+    const mappedPath = path.map((postId) => {
       if (!postId) {
         return "";
       }
@@ -406,7 +403,7 @@ export const getBufferItems = async (
       ...(site.vars || {}),
       ...(getAggregateItemPropValues("item.vars", parentIds, bufferItems) ||
         {}),
-      ...(post.vars || {})
+      ...(post.vars || {}),
     };
 
     const headHtml =
@@ -459,7 +456,7 @@ export const getBufferItems = async (
         headHtml,
         footerHtml,
         sidebarHtml,
-        vars
+        vars,
       } as IBufferItem);
     }
   });
@@ -468,13 +465,13 @@ export const getBufferItems = async (
 };
 
 export const structureToBufferItems = (structurePaths, siteUUID: string) => {
-  return new Promise(async resolve => {
+  return new Promise(async (resolve) => {
     const postIds = [];
     const postPromises = [];
 
-    structurePaths.forEach(item => {
+    structurePaths.forEach((item) => {
       const path = item.split("/");
-      path.forEach(postId => {
+      path.forEach((postId) => {
         if (!postId) {
           return;
         }
@@ -502,8 +499,8 @@ export const getAggregateItemPropValues = (
 ) => {
   let aggregate;
 
-  itemsIds.forEach(itemId => {
-    const bufferItem = bufferItems.find(bItem => bItem.item.uuid === itemId);
+  itemsIds.forEach((itemId) => {
+    const bufferItem = bufferItems.find((bItem) => bItem.item.uuid === itemId);
     const itemPropValue = objGet(propQuery, bufferItem) || "";
 
     /**
@@ -514,7 +511,7 @@ export const getAggregateItemPropValues = (
       Array.isArray(bufferItem.item.exclusiveVars) &&
       bufferItem.item.exclusiveVars.length
     ) {
-      bufferItem.item.exclusiveVars.forEach(excludedVar => {
+      bufferItem.item.exclusiveVars.forEach((excludedVar) => {
         !!excludedVar && delete itemPropValue[excludedVar];
       });
     }
@@ -527,13 +524,13 @@ export const getAggregateItemPropValues = (
       if (!aggregate) aggregate = [];
       aggregate = [
         ...(aggregate || []),
-        ...(objGet(propQuery, bufferItem) || [])
+        ...(objGet(propQuery, bufferItem) || []),
       ];
     } else if (typeof itemPropValue === "object") {
       if (!aggregate) aggregate = {};
       aggregate = {
         ...(aggregate || {}),
-        ...(objGet(propQuery, bufferItem) || {})
+        ...(objGet(propQuery, bufferItem) || {}),
       };
     }
   });
@@ -542,7 +539,7 @@ export const getAggregateItemPropValues = (
 };
 
 export const getStructurePaths = (nodes, prefix = "", store = []) => {
-  nodes.forEach(node => {
+  nodes.forEach((node) => {
     const pathNode = node.key;
     const curPath = `${prefix}/${pathNode}`;
 
@@ -569,9 +566,9 @@ export const walkStructure = async (
   let outputNodes = [...nodes];
   const posts = await getItems(siteUUID);
 
-  const parseNodes = obj => {
+  const parseNodes = (obj) => {
     const { key, children = [] } = obj;
-    const post = posts.find(p => p.uuid === key && p.siteId === siteUUID);
+    const post = posts.find((p) => p.uuid === key && p.siteId === siteUUID);
 
     if (!post) return obj;
 
@@ -579,13 +576,13 @@ export const walkStructure = async (
       key,
       ...(obj.title ? { title: obj.title } : {}),
       ...(itemCb ? itemCb(post, obj) : {}),
-      children: children.map(parseNodes)
+      children: children.map(parseNodes),
     };
 
     return parsedNode;
   };
 
-  outputNodes = outputNodes.map(node => parseNodes(node));
+  outputNodes = outputNodes.map((node) => parseNodes(node));
 
   return outputNodes;
 };
@@ -597,7 +594,7 @@ export const structureHasItem = (uuid: string, nodes: IStructureItem) => {
 export const findInStructure = (uuid: string, nodes: IStructureItem[]) => {
   let foundItem;
 
-  const checkNode = node => {
+  const checkNode = (node) => {
     if (node.key === uuid) {
       foundItem = node;
       return true;
@@ -616,7 +613,7 @@ export const findInStructureCondition = (
 ) => {
   let foundItem;
 
-  const checkNode = node => {
+  const checkNode = (node) => {
     if (condition(node)) {
       foundItem = node;
       return true;
@@ -635,8 +632,8 @@ export const findParentInStructure = (
 ) => {
   let foundItem;
 
-  const checkNode = node => {
-    if (node.children && node.children.some(nItem => nItem.key === uuid)) {
+  const checkNode = (node) => {
+    if (node.children && node.children.some((nItem) => nItem.key === uuid)) {
       foundItem = node;
       return true;
     } else {
@@ -665,7 +662,7 @@ export const insertStructureChildren = (
 
     structureItem.children = newChildren;
   } else {
-    structureItem.children = structureItem.children.map(nodeChild =>
+    structureItem.children = structureItem.children.map((nodeChild) =>
       insertStructureChildren(nodeChild, itemToInsert, parentPostId)
     );
   }

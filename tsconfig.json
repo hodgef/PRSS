@@ -1,14 +1,24 @@
 {
-    "extends": "./node_modules/electron-webpack/tsconfig-base.json",
     "compilerOptions": {
-        "lib": ["es6", "dom"],
-        "noImplicitAny": false,
-        "noImplicitThis": true,
-        "strictNullChecks": false,
-        "resolveJsonModule": true,
-        "esModuleInterop": true,
-        "noUnusedLocals": false,
-        "jsx": "react",
-        "noEmit": false
-    }
+      "noImplicitAny": false,
+      "outDir": "build",
+      "module": "esnext",
+      "target": "es5",
+      "allowJs": true,
+      "sourceMap": true,
+      "declaration": true,
+      "emitDeclarationOnly": true,
+      "suppressImplicitAnyIndexErrors": true,
+      "lib": ["es2018", "dom"],
+      "moduleResolution": "node",
+      "jsx": "react",
+      "allowSyntheticDefaultImports": true,
+      "resolveJsonModule": true,
+      "downlevelIteration": true,
+      "importHelpers": true,
+      "skipLibCheck": true,
+      "strictNullChecks": false,
+      "esModuleInterop": true,
+    },
+    "include": ["src/main", "src/renderer", "src/global.d.ts"]
 }

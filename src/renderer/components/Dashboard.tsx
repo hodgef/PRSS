@@ -5,7 +5,7 @@ import React, {
   FunctionComponent,
   useState,
   useEffect,
-  ReactNode
+  ReactNode,
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import cx from "classnames";
@@ -23,7 +23,7 @@ interface IProps {
 }
 
 const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
-  const { siteId } = useParams();
+  const { siteId } = useParams() as any;
 
   const [site, setSite] = useState(null);
   const [publishSuggested, setPublishSuggested] = useState(null);
@@ -89,9 +89,9 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       onClick: () => {
         history.push({
           pathname: `/sites/${siteId}/posts`,
-          state: { showBack: true }
+          state: { showBack: true },
         });
-      }
+      },
     },
     {
       id: "themes",
@@ -103,9 +103,9 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       onClick: () => {
         history.push({
           pathname: `/sites/${siteId}/themes`,
-          state: { showBack: true }
+          state: { showBack: true },
         });
-      }
+      },
     },
     {
       id: "settings",
@@ -117,9 +117,9 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       onClick: () => {
         history.push({
           pathname: `/sites/${siteId}/settings`,
-          state: { showBack: true }
+          state: { showBack: true },
         });
-      }
+      },
     },
     {
       id: "menus",
@@ -131,10 +131,10 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       onClick: () => {
         history.push({
           pathname: `/sites/${siteId}/menus`,
-          state: { showBack: true }
+          state: { showBack: true },
         });
-      }
-    }
+      },
+    },
   ];
 
   if (url) {
@@ -147,7 +147,7 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       tooltip: url,
       onClick: () => {
         require("electron").shell.openExternal(url);
-      }
+      },
     });
   }
 
@@ -161,7 +161,7 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       tooltip: repositoryUrl,
       onClick: () => {
         require("electron").shell.openExternal(repositoryUrl);
-      }
+      },
     });
   }
 
@@ -193,7 +193,7 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
           }
         }
         setLoading(null);
-      }
+      },
     });
   }
 
@@ -221,7 +221,7 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                 icon,
                 onClick = () => {},
                 className = "",
-                tooltip
+                tooltip,
               } = item;
               return (
                 <li

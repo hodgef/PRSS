@@ -2,14 +2,14 @@ import {
   localStorageSet,
   configGet,
   configSet,
-  configRem
+  configRem,
 } from "./../../common/utils";
 import { getString } from "../../common/utils";
 import {
   getStructurePaths,
   findParentInStructure,
   insertStructureChildren,
-  findInStructure
+  findInStructure,
 } from "./build";
 import GithubProvider from "./providers/github";
 import FallbackProvider from "./providers/none";
@@ -22,17 +22,17 @@ import {
   getItems,
   deleteItem,
   getSiteUUIDById,
-  createItems
+  createItems,
 } from "./db";
 
 export const getHostingTypes = () => ({
   github: GithubProvider.hostingTypeDef,
-  none: FallbackProvider.hostingTypeDef
+  none: FallbackProvider.hostingTypeDef,
 });
 
 export const setupRemote = (siteUUID: string, onUpdate: updaterType) => {
   const {
-    hosting: { name: hostingName }
+    hosting: { name: hostingName },
   } = configGet(`sites.${siteUUID}`);
 
   switch (hostingName) {
@@ -48,7 +48,7 @@ export const setupRemote = (siteUUID: string, onUpdate: updaterType) => {
 
 export const deploy = (siteUUID: string, params = []) => {
   const {
-    hosting: { name: hostingName }
+    hosting: { name: hostingName },
   } = configGet(`sites.${siteUUID}`);
 
   switch (hostingName) {
@@ -64,7 +64,7 @@ export const deploy = (siteUUID: string, params = []) => {
 
 export const getRepositoryUrl = async (siteUUID: string) => {
   const {
-    hosting: { name: hostingName }
+    hosting: { name: hostingName },
   } = configGet(`sites.${siteUUID}`);
 
   switch (hostingName) {
@@ -82,7 +82,7 @@ export const getRepositoryUrl = async (siteUUID: string) => {
  */
 export const wipe = (siteUUID: string, onUpdate?) => {
   const {
-    hosting: { name: hostingName }
+    hosting: { name: hostingName },
   } = configGet(`sites.${siteUUID}`);
 
   switch (hostingName) {
@@ -91,7 +91,7 @@ export const wipe = (siteUUID: string, onUpdate?) => {
       return githubProvider.wipe(onUpdate);
 
     default:
-      return Promise.resolve();
+      return Promise.resolve(null);
   }
 };
 
@@ -110,7 +110,7 @@ export const buildAndDeploy = (
 
 export const deleteRemoteItems = (filesToDeleteArr, siteUUID: string) => {
   const {
-    hosting: { name: hostingName }
+    hosting: { name: hostingName },
   } = configGet(`sites.${siteUUID}`);
 
   switch (hostingName) {
@@ -119,7 +119,7 @@ export const deleteRemoteItems = (filesToDeleteArr, siteUUID: string) => {
       return githubProvider.deleteFiles(filesToDeleteArr);
 
     default:
-      return Promise.resolve();
+      return Promise.resolve(null);
   }
 };
 
@@ -128,7 +128,7 @@ export const setSiteConfig = (data: ISiteInternal) => {
   const sites = configGet("sites");
 
   return configSet({
-    sites: merge(sites, { [uuid]: { uuid: uuid, ...data } })
+    sites: merge(sites, { [uuid]: { uuid: uuid, ...data } }),
   });
 };
 
@@ -136,8 +136,8 @@ export const checkIfPostsHaveChildren = (site, postIds = []) => {
   const { structure } = site;
   const structurePaths = getStructurePaths(structure);
 
-  return postIds.filter(postId => {
-    return structurePaths.some(structurePath => {
+  return postIds.filter((postId) => {
+    return structurePaths.some((structurePath) => {
       const structurePathArr = structurePath.split("/");
       const postIdIndex = structurePathArr.indexOf(postId);
       return postIdIndex > 0 && postIdIndex !== structurePathArr.length - 1;
@@ -145,7 +145,7 @@ export const checkIfPostsHaveChildren = (site, postIds = []) => {
   });
 };
 
-export const getRootPost = site => {
+export const getRootPost = (site) => {
   const { structure } = site;
   const structurePaths = getStructurePaths(structure);
   return structurePaths[0].split("/")[1];
@@ -153,10 +153,10 @@ export const getRootPost = site => {
 
 export const deleteSites = async (siteIds: string[]) => {
   const confRes = await confirmation({
-    title: getString("warn_delete_sites")
+    title: getString("warn_delete_sites"),
   });
 
-  const delSite = async siteId => {
+  const delSite = async (siteId) => {
     const siteUUID = await getSiteUUIDById(siteId);
     await deleteSite(siteUUID);
     await configRem(`sites.${siteUUID}`);
@@ -181,7 +181,7 @@ export const deleteMenus = async (siteUUID: string, menuNames: string[]) => {
   const updatedAt = Date.now();
 
   const confRes = await confirmation({
-    title: getString("warn_delete_menus")
+    title: getString("warn_delete_menus"),
   });
 
   if (confRes !== 0) {
@@ -190,7 +190,7 @@ export const deleteMenus = async (siteUUID: string, menuNames: string[]) => {
 
   const updatedMenus = { ...site.menus };
 
-  menuNames.forEach(menuToDelete => {
+  menuNames.forEach((menuToDelete) => {
     if (["header", "sidebar", "footer"].includes(menuToDelete)) {
       return;
     }
@@ -203,7 +203,7 @@ export const deleteMenus = async (siteUUID: string, menuNames: string[]) => {
    */
   await updateSite(siteUUID, {
     menus: updatedMenus,
-    updatedAt
+    updatedAt,
   });
 
   return updatedMenus;
@@ -241,7 +241,7 @@ export const deletePosts = async (siteUUID: string, postIds: string[]) => {
       postsWithChildren.length
         ? "warn_delete_post_with_children"
         : "confirmation_request_message"
-    )
+    ),
   });
 
   if (confRes !== 0) {
@@ -251,7 +251,7 @@ export const deletePosts = async (siteUUID: string, postIds: string[]) => {
   /**
    * Filter out deleted items from item list
    */
-  const filteredItems = items.filter(item => !postIds.includes(item.uuid));
+  const filteredItems = items.filter((item) => !postIds.includes(item.uuid));
 
   /**
    * Filter out deleted items from site structure
@@ -268,7 +268,7 @@ export const deletePosts = async (siteUUID: string, postIds: string[]) => {
   const siteMenus = site.menus || {};
   const filteredMenuPromises = [];
 
-  Object.keys(siteMenus).forEach(menuName => {
+  Object.keys(siteMenus).forEach((menuName) => {
     filteredMenuPromises.push(
       filterItemsFromNodes(siteUUID, siteMenus[menuName], postIds)
     );
@@ -287,13 +287,13 @@ export const deletePosts = async (siteUUID: string, postIds: string[]) => {
   await updateSite(siteUUID, {
     structure: filteredStructure,
     menus: filteredMenus,
-    updatedAt: Date.now()
+    updatedAt: Date.now(),
   });
-  await Promise.all(postIds.map(postId => deleteItem(siteUUID, postId)));
+  await Promise.all(postIds.map((postId) => deleteItem(siteUUID, postId)));
 
   return {
     structure: filteredStructure,
-    items: filteredItems
+    items: filteredItems,
   };
 };
 
@@ -318,7 +318,7 @@ export const clonePosts = async (siteUUID: string, postIds: string[]) => {
   const confRes = await confirmation({
     title: `Are you sure you want to clone ${
       postIds.length > 1 ? "these" : "this"
-    } ${postIds.length} ${postIds.length > 1 ? "posts" : "post"}?`
+    } ${postIds.length} ${postIds.length > 1 ? "posts" : "post"}?`,
   });
 
   if (confRes !== 0) {
@@ -328,8 +328,8 @@ export const clonePosts = async (siteUUID: string, postIds: string[]) => {
   const newItems = [];
   let updatedStructure = [...structure];
 
-  postIds.forEach(postId => {
-    const postToBeCloned = items.find(item => item.uuid === postId);
+  postIds.forEach((postId) => {
+    const postToBeCloned = items.find((item) => item.uuid === postId);
     const nodeParent = findParentInStructure(postId, structure);
     const cloneId = uuidv4();
     const randomString = cloneId.substring(0, 5);
@@ -339,15 +339,15 @@ export const clonePosts = async (siteUUID: string, postIds: string[]) => {
       createdAt: Date.now(),
       updatedAt: null,
       title: "[CLONE] " + postToBeCloned.title,
-      slug: postToBeCloned.slug + `-${randomString}`
+      slug: postToBeCloned.slug + `-${randomString}`,
     };
     delete cloneItem.id;
     const cloneStructureItem = {
       key: cloneId,
-      children: []
+      children: [],
     };
 
-    updatedStructure = updatedStructure.map(node =>
+    updatedStructure = updatedStructure.map((node) =>
       insertStructureChildren(node, cloneStructureItem, nodeParent.key)
     );
     newItems.push(cloneItem);
@@ -360,7 +360,7 @@ export const clonePosts = async (siteUUID: string, postIds: string[]) => {
    */
   await updateSite(siteUUID, {
     structure: updatedStructure,
-    updatedAt: Date.now()
+    updatedAt: Date.now(),
   });
 
   /**
@@ -389,12 +389,12 @@ export const deleteMenuEntries = async (
    */
   const updatedMenus = {
     ...menus,
-    [menuId]: filteredStructure
+    [menuId]: filteredStructure,
   };
 
   await updateSite(siteUUID, {
     menus: updatedMenus,
-    updatedAt
+    updatedAt,
   });
 
   await configSet(`sites.${siteUUID}.publishSuggested`, true);
@@ -407,7 +407,7 @@ export const updateSiteStructure = async (siteUUID: string, newStructure) => {
   if (site) {
     await updateSite(siteUUID, {
       structure: newStructure,
-      updatedAt: Date.now()
+      updatedAt: Date.now(),
     });
 
     await configSet(`sites.${site.uuid}.publishSuggested`, true);
@@ -422,9 +422,9 @@ export const filterItemsFromNodes = async (
   let outputNodes = nodes;
   const posts = await getItems(siteUUID);
 
-  const parseNodes = obj => {
+  const parseNodes = (obj) => {
     const { key, children = [] } = obj;
-    const post = posts.find(p => p.uuid === key && p.siteId === siteUUID);
+    const post = posts.find((p) => p.uuid === key && p.siteId === siteUUID);
 
     if (!post) return obj;
     if (itemIds.includes(key)) {
@@ -435,21 +435,21 @@ export const filterItemsFromNodes = async (
       ...obj,
       key,
       children: children
-        .filter(node => !itemIds.includes(node.key))
+        .filter((node) => !itemIds.includes(node.key))
         .map(parseNodes)
-        .filter(resNode => !!resNode)
+        .filter((resNode) => !!resNode),
     };
   };
 
   outputNodes = outputNodes
-    .map(node => parseNodes(node))
-    .filter(resNode => !!resNode);
+    .map((node) => parseNodes(node))
+    .filter((resNode) => !!resNode);
 
   return outputNodes;
 };
 
 export const handleHostingFields = (hostingFieldsObj = {}) => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const fields = { ...hostingFieldsObj };
     const { name, username } = fields as IHosting;
 
@@ -460,7 +460,7 @@ export const handleHostingFields = (hostingFieldsObj = {}) => {
     const storePromises = [];
 
     if (username) {
-      ["password", "token"].forEach(sensitiveField => {
+      ["password", "token"].forEach((sensitiveField) => {
         if (fields[sensitiveField]) {
           storePromises.push(
             localStorageSet(`${name}:${username}`, fields[sensitiveField])
@@ -481,7 +481,7 @@ export const validateHostingFields = (
 ) => {
   const fields = [...hostingFields];
 
-  return fields.every(field => {
+  return fields.every((field) => {
     if (field.optional) {
       return true;
     } else {
@@ -507,21 +507,23 @@ export const isValidSlug = async (
   const mappedChildren = await mapNodesToItems(siteUUID, nodeParent.children);
 
   return !mappedChildren.some(
-    item => slug === item.slug && item.uuid !== postId
+    (item) => slug === item.slug && item.uuid !== postId
   );
 };
 
 export const mapNodesToItems = async (siteUUID, nodes) => {
   const items = await getItems(siteUUID);
 
-  return (nodes || []).map(node => items.find(item => item.uuid === node.key));
+  return (nodes || []).map((node) =>
+    items.find((item) => item.uuid === node.key)
+  );
 };
 
 export const siteVarToArray = (siteVars: ISiteVar) => {
-  return Object.keys(siteVars).map(varName => {
+  return Object.keys(siteVars).map((varName) => {
     return {
       name: varName,
-      content: siteVars[varName]
+      content: siteVars[varName],
     };
   });
 };

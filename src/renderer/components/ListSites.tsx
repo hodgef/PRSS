@@ -5,7 +5,7 @@ import React, {
   useState,
   Fragment,
   useEffect,
-  ReactNode
+  ReactNode,
 } from "react";
 import { useHistory } from "react-router-dom";
 
@@ -67,7 +67,7 @@ const ListSites: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     }
   };
 
-  const formatSites = rawSitesArr => {
+  const formatSites = (rawSitesArr) => {
     const sortedObj = rawSitesArr.sort((a, b) => a.name.localeCompare(b.name));
 
     return sortedObj.map(({ id, name }) => ({
@@ -81,14 +81,12 @@ const ListSites: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
           <div className="right-align"></div>
         </Fragment>
       ),
-      children: []
+      children: [],
     }));
   };
 
-  const onItemClick = async itemId => {
-    const item = await getSites()
-      .where("id", itemId)
-      .first();
+  const onItemClick = async (itemId) => {
+    const item = await getSites().where("id", itemId).first();
     history.push(`/sites/${item.uuid}`);
   };
 
@@ -124,7 +122,7 @@ const ListSites: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
               onClick={() =>
                 history.push({
                   pathname: "/sites/create",
-                  state: { showBack: true }
+                  state: { showBack: true },
                 })
               }
             >
@@ -137,7 +135,7 @@ const ListSites: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
           <DraggableTree
             checkable={selectEnabled}
             data={formatSites(sites)}
-            onSelect={items => items[0] && onItemClick(items[0])}
+            onSelect={(items) => items[0] && onItemClick(items[0])}
             checkedKeys={selectedItems}
             onCheck={setSelectedItems}
             draggable={false}
