@@ -22,7 +22,17 @@ jobs:
         with:
           node-version: 17
 
-      - name: Install build tools
+      - name: Run a one-line script
+        if: startsWith(matrix.os, 'windows')
+        run: Invoke-webrequest -uri  https://aka.ms/vs/15/release/vs_buildtools.exe -OutFile vs_buildtools.exe
+        shell: powershell
+
+      - name: install build tools
+        if: startsWith(matrix.os, 'windows')
+        run: .\vs_buildtools.exe --wait --norestart --passive --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools" --add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools --add Microsoft.VisualStudio.Workload.MSBuildTools
+        shell: cmd
+
+      - name: Set msvs_version
         if: startsWith(matrix.os, 'windows')
         run: |
           npm config set msvs_version 2017
