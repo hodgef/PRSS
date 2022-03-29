@@ -20,13 +20,7 @@ jobs:
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
-          node-version: 12
-
-      - name: Install build tools
-        if: startsWith(matrix.os, 'windows')
-        run: |
-          npm install --global windows-build-tools
-          npm config set msvs_version 2017
+          node-version: 17
 
       - name: Prepare for app notarization
         if: startsWith(matrix.os, 'macos')
