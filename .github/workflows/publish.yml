@@ -20,23 +20,22 @@ jobs:
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
-          node-version: 17
+          node-version: 16
 
-      - name: Run a one-line script
+      - name: Install build tools
         if: startsWith(matrix.os, 'windows')
-        run: Invoke-webrequest -uri  https://aka.ms/vs/15/release/vs_buildtools.exe -OutFile vs_buildtools.exe
+        run: ./scripts/ci/github/install-vs-build-tools.ps1 -IncludeWin81Sdk $true
         shell: powershell
-
-      - name: install build tools
-        if: startsWith(matrix.os, 'windows')
-        run: .\vs_buildtools.exe --wait --norestart --passive --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools" --add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools --add Microsoft.VisualStudio.Workload.MSBuildTools
-        shell: cmd
 
       - name: Set msvs_version
         if: startsWith(matrix.os, 'windows')
         run: |
-          npm config set msvs_version 2015 --global
-          set VCTargetsPath=C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140
+          npm config set msvs_version 2017
+
+      - name: Install node-gyp
+        if: startsWith(matrix.os, 'windows')
+        run: ./scripts/ci/install-node-gyp.ps1
+        shell: powershell
 
       - name: Prepare for app notarization
         if: startsWith(matrix.os, 'macos')
