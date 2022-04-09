@@ -24,7 +24,7 @@ jobs:
 
       - name: Install build tools
         if: startsWith(matrix.os, 'windows')
-        run: ./scripts/ci/github/install-vs-build-tools.ps1 -IncludeWin81Sdk $true
+        run: ./scripts/ci/install-vs-build-tools.ps1 -IncludeWin81Sdk $true
         shell: powershell
 
       - name: Set msvs_version
