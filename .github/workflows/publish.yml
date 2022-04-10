@@ -28,9 +28,11 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Install build tools
+      - name: Install node-gyp
         if: startsWith(matrix.os, 'windows')
-        run: ./scripts/ci/install-vs-build-tools.ps1 -IncludeWin81Sdk $true
+        run: |
+          npm install --global node-gyp@latest
+          npm prefix -g | % { npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js" }
         shell: powershell
 
       - name: Set msvs_version
@@ -38,11 +40,8 @@ jobs:
         run: |
           npm config set msvs_version "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise"
           npm config set msbuild_path "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
-          dir "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise"
-
-      - name: Install node-gyp
-        if: startsWith(matrix.os, 'windows')
-        run: ./scripts/ci/install-node-gyp.ps1
+          $env:PATH = "C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\ProgramData\chocolatey\bin;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin"
+          [Environment]::SetEnvironmentVariable("Path", $env:PATH, "Machine")
         shell: powershell
 
       - name: envinfo
