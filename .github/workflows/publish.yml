@@ -52,6 +52,8 @@ jobs:
           APPLE_ID_PASSWORD: ${{ secrets.apple_id_pwd }}
           APPLE_TEAM_ID: ${{ secrets.apple_team_id }}
           GH_TOKEN: ${{ secrets.gh_token }}
+          CSC_LINK: "${{ startsWith(matrix.os, 'macos') && secrets.mac_certs || secrets.windows_certs }}"
+          CSC_KEY_PASSWORD: "${{ startsWith(matrix.os, 'macos') && secrets.mac_certs_password || secrets.windows_certs_password }}"
 
       # - name: Build/Release
       #   uses: samuelmeuli/action-electron-builder@v1
