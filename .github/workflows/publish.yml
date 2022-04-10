@@ -40,6 +40,10 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
+      - name: Install dmg-license
+        if: startsWith(matrix.os, 'macos')
+        run: npm install dmg-license
+
       - name: Install project
         run: |
           npm install --no-optional
