@@ -28,9 +28,6 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: envinfo
-        run: npx envinfo
-
       - name: Install build tools
         if: startsWith(matrix.os, 'windows')
         run: ./scripts/ci/install-vs-build-tools.ps1 -IncludeWin81Sdk $true
@@ -39,12 +36,17 @@ jobs:
       - name: Set msvs_version
         if: startsWith(matrix.os, 'windows')
         run: |
-          npm config set msvs_version "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community"
+          npm config set msvs_version "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise"
+          npm config set msbuild_path "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
+          dir "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community"
 
       - name: Install node-gyp
         if: startsWith(matrix.os, 'windows')
         run: ./scripts/ci/install-node-gyp.ps1
         shell: powershell
+
+      - name: envinfo
+        run: npx envinfo
 
       - name: Prepare for app notarization
         if: startsWith(matrix.os, 'macos')
