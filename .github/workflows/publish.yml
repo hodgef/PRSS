@@ -41,7 +41,6 @@ jobs:
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
       - name: Install project
-        if: startsWith(matrix.os, 'windows')
         run: |
           npm install
           npm run rebuild
