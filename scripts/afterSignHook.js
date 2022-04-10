@@ -9,7 +9,7 @@ const opts = { stdio: 'pipe' };
 
 module.exports = async function (params) {
     if (process.platform !== 'darwin') {
-        return
+        return;
     }
 
     console.log('afterSign hook triggered', params)
@@ -59,8 +59,7 @@ module.exports = async function (params) {
         console.log(`Done notarizing ${appId}`);
 
     } catch (error) {
-        console.error("Notarization failed!")
-        // console.error('ERR', error)
+        console.error("Notarization failed!");
     }
 }
 

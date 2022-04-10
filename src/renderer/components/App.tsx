@@ -1,11 +1,10 @@
 import "./styles/App.css";
 import "react-toastify/dist/ReactToastify.css";
 
-import React, { FunctionComponent, Fragment, useState, useEffect } from "react";
+import React, { FunctionComponent, useState } from "react";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import cx from "classnames";
-import versionCompare from "semver-compare";
 
 import Dashboard from "./Dashboard";
 import ListPosts from "./ListPosts";
