@@ -8,8 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [windows-2019]
-      fail-fast: false
+        os: [macos-latest, windows-2019]
 
     steps:
       - name: Check out Git repository
