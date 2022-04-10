@@ -75,7 +75,7 @@ const initDb = async () => {
       filename: dbFile,
     },
     useNullAsDefault: true,
-    postProcessResponse: (result, queryContext) => {
+    postProcessResponse: (result) => {
       if (Array.isArray(result)) {
         if (result && typeof result[0] === "object") {
           const output = result.map((res) =>
