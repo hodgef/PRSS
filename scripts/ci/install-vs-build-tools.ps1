@@ -3,7 +3,12 @@ param(
 )
 
 $stopWatch = [Diagnostics.Stopwatch]::StartNew()
-$installerArgs = @("--norestart","--passive","--wait","--includeRecommended","--add Microsoft.VisualStudio.Workload.VCTools")
+
+$env:PATH = "C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\ProgramData\chocolatey\bin"
+[Environment]::SetEnvironmentVariable("Path", $env:PATH, "Machine")
+choco install -y visualstudio2017community
+
+$installerArgs = @("--norestart", "--passive", "--wait", "--includeRecommended", "--add Microsoft.VisualStudio.Workload.VCTools")
 $installerBinary = "C:\vs_buildtools_15.exe"
 
 if ($IncludeWin81Sdk -eq $true) {
