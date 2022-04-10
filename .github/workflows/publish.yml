@@ -1,9 +1,6 @@
 name: Publish
 
-on:
-  push:
-    tags:
-      - v*
+on: push
 
 jobs:
   release:
@@ -44,18 +41,26 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
-      - name: Build/Release
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          mac_certs: ${{ secrets.mac_certs }}
-          mac_certs_password: ${{ secrets.mac_certs_password }}
-          windows_certs: ${{ secrets.windows_certs }}
-          windows_certs_password: ${{ secrets.windows_certs_password }}
-          github_token: ${{ secrets.github_token }}
-          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
-          max_attempts: 1
-        env:
-          APPLE_ID: ${{ secrets.apple_id }}
-          APPLE_ID_PASSWORD: ${{ secrets.apple_id_pwd }}
-          APPLE_TEAM_ID: ${{ secrets.apple_team_id }}
-          GH_TOKEN: ${{ secrets.gh_token }}
+      - name: Install project
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          npm install
+          npm run rebuild
+          npm run dist
+        shell: powershell
+
+      # - name: Build/Release
+      #   uses: samuelmeuli/action-electron-builder@v1
+      #   with:
+      #     mac_certs: ${{ secrets.mac_certs }}
+      #     mac_certs_password: ${{ secrets.mac_certs_password }}
+      #     windows_certs: ${{ secrets.windows_certs }}
+      #     windows_certs_password: ${{ secrets.windows_certs_password }}
+      #     github_token: ${{ secrets.github_token }}
+      #     release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      #     max_attempts: 1
+      #   env:
+      #     APPLE_ID: ${{ secrets.apple_id }}
+      #     APPLE_ID_PASSWORD: ${{ secrets.apple_id_pwd }}
+      #     APPLE_TEAM_ID: ${{ secrets.apple_team_id }}
+      #     GH_TOKEN: ${{ secrets.gh_token }}
