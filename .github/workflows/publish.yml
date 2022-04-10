@@ -42,7 +42,7 @@ jobs:
 
       - name: Install project
         run: |
-          npm install
+          npm install --no-optional
           npm run rebuild
           npm run dist
         env:
