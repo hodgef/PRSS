@@ -1,9 +1,6 @@
 name: Publish
 
-on:
-  push:
-    tags:
-      - v*
+on: push
 
 jobs:
   release:
@@ -26,7 +23,10 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.9"
+          python-version: "2.7"
+
+      - name: Setup msvc
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Install node-gyp
         if: startsWith(matrix.os, 'windows')
@@ -35,36 +35,31 @@ jobs:
           npm prefix -g | % { npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js" }
         shell: powershell
 
-      - name: Set msvs_version
-        if: startsWith(matrix.os, 'windows')
-        run: |
-          npm config set msvs_version "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise"
-          npm config set msbuild_path "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
-          $env:PATH = "C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\ProgramData\chocolatey\bin;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin"
-          [Environment]::SetEnvironmentVariable("Path", $env:PATH, "Machine")
-        shell: powershell
-
-      - name: envinfo
-        run: npx envinfo
-
       - name: Prepare for app notarization
         if: startsWith(matrix.os, 'macos')
         run: |
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
-      - name: Build/Release
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          mac_certs: ${{ secrets.mac_certs }}
-          mac_certs_password: ${{ secrets.mac_certs_password }}
-          windows_certs: ${{ secrets.windows_certs }}
-          windows_certs_password: ${{ secrets.windows_certs_password }}
-          github_token: ${{ secrets.github_token }}
-          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
-          max_attempts: 2
-        env:
-          APPLE_ID: ${{ secrets.apple_id }}
-          APPLE_ID_PASSWORD: ${{ secrets.apple_id_pwd }}
-          APPLE_TEAM_ID: ${{ secrets.apple_team_id }}
-          GH_TOKEN: ${{ secrets.gh_token }}
+      - name: Install project
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          npm install
+          npm run rebuild
+        shell: powershell
+
+      # - name: Build/Release
+      #   uses: samuelmeuli/action-electron-builder@v1
+      #   with:
+      #     mac_certs: ${{ secrets.mac_certs }}
+      #     mac_certs_password: ${{ secrets.mac_certs_password }}
+      #     windows_certs: ${{ secrets.windows_certs }}
+      #     windows_certs_password: ${{ secrets.windows_certs_password }}
+      #     github_token: ${{ secrets.github_token }}
+      #     release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      #     max_attempts: 1
+      #   env:
+      #     APPLE_ID: ${{ secrets.apple_id }}
+      #     APPLE_ID_PASSWORD: ${{ secrets.apple_id_pwd }}
+      #     APPLE_TEAM_ID: ${{ secrets.apple_team_id }}
+      #     GH_TOKEN: ${{ secrets.gh_token }}
