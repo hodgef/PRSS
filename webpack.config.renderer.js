@@ -1,7 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const PrettierPlugin = require('prettier-webpack-plugin');
 const webpack = require('webpack');
 
 const mode = process.env.NODE_ENV || "development";
@@ -60,8 +59,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: 'public/index.html',
-    }),
-    new PrettierPlugin()
+    })
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js']

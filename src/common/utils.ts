@@ -11,6 +11,7 @@ export const configRem = (param: any) => store.delete(param);
 const { app } = require("@electron/remote");
 const execSync = require("child_process").execSync;
 const isDevelopment = process.env.NODE_ENV !== "production";
+const path = require('path');
 
 export const getString = (id: string, replaceWith: string[] = []) => {
   let str = strings[id] || "";
@@ -61,4 +62,14 @@ export const runCommand = (dir, cmd) => {
 
 export const getConfigPath = async () => {
   return (await storeInt.get("paths.config")) || app.getPath("userData");
+};
+
+export const getRootPath = () => {
+  const rootPath = app.isPackaged ? app.getPath('appData') : app.getPath('exe').split("node_modules")[0];
+  console.log("rootPath", rootPath);
+  return rootPath;
+}
+
+export const getStaticPath = () => {
+  return path.join(app.isPackaged ? process.resourcesPath : getRootPath(), 'static');
 };

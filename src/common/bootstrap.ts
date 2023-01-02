@@ -7,7 +7,7 @@ import {
   getGithubSecureAuth,
   getPRSSConfig,
 } from "../renderer/services/utils";
-import { getConfigPath } from "./utils";
+import { getConfigPath, getStaticPath } from "./utils";
 
 const JSON_FIELDS = [
   "structure",
@@ -149,29 +149,35 @@ const initStore = () => {
       defaultsInt,
     } as any);
 
+    console.log("_static", getStaticPath());
+
     const paths = (await storeInt.get("paths")) || {};
 
-    const envPath = path.join(__static, "env");
+    const envPath = path.join(getStaticPath(), "env");
     const configPath = await getConfigPath();
-    const assetsPath = path.join(__static, "assets");
-    const themesPath = path.join(__static, "themes");
-    const bufferPath = path.join(__static, "buffer");
-    const publicPath = path.join(__static, "public");
-    const vendorPath = path.join(__static, "vendor");
+    const assetsPath = path.join(getStaticPath(), "assets");
+    const themesPath = path.join(getStaticPath(), "themes");
+    const bufferPath = path.join(getStaticPath(), "buffer");
+    const publicPath = path.join(getStaticPath(), "public");
+    const vendorPath = path.join(getStaticPath(), "vendor");
+
+    const storeIntPaths =  {
+      ...paths,
+      env: envPath,
+      config: configPath,
+      assets: assetsPath,
+      buffer: bufferPath,
+      public: publicPath,
+      themes: themesPath,
+      vendor: vendorPath,
+    };
 
     storeInt.set({
-      paths: {
-        ...paths,
-        env: envPath,
-        config: configPath,
-        assets: assetsPath,
-        buffer: bufferPath,
-        public: publicPath,
-        themes: themesPath,
-        vendor: vendorPath,
-      },
+      paths: storeIntPaths
     });
 
+    console.log("storeIntPaths", storeIntPaths);
+    
     /**
      * Store
      */

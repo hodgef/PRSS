@@ -201,6 +201,9 @@ class GithubProvider {
       const bufferDir = storeInt.get("paths.buffer");
       runCommand(bufferDir, `git clone "${repositoryUrl}" .`);
 
+      console.log("repositoryUrl", repositoryUrl);
+      console.log("bufferDir", bufferDir);
+
       const buildRes = await build(
         this.siteUUID,
         onUpdate,
