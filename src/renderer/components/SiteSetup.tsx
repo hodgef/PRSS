@@ -151,7 +151,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
       className: "",
       tooltip: "",
       onClick: () => {
-        window.open(getApiUrl("/login/github"));
+        window.open(getApiUrl("auth/github/authorize"));
       },
     },
     {

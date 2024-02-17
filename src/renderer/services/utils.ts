@@ -335,12 +335,6 @@ export const getLatestVersion = async () => {
   return res;
 };
 
-export const getGithubSecureAuth = async (code) => {
-  const res = ((await getJson(getApiUrl(`/login/github/verify/${code}`))) ||
-    {}) as any;
-  return res;
-};
-
 export const getCurrentVersion = () => {
   const isDevelopment = process.env.NODE_ENV !== "production";
   const { app } = require("@electron/remote");

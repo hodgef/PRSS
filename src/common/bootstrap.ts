@@ -4,7 +4,6 @@ import fs from "fs";
 import knex from "knex";
 import {
   mapFieldsFromJSON,
-  getGithubSecureAuth,
   getPRSSConfig,
 } from "../renderer/services/utils";
 import { getConfigPath, getStaticPath } from "./utils";
@@ -35,7 +34,7 @@ let prssConfig;
 const cache = {};
 
 const expressUrl = "http://127.0.0.1:3001";
-const getApiUrl = (path = "/") => `https://prss.co/api${path}`;
+const getApiUrl = (path = "/") => `https://prss.volted.co/${path}`;
 
 const setHook = (name, fct) => {
   hooks[name] = fct;
@@ -217,12 +216,11 @@ const initExpress = async () => {
 
   expressApp.get("/github/callback", async (req, res) => {
     res.send("Success - You can now close this page and return to PRSS");
-    const code = req.query.c;
-    if (code) {
-      const { token, username } = await getGithubSecureAuth(code);
-      if (token && username) {
-        runHook("github_login_success", { token, username });
-      }
+    const token = req.query.t;
+    const username = req.query.u;
+
+    if (token && username) {
+      runHook("github_login_success", { token, username });
     }
   });
 };

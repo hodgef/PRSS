@@ -503,18 +503,22 @@ class GithubProvider {
     return repo;
   };
 
-  request: requestType = async (method, endpoint, data = {}, headers = {}) => {
+  request: requestType = async (method, endpoint, data = {}, headers) => {
     const url = `https://${this.vars.baseApiUrl()}/${endpoint}`;
     const { hosting } = configGet(`sites.${this.siteUUID}`);
     const { name, username } = hosting;
-    const password = await localStorageGet(`${name}:${username}`);
+    const token = await localStorageGet(`${name}:${username}`);
 
     return axios({
       method,
       url,
-      auth: { username, password },
+      auth: { username, password: token },
       data,
-      headers,
+      headers: headers || {
+        "Accept": "application/vnd.github+json",
+        "Authorization": `Bearer ${token}`,
+        "X-GitHub-Api-Version": "2022-11-28"
+      },
     })
       .then((response) => response.data)
       .catch((res) => res);
