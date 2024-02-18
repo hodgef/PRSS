@@ -125,7 +125,7 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
                     <span>Settings</span>
                   </li>
 
-                  <li
+                  {/*<li
                     className="clickable"
                     onClick={() => {
                       setShowMoreMenu(false);
@@ -134,7 +134,7 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
                   >
                     <span className="material-icons">code</span>
                     <span>Developer Tools</span>
-                  </li>
+                  </li>*/}
                   
                   <li
                     className="clickable"
