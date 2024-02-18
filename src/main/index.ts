@@ -67,7 +67,7 @@ function createWindow () {
     function setLog(text) {
       log.info(text);
     }
-    /*autoUpdater.on('checking-for-update', () => {
+    autoUpdater.on('checking-for-update', () => {
       setLog('Checking for update...');
     })
     autoUpdater.on('update-available', (info) => {
@@ -87,7 +87,7 @@ function createWindow () {
     })
     autoUpdater.on('update-downloaded', (info) => {
       setLog('Update downloaded');
-    });*/
+    });
 
     /**
      * Preview server
@@ -145,9 +145,9 @@ if (!gotTheLock) {
   })
 
   // Create myWindow, load the rest of the app, etc...
-  /*app.on('ready', () => {
+  app.on('ready', () => {
     autoUpdater.checkForUpdatesAndNotify();
-  });*/
+  });
 }
 
 // This method will be called when Electron has finished
