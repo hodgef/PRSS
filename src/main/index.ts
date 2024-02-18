@@ -101,6 +101,10 @@ function createWindow () {
       }
     }
 
+    (global as any).openDevTools = () => {
+      mainWindow.webContents.openDevTools();
+    }
+
     (global as any).reloadPreview = () => {
       previewServer.reload();
     }
