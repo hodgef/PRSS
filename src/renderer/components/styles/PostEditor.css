@@ -88,6 +88,9 @@
   width: 100% !important;
   max-width: calc(100vw - 350px) !important;
 }
+#app .PostEditor .jodit-container:not(.jodit_inline) {
+  background-color: transparent;
+}
 #app .PostEditor .jodit-container.jodit_fullsize {
   top: 49px;
   height: calc(100vh - 50px) !important;

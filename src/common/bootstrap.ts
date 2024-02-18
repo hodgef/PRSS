@@ -144,6 +144,7 @@ const initStore = () => {
      * StoreInt
      */
     storeInt = new Store({
+      projectName: "prss-int",
       name: "prss-int",
       defaultsInt,
     } as any);
@@ -181,6 +182,7 @@ const initStore = () => {
      * Store
      */
     store = new Store({
+      projectName: "prss",
       name: "prss",
       cwd: configPath,
       defaults,
@@ -193,7 +195,7 @@ const initStore = () => {
       fs.mkdirSync(themesPath);
     }
 
-    resolve(null);
+    resolve(storeIntPaths);
   });
 };
 

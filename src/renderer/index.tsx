@@ -10,6 +10,9 @@ import { checkDirs } from "./services/utils";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PRSSLogo from "./images/icon.png";
 
+const remote = require("@electron/remote");
+const openDevTools = remote.getGlobal("openDevTools");
+
 const setLoading = () => {
   const appElem = document.querySelector("#app") as HTMLDivElement;
   if (appElem) {
@@ -41,4 +44,5 @@ const initApp = async () => {
   ReactDOM.render(<PRSS />, document.getElementById("app"));
 };
 
+//openDevTools();
 initApp();
