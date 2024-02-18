@@ -27,7 +27,7 @@
     "browser-sync": "^2.27.9",
     "electron-log": "^4.2.2",
     "electron-store": "^8.1.0",
-    "electron-updater": "6.1.7",
+    "electron-updater": "4.6.5",
     "express": "^4.17.3",
     "html-minifier-terser": "^5.1.1",
     "jodit-react": "^1.0.42",
