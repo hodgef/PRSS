@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const CopyPlugin = require("copy-webpack-plugin");
 
 const mode = process.env.NODE_ENV || "development";
 const staticPath =
@@ -36,6 +37,9 @@ module.exports = {
   plugins: [
     new webpack.ContextReplacementPlugin(/knex|express/),
     new webpack.DefinePlugin({ '__static': staticPath }),
+    new CopyPlugin({
+      patterns: [ { from: "static/icons", to: "appx/" } ],
+    }),
   ],
   resolve: {
     extensions: ['.ts', '.js']

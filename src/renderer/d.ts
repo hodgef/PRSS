@@ -108,8 +108,8 @@ interface IHosting extends hostingType {
 type requestType = (
     method: any,
     endpoint: string,
-    data?: object,
-    headers?: object
+    data?: any,
+    headers?: any
 ) => any;
 
 type updaterType = (

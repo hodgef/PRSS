@@ -39,7 +39,7 @@ class FallbackProvider {
     return true;
   };
 
-  deploy = async (onUpdate?, providedBufferItems?: IBufferItem[]) => {
+  deploy = async (onUpdate?) => {
     const buildRes = await build(this.siteUUID, onUpdate, null, false, true);
 
     if (!buildRes) {

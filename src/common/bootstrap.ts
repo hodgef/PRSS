@@ -8,7 +8,7 @@ import {
 } from "../renderer/services/utils";
 import { getConfigPath, getStaticPath } from "./utils";
 
-const JSON_FIELDS = [
+export const JSON_FIELDS = [
   "structure",
   "menus",
   "vars",
@@ -24,46 +24,45 @@ const defaults = {
   sites: {},
 } as IStore;
 
-let store;
-let storeInt;
-let db;
-let expressApp;
-let expressServer;
-let hooks = {};
-let prssConfig;
+export let store;
+export let storeInt;
+export let db;
+export let expressApp;
+export let expressServer;
+export let hooks = {};
+export let prssConfig;
 const cache = {};
 
 const expressUrl = "http://127.0.0.1:3001";
-const getApiUrl = (path = "/") => `https://prss.volted.co/${path}`;
+export const getApiUrl = (path = "/") => `https://prss.volted.co/${path}`;
 
-const setHook = (name, fct) => {
+export const setHook = (name, fct) => {
   hooks[name] = fct;
 };
 
-const getHooks = () => {
+export const getHooks = () => {
   return hooks;
 };
 
-const runHook = (name, params?) => {
+export const runHook = (name, params?) => {
   if (hooks[name]) {
     if (params) hooks[name](params);
     else hooks[name]();
   }
 };
 
-const clearHooks = () => {
+export const clearHooks = () => {
   hooks = {};
 };
 
-const setCache = (name, val) => {
+export const setCache = (name, val) => {
   cache[name] = val;
 };
 
-const getCache = (name) => cache[name];
+export const getCache = (name) => cache[name];
+export const deleteCache = (name) => delete cache[name];
 
-const deleteCache = (name) => delete cache[name];
-
-const initDb = async () => {
+export const initDb = async () => {
   const storePath = await getConfigPath();
   const dbFile = path.join(storePath, "prss.db");
   const dbExists = fs.existsSync(dbFile);
@@ -134,7 +133,7 @@ const initDb = async () => {
   return db;
 };
 
-const initStore = () => {
+export const initStore = () => {
   return new Promise(async (resolve) => {
     if (store) {
       resolve(null);
@@ -199,7 +198,7 @@ const initStore = () => {
   });
 };
 
-const initExpress = async () => {
+export const initExpress = async () => {
   /**
    * Start Express
    */
@@ -227,33 +226,10 @@ const initExpress = async () => {
   });
 };
 
-const expressOpen = (path) => {
+export const expressOpen = (path) => {
   window.open(expressUrl + path);
 };
 
-const init = async () => {
+export const initConfig = async () => {
   prssConfig = await getPRSSConfig();
-  await initStore();
-  await initDb();
-  await initExpress();
-};
-
-export {
-  init,
-  store,
-  storeInt,
-  db,
-  expressApp,
-  expressServer,
-  prssConfig,
-  getCache,
-  setCache,
-  deleteCache,
-  expressOpen,
-  getApiUrl,
-  setHook,
-  runHook,
-  getHooks,
-  clearHooks,
-  JSON_FIELDS,
 };

@@ -3,9 +3,11 @@
 @import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap");
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+
 html {
   height: 100%;
 }
+
 body {
   display: flex;
   font-family: "Roboto", sans-serif;
@@ -13,63 +15,85 @@ body {
   padding: 0;
   overflow-x: hidden;
 }
+
 body.jodit-fullsize_box,
 html.jodit-fullsize_box {
   min-width: 100% !important;
 }
+
 #app {
   flex: 1;
   display: flex;
   flex-flow: column;
 }
+
 #app:not(.app-loading) {
   background-image: none !important;
 }
+
 #app.app-loading {
   -webkit-app-region: drag;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 365px;
+    background-repeat: no-repeat;
+    background-position: center 125px, top, top;
+    background-size: 270px, cover, cover;
 }
-#app.app-loading:before {
-  content: "";
+
+#app .loading-box {
+  display: flex;
+  background: #2f2f2f;
+  align-items: center;
+  position: absolute;
+  bottom: 70px;
+  width: 92%;
+  color: white;
+  font-size: 20px;
+  gap: 20px;
+  height: 80px;
+  padding: 30px;
+  border-radius: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#app .loading-icon {
   width: 30px;
   height: 30px;
-  margin: 100px auto;
   background-color: #fff;
   border-radius: 100%;
   -webkit-animation: sk-scaleout 1s infinite ease-in-out;
   animation: sk-scaleout 1s infinite ease-in-out;
-  position: fixed;
-  right: 100px;
-  bottom: -91px;
   z-index: 99;
+  display: inline-block;
 }
-#app.app-loading:after {
+
+/* #app.app-loading:after {
   content: "Loading";
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: 10px;
+  right: 10px;
   background: #353535;
   color: white;
   font-size: 20px;
   font-weight: 300;
   padding: 10px 20px 10px 55px;
-}
+} */
 @-webkit-keyframes sk-scaleout {
   0% {
     -webkit-transform: scale(0);
   }
+
   100% {
     -webkit-transform: scale(1);
     opacity: 0;
   }
 }
+
 @keyframes sk-scaleout {
   0% {
     -webkit-transform: scale(0);
     transform: scale(0);
   }
+
   100% {
     -webkit-transform: scale(1);
     transform: scale(1);

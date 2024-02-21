@@ -36,13 +36,14 @@ export const setupRemote = (siteUUID: string, onUpdate: updaterType) => {
   } = configGet(`sites.${siteUUID}`);
 
   switch (hostingName) {
-    case "github":
+    case "github": {
       const githubProvider = new GithubProvider(siteUUID);
       return githubProvider.setup(onUpdate);
-
-    default:
+    }
+    default: {
       const fallbackProvider = new FallbackProvider(siteUUID);
       return fallbackProvider.setup(onUpdate);
+    }
   }
 };
 
@@ -52,13 +53,14 @@ export const deploy = (siteUUID: string, params = []) => {
   } = configGet(`sites.${siteUUID}`);
 
   switch (hostingName) {
-    case "github":
+    case "github": {
       const githubProvider = new GithubProvider(siteUUID);
       return githubProvider.deploy(...params);
-
-    default:
+    }
+    default: {
       const fallbackProvider = new FallbackProvider(siteUUID);
       return fallbackProvider.deploy(...params);
+    }
   }
 };
 
@@ -68,9 +70,10 @@ export const getRepositoryUrl = async (siteUUID: string) => {
   } = configGet(`sites.${siteUUID}`);
 
   switch (hostingName) {
-    case "github":
+    case "github": {
       const githubProvider = new GithubProvider(siteUUID);
       return githubProvider.getRepositoryUrl();
+    }
 
     default:
       return false;
@@ -86,9 +89,10 @@ export const wipe = (siteUUID: string, onUpdate?) => {
   } = configGet(`sites.${siteUUID}`);
 
   switch (hostingName) {
-    case "github":
+    case "github": {
       const githubProvider = new GithubProvider(siteUUID);
       return githubProvider.wipe(onUpdate);
+    }
 
     default:
       return Promise.resolve(null);
@@ -114,9 +118,10 @@ export const deleteRemoteItems = (filesToDeleteArr, siteUUID: string) => {
   } = configGet(`sites.${siteUUID}`);
 
   switch (hostingName) {
-    case "github":
+    case "github": {
       const githubProvider = new GithubProvider(siteUUID);
       return githubProvider.deleteFiles(filesToDeleteArr);
+    }
 
     default:
       return Promise.resolve(null);
@@ -476,7 +481,7 @@ export const handleHostingFields = (hostingFieldsObj = {}) => {
 };
 
 export const validateHostingFields = (
-  hostingFieldsObj: object,
+  hostingFieldsObj: any,
   hostingFields: any[]
 ) => {
   const fields = [...hostingFields];

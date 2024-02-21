@@ -22,7 +22,6 @@ const SlugEditor: FunctionComponent<IProps> = ({
   site,
   post,
   items,
-  url,
   onSave,
   previewMode,
 }) => {

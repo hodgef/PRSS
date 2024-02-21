@@ -198,7 +198,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
 
         <div className="theme-list">
           {themeList.map((theme) => {
-            const { name, title, author, url, type, themeDir } = theme;
+            const { name, title, author, url, themeDir } = theme;
             let image = defaultThumbnail;
 
             const authorFormatted =
@@ -243,8 +243,8 @@ const ThemeManager: FunctionComponent<IProps> = ({
                     </div>
                     <div className="right-align">
                       {prssConfig.themes[name] && (
-                        <span className="material-icons" title="Official Theme">
-                          star
+                        <span className="material-icons" title="Official Theme" onClick={() => showThemeDetails(theme)}>
+                          info
                         </span>
                       )}
                     </div>

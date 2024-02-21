@@ -11,7 +11,6 @@ import React, {
 const isFrameless = process.platform !== "darwin";
 const remote = require("@electron/remote");
 const win = remote.getCurrentWindow();
-const openDevTools = remote.getGlobal("openDevTools");
 
 import PRSSLogo from "../images/prss-sm.png";
 import minImg from "../images/icons/min-k-30.png";

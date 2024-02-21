@@ -11,7 +11,7 @@ export const parseShortcodes = async (str = "", data: IBufferItem) => {
   const matchArr = [];
 
   matches.forEach((match) => {
-    const [fullMatch, fn, param, value] = match;
+    const [fn, param, value] = match;
     matchPromises.push(execShortcode(fn, value, param, data));
     matchArr.push(match);
   });

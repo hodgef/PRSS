@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ReactNode, useState } from "react";
+import React, { FunctionComponent, useState } from "react";
 import { getString } from "../../common/utils";
 import { modal } from "./Modal";
 

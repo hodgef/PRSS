@@ -9,12 +9,12 @@
 }
 .ThemeManager .content .theme-list .right-align .material-icons {
   font-size: 21px;
-  color: #eaad24;
+  color: #2c2c2c;
   opacity: 0.6;
 }
 .ThemeManager .content .theme-list-item {
-  box-shadow: 0 0 10px #e8e8e8 59;
-  border: 2px solid #cacaca 78;
+  box-shadow: 0 0 10px #e8e8e8;
+  border: 2px solid #e8e8e8;
   border-radius: 6px;
   overflow: hidden;
   position: relative;

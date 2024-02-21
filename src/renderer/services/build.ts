@@ -5,7 +5,7 @@ import fse from "fs-extra";
 import path from "path";
 import fs from "fs";
 
-import { getString, configGet } from "../../common/utils";
+import { getString } from "../../common/utils";
 import {
   sequential,
   sanitizeSite,

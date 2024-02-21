@@ -3,46 +3,29 @@ import "./index.css";
 
 import React from "react";
 import ReactDOM from "react-dom";
-
-import App from "./components/App";
-import { init } from "../common/bootstrap";
-import { checkDirs } from "./services/utils";
+import Loader from "./components/Loader";
 import ErrorBoundary from "./components/ErrorBoundary";
+
 import PRSSLogo from "./images/icon.png";
-
-const remote = require("@electron/remote");
-const openDevTools = remote.getGlobal("openDevTools");
-
-const setLoading = () => {
-  const appElem = document.querySelector("#app") as HTMLDivElement;
-  if (appElem) {
-    appElem.style.backgroundImage = `url('${PRSSLogo}')`;
-    appElem.classList.add("app-loading");
-  }
-};
-
-const unsetLoading = () => {
-  const appElem = document.querySelector("#app") as HTMLDivElement;
-  if (appElem) {
-    appElem.style.backgroundImage = "";
-    appElem.classList.remove("app-loading");
-  }
-};
+import background from "./images/background.jpg";
 
 const initApp = async () => {
+  const setLoading = () => {
+      const appElem = document.querySelector("#app") as HTMLDivElement;
+      if (appElem) {
+        appElem.style.backgroundImage = `url('${PRSSLogo}'), linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.9)), url('${background}')`;
+        appElem.classList.add("app-loading");
+      }
+  };
+
   setLoading();
-  await init();
-  await checkDirs();
 
   const PRSS = () => (
     <ErrorBoundary>
-      <App />
+      <Loader />
     </ErrorBoundary>
   );
-
-  unsetLoading();
   ReactDOM.render(<PRSS />, document.getElementById("app"));
 };
 
-//openDevTools();
 initApp();

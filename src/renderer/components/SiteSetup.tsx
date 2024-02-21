@@ -12,8 +12,6 @@ import cx from "classnames";
 
 import { getString, configGet, configSet, configRem } from "../../common/utils";
 import {
-  buildAndDeploy,
-  getRepositoryUrl,
   handleHostingFields,
   getHostingTypes,
   validateHostingFields,
@@ -52,20 +50,14 @@ const SiteSetup: FunctionComponent<IProps> = ({
   const sites = configGet("sites");
   const hasSites = !!(Object.keys(sites) && Object.keys(sites).length);
   const [site, setSite] = useState(null);
-  const [publishSuggested, setPublishSuggested] = useState(null);
   const [loading, setLoading] = useState(null);
-  const [repositoryUrl, setRepositoryUrl] = useState(null);
   const hostingTypes = getHostingTypes();
   const [loadingStatus, setLoadingStatus] = useState("");
-  const [publishDescription, setPublishDescription] = useState(
-    "You have unpublished changes"
-  );
 
   const [hostingFields, setHostingFields] = useState(null);
   const [extraHostingFields, setExtraHostingFields] = useState(null);
 
   const history = useHistory();
-  const { url } = (site as ISite) || {};
   const [title, setTitle] = useState(site ? site.title : "");
 
   useEffect(() => {

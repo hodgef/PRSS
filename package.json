@@ -15,9 +15,10 @@
     "test": "cross-env ELECTRON_RUN_AS_NODE=true electron ./node_modules/jest-cli/bin/jest.js --silent",
     "test:verbose": "cross-env ELECTRON_RUN_AS_NODE=true electron ./node_modules/jest-cli/bin/jest.js --verbose",
     "coverage": "npm run test -- --coverage",
-    "trypublish": "npm publish || true"
+    "trypublish": "npm publish || true",
+    "lint": "eslint --ext .ts,.tsx ."
   },
-  "author": "Francisco Hodge <hello@franciscohodge.com> (https://github.com/hodgef)",
+  "author": "Volted Interactive <contact@volted.co> (https://volted.co)",
   "repository": {
     "type": "git",
     "url": "https://github.com/hodgef/PRSS"
@@ -64,6 +65,7 @@
     "babel-minify": "^0.5.1",
     "babel-preset-minify": "^0.5.0",
     "classnames": "^2.2.6",
+    "copy-webpack-plugin": "^12.0.2",
     "cross-env": "7.0.3",
     "css-loader": "^6.6.0",
     "del": "^5.1.0",
@@ -114,9 +116,9 @@
   "homepage": "https://github.com/hodgef/PRSS",
   "build": {
     "extends": null,
-    "productName": "PRSS",
+    "productName": "PRSS Site Creator",
     "appId": "io.prss.app",
-    "copyright": "2022-present, Francisco Hodge",
+    "copyright": "2022-present, Volted Interactive",
     "artifactName": "${productName}-${platform}.${ext}",
     "files": [
       "build/**/*",
@@ -140,8 +142,9 @@
     ],
     "appx": {
       "applicationId": "PRSS",
-      "identityName": "electron-webpack",
-      "publisher": "CN=Francisco Hodge, O=Francisco Hodge, L=Vancouver, S=British Columbia, C=CA"
+      "identityName": "VoltedInteractive.PRSSSiteCreator",
+      "publisher": "CN=F26626CB-0F6C-48E9-85BB-53BD354054E0",
+      "publisherDisplayName": "Volted Interactive"
     },
     "win": {
       "icon": "public/icons/icon.ico",
@@ -149,7 +152,7 @@
         "appx",
         "nsis"
       ],
-      "publisherName": "Francisco Hodge"
+      "publisherName": "Volted Interactive"
     },
     "linux": {
       "icon": "public/icons/icon.png",

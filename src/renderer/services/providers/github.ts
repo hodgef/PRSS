@@ -21,7 +21,6 @@ import {
 import { confirmation, error } from "../utils";
 import { sequential } from "./../utils";
 import { modal } from "../../components/Modal";
-import React from "react";
 import { getSite } from "../db";
 import { storeInt } from "../../../common/bootstrap";
 

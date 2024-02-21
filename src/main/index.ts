@@ -14,6 +14,9 @@ autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
 
+const ElectronStore = require('electron-store');
+ElectronStore.initRenderer();
+
 initialize();
 
 let mainWindow;
@@ -70,10 +73,10 @@ function createWindow () {
     autoUpdater.on('checking-for-update', () => {
       setLog('Checking for update...');
     })
-    autoUpdater.on('update-available', (info) => {
+    autoUpdater.on('update-available', () => {
       setLog('Update available.');
     })
-    autoUpdater.on('update-not-available', (info) => {
+    autoUpdater.on('update-not-available', () => {
       setLog('Update not available.');
     })
     autoUpdater.on('error', (err) => {
@@ -85,7 +88,7 @@ function createWindow () {
       log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
       setLog(log_message);
     })
-    autoUpdater.on('update-downloaded', (info) => {
+    autoUpdater.on('update-downloaded', () => {
       setLog('Update downloaded');
     });
 

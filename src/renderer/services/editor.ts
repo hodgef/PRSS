@@ -1,11 +1,11 @@
 //import draftToHtml from 'draftjs-to-html';
 
 export const imageUploadCallback = (file) => {
-  new Promise((resolve, reject) => {
+  new Promise((resolve) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     const img = new Image() as any;
-    reader.onload = function (e) {
+    reader.onload = function () {
       img.src = this.result;
     };
     img.onload = function () {
@@ -57,7 +57,7 @@ export const imageUploadCallback = (file) => {
   });
 };
 
-const convertImages = (htmlText) => {
+export const convertImages = (htmlText) => {
   const regex = /<img\s[^>]*?style\s*=\s*['\"]float([^'\"]*?)['\"][^>]*?>/g;
   let m;
   while ((m = regex.exec(htmlText)) !== null) {
