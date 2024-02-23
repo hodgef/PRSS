@@ -65,11 +65,9 @@ export const getConfigPath = async () => {
 };
 
 export const getRootPath = () => {
-  const rootPath = app.isPackaged ? app.getPath('appData') : app.getPath('exe').split("node_modules")[0];
-  console.log("rootPath", rootPath);
-  return rootPath;
+  return app.isPackaged ? app.getPath('userData') : app.getPath('exe').split("node_modules")[0];;
 }
 
 export const getStaticPath = () => {
-  return path.join(app.isPackaged ? process.resourcesPath : getRootPath(), 'static');
+  return path.join(app.isPackaged && !process.resourcesPath?.includes("WindowsApps") ? process.resourcesPath : getRootPath(), 'static');
 };

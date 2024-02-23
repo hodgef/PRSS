@@ -148,17 +148,19 @@ export const initStore = () => {
       defaultsInt,
     } as any);
 
-    console.log("_static", getStaticPath());
+    const staticsPath = getStaticPath();
+
+    console.log("_static", staticsPath);
 
     const paths = (await storeInt.get("paths")) || {};
 
-    const envPath = path.join(getStaticPath(), "env");
+    const envPath = path.join(staticsPath, "env");
     const configPath = await getConfigPath();
-    const assetsPath = path.join(getStaticPath(), "assets");
-    const themesPath = path.join(getStaticPath(), "themes");
-    const bufferPath = path.join(getStaticPath(), "buffer");
-    const publicPath = path.join(getStaticPath(), "public");
-    const vendorPath = path.join(getStaticPath(), "vendor");
+    const assetsPath = path.join(staticsPath, "assets");
+    const themesPath = path.join(staticsPath, "themes");
+    const bufferPath = path.join(staticsPath, "buffer");
+    const publicPath = path.join(staticsPath, "public");
+    const vendorPath = path.join(staticsPath, "vendor");
 
     const storeIntPaths =  {
       ...paths,
@@ -186,6 +188,13 @@ export const initStore = () => {
       cwd: configPath,
       defaults,
     });
+
+    /**
+     * Creating statics dir if it doesn't exist
+     */
+    if (!fs.existsSync(staticsPath)) {
+      fs.mkdirSync(staticsPath);
+    }
 
     /**
      * Creating themes dir if it doesn't exist

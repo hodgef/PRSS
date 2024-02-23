@@ -8,6 +8,10 @@ import App from "./App";
 
 import cx from "classnames";
 
+// const remote = require("@electron/remote");
+// const win = remote.getCurrentWindow();
+// const openDevTools = remote.getGlobal("openDevTools");
+
 const Loader: FunctionComponent = () => {
     const [isLoading, setIsLoading] = React.useState(true);
     const [loadingText, setLoadingText] = React.useState("");
@@ -22,6 +26,7 @@ const Loader: FunctionComponent = () => {
     };
 
     React.useEffect(() => {
+        //openDevTools();
         const init = async () => {
             setLoadingText("Initializing Configuration");
             await initConfig();
