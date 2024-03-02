@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "prss",
   "version": "1.8.0",
   "description": "Powerful Blogging",
