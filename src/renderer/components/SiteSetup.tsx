@@ -393,6 +393,11 @@ const SiteSetup: FunctionComponent<IProps> = ({
                 </div>
               </div>
             </div>
+            {hostingFields.name === "github" && (
+                <div className="alert alert-warning" role="alert">
+                  Hello {hostingFields.username}! Before proceeding, please make sure you have <a href="https://docs.github.com/en/get-started/getting-started-with-git/set-up-git#setting-up-git" target="_blank">setup Git</a> and <b>that you can access</b> (pull, push) your GitHub repositories locally via Git.
+                </div>
+              )}
             <div className="input-group input-group-lg">
               <input
                 type="text"
