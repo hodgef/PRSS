@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "prss",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "Powerful Blogging",
   "license": "GPL-3.0-or-later",
   "main": "build/index.js",
