@@ -20,7 +20,7 @@
   position: relative;
   display: inline-flex;
   width: 270px;
-  height: 228px;
+  height: 250px;
   margin-right: 20px;
   flex-flow: column;
   vertical-align: top;
@@ -41,7 +41,28 @@
 }
 .ThemeManager .content .theme-list-item .theme-name .left-align {
   flex: 1;
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  font-size: 21px;
 }
+
+.ThemeManager .content .theme-list-item .theme-name .left-align .badge {
+  font-size: 12px;
+}
+
+.ThemeManager .content .theme-list-item .theme-author {
+  margin-top: 4px;
+  background: #f3f3f3;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.ThemeManager .content .theme-list-item .theme-author .left-align {
+  display: flex;
+  align-items: center;
+}
+
 .ThemeManager .content .theme-list-item .theme-list-item-desc {
   padding: 10px 15px;
   box-sizing: border-box;
@@ -63,6 +84,6 @@
 .ThemeManager .content .theme-list-item-image {
   height: 150px;
   width: 265px;
-  background-size: contain;
+  background-size: cover;
   background-repeat: no-repeat;
 }

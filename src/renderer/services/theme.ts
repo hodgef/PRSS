@@ -54,22 +54,25 @@ export const getDefaultReadme = () => {
   return fs.readFileSync(readmePath, "utf8");
 };
 
-export const getThemeListDetails = async () => {
+export const getThemeListDetails = async (fetchManifest?: boolean) => {
   const themeNameList = await getThemeList();
   const themePath = await storeInt.get("paths.themes");
 
   const manifestPromises = [];
+  let manifestPromiseData = {};
 
-  themeNameList.forEach((themeName) => {
-    manifestPromises.push(getThemeManifest(themeName));
-  });
+  if(fetchManifest){
+    themeNameList.forEach((themeName) => {
+      manifestPromises.push(getThemeManifest(themeName));
+    });
 
-  const promiseValues = await Promise.all(manifestPromises);
+    manifestPromiseData = await Promise.all(manifestPromises);
+  }
 
   return themeNameList.map((themeName, index) => {
     const themeDir = path.join(themePath, themeName);
     return {
-      ...(promiseValues[index] || {}),
+      ...(manifestPromiseData[index] || {}),
       name: themeName,
       themeDir: themeDir,
     };

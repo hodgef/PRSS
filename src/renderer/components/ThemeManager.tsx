@@ -71,6 +71,9 @@ const ThemeManager: FunctionComponent<IProps> = ({
     if (!noToast) {
       toast.success("Theme list refreshed!");
     }
+
+    const themesWithManifest = await getThemeListDetails(true);
+    setThemeList(themesWithManifest);
   };
 
   useEffect(() => {
@@ -84,10 +87,13 @@ const ThemeManager: FunctionComponent<IProps> = ({
   }
 
   const showThemeDetails = (theme) => {
+    const authorFormatted =
+      theme.author === "Francisco Hodge" ? "PRSS" : theme.author;
+
     modal.alert(
       <Fragment>
         <p>
-          <strong>Author:</strong> {theme.author}
+          <strong>Author:</strong> {authorFormatted}
         </p>
         <p>
           <strong>Homepage:</strong>{" "}
@@ -242,8 +248,8 @@ const ThemeManager: FunctionComponent<IProps> = ({
                       <span>{title || name}</span>
                     </div>
                     <div className="right-align">
-                      {prssConfig.themes[name] && (
-                        <span className="material-icons" title="Official Theme" onClick={() => showThemeDetails(theme)}>
+                      {authorFormatted && (
+                        <span className="material-icons" title="Theme Info" onClick={() => showThemeDetails(theme)}>
                           info
                         </span>
                       )}
@@ -259,10 +265,13 @@ const ThemeManager: FunctionComponent<IProps> = ({
                             rel="noopener noreferrer"
                             title={url}
                           >
-                            {authorFormatted}
+                            by <b>{authorFormatted}</b>
                           </a>
                         ) : (
-                          <span>{authorFormatted}</span>
+                          <span>by <b>{authorFormatted}</b></span>
+                        )}
+                        {authorFormatted === "PRSS" && (
+                          <span className="badge badge-secondary ml-2">Official</span>
                         )}
                       </div>
                       <div className="right-align"></div>
