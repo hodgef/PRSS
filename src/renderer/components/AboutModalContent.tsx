@@ -10,12 +10,12 @@ const AboutModalContent = ({ version }) => {
         <div className="col">
           <h1>PRSS {version}</h1>
           <div>
-            Copyright (c) 2020-present, Francisco Hodge. All rights reserved.
+            Copyright (c) 2020-present, Volted Interactive. All rights reserved.
           </div>
           <ul className="list">
             <li>
               <a
-                href="https://hodgef.com/policies/privacy"
+                href="https://volted.co/privacy"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -24,7 +24,7 @@ const AboutModalContent = ({ version }) => {
             </li>
             <li>
               <a
-                href="https://hodgef.com/policies/terms"
+                href="https:///volted.co/terms"
                 target="_blank"
                 rel="noreferrer"
               >
