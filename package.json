@@ -29,7 +29,7 @@
     "browser-sync": "^2.27.9",
     "electron-log": "^4.2.2",
     "electron-store": "^8.1.0",
-    "electron-updater": "4.6.5",
+    "electron-updater": "6.1.8",
     "express": "^4.17.3",
     "html-minifier-terser": "^5.1.1",
     "jodit-react": "^1.0.42",
@@ -120,7 +120,7 @@
     "productName": "PRSS Site Creator",
     "appId": "io.prss.app",
     "copyright": "2022-present, Volted Interactive",
-    "artifactName": "${productName}-${platform}.${ext}",
+    "artifactName": "PRSS-${version}-${platform}.${ext}",
     "files": [
       "build/**/*",
       "embedded.provisionprofile"
