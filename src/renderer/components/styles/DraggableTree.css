@@ -38,6 +38,9 @@
   border-radius: 5px;
   color: black;
   margin-left: 5px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
 }
 .draggable-tree
   .ant-tree.draggable-tree
@@ -66,4 +69,87 @@
   + .drag-over-gap-bottom {
   border-bottom: unset;
   border-top: unset;
+}
+
+.draggable-tree .tree-title-selected, .tree-title-path {
+  font-weight: 600;
+}
+
+.draggable-tree .tree-title-selected::after {
+  content: "";
+  height: 10px;
+  width: 10px;
+  background: #efa83a;
+  display: inline-block;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+
+.draggable-tree .ant-input-group .ant-input {
+  background: transparent;
+  border: none;
+}
+
+.draggable-tree button.ant-btn.ant-btn-default.ant-btn-icon-only.ant-input-search-button {
+  position: absolute;
+  right: 5px;
+  height: 48px;
+  background: transparent;
+  border: none;
+}
+
+.draggable-tree span.ant-input-wrapper.ant-input-group {
+  border-bottom: 2px solid #f3f3f3;
+  border-radius: 10px;
+  height: 48px;
+  display: flex;
+  flex-flow: row;
+  background: #f9f9f9;
+}
+
+.draggable-tree .ant-btn-default.ant-btn-icon-only.ant-input-search-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
+.draggable-tree .ant-input-search .ant-input:focus, .ant-input-search .ant-input:hover {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.draggable-tree .ant-tree-checkbox {
+  align-self: center !important;
+}
+
+.draggable-tree .ant-tree-switcher-leaf-line:after {
+  height: 32px;
+}
+
+.draggable-tree .ant-tree-switcher-leaf-line:before {
+  bottom: -37px;
+}
+
+.draggable-tree .ant-tree-show-line .ant-tree-switcher-line-icon {
+  background: white;
+  position: relative;
+  z-index: 1;
+}
+
+.draggable-tree .ant-tree-switcher {
+  line-height: 56px;
+}
+
+.draggable-tree .ant-tree-node-content-wrapper .ant-tree-iconEle {
+  display: flex;
+  align-items: center;
+}
+
+.draggable-tree .ant-tree-node-content-wrapper .ant-tree-iconEle img {
+  border-radius: 5px;
+}
+
+.draggable-tree .ant-tree-treenode-leaf-last .ant-tree-switcher-leaf-line:before {
+  height: 32px!important;
 }

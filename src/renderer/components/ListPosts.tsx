@@ -261,6 +261,7 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         </h1>
         <div className="items">
           <DraggableTree
+            showSearch
             checkable={selectEnabled}
             data={structureState}
             onUpdate={(data) => {

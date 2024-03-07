@@ -70,19 +70,39 @@ const ListSites: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const formatSites = (rawSitesArr) => {
     const sortedObj = rawSitesArr.sort((a, b) => a.name.localeCompare(b.name));
 
-    return sortedObj.map(({ id, name }) => ({
-      key: id,
-      title: (
-        <Fragment>
-          <div className="left-align">
-            <i className="material-icons mr-2">public</i>
-            <div className="site-title">{name}</div>
-          </div>
-          <div className="right-align"></div>
-        </Fragment>
-      ),
-      children: [],
-    }));
+    return sortedObj.map((item) => {
+      const { id, title, url } = item;
+      let domain = "";
+
+      try {
+        domain = url ? (new URL(url)).hostname.replace("www.", "") : null;
+      } catch(e) {
+
+      }
+
+      return {
+        key: id,
+        title,
+        icon: (
+          (!domain || (domain && domain.includes("github"))) ?
+          <i className="material-icons mr-2">public</i> : 
+          <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=24`} height="24" width="24" />
+        ),
+        children: [],
+      }
+    });
+  };
+
+  const formatTitle = (node) => {
+    const { name, title } = node;
+    return (
+      <Fragment>
+        <div className="left-align">
+          <div className="site-title">{title}</div>
+        </div>
+        <div className="right-align"></div>
+      </Fragment>
+    );
   };
 
   const onItemClick = async (itemId) => {
@@ -133,7 +153,9 @@ const ListSites: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         </h1>
         <div className="items">
           <DraggableTree
+            showIcon
             checkable={selectEnabled}
+            titleRender={formatTitle}
             data={formatSites(sites)}
             onSelect={(items) => items[0] && onItemClick(items[0])}
             checkedKeys={selectedItems}

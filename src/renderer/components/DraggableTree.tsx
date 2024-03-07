@@ -1,9 +1,10 @@
 import "./styles/DraggableTree.css";
 
-import { Tree } from "antd";
+import { Input, Tree } from "antd";
 import React from "react";
-
+import cx from "classnames";
 import { noop } from "../services/utils";
+import { parseNodes, flattenStructure, structureHasItem } from "../services/build";
 
 interface IProps {
   checkable?: boolean;
@@ -20,16 +21,33 @@ interface IProps {
 
 interface IState {
   gData: any;
-  expandedKeys: any;
+  searchValue: string;
+  autoExpandParent: boolean;
+  itemsContainingSearch: React.Key[];
+  expandedKeys: React.Key[];
+  firstItemTitle: string;
+  firstItemKey: string;
 }
 
+const { Search } = Input;
+
 class DraggableTree extends React.Component<IProps, IState> {
+  treeRef = React.createRef();
+
   constructor(props) {
     super(props);
 
+    const firstItemKey = props.data?.[0]?.key;
+    const firstItemTitle = props.data?.[0]?.title;
+
     this.state = {
       gData: props.data,
+      searchValue: "",
+      autoExpandParent: false,
+      itemsContainingSearch: [],
       expandedKeys: [],
+      firstItemKey,
+      firstItemTitle
     };
   }
 
@@ -123,6 +141,77 @@ class DraggableTree extends React.Component<IProps, IState> {
     }
   };
 
+  onExpand = (newExpandedKeys: React.Key[]) => {
+    this.setState({
+      expandedKeys: newExpandedKeys,
+      autoExpandParent: false
+    })
+  }
+
+  getParentKey = (key: React.Key, tree: TreeDataNode[]): React.Key => {
+    let parentKey: React.Key;
+    for (let i = 0; i < tree.length; i++) {
+      const node = tree[i];
+      if (node.children) {
+        if (node.children.some((item) => item.key === key)) {
+          parentKey = node.key;
+        } else if (this.getParentKey(key, node.children)) {
+          parentKey = this.getParentKey(key, node.children);
+        }
+      }
+    }
+    return parentKey!;
+  };
+
+  onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+
+    if(!value.trim()){
+      this.setState({
+        itemsContainingSearch: [],
+        expandedKeys: [],
+        searchValue: "",
+      });
+      return;
+    }
+
+    const items = this.state.gData?.[0]?.children || [];
+    const flattenedStructure = flattenStructure(items);
+
+    const itemsContainingSearch = flattenedStructure.filter(({ title }) => {
+      const lowerTitle = title.toLowerCase();
+      const lowerSearch = value.toLowerCase();
+      return lowerTitle.includes(lowerSearch) || lowerTitle === lowerSearch;
+    });
+
+    const parentsOfItemsContainingSearch = flattenedStructure.filter(node => {
+      const uuids = itemsContainingSearch.map(item => item.key);
+      return structureHasItem(uuids, node);
+    });
+
+    const combinedItemsToExpand = [...itemsContainingSearch, ...parentsOfItemsContainingSearch];
+    const expandedKeys = [...combinedItemsToExpand.map(({ key }) => key)];
+
+    this.setState({
+      itemsContainingSearch: itemsContainingSearch.map(({ key }) => key),
+      expandedKeys,
+      searchValue: value,
+      autoExpandParent: true
+    });
+  }
+
+  titleTextRender = node => {
+    const isSearchResult = this.state.searchValue && this.state.itemsContainingSearch.includes(node.key);
+    const isSearchPath = this.state.searchValue && this.state.expandedKeys.includes(node.key);
+    return <span className={cx(
+      "tree-title",
+      isSearchResult && "tree-title-selected",
+      isSearchPath && "tree-title-path"
+      )}>
+        {node.title}
+      </span>
+  }
+
   render() {
     const {
       onCheck = noop,
@@ -130,18 +219,26 @@ class DraggableTree extends React.Component<IProps, IState> {
       checkable,
       checkedKeys = [],
       checkStrictly,
+      titleRender,
+      showSearch,
+      showIcon
     } = this.props;
 
     return (
       <div className="draggable-tree">
+        {showSearch ? <Search style={{ marginBottom: 8 }} placeholder="Search" onChange={this.onSearch} /> : null}
         <Tree
+          showIcon={showIcon}
+          ref={this.treeRef}
+          titleRender={node => titleRender ? titleRender(node, this.titleTextRender(node)) : this.titleTextRender(node)}
           className="draggable-tree"
-          defaultExpandAll
           draggable={this.props.draggable ?? true}
           blockNode
           onDragEnter={this.onDragEnter}
           onDrop={this.onDrop}
           treeData={this.state.gData}
+          expandedKeys={[this.state.firstItemKey, ...this.state.expandedKeys]}
+          onExpand={this.onExpand}
           onSelect={onSelect}
           onCheck={(chk: any) => {
             const checked = checkStrictly ? chk.checked : chk;

@@ -54,7 +54,10 @@ const SiteSetup: FunctionComponent<IProps> = ({
   const hostingTypes = getHostingTypes();
   const [loadingStatus, setLoadingStatus] = useState("");
 
-  const [hostingFields, setHostingFields] = useState(null);
+  // Default to "none" hosting
+  const [hostingFields, setHostingFields] = useState(hasSites ? null : {
+    name: "none",
+  });
   const [extraHostingFields, setExtraHostingFields] = useState(null);
 
   const history = useHistory();
@@ -374,22 +377,20 @@ const SiteSetup: FunctionComponent<IProps> = ({
             <div className="content-header full-size mb-5">
               <h1>
                 <div className="left-align">
-                  <i
-                    className="material-icons clickable"
-                    onClick={() =>
-                      hasSites
-                        ? history.push("/sites")
-                        : history.replace("/sites/create")
-                    }
-                  >
-                    arrow_back
-                  </i>
-                  <span>Last step</span>
+                  {hasSites && (
+                    <i
+                      className="material-icons clickable"
+                      onClick={() => history.push("/sites")}
+                    >
+                      arrow_back
+                    </i>
+                  )}
+                  <span>{hasSites ? "Last step" : "Welcome"}</span>
                 </div>
               </h1>
               <div className="sites-intro">
                 <div className="image-label">
-                  <h2>Wrap up your site setup</h2>
+                  <h2>Choose a name for your site</h2>
                 </div>
               </div>
             </div>

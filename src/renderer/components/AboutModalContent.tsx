@@ -15,6 +15,15 @@ const AboutModalContent = ({ version }) => {
           <ul className="list">
             <li>
               <a
+                href="https://prss.io"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Website
+              </a>
+            </li>
+            <li>
+              <a
                 href="https://volted.co/privacy"
                 target="_blank"
                 rel="noreferrer"
@@ -24,7 +33,7 @@ const AboutModalContent = ({ version }) => {
             </li>
             <li>
               <a
-                href="https:///volted.co/terms"
+                href="https://volted.co/terms"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -46,7 +55,7 @@ const AboutModalContent = ({ version }) => {
           <img src={PRSSLogo} width="200" />
         </div>
       </div>
-      <div className="row separator-bar mt-4 pt-4">
+      {/*<div className="row separator-bar mt-4 pt-4">
         <i className="material-icons mr-2">insert_emoticon</i> If you like PRSS,
         please consider&nbsp;
         <a
@@ -56,7 +65,7 @@ const AboutModalContent = ({ version }) => {
         >
           <u>Starring it on Github!</u>
         </a>
-      </div>
+      </div>*/}
     </div>
   );
 };

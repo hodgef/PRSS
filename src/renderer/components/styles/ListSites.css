@@ -38,6 +38,17 @@
 }
 .ListSites .content .site-title {
   font-size: 20px;
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
+}
+.ListSites .content .site-title span {
+  opacity: 0.5;
+  font-size: 15px;
+  background: #efefef;
+  padding: 5px;
+  border-radius: 5px;
+  margin-left: 10px;
 }
 .ListSites .content .site-tag {
   background: rgba(0, 0, 0, 0.1);

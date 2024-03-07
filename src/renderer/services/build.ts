@@ -553,6 +553,20 @@ export const getStructurePaths = (nodes, prefix = "", store = []) => {
   return store;
 };
 
+export const parseNodes = (node, itemCb?: any, posts: any[] = []) => {
+  const { key, title, children = [] } = node;
+  const post = posts.find((p) => p.uuid === node.key/* && p.siteId === siteUUID*/);
+  if (!post) return node;
+  const parsedNode = {
+    key,
+    title,
+    ...(itemCb ? itemCb(post, node) : {}),
+    children: children.map(child => parseNodes(child, itemCb, posts)),
+  };
+
+  return parsedNode;
+};
+
 export const walkStructure = async (
   siteUUID: string,
   nodes,
@@ -566,29 +580,28 @@ export const walkStructure = async (
   let outputNodes = [...nodes];
   const posts = await getItems(siteUUID);
 
-  const parseNodes = (obj) => {
-    const { key, children = [] } = obj;
-    const post = posts.find((p) => p.uuid === key && p.siteId === siteUUID);
-
-    if (!post) return obj;
-
-    const parsedNode = {
-      key,
-      ...(obj.title ? { title: obj.title } : {}),
-      ...(itemCb ? itemCb(post, obj) : {}),
-      children: children.map(parseNodes),
-    };
-
-    return parsedNode;
-  };
-
-  outputNodes = outputNodes.map((node) => parseNodes(node));
+  outputNodes = outputNodes.map((node) => {
+    return parseNodes(node, itemCb, posts);
+  });
 
   return outputNodes;
 };
 
-export const structureHasItem = (uuid: string, nodes: IStructureItem) => {
-  return toJson(nodes).includes(uuid);
+export const flattenStructure = (arr: any[]) => {  
+  return arr.reduce((flattened, { key, title, children }) => {
+    return flattened
+      .concat({ key, title, children })
+      .concat(children ? flattenStructure(children) : []);
+  }, [])
+}
+
+export const structureHasItem = (uuid: string | string[], nodes: IStructureItem) => {
+  const stringNodes = toJson(nodes);
+  if(Array.isArray(uuid)){
+    return uuid.some(uuidItem => stringNodes.includes(uuidItem));
+  } else {
+    return stringNodes.includes(uuid);
+  }
 };
 
 export const findInStructure = (uuid: string, nodes: IStructureItem[]) => {
