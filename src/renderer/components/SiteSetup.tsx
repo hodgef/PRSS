@@ -55,7 +55,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
   const [loadingStatus, setLoadingStatus] = useState("");
 
   // Default to "none" hosting
-  const [hostingFields, setHostingFields] = useState(hasSites ? null : {
+  const [hostingFields, setHostingFields] = useState<any>(hasSites ? null : {
     name: "none",
   });
   const [extraHostingFields, setExtraHostingFields] = useState(null);
@@ -119,7 +119,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
         name: "github",
         username,
         token,
-      });
+      }) as any;
 
       setHostingFields(parsedHostingFields);
     });
@@ -396,7 +396,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
             </div>
             {hostingFields.name === "github" && (
                 <div className="alert alert-warning" role="alert">
-                  Hello {hostingFields.username}! Before proceeding, please make sure you have <a href="https://docs.github.com/en/get-started/getting-started-with-git/set-up-git#setting-up-git" target="_blank">setup Git</a> and <b>that you can access</b> (pull, push) your GitHub repositories locally via Git.
+                  Hello {(hostingFields as any).username}! Before proceeding, please make sure you have <a href="https://docs.github.com/en/get-started/getting-started-with-git/set-up-git#setting-up-git" target="_blank">setup Git</a> and <b>that you can access</b> (pull, push) your GitHub repositories locally via Git.
                 </div>
               )}
             <div className="input-group input-group-lg">

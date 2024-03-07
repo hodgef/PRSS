@@ -17,6 +17,9 @@ interface IProps {
   checkStrictly?: boolean;
   draggable?: boolean;
   noRootParent?: boolean;
+  showSearch?: boolean;
+  showIcon?: boolean;
+  titleRender?: any;
 }
 
 interface IState {
@@ -32,8 +35,6 @@ interface IState {
 const { Search } = Input;
 
 class DraggableTree extends React.Component<IProps, IState> {
-  treeRef = React.createRef();
-
   constructor(props) {
     super(props);
 
@@ -148,7 +149,7 @@ class DraggableTree extends React.Component<IProps, IState> {
     })
   }
 
-  getParentKey = (key: React.Key, tree: TreeDataNode[]): React.Key => {
+  getParentKey = (key: React.Key, tree: any[]): React.Key => {
     let parentKey: React.Key;
     for (let i = 0; i < tree.length; i++) {
       const node = tree[i];
@@ -229,7 +230,6 @@ class DraggableTree extends React.Component<IProps, IState> {
         {showSearch ? <Search style={{ marginBottom: 8 }} placeholder="Search" onChange={this.onSearch} /> : null}
         <Tree
           showIcon={showIcon}
-          ref={this.treeRef}
           titleRender={node => titleRender ? titleRender(node, this.titleTextRender(node)) : this.titleTextRender(node)}
           className="draggable-tree"
           draggable={this.props.draggable ?? true}
