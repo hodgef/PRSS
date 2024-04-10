@@ -8,53 +8,54 @@ interface IProps {
 
 const SiteSetupGithub: FunctionComponent<IProps> = ({ onChange }) => {
   const [repo, setRepo] = useState("");
-  const repoDescription = [
-    React.createElement(
-      "p",
-      { key: "github-repo-info-1" },
-      getString("github_repo_info_1")
-    ),
-    React.createElement("p", { key: "github-repo-info-1b" }, [
+  const repoDescription = 
+    React.createElement(React.Fragment, {}, [
       React.createElement(
-        "span",
-        { key: "github-repo-info-1b-span" },
-        "For Example: "
+        "p",
+        { key: "github-repo-info-1" },
+        getString("github_repo_info_1")
       ),
+      React.createElement("p", { key: "github-repo-info-1b" }, [
+        React.createElement(
+          "span",
+          { key: "github-repo-info-1b-span" },
+          "For Example: "
+        ),
+        React.createElement(
+          "span",
+          {
+            className: "code-dark-inline",
+            key: "github-repo-info-1b-span-2",
+          },
+          "myRepo"
+        ),
+      ]),
       React.createElement(
-        "span",
-        {
-          className: "code-dark-inline",
-          key: "github-repo-info-1b-span-2",
-        },
-        "myRepo"
+        "p",
+        { key: "github-repo-info-2" },
+        getString("github_repo_info_2")
       ),
-    ]),
-    React.createElement(
-      "p",
-      { key: "github-repo-info-2" },
-      getString("github_repo_info_2")
-    ),
-    React.createElement("p", { key: "github-repo-info-2b" }, [
+      React.createElement("p", { key: "github-repo-info-2b" }, [
+        React.createElement(
+          "span",
+          { key: "github-repo-info-2b-span" },
+          "For Example: "
+        ),
+        React.createElement(
+          "span",
+          {
+            className: "code-dark-inline",
+            key: "github-repo-info-2b-span-2",
+          },
+          "username/repoName"
+        ),
+      ]),
       React.createElement(
-        "span",
-        { key: "github-repo-info-2b-span" },
-        "For Example: "
+        "p",
+        { key: "github-repo-info-3" },
+        getString("github_repo_info_3")
       ),
-      React.createElement(
-        "span",
-        {
-          className: "code-dark-inline",
-          key: "github-repo-info-2b-span-2",
-        },
-        "username/repoName"
-      ),
-    ]),
-    React.createElement(
-      "p",
-      { key: "github-repo-info-3" },
-      getString("github_repo_info_3")
-    ),
-  ];
+    ]);
 
   return (
     <div className="site-setup-github">
@@ -74,7 +75,7 @@ const SiteSetupGithub: FunctionComponent<IProps> = ({ onChange }) => {
         <div
           className="description-icon clickable"
           onClick={() =>
-            modal.alert(repoDescription, null, "hosting-field-desc")
+            modal.alert(repoDescription, null, "hosting-field-desc", null, "gh-create-repo-info")
           }
         >
           <span className="material-icons mr-2">info</span>

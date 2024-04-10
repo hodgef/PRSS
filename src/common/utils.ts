@@ -64,6 +64,10 @@ export const getConfigPath = async () => {
   return (await storeInt.get("paths.config")) || app.getPath("userData");
 };
 
+export const isReportIssuesEnabled = async () => {
+  return (await storeInt.get("reportIssues")) === false ? false : true;
+};
+
 export const getRootPath = () => {
   return app.isPackaged ? app.getPath('userData') : app.getPath('exe').split("node_modules")[0];;
 }

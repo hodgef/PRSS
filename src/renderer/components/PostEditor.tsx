@@ -138,7 +138,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const prevContent = post.content;
 
     if (editorMode.current === "html" && post && !post.isContentRaw) {
-      modal.alert(getString("error_save_text_editor"));
+      modal.alert(["error_save_text_editor", []]);
       if (buildAll) {
         setBuildAllLoading(false);
       } else {
@@ -309,7 +309,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     setPreviewLoading(true);
 
     if (editorMode.current === "html" && post && !post.isContentRaw) {
-      modal.alert(getString("error_preview_text_editor"));
+      modal.alert(["error_preview_text_editor", []]);
       setPreviewLoading(false);
       return;
     }
@@ -331,7 +331,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     setPreviewLoading(true);
 
     if (editorMode.current === "html" && post && !post.isContentRaw) {
-      modal.alert(getString("error_preview_text_editor"));
+      modal.alert(["error_preview_text_editor", []]);
       setPreviewLoading(false);
       return;
     }

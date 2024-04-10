@@ -141,7 +141,9 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
                       setShowMoreMenu(false);
                       modal.alert(
                         <AboutModalContent version={currentVersion} />,
-                        false,
+                        null,
+                        "about-modal",
+                        null,
                         "about-modal"
                       );
                     }}

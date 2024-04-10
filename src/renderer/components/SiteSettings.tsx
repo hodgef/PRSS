@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
-import { normalizeStrict, error, appendSlash } from "../services/utils";
+import { normalizeStrict, appendSlash } from "../services/utils";
 import { toast } from "react-toastify";
 import HTMLEditorOverlay from "./HTMLEditorOverlay";
 import { modal } from "./Modal";
@@ -99,30 +99,28 @@ const SiteSettings: FunctionComponent<IProps> = ({
     if (fs.existsSync(publicDir)) {
       shell.openPath(publicDir);
     } else {
-      error(
-        "The directory does not exist yet. Please preview or deploy your site"
-      );
+      modal.alert(["site_cfg_dir_prev", []]);
     }
   };
 
   const handleSubmit = async () => {
     if (!editedSiteName) {
-      modal.alert("Your site must have an id");
+      modal.alert(["site_cfg_id_missing", []]);
       return;
     }
 
     if (!siteTitle) {
-      modal.alert("Your site must have a title");
+      modal.alert(["site_cfg_title_missing", []]);
       return;
     }
 
     if (!siteTheme) {
-      modal.alert("Your site must have a theme");
+      modal.alert(["site_cfg_theme_missing", []]);
       return;
     }
 
     if (!siteUrl) {
-      modal.alert("Your site must have an URL");
+      modal.alert(["site_cfg_url_missing", []]);
       return;
     }
 

@@ -30,11 +30,12 @@ import {
 import ghImage from "../images/gh-mark.png";
 import { setHook, getApiUrl } from "../../common/bootstrap";
 import SiteSetupGithub from "./SiteSetupGithub";
-import { error, normalizeStrict } from "../services/utils";
+import { normalizeStrict } from "../services/utils";
 import {
   getSampleSiteStructure,
   getSampleSiteIntStructure,
 } from "../services/site";
+import { modal } from "./Modal";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -171,7 +172,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
 
   const handleSubmit = async () => {
     if (!title) {
-      error("Your site must have a title");
+      modal.alert(["site_cfg_title_missing", []]);
       return;
     }
 
@@ -194,7 +195,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
     );
 
     if (!isValid) {
-      error(getString("error_fill_fields"));
+      modal.alert(["error_fill_fields", []]);
       return;
     }
 

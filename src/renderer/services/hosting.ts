@@ -13,7 +13,7 @@ import {
 } from "./build";
 import GithubProvider from "./providers/github";
 import FallbackProvider from "./providers/none";
-import { confirmation, error, merge } from "./utils";
+import { confirmation, merge } from "./utils";
 import { v4 as uuidv4 } from "uuid";
 import {
   deleteSite,
@@ -24,6 +24,7 @@ import {
   getSiteUUIDById,
   createItems,
 } from "./db";
+import { modal } from "../components/Modal";
 
 export const getHostingTypes = () => ({
   github: GithubProvider.hostingTypeDef,
@@ -222,7 +223,7 @@ export const deletePosts = async (siteUUID: string, postIds: string[]) => {
    * Can't delete only post
    */
   if (items.length === 1) {
-    error(getString("error_delete_single_post"));
+    modal.alert(["error_delete_single_post", []]);
     return {};
   }
 
@@ -232,7 +233,7 @@ export const deletePosts = async (siteUUID: string, postIds: string[]) => {
   const rootPost = getRootPost(site);
 
   if (postIds.includes(rootPost)) {
-    error(getString("error_delete_root_post"));
+    modal.alert(["error_delete_root_post", []]);
     return {};
   }
 
@@ -313,7 +314,7 @@ export const clonePosts = async (siteUUID: string, postIds: string[]) => {
   const rootPost = getRootPost(site);
 
   if (postIds.includes(rootPost)) {
-    error("You cannot clone the root post. Please unselect it and try again.");
+    modal.alert(["no_clone_root", []]);
     return {};
   }
 

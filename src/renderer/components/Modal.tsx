@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { getString, isReportIssuesEnabled } from "../../common/utils";
+import { dispatchPRSSEvent } from "../services/utils";
 
 class Modal extends Component {
   state = {
@@ -36,20 +38,30 @@ class Modal extends Component {
     });
   };
 
-  alert = (
-    message,
-    title?,
+  alert = async (
+    message: JSX.Element | string | [string, string[]],
+    title?: JSX.Element | string | [string, string[]],
     contentClassName = "",
-    innerContentClassName = ""
+    innerContentClassName = "",
+    context = ""
   ) => {
+    const parsedMessage = Array.isArray(message) ? getString(...message) : null;
+    const parsedTitle = Array.isArray(title) ? getString(...title) : null;
     this.setState({
       mode: "alert",
       show: true,
-      title,
-      message,
+      title: parsedTitle || title,
+      message: parsedMessage || message,
       contentClassName,
       innerContentClassName,
     });
+
+    if(await isReportIssuesEnabled()){
+      dispatchPRSSEvent({
+        id: parsedTitle || (parsedMessage ? message : "generic_event"),
+        context: Array.isArray(message) && message[1]?.length ? message : (context || parsedMessage)
+      });
+    }
   };
 
   prompt = ({

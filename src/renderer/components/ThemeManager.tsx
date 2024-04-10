@@ -120,7 +120,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
 
   const handleSubmit = async (themeName) => {
     if (!themeName) {
-      modal.alert("Your site must have a theme");
+      modal.alert(["theme_mgr_reqtheme", []]);
       return;
     }
 

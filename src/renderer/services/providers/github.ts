@@ -18,7 +18,7 @@ import {
   getFilteredBufferItems,
   clearBuffer,
 } from "../build";
-import { confirmation, error } from "../utils";
+import { confirmation } from "../utils";
 import { sequential } from "./../utils";
 import { modal } from "../../components/Modal";
 import { getSite } from "../db";
@@ -85,7 +85,7 @@ class GithubProvider {
 
     if (!siteUrl) {
       if (!modal.isShown()) {
-        error(getString("error_setup_remote"));
+        modal.alert(["error_setup_remote", []]);
       }
       return false;
     }
@@ -135,7 +135,11 @@ class GithubProvider {
   getRepositoryUrl = async () => {
     const repositoryName = await this.getRepositoryName();
     const username = await this.getUsername();
-    return `https://${this.vars.baseUrl()}/${username}/${repositoryName}`;
+    if(repositoryName && username){
+      return `https://${this.vars.baseUrl()}/${username}/${repositoryName}`;
+    } else {
+      return "";
+    }
   };
 
   /**
@@ -212,7 +216,7 @@ class GithubProvider {
       );
 
       if (!buildRes) {
-        error(getString("error_buffer"));
+        modal.alert(["error_buffer", [repositoryUrl]]);
         return false;
       }
 
@@ -226,14 +230,14 @@ class GithubProvider {
           );
 
           if (commitError) {
-            modal.alert(e.message);
+            modal.alert(e.message, null, null, null, `commit_error: ${repositoryUrl}`);
             console.error(e);
           }
           resolve(null);
         }, 1000);
       });
     } catch (e) {
-      modal.alert(e.message);
+      modal.alert(e.message, null, null, null, `deploy_error: ${repositoryUrl}`);
       console.error(e);
     }
 
@@ -288,7 +292,7 @@ class GithubProvider {
     });
 
     if (confirmationRes !== 0) {
-      error(getString("action_cancelled"));
+      modal.alert(["action_cancelled", [repoUrl]]);
       return false;
     }
 
@@ -454,6 +458,7 @@ class GithubProvider {
 
   createRepo = async () => {
     const repo = await this.getRepo();
+    const repoUrl = await this.getRepositoryUrl();
 
     if (repo) {
       const confirmationRes = await confirmation({
@@ -462,7 +467,7 @@ class GithubProvider {
       });
 
       if (confirmationRes !== 0) {
-        error(getString("action_cancelled"));
+        modal.alert(["action_cancelled", [repoUrl]]);
         return false;
       } else {
         return true;
@@ -480,7 +485,7 @@ class GithubProvider {
       })) || {};
 
     if (!created_at) {
-      error(getString("error_repo_creation"));
+      modal.alert(["error_repo_creation", [repoUrl]]);
       return false;
     }
 
@@ -489,11 +494,12 @@ class GithubProvider {
 
   getRepo = async () => {
     const username = await this.getUsername();
+    const requestUrl = `users/${username}/repos`;
 
     const repos = (await this.request("GET", `users/${username}/repos`)) || [];
 
     if (!Array.isArray(repos)) {
-      error();
+      modal.alert(["error_occurred", [requestUrl]]);
       return false;
     }
 

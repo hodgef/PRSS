@@ -66,7 +66,8 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
       </Fragment>,
       null,
       "parameters-info-content",
-      "parameters-info-inner-content"
+      "parameters-info-inner-content",
+      "parameters-info-content"
     );
   };
 
@@ -94,32 +95,32 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
           </div>
         </h2>
 
-        <div className="title-label">
-          <div className="left-align">Add Raw HTML to the &lt;HEAD&gt;</div>
-          <div
-            className="right-align available-parameters clickable"
-            onClick={() => showParametersInfo()}
-          >
-            <span className="material-icons mr-1">assistant</span>
-            <span>See available parameters</span>
+          <div className="title-label">
+            <div className="left-align">Add Raw HTML to the &lt;HEAD&gt;</div>
+              <div
+                className="right-align available-parameters clickable"
+                onClick={() => showParametersInfo()}
+              >
+                <span className="material-icons mr-1">assistant</span>
+                <span>See available parameters</span>
+              </div>
           </div>
-        </div>
 
-        <AceEditor
-          mode="html"
-          theme="github"
-          wrapEnabled
-          width="100%"
-          showPrintMargin={false}
-          showGutter
-          fontSize={17}
-          value={pretty(headHTMLState.current)}
-          onChange={(html) => {
-            headHTMLState.current = html;
-          }}
-          name="html-editor-component"
-          editorProps={{ $blockScrolling: true }}
-        />
+          <AceEditor
+            mode="html"
+            theme="github"
+            wrapEnabled
+            width="100%"
+            showPrintMargin={false}
+            showGutter
+            fontSize={17}
+            value={pretty(headHTMLState.current)}
+            onChange={(html) => {
+              headHTMLState.current = html;
+            }}
+            name="html-editor-component"
+            editorProps={{ $blockScrolling: true }}
+          />
 
         <h2>FOOTER HTML</h2>
         <div className="title-label">

@@ -51,7 +51,7 @@ const AboutModalContent = ({ version }) => {
             </li>
           </ul>
         </div>
-        <div>
+        <div className="col d-flex align-items-center justify-content-center">
           <img src={PRSSLogo} width="200" />
         </div>
       </div>

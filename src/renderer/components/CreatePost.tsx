@@ -10,11 +10,12 @@ import React, {
 import { useHistory, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
-import { normalize, error, removeStopWords } from "../services/utils";
+import { normalize, removeStopWords } from "../services/utils";
 import { walkStructure, insertStructureChildren } from "../services/build";
 import { toast } from "react-toastify";
 import { isValidSlug, getRootPost } from "../services/hosting";
 import { getSite, getItems, updateSite, createItems } from "../services/db";
+import { modal } from "./Modal";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -104,7 +105,7 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const postTitleTrimmed = postTitle.trim();
 
     if (!postTitleTrimmed) {
-      error("You must provide a title");
+      modal.alert(["title_missing", []]);
       return;
     }
 
@@ -117,9 +118,7 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     let normalizedSlug = normalize(postSlug || cleanedTitle);
 
     if (!normalizedSlug) {
-      error(
-        "URL Slug error. Please provide a URL Slug for your post or choose a different title."
-      );
+      modal.alert(["slug_missing", []]);
       return;
     }
 

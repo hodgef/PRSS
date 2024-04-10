@@ -21,7 +21,8 @@ class ErrorBoundary extends React.Component<IProps> {
           <p className="code-dark">${error.reason.toString()}</p>
         </Fragment>,
         null,
-        "error-alert-content"
+        "error-alert-content",
+        error.reason.toString()
       );
   };
 

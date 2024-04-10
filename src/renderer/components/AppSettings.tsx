@@ -9,10 +9,15 @@ import React, {
 } from "react";
 import { useHistory } from "react-router-dom";
 import path from "path";
-import { getString, getConfigPath } from "../../common/utils";
-import { error, confirmation } from "../services/utils";
+import { getConfigPath, isReportIssuesEnabled } from "../../common/utils";
+import { confirmation } from "../services/utils";
 import { modal } from "./Modal";
 import { storeInt } from "../../common/bootstrap";
+
+import Form from 'react-bootstrap/Form';
+import InputGroup from 'react-bootstrap/InputGroup';
+import Col from 'react-bootstrap/Col';
+
 const { app, dialog } = require("@electron/remote");
 const fs = require("fs-extra");
 
@@ -23,9 +28,11 @@ interface IProps {
 const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const history = useHistory();
   const [currentConfigPath, setCurrentConfigPath] = useState("");
+  const [reportIssues, setReportIssues] = useState(true);
 
   const getData = async () => {
     setCurrentConfigPath(await getConfigPath());
+    setReportIssues(await isReportIssuesEnabled());
   };
 
   useEffect(() => {
@@ -66,7 +73,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         });
 
         if (confirmationRes !== 0) {
-          error(getString("action_cancelled"));
+          modal.alert(["action_cancelled", []]);
           return;
         }
 
@@ -87,7 +94,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         await storeInt.set("paths.config", configPath);
         setCurrentConfigPath(configPath);
 
-        modal.alert("Config path changed! PRSS will restart in 3 seconds...");
+        modal.alert(["config_path_changed", []]);
 
         setTimeout(() => {
           app.relaunch();
@@ -122,14 +129,14 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     </div>*/}
         </h1>
 
-        <form className="mt-4">
+        <Form className="mt-4">
           <div className="form-group row">
             <div className="input-group input-group-lg">
               <label htmlFor="siteConfig" className="col-sm-3 col-form-label">
                 Config Location (prss.db, prss.json)
               </label>
               <div className="col-sm-9">
-                <div className="input-group mb-3">
+                <div className="input-group">
                   <input
                     type="text"
                     className="form-control"
@@ -150,7 +157,30 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
               </div>
             </div>
           </div>
-        </form>
+
+          <div className="form-group row">
+            <div className="input-group input-group-lg">
+              <label htmlFor="report-issues" className="col-sm-3 col-form-label">
+                Enable feature reports
+              </label>
+              <Col className="col-sm-9 d-flex align-items-center">
+                <InputGroup>
+                  <Form.Check
+                    checked={reportIssues}
+                    type="switch"
+                    id="report-issues"
+                    label="This allows PRSS to quickly identify issues and correct them as soon as possible."
+                    onChange={async (e) => {
+                      setReportIssues(e.target.checked);
+                      await storeInt.set("reportIssues", e.target.checked);
+                    }}
+                  />
+                </InputGroup>
+              </Col>
+            </div>
+          </div>
+
+        </Form>
       </div>
     </div>
   );

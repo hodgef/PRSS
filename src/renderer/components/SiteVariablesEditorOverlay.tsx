@@ -247,7 +247,8 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
       </Fragment>,
       null,
       "parameters-info-content",
-      "parameters-info-inner-content"
+      "parameters-info-inner-content",
+      "site-variables-modal"
     );
   };
 

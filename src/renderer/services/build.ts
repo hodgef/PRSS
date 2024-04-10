@@ -9,7 +9,6 @@ import { getString } from "../../common/utils";
 import {
   sequential,
   sanitizeSite,
-  error,
   objGet,
   sanitizeSiteItems,
   toJson,
@@ -326,9 +325,7 @@ export const buildBufferItem = async (bufferItem: IBufferItem) => {
   const handler = getParserHandler(parser);
 
   if (!handler) {
-    modal.alert(
-      `There was an error parsing the template for post id (${bufferItem.item.uuid})`
-    );
+    modal.alert(["build_theme_parseerr", [bufferItem.item.uuid]]);
     return false;
   }
 
@@ -350,7 +347,7 @@ export const buildBufferItem = async (bufferItem: IBufferItem) => {
       );
     } catch (e) {
       console.error(e);
-      error(e.message);
+      modal.alert(e.message);
       return;
     }
   });
@@ -371,7 +368,7 @@ export const getBufferItems = async (
   const bufferItems = [];
 
   if (!themeManifest) {
-    modal.alert("Could not find theme manifest.");
+    modal.alert(["build_manifest_missing", []]);
     throw "Could not find theme manifest.";
   }
 

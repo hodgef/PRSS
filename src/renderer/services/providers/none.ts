@@ -1,9 +1,10 @@
-import { getString, configGet } from "../../../common/utils";
+import { configGet } from "../../../common/utils";
 import { build } from "../build";
-import { error, confirmation } from "../utils";
+import { confirmation } from "../utils";
 import { shell } from "electron";
 import { getSite } from "../db";
 import { storeInt } from "../../../common/bootstrap";
+import { modal } from "../../components/Modal";
 
 class FallbackProvider {
   private readonly siteUUID: string;
@@ -32,7 +33,7 @@ class FallbackProvider {
     const buildRes = await build(this.siteUUID, onUpdate);
 
     if (!buildRes) {
-      error(getString("error_buffer"));
+      modal.alert(["error_buffer", []]);
       return false;
     }
 
@@ -43,7 +44,7 @@ class FallbackProvider {
     const buildRes = await build(this.siteUUID, onUpdate, null, false, true);
 
     if (!buildRes) {
-      error(getString("error_buffer"));
+      modal.alert(["error_buffer", []]);
       return false;
     }
 

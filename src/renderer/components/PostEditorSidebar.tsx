@@ -2,7 +2,7 @@ import "./styles/PostEditorSidebar.css";
 
 import React, { FunctionComponent, useState, Fragment, useEffect } from "react";
 import cx from "classnames";
-import { noop, confirmation, error } from "../services/utils";
+import { noop, confirmation } from "../services/utils";
 import Loading from "./Loading";
 import { getString } from "../../common/utils";
 import { modal } from "./Modal";
@@ -76,7 +76,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
       });
 
       if (confirmationRes !== 0) {
-        error(getString("action_cancelled"));
+        modal.alert(["action_cancelled", []]);
         return;
       }
     }
@@ -171,7 +171,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
             if (!editorChanged) {
               onPublish();
             } else {
-              modal.alert(getString("error_publish_save_changes"));
+              modal.alert(["error_publish_save_changes", []]);
             }
           }}
         >

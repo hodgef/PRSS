@@ -25,7 +25,7 @@ import Footer from "./Footer";
 import Loading from "./Loading";
 import { getSite, getItems } from "../services/db";
 import { configGet, configSet } from "../../common/utils";
-import { error } from "../services/utils";
+import { modal } from "./Modal";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -187,9 +187,7 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     });
 
     if (hasSlugDuplicates) {
-      error(
-        `There is already an item with the same slug ("${draggedItem.slug}") at this position. Please change the slug or drop elsewhere`
-      );
+      modal.alert(["slug_existing", [draggedItem.slug]]);
     }
 
     return hasSlugDuplicates;

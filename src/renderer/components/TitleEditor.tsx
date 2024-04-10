@@ -2,10 +2,11 @@ import "./styles/TitleEditor.css";
 
 import React, { FunctionComponent, useState, Fragment, useEffect } from "react";
 
-import { error, normalize, removeStopWords } from "../services/utils";
+import { normalize, removeStopWords } from "../services/utils";
 import cx from "classnames";
 import { getItem } from "../services/db";
 import { isValidSlug } from "../services/hosting";
+import { modal } from "./Modal";
 
 interface IProps {
   siteId: string;
@@ -38,7 +39,7 @@ const TitleEditor: FunctionComponent<IProps> = ({
 
   const save = async () => {
     if (!value.trim()) {
-      error("The title must have a value");
+      modal.alert(["title_missing", []]);
       return;
     }
 

@@ -1,5 +1,5 @@
 import fs from "fs";
-import { getString, configSet } from "../../common/utils";
+import { configSet } from "../../common/utils";
 import { modal } from "../components/Modal";
 import stopwords from "../json/stopwords.json";
 import React from "react";
@@ -57,7 +57,6 @@ export const camelCase = (str: string) => {
 };
 
 export const getJson = (url, cache = false) => {
-  const userAgent = process.env.NODE_ENV !== "production" ? "PRSS_DEV" : "PRSS";
   return new Promise((resolve) => {
     if (cache && getCache(url)) {
       resolve(getCache(url));
@@ -66,19 +65,35 @@ export const getJson = (url, cache = false) => {
         {
           url: url,
           json: true,
-          headers: { "User-Agent": userAgent },
+          headers: { "User-Agent": getUserAgent() },
         },
         function (error, response, body) {
           cache && setCache(url, body);
           resolve(body);
+          console.log("Request", url, response?.statusCode);
         }
       );
     }
   });
 };
 
+export const dispatchPRSSEvent = (inputBody) => {
+  const url = getApiUrl(`r/v${getCurrentVersion()}`);
+  require("request")(
+    {
+      url,
+      json: true,
+      headers: { "User-Agent": getUserAgent() },
+      method: "POST",
+      body: inputBody
+    },
+    function (error, response, body) {
+      console.log("Request", url, response?.statusCode);
+    }
+  );
+};
+
 export const getUrl = (url, cache = false) => {
-  const userAgent = process.env.NODE_ENV !== "production" ? "PRSS_DEV" : "PRSS";
   return new Promise((resolve) => {
     if (cache && getCache(url)) {
       resolve(getCache(url));
@@ -87,27 +102,16 @@ export const getUrl = (url, cache = false) => {
         {
           url: url,
           json: false,
-          headers: { "User-Agent": userAgent },
+          headers: { "User-Agent": getUserAgent() },
         },
         function (error, response, body) {
           cache && setCache(url, body);
           resolve(body);
+          console.log("Request", url, response?.statusCode);
         }
       );
     }
   });
-};
-
-export const alert = (message: string, title?: string) => {
-  modal.alert(message, title);
-};
-
-export const error = (
-  message = getString("error_occurred"),
-  title?: string
-) => {
-  alert(message, title);
-  // dialog.showMessageBox({ title, message });
 };
 
 export const confirmation = ({
@@ -249,6 +253,8 @@ export const mapFieldsToJSON = (fields = [], obj) => {
   return newObj;
 };
 
+export const getUserAgent = () => process.env.NODE_ENV !== "production" ? "PRSS_DEV" : "PRSS";
+
 export const sequential = (
   arr: any[],
   asyncFn: (...p: any) => any,
@@ -326,12 +332,12 @@ export const sanitizeSite = (siteObj) => {
 };
 
 export const getPRSSConfig = async () => {
-  const res = ((await getJson(getApiUrl("/config"))) || {}) as any;
+  const res = ((await getJson(getApiUrl(`config/v${getCurrentVersion()}`))) || {}) as any;
   return res;
 };
 
 export const getLatestVersion = async () => {
-  const res = ((await getJson(getApiUrl("/version"))) || {}) as any;
+  const res = ((await getJson(getApiUrl("version"))) || {}) as any;
   return res;
 };
 

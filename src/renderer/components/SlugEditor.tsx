@@ -2,8 +2,7 @@ import "./styles/SlugEditor.css";
 
 import React, { FunctionComponent, useState, Fragment, useEffect } from "react";
 
-import { getString } from "../../common/utils";
-import { error, normalize, appendSlash } from "../services/utils";
+import { normalize, appendSlash } from "../services/utils";
 import cx from "classnames";
 import { getBufferItems } from "../services/build";
 import { isValidSlug } from "../services/hosting";
@@ -48,7 +47,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
 
   const save = async () => {
     if (!value.trim()) {
-      error("The slug must have a value");
+      modal.alert(["site_slug_val", []]);
       return;
     }
 
@@ -59,7 +58,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
     const normalizedSlug = normalize(value);
 
     if (!(await isValidSlug(normalizedSlug, site.uuid, post.uuid))) {
-      modal.alert(getString("error_invalid_slug"));
+      modal.alert(["error_invalid_slug", []]);
       return;
     }
 
