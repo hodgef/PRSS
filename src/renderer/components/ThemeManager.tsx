@@ -21,6 +21,7 @@ import defaultThumbnail from "../images/defaultThemeThumbnail.png";
 import { getSite, updateSite } from "../services/db";
 import { configSet } from "../../common/utils";
 import { prssConfig, storeInt } from "../../common/bootstrap";
+import { ISite } from "../../common/interfaces";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
