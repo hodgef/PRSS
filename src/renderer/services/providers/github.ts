@@ -23,6 +23,7 @@ import { sequential } from "./../utils";
 import { modal } from "../../components/Modal";
 import { getSite } from "../db";
 import { storeInt } from "../../../common/bootstrap";
+import { requestType } from "../../../common/interfaces";
 
 class GithubProvider {
   private readonly siteUUID: string;

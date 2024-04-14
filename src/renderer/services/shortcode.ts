@@ -1,3 +1,4 @@
+import { IBufferItem } from "../../common/interfaces";
 import { getMenuHtml } from "./menus";
 
 const shortcodeRegex =

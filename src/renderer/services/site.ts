@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { getString } from "../../common/utils";
+import { IPostItem, ISite, ISiteMenus } from "../../common/interfaces";
 
 export const getSampleSiteStructure = (): {
   site: ISite;

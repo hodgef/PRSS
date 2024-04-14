@@ -31,6 +31,8 @@ import SiteVariablesEditorOverlay from "./SiteVariablesEditorOverlay";
 import { getSite, getItems, updateItem, updateSite } from "../services/db";
 import { editorOptions } from "../services/editor";
 import { truncateString } from "../services/utils";
+import { ISite } from "../../common/interfaces";
+
 const remote = require("@electron/remote");
 const win = remote.getCurrentWindow();
 
@@ -45,9 +47,9 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const { siteId, postId } = useParams() as any;
   const [publishSuggested, setPublishSuggested] = useState(null);
 
-  const [site, setSite] = useState(null);
+  const [site, setSite] = useState<ISite>(null);
   const [items, setItems] = useState(null);
-  const { title, url } = (site as ISite) || {};
+  const { title, url } = site || {};
 
   const [post, setPost] = useState(null);
 

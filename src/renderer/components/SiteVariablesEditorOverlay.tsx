@@ -20,11 +20,12 @@ import { modal } from "./Modal";
 import { siteVarToArray } from "../services/hosting";
 import { getBufferItems } from "../services/build";
 import { getSite, getItems, updateSite, updateItem } from "../services/db";
+import { Noop } from "../../common/interfaces";
 
 interface IProps {
   siteId: string;
   postId?: string;
-  onClose: noop;
+  onClose: Noop;
 }
 
 const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({

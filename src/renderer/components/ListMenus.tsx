@@ -15,6 +15,7 @@ import { deleteMenus } from "../services/hosting";
 import DraggableTree from "./DraggableTree";
 import { ask, normalizeStrict } from "../services/utils";
 import { getSite, updateSite } from "../services/db";
+import { ISite } from "../../common/interfaces";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -24,9 +25,9 @@ const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const { siteId } = useParams() as any;
   const { state = {} } = useLocation();
 
-  const [site, setSite] = useState(null);
+  const [site, setSite] = useState<ISite>(null);
   const [menus, setMenus] = useState(null);
-  const { title } = (site as ISite) || {};
+  const { title } = site || {};
 
   const history = useHistory();
 

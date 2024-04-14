@@ -4,6 +4,7 @@ import { sanitizeBufferItem, stripTags, truncateString } from "../../utils";
 import { configFileName } from "../../build";
 import { parseShortcodes } from "../../shortcode";
 import { prssConfig } from "../../../../common/bootstrap";
+import { IBufferItem, handlerType } from "../../../../common/interfaces";
 
 const reactHandlerExtension = "js";
 

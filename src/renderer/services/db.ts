@@ -1,6 +1,7 @@
 import { db } from "../../common/bootstrap";
 import { mapFieldsToJSON } from "./utils";
 import { JSON_FIELDS } from "../../common/bootstrap";
+import { IPostItem, ISite } from "../../common/interfaces";
 
 /**
  * Sites
@@ -9,27 +10,28 @@ export const getSites = () => {
   return db("sites");
 };
 
-export const getSite = (siteUUID: string) => {
-  return getSites().where("uuid", siteUUID).first();
+export const getSite = async (siteUUID: string): Promise<ISite> => {
+  const site = await getSites().where("uuid", siteUUID).first();
+  return site;
 };
 
-export const getSiteUUIDById = async (siteId: string) => {
+export const getSiteUUIDById = async (siteId: string): Promise<string> => {
   const { uuid } = await getSites().select("uuid").where("id", siteId).first();
   return uuid;
 };
 
-export const createSite = (fields: ISite) => {
+export const createSite = (fields: ISite): Promise<void> => {
   return db.insert(sitesToDB(fields)).into("sites");
 };
 
-export const updateSite = async (siteUUID: string, fields: Partial<ISite>) => {
+export const updateSite = async (siteUUID: string, fields: Partial<ISite>): Promise<void> => {
   const res = await getSites()
     .where("uuid", siteUUID)
     .update(sitesToDB(fields));
   return res;
 };
 
-export const deleteSite = async (siteUUID: string) => {
+export const deleteSite = async (siteUUID: string): Promise<void> => {
   //const { name: siteName } = await getSite(siteUUID);
   await getSites().where("uuid", siteUUID).del();
   await deleteAllSiteItems(siteUUID);
@@ -59,11 +61,11 @@ export const getItems = (siteUUID: string) => {
   return db("items").where("siteId", siteUUID);
 };
 
-export const getItem = (siteUUID: string, itemUUID: string) => {
+export const getItem = (siteUUID: string, itemUUID: string): Promise<IPostItem> => {
   return getItems(siteUUID).where("uuid", itemUUID).first();
 };
 
-export const getItemUUIDById = async (siteUUID: string, itemId: string) => {
+export const getItemUUIDById = async (siteUUID: string, itemId: string): Promise<string> => {
   const { uuid } = await getItems(siteUUID)
     .select("uuid")
     .where("id", itemId)

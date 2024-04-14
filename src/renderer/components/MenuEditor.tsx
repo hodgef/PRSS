@@ -20,6 +20,7 @@ import DraggableTree from "./DraggableTree";
 import Footer from "./Footer";
 import { ask } from "../services/utils";
 import { getSite, getItems, updateSite, getItem } from "../services/db";
+import { ISite } from "../../common/interfaces";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -28,9 +29,9 @@ interface IProps {
 const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const { siteId, menuId } = useParams() as any;
 
-  const [site, setSite] = useState(null);
+  const [site, setSite] = useState<ISite>(null);
   const [items, setItems] = useState(null);
-  const { title } = (site as ISite) || {};
+  const { title } = site || {};
   const [formattedStructure, setFormattedStructure] = useState(null);
   const [formattedMenuStructure, setFormattedMenuStructure] = useState(null);
 

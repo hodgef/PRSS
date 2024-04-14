@@ -6,8 +6,6 @@ import { initConfig, initStore, initDb, initExpress } from "../../common/bootstr
 import { checkDirs } from "../services/utils";
 import App from "./App";
 
-import cx from "classnames";
-
 // const remote = require("@electron/remote");
 // const win = remote.getCurrentWindow();
 // const openDevTools = remote.getGlobal("openDevTools");

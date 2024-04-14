@@ -1,5 +1,6 @@
 import { objGet } from "../utils";
 import { reactHandler, reactHandlerExtension } from "../handlers/react";
+import { IBufferItem, handlerType } from "../../../common/interfaces";
 
 const htmlMinifier = require("html-minifier-terser");
 const Terser = require("terser");

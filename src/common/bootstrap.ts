@@ -7,6 +7,7 @@ import {
   getPRSSConfig,
 } from "../renderer/services/utils";
 import { getConfigPath, getStaticPath } from "./utils";
+import { IStore, IStoreInternal } from "./interfaces";
 
 export const JSON_FIELDS = [
   "structure",
@@ -187,7 +188,7 @@ export const initStore = () => {
       name: "prss",
       cwd: configPath,
       defaults,
-    });
+    } as any);
 
     /**
      * Creating statics dir if it doesn't exist

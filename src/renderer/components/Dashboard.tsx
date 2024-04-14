@@ -17,6 +17,7 @@ import Loading from "./Loading";
 import { getSite } from "../services/db";
 import { prssConfig } from "../../common/bootstrap";
 import { getThemeManifest } from "../services/theme";
+import { ISite, ISiteInternal } from "../../common/interfaces";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -25,7 +26,7 @@ interface IProps {
 const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const { siteId } = useParams() as any;
 
-  const [site, setSite] = useState(null);
+  const [site, setSite] = useState<ISite>(null);
   const [publishSuggested, setPublishSuggested] = useState(null);
   const [loading, setLoading] = useState(null);
   const [repositoryUrl, setRepositoryUrl] = useState(null);
@@ -34,7 +35,7 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   );
 
   const history = useHistory();
-  const { title, url } = (site as ISite) || {};
+  const { title, url } = site || {};
 
   useEffect(() => {
     if (!title) {

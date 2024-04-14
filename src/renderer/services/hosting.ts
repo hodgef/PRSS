@@ -25,6 +25,7 @@ import {
   createItems,
 } from "./db";
 import { modal } from "../components/Modal";
+import { IHosting, ISiteInternal, ISiteVar, IStructureItem, updaterType } from "../../common/interfaces";
 
 export const getHostingTypes = () => ({
   github: GithubProvider.hostingTypeDef,
@@ -454,13 +455,13 @@ export const filterItemsFromNodes = async (
   return outputNodes;
 };
 
-export const handleHostingFields = (hostingFieldsObj = {}) => {
+export const handleHostingFields = (hostingFieldsObj = {} as IHosting): Promise<IHosting> => {
   return new Promise((resolve) => {
     const fields = { ...hostingFieldsObj };
     const { name, username } = fields as IHosting;
 
     if (!name) {
-      resolve({});
+      resolve({} as IHosting);
     }
 
     const storePromises = [];

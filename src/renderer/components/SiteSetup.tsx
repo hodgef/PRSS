@@ -36,6 +36,7 @@ import {
   getSampleSiteIntStructure,
 } from "../services/site";
 import { modal } from "./Modal";
+import { ISite, ISiteInternal } from "../../common/interfaces";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -179,7 +180,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
     const parsedHosting = (await handleHostingFields({
       ...hostingFields,
       ...extraHostingFields,
-    })) as IHosting;
+    }));
 
     console.log(
       "parsedHosting",

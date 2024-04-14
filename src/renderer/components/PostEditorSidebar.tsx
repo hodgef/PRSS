@@ -7,6 +7,7 @@ import Loading from "./Loading";
 import { getString } from "../../common/utils";
 import { modal } from "./Modal";
 import { getTemplateList } from "../services/theme";
+import { IPostItem, ISite, Noop } from "../../common/interfaces";
 
 interface IProps {
   site: ISite;
@@ -20,15 +21,15 @@ interface IProps {
   publishSuggested: boolean;
   loadingStatus: string;
   forceRawHTMLEditing: boolean;
-  onSave?: noop;
-  onStopPreview?: noop;
-  onStartPreview?: noop;
-  onPublish?: noop;
-  onSaveRebuildAll?: noop;
+  onSave?: Noop;
+  onStopPreview?: Noop;
+  onStartPreview?: Noop;
+  onPublish?: Noop;
+  onSaveRebuildAll?: Noop;
   onChangePostTemplate?: (t: string) => void;
-  onOpenRawHTMLOverlay?: noop;
-  onOpenVarEditorOverlay?: noop;
-  onToggleRawHTMLOnly?: noop;
+  onOpenRawHTMLOverlay?: Noop;
+  onOpenVarEditorOverlay?: Noop;
+  onToggleRawHTMLOnly?: Noop;
 }
 
 const PostEditorSidebar: FunctionComponent<IProps> = ({

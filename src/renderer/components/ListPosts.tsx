@@ -26,6 +26,7 @@ import Loading from "./Loading";
 import { getSite, getItems } from "../services/db";
 import { configGet, configSet } from "../../common/utils";
 import { modal } from "./Modal";
+import { ISite } from "../../common/interfaces";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -34,9 +35,9 @@ interface IProps {
 const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const { siteId } = useParams() as any;
 
-  const [site, setSite] = useState(null);
+  const [site, setSite] = useState<ISite>(null);
   const [items, setItems] = useState(null);
-  const { title } = (site as ISite) || {};
+  const { title } = site|| {};
 
   const { hosting, publishSuggested } = configGet(`sites.${siteId}`);
   const [structureState, setStructureState] = useState(null);

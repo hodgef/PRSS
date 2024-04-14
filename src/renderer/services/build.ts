@@ -19,6 +19,7 @@ import { getThemeManifest, getDefaultReadme } from "./theme";
 import { getSite, getItems, getItem } from "./db";
 import { getRootPost } from "./hosting";
 import { storeInt } from "../../common/bootstrap";
+import { IBufferItem, IPostItem, ISite, IStructureItem, handlerTypeReturn, loadBufferType } from "../../common/interfaces";
 
 export const bufferPathFileNames = ["index.html" /*, 'index.js'*/];
 export const configFileName = "config.js";
@@ -464,7 +465,7 @@ export const getBufferItems = async (
 export const structureToBufferItems = (structurePaths, siteUUID: string) => {
   return new Promise(async (resolve) => {
     const postIds = [];
-    const postPromises = [];
+    const postPromises: Promise<IPostItem>[] = [];
 
     structurePaths.forEach((item) => {
       const path = item.split("/");

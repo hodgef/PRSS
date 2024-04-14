@@ -4,7 +4,8 @@ import { Input, Tree } from "antd";
 import React from "react";
 import cx from "classnames";
 import { noop } from "../services/utils";
-import { parseNodes, flattenStructure, structureHasItem } from "../services/build";
+import { flattenStructure, structureHasItem } from "../services/build";
+import { IStructureItem } from "../../common/interfaces";
 
 interface IProps {
   checkable?: boolean;

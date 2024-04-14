@@ -32,7 +32,7 @@ export const toBase64 = (file) =>
   });
 
 export const localStorageSet = async (key: string, value: string) => {
-  window.localStorage.setItem(key, value);
+  return window.localStorage.setItem(key, value);
 };
 
 export const localStorageGet = async (key: string) => {
@@ -40,7 +40,7 @@ export const localStorageGet = async (key: string) => {
 };
 
 export const localStorageDelete = async (key: string) => {
-  window.localStorage.removeItem(key);
+  return window.localStorage.removeItem(key);
 };
 
 export const runCommand = (dir, cmd) => {
@@ -60,7 +60,7 @@ export const runCommand = (dir, cmd) => {
   }
 };
 
-export const getConfigPath = async () => {
+export const getConfigPath = async (): Promise<string> => {
   return (await storeInt.get("paths.config")) || app.getPath("userData");
 };
 
@@ -68,10 +68,10 @@ export const isReportIssuesEnabled = async () => {
   return (await storeInt.get("reportIssues")) === false ? false : true;
 };
 
-export const getRootPath = () => {
-  return app.isPackaged ? app.getPath('userData') : app.getPath('exe').split("node_modules")[0];;
+export const getRootPath = (): string => {
+  return app.isPackaged ? app.getPath('userData') : app.getPath('exe').split("node_modules")[0];
 }
 
-export const getStaticPath = () => {
+export const getStaticPath = (): string => {
   return path.join(app.isPackaged && !process.resourcesPath?.includes("WindowsApps") ? process.resourcesPath : getRootPath(), 'static');
 };

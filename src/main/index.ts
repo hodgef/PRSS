@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, shell, BrowserWindow } = require('electron');
+const { app, shell, BrowserWindow, ipcMain } = require('electron');
 import { initialize, enable } from "@electron/remote/main";
 const path = require('path');
 
@@ -20,6 +20,8 @@ ElectronStore.initRenderer();
 initialize();
 
 let mainWindow;
+let appLink;
+let eventSender;
 
 function createWindow () {
     // Create the browser window.
@@ -134,23 +136,23 @@ function createWindow () {
         // toast.success('Starting PRSS Preview');
       }
     }
+
+    (global as any).getAppLink = () => {
+      return appLink;
+    }
 }
 
 if (!gotTheLock) {
   app.quit()
 } else {
-  app.on('second-instance', () => {
+  app.on('second-instance', (event, commandLine) => {
     // Someone tried to run a second instance, we should focus our window.
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
+      handleProtocolLaunch(commandLine);
     }
   })
-
-  // Create myWindow, load the rest of the app, etc...
-  app.on('ready', () => {
-    autoUpdater.checkForUpdatesAndNotify();
-  });
 }
 
 // This method will be called when Electron has finished
@@ -158,6 +160,12 @@ if (!gotTheLock) {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   createWindow();
+
+  // Check for updates
+  autoUpdater.checkForUpdatesAndNotify();
+
+  // Handle protocol launch
+  handleProtocolLaunch(process.argv);
 
   process.on('exit', () => {
     app.quit();
@@ -177,5 +185,23 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+// Handle protocol launch
+const handleProtocolLaunch = (argv: any[]) => {
+  const caller = argv[argv.length - 1];
+
+  if(caller){
+    appLink = caller.includes("prss:") ? caller : null;
+
+    if(eventSender) {
+      eventSender.send("protocol-received", appLink);
+    }
+  }
+}
+
+ipcMain.on("prss-ready", (event) => {
+  eventSender = event.sender;
+
+  if(appLink){
+    eventSender.send("protocol-received", appLink);
+  }
+});

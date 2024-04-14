@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import { isValidSlug, getRootPost } from "../services/hosting";
 import { getSite, getItems, updateSite, createItems } from "../services/db";
 import { modal } from "./Modal";
+import { ISite } from "../../common/interfaces";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -24,9 +25,9 @@ interface IProps {
 const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const { siteId } = useParams() as any;
 
-  const [site, setSite] = useState(null);
+  const [site, setSite] = useState<ISite>(null);
   const [items, setItems] = useState(null);
-  const { title, structure } = (site as ISite) || {};
+  const { title, structure } = site || {};
 
   const [formattedStructure, setFormattedStructure] = useState(structure);
   const [postTitle, setPostTitle] = useState("");

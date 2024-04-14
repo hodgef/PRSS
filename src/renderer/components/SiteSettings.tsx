@@ -21,6 +21,10 @@ import { shell } from "electron";
 import path from "path";
 import fs from "fs";
 import { storeInt } from "../../common/bootstrap";
+import Form from 'react-bootstrap/Form';
+import InputGroup from 'react-bootstrap/InputGroup';
+import Col from 'react-bootstrap/Col';
+import { ISite, ISiteInternal } from "../../common/interfaces";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -36,8 +40,8 @@ const SiteSettings: FunctionComponent<IProps> = ({
     hosting: { name: hostingName = "none" },
   } = siteInt;
 
-  const [site, setSite] = useState(null);
-  const { title, headHtml, footerHtml, sidebarHtml } = (site as ISite) || {};
+  const [site, setSite] = useState<ISite>(null);
+  const { title, headHtml, footerHtml, sidebarHtml } = site || {};
 
   const [siteTitle, setSiteTitle] = useState("");
   const [editedSiteName, setEditedSiteName] = useState("");
@@ -76,7 +80,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
   useEffect(() => {
     const getData = async () => {
       const siteRes = await getSite(siteId);
-      const { title, name, theme, url } = (siteRes as ISite) || {};
+      const { title, name, theme, url } = (siteRes) || {};
       setSite(siteRes);
       setSiteTitle(title);
       setEditedSiteName(name);
@@ -222,7 +226,15 @@ const SiteSettings: FunctionComponent<IProps> = ({
           </div>
         </h1>
 
-        <form className="mt-4">
+        <Form className="mt-4">
+          <Form.Group className="form-group row">
+            <InputGroup className="input-group-lg">
+              <Form.Label className="col-sm-2 col-form-label">Site ID</Form.Label>
+              <Col className="col-sm-10">
+                <Form.Control type="text" className="form-control" value={siteId} disabled />
+              </Col>
+            </InputGroup>
+          </Form.Group>
           <div className="form-group row">
             <div className="input-group input-group-lg">
               <label className="col-sm-2 col-form-label">Site Title</label>
@@ -348,7 +360,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
               </div>
             </div>
           </div>
-        </form>
+        </Form>
       </div>
       {showRawHTMLEditorOverlay && (
         <HTMLEditorOverlay

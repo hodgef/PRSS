@@ -7,6 +7,7 @@ import cx from "classnames";
 import { getBufferItems } from "../services/build";
 import { isValidSlug } from "../services/hosting";
 import { modal } from "./Modal";
+import { IPostItem, ISite } from "../../common/interfaces";
 
 interface IProps {
   site: ISite;

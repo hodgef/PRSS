@@ -7,7 +7,7 @@ import { getString } from "../../common/utils";
 
 const CreateSelector: FunctionComponent = () => {
   const history = useHistory();
-  const { state = {} } = useLocation();
+  const { state = {} } = useLocation<any>();
 
   return (
     <div className="CreateSelector page">

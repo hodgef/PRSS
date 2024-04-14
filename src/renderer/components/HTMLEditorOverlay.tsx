@@ -12,13 +12,15 @@ import pretty from "pretty";
 import { toast } from "react-toastify";
 import { modal } from "./Modal";
 import bufferItemMockJson from "../json/bufferItem.json";
+import { Noop } from "../../common/interfaces";
+
 const htmlMinifier = require("html-minifier-terser");
 interface IProps {
   headDefaultValue?: string;
   footerDefaultValue?: string;
   sidebarDefaultValue?: string;
   onSave: (headHtml: string, footerHtml: string, sidebarHtml: string) => void;
-  onClose: noop;
+  onClose: Noop;
 }
 
 const HTMLEditorOverlay: FunctionComponent<IProps> = ({

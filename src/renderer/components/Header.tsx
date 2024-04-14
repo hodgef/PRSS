@@ -30,6 +30,8 @@ interface IProps {
   history: any;
 }
 
+const ipc = require('electron').ipcRenderer;
+
 const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const headerMore = useRef(null);
@@ -61,6 +63,17 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
       win.removeListener("unmaximize", minHandler);
     };
   }, []);
+
+  // Process protocol launch deep linking
+  useEffect(() => {
+    if(history){
+      ipc.send('prss-ready');
+      ipc.on('protocol-received', (event, path) => {
+        const route = '/' + path.replace("prss://", "").replace(/\/+$/, "");
+        history.push(route, { isProtocol: true });
+      })
+    }
+  }, [history]);
 
   return (
     <header className={cx({ "has-header-left": headerLeft })}>

@@ -123,6 +123,12 @@
     "appId": "io.prss.app",
     "copyright": "2022-present, Volted Interactive",
     "artifactName": "PRSS-${version}-${platform}.${ext}",
+    "protocols": {
+      "name": "prss-protocol",
+      "schemes": [
+        "prss"
+      ]
+    },
     "files": [
       "build/**/*",
       "embedded.provisionprofile"
