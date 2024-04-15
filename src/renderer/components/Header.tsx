@@ -104,7 +104,7 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
               })}
               onClick={() => setShowMoreMenu(!showMoreMenu)}
             >
-              <span className="material-symbols-outlined">expand_more</span>
+              <span className="material-symbols-outlined">more_horiz</span>
             </button>
             {showMoreMenu && (
               <React.Fragment>

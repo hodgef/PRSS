@@ -6,7 +6,7 @@
   align-items: center;
   font-size: 12px;
   z-index: 5;
-  box-shadow: -6px -6px 12px 2px #eaeaea 1f;
+  box-shadow: -6px -6px 12px 2px #eaeaea;
   border-top: 1px solid whitesmoke;
 }
 #app footer .left-align,

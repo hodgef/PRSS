@@ -2,9 +2,7 @@ header {
   box-sizing: border-box;
   width: 100%;
   z-index: 999999999999999;
-  border-bottom: 1px solid #efefef 9e;
   height: 50px;
-  padding: 2px;
   user-select: none;
   background-color: white;
 }
@@ -51,16 +49,25 @@ header .header-cont .right-align button span.material-symbols-outlined {
 header .header-cont .right-align .btn {
   outline: none !important;
   box-shadow: none !important;
+  border: none !important;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  border-radius: 0;
+}
+header .header-cont .right-align .btn:hover {
+  transform: scale(1.1);
 }
 header .header-cont .right-align .header-more {
   position: relative;
+  margin-right: 25px;
 }
 header .header-cont .right-align .drop-menu {
   position: absolute;
-  top: calc(100% + 2px);
+  top: 100%;
   right: 0;
   width: 200px;
-  background: white;
+  background: #f9f9f9;
   margin: 0;
   padding: 0;
 }
@@ -68,7 +75,6 @@ header .header-cont .right-align .drop-menu li {
   display: flex;
   align-items: center;
   padding: 10px;
-  border-bottom: 1px solid #e8e8e8 4d;
 }
 header .header-cont .right-align .drop-menu li a {
   display: flex;
@@ -112,7 +118,4 @@ header .header-subtitle .material-symbols-outlined {
 }
 header .header-subtitle > div:first-child .material-symbols-outlined:first-child {
   margin-left: 0;
-}
-header .expanded .material-symbols-outlined {
-  transform: rotate(180deg);
 }

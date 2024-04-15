@@ -31,7 +31,7 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const [loading, setLoading] = useState(null);
   const [repositoryUrl, setRepositoryUrl] = useState(null);
   const [publishDescription, setPublishDescription] = useState(
-    "You have unpublished changes"
+    "Publish latest changes"
   );
 
   const history = useHistory();

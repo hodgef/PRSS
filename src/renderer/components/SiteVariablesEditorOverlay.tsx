@@ -254,11 +254,11 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
   };
 
   return (
-    <div className="html-editor-overlay">
+    <div className="sitevars-editor-overlay">
       <div className="editor-content">
         <h2>
           <div className="left-align">
-            <span>VARIABLES</span>
+            <span>Scoped Variables</span>
           </div>
           <div className="right-align">
             <button
@@ -360,13 +360,14 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
         </div>
 
         {post && !!parsedInheritedVariables.length && (
-          <div className="inherited-variable-list mt-5">
-            <h2>EFFECTIVE VARIABLES</h2>
+          <>
+            <h2>Computed Variables</h2>
             <p>
               This includes global variables from{" "}
               <Link to={`/sites/${siteId}/settings`}>Site Settings</Link> as
               well as parent variables.
             </p>
+            <div className="inherited-variable-list">
             <ul>
               {parsedInheritedVariables.map((variable, index) => {
                 return (
@@ -393,6 +394,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
               })}
             </ul>
           </div>
+          </>
         )}
       </div>
     </div>

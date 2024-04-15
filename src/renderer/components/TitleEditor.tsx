@@ -91,6 +91,7 @@ const TitleEditor: FunctionComponent<IProps> = ({
           <span title={post.title}>{post.title}</span>
           <i
             className="material-symbols-outlined clickable"
+            style={{ fontSize: "26px" }}
             onClick={() => {
               setValue(post.title);
               setEditing(true);

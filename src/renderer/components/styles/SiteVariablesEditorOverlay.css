@@ -1,71 +1,76 @@
-.html-editor-overlay {
+.sitevars-editor-overlay {
   position: fixed;
   top: 50px;
   width: 100%;
-  background: #020202 d1;
-  height: 100%;
+  background: rgba(0,0,0,0.9);
+  height: calc(100vh - 50px);
   z-index: 100;
+  display: flex;
 }
-.html-editor-overlay .editor-content {
+.sitevars-editor-overlay .editor-content {
   margin: 0 auto;
-  width: 80%;
+  width: 100%;
   background: white;
   padding: 20px;
   box-sizing: border-box;
-  height: calc(100% - 100px);
   overflow: hidden;
   border-radius: 10px;
   margin-top: 20px;
-  display: flex;
   flex-flow: column;
+  overflow-y: auto !important;
+  position: relative;
+  box-shadow: 0 0 10px #b3b3b3;
+  display: flex;
 }
-.html-editor-overlay .editor-content h2 {
+.sitevars-editor-overlay .editor-content h2 {
   display: flex;
   align-items: center;
 }
-.html-editor-overlay .editor-content h2:first-child {
+.sitevars-editor-overlay .editor-content h2:first-child {
   margin-top: 0 !important;
+  margin-bottom: 5px !important;
 }
-.html-editor-overlay .editor-content h2 .left-align {
+.sitevars-editor-overlay .editor-content h2 .left-align {
   flex: 1;
 }
-.html-editor-overlay .editor-content h2 .right-align {
+.sitevars-editor-overlay .editor-content h2 .right-align {
   display: flex;
   height: 40px;
 }
-.html-editor-overlay .editor-content h2 .right-align button {
+.sitevars-editor-overlay .editor-content h2 .right-align button {
   display: flex;
 }
-.html-editor-overlay .editor-content .title-label {
+.sitevars-editor-overlay .editor-content .title-label {
   display: flex;
   margin-bottom: 10px;
 }
-.html-editor-overlay .editor-content .title-label .left-align {
+.sitevars-editor-overlay .editor-content .title-label .left-align {
   flex: 1;
 }
-.html-editor-overlay .editor-content .title-label .right-align {
+.sitevars-editor-overlay .editor-content .title-label .right-align {
   display: flex;
   align-items: center;
 }
-.html-editor-overlay
+.sitevars-editor-overlay
   .editor-content
   .title-label
   .right-align.available-parameters {
-  color: #0093ff d1;
+  color: #0093ff;
 }
-.html-editor-overlay .editor-content .variable-list,
-.html-editor-overlay .editor-content .inherited-variable-list {
+.sitevars-editor-overlay .editor-content .variable-list,
+.sitevars-editor-overlay .editor-content .inherited-variable-list {
   flex: 1;
   overflow-y: auto;
+  border-bottom: 2px solid #dbdbdb;
 }
-.html-editor-overlay .editor-content .variable-list ul,
-.html-editor-overlay .editor-content .inherited-variable-list ul {
+.sitevars-editor-overlay .editor-content .variable-list ul,
+.sitevars-editor-overlay .editor-content .inherited-variable-list ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.html-editor-overlay .editor-content .variable-list ul li input:first-child,
-.html-editor-overlay
+.sitevars-editor-overlay .editor-content .variable-list ul li input:first-child,
+.sitevars-editor-overlay
   .editor-content
   .inherited-variable-list
   ul
@@ -73,8 +78,8 @@
   input:first-child {
   max-width: 250px;
 }
-.html-editor-overlay .editor-content .variable-list ul li button,
-.html-editor-overlay .editor-content .inherited-variable-list ul li button {
+.sitevars-editor-overlay .editor-content .variable-list ul li button,
+.sitevars-editor-overlay .editor-content .inherited-variable-list ul li button {
   display: flex;
   align-items: center;
 }
