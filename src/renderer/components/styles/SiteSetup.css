@@ -33,13 +33,13 @@
   font-size: 23px;
   display: flex;
 }
-#app .SiteSetup .content .items > ul .feature-title span.material-icons {
+#app .SiteSetup .content .items > ul .feature-title span.material-symbols-outlined {
   font-size: 13px;
   color: #3eccc0;
   display: flex;
   align-items: center;
 }
-#app .SiteSetup .content .items > ul .feature-title span.material-icons:after {
+#app .SiteSetup .content .items > ul .feature-title span.material-symbols-outlined:after {
   font-family: "Roboto", sans-serif;
   content: "DEFAULT";
   margin-left: 5px;
@@ -64,7 +64,7 @@
 #app .SiteSetup .content .image-cnt img {
   width: 100%;
 }
-#app .SiteSetup .content .image-cnt .material-icons {
+#app .SiteSetup .content .image-cnt .material-symbols-outlined {
   font-size: 28px;
   color: #464646;
   margin-right: 20px;

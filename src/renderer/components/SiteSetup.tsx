@@ -83,13 +83,13 @@ const SiteSetup: FunctionComponent<IProps> = ({
       setHeaderLeftComponent(
         <Fragment>
           <div className="align-center">
-            <i className="material-icons">public</i>
+            <i className="material-symbols-outlined">public</i>
             <a onClick={() => history.push(`/sites/${siteId}`)}>
               {site ? site.title : ""}
             </a>
           </div>
           <div className="align-center">
-            <i className="material-icons">keyboard_arrow_right</i>
+            <i className="material-symbols-outlined">keyboard_arrow_right</i>
             <a onClick={() => history.push(`/sites/${siteId}/hosting`)}>
               Change hosting
             </a>
@@ -133,7 +133,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
       title: (
         <Fragment>
           GitHub
-          {/*<span className="material-icons mb-2 mb-1" title="Recommended">
+          {/*<span className="material-symbols-outlined mb-2 mb-1" title="Recommended">
                         check_circle
             </span>*/}
         </Fragment>
@@ -311,7 +311,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
                 <div className="left-align">
                   {hasSites && (
                     <i
-                      className="material-icons clickable"
+                      className="material-symbols-outlined clickable"
                       onClick={() => history.push("/sites")}
                     >
                       arrow_back
@@ -360,7 +360,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
                           {image ? (
                             <img src={image} />
                           ) : (
-                            <i className="material-icons">{icon}</i>
+                            <i className="material-symbols-outlined">{icon}</i>
                           )}
                         </div>
                       )}
@@ -381,7 +381,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
                 <div className="left-align">
                   {hasSites && (
                     <i
-                      className="material-icons clickable"
+                      className="material-symbols-outlined clickable"
                       onClick={() => history.push("/sites")}
                     >
                       arrow_back

@@ -59,11 +59,11 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     setHeaderLeftComponent(
       <Fragment>
         <div className="align-center">
-          <i className="material-icons">public</i>
+          <i className="material-symbols-outlined">public</i>
           <a onClick={() => history.push(`/sites/${siteId}`)}>{title}</a>
         </div>
         <div className="align-center">
-          <i className="material-icons">keyboard_arrow_right</i>
+          <i className="material-symbols-outlined">keyboard_arrow_right</i>
           <a onClick={() => history.push(`/sites/${siteId}/posts`)}>Posts</a>
         </div>
       </Fragment>
@@ -200,7 +200,7 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         <h1>
           <div className="left-align">
             <i
-              className="material-icons clickable"
+              className="material-symbols-outlined clickable"
               onClick={() => history.goBack()}
             >
               arrow_back
@@ -226,7 +226,7 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                   onClick={() => cloneSelectedPosts()}
                   title="Clone Selected Posts"
                 >
-                  <i className="material-icons">file_copy</i>
+                  <i className="material-symbols-outlined">file_copy</i>
                 </button>
                 <button
                   type="button"
@@ -234,7 +234,7 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                   onClick={() => deleteSelectedPosts()}
                   title="Delete Selected Posts"
                 >
-                  <i className="material-icons">delete</i>
+                  <i className="material-symbols-outlined">delete</i>
                 </button>
               </Fragment>
             )}
@@ -243,7 +243,7 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
               className="btn btn-primary"
               onClick={() => history.push(`/sites/${siteId}/posts/create`)}
             >
-              <i className="material-icons">add</i>
+              <i className="material-symbols-outlined">add</i>
               <span>Add New</span>
             </button>
             {showPublishButton && hosting.name !== "none" && (
@@ -252,7 +252,7 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                 className="btn btn-outline-success"
                 onClick={() => publishSite()}
               >
-                <i className="material-icons">publish</i>
+                <i className="material-symbols-outlined">publish</i>
                 <span>Publish Changes</span>
               </button>
             )}

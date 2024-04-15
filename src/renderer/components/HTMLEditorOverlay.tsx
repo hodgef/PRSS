@@ -84,7 +84,7 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
               className="btn btn-primary mr-2"
               onClick={() => handleSave()}
             >
-              <span className="material-icons mr-2">save</span>
+              <span className="material-symbols-outlined mr-2">save</span>
               <span>Save</span>
             </button>
             <button
@@ -92,7 +92,7 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
               className="btn btn-outline-primary"
               onClick={() => onClose()}
             >
-              <span className="material-icons">clear</span>
+              <span className="material-symbols-outlined">clear</span>
             </button>
           </div>
         </h2>
@@ -103,7 +103,7 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
                 className="right-align available-parameters clickable"
                 onClick={() => showParametersInfo()}
               >
-                <span className="material-icons mr-1">assistant</span>
+                <span className="material-symbols-outlined mr-1">assistant</span>
                 <span>See available parameters</span>
               </div>
           </div>

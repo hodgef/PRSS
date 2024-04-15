@@ -104,7 +104,7 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
               })}
               onClick={() => setShowMoreMenu(!showMoreMenu)}
             >
-              <span className="material-icons">expand_more</span>
+              <span className="material-symbols-outlined">expand_more</span>
             </button>
             {showMoreMenu && (
               <React.Fragment>
@@ -121,7 +121,7 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
                         notifyNewVersion(latestVersion);
                       }}
                     >
-                      <span className="material-icons">check_circle</span>
+                      <span className="material-symbols-outlined">check_circle</span>
                       <span>Update PRSS</span>
                     </li>
                   )}
@@ -133,7 +133,7 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
                       history.push("/settings");
                     }}
                   >
-                    <span className="material-icons">settings</span>
+                    <span className="material-symbols-outlined">settings</span>
                     <span>Settings</span>
                   </li>
 
@@ -144,7 +144,7 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
                       openDevTools();
                     }}
                   >
-                    <span className="material-icons">code</span>
+                    <span className="material-symbols-outlined">code</span>
                     <span>Developer Tools</span>
                   </li>*/}
                   
@@ -161,7 +161,7 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
                       );
                     }}
                   >
-                    <span className="material-icons">info</span>
+                    <span className="material-symbols-outlined">info</span>
                     <span>About</span>
                   </li>
                 </ul>

@@ -266,7 +266,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
               className="btn btn-primary mr-2"
               onClick={() => handleSave()}
             >
-              <span className="material-icons mr-2">save</span>
+              <span className="material-symbols-outlined mr-2">save</span>
               <span>Save</span>
             </button>
             <button
@@ -274,7 +274,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
               className="btn btn-outline-primary mr-2"
               onClick={() => addNew()}
             >
-              <span className="material-icons mr-2">add</span>
+              <span className="material-symbols-outlined mr-2">add</span>
               <span>Add New</span>
             </button>
             <button
@@ -282,7 +282,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
               className="btn btn-outline-primary"
               onClick={() => onClose()}
             >
-              <span className="material-icons">clear</span>
+              <span className="material-symbols-outlined">clear</span>
             </button>
           </div>
         </h2>
@@ -295,7 +295,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
             className="right-align available-parameters clickable"
             onClick={() => showInfo()}
           >
-            <span className="material-icons mr-1">info</span>
+            <span className="material-symbols-outlined mr-1">info</span>
             <span>What are variables?</span>
           </div>
         </div>
@@ -341,7 +341,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                         )}
                         onClick={() => preventVarToggle(index)}
                       >
-                        <span className="material-icons">block</span>
+                        <span className="material-symbols-outlined">block</span>
                       </button>
                     )}
                     <button
@@ -350,7 +350,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                       className="btn btn-outline-primary ml-2"
                       onClick={() => delVar(index)}
                     >
-                      <span className="material-icons">delete</span>
+                      <span className="material-symbols-outlined">delete</span>
                     </button>
                   </div>
                 </li>

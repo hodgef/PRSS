@@ -79,7 +79,7 @@
 #app h1 button.btn:last-child {
   margin-right: 0;
 }
-#app h1 button.btn .material-icons {
+#app h1 button.btn .material-symbols-outlined {
   font-size: 20px;
   line-height: 20px;
 }
@@ -95,7 +95,7 @@
   display: flex;
   align-items: center;
 }
-#app h1 .left-align .material-icons {
+#app h1 .left-align .material-symbols-outlined {
   font-size: 30px;
   margin-right: 10px;
 }

@@ -41,11 +41,11 @@ const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     setHeaderLeftComponent(
       <Fragment>
         <div className="align-center">
-          <i className="material-icons">public</i>
+          <i className="material-symbols-outlined">public</i>
           <a onClick={() => history.push(`/sites/${siteId}`)}>{title}</a>
         </div>
         <div className="align-center">
-          <i className="material-icons">keyboard_arrow_right</i>
+          <i className="material-symbols-outlined">keyboard_arrow_right</i>
           <a onClick={() => history.push(`/sites/${siteId}/menus`)}>Menus</a>
         </div>
       </Fragment>
@@ -169,7 +169,7 @@ const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         <h1>
           <div className="left-align">
             <i
-              className="material-icons clickable"
+              className="material-symbols-outlined clickable"
               onClick={() => history.goBack()}
             >
               arrow_back
@@ -192,7 +192,7 @@ const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                 className="btn btn-outline-danger"
                 onClick={() => deleteSelectedMenus()}
               >
-                <i className="material-icons">delete</i>
+                <i className="material-symbols-outlined">delete</i>
               </button>
             )}
             <button
@@ -200,7 +200,7 @@ const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
               className="btn btn-primary"
               onClick={async () => addNew()}
             >
-              <i className="material-icons">add</i>
+              <i className="material-symbols-outlined">add</i>
               <span>Create New</span>
             </button>
           </div>

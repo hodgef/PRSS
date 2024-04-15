@@ -64,11 +64,11 @@ const SiteSettings: FunctionComponent<IProps> = ({
     setHeaderLeftComponent(
       <Fragment>
         <div className="align-center">
-          <i className="material-icons">public</i>
+          <i className="material-symbols-outlined">public</i>
           <a onClick={() => history.push(`/sites/${siteId}`)}>{title}</a>
         </div>
         <div className="align-center">
-          <i className="material-icons">keyboard_arrow_right</i>
+          <i className="material-symbols-outlined">keyboard_arrow_right</i>
           <a onClick={() => history.push(`/sites/${siteId}/settings`)}>
             Settings
           </a>
@@ -207,7 +207,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
         <h1>
           <div className="left-align">
             <i
-              className="material-icons clickable"
+              className="material-symbols-outlined clickable"
               onClick={() => history.goBack()}
             >
               arrow_back
@@ -220,7 +220,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
               className="btn btn-primary"
               onClick={() => handleSubmit()}
             >
-              <span className="material-icons mr-2">save</span>
+              <span className="material-symbols-outlined mr-2">save</span>
               <span>Save Changes</span>
             </button>
           </div>
@@ -306,7 +306,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
                   className="btn btn-outline-primary d-flex"
                   onClick={() => setShowRawHTMLEditorOverlay(true)}
                 >
-                  <span className="material-icons mr-2">code</span>
+                  <span className="material-symbols-outlined mr-2">code</span>
                   <span>Add Site Raw HTML</span>
                 </button>
               </div>
@@ -324,7 +324,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
                   className="btn btn-outline-primary d-flex"
                   onClick={() => history.push(`/sites/${siteId}/hosting`)}
                 >
-                  <span className="material-icons mr-2">language</span>
+                  <span className="material-symbols-outlined mr-2">language</span>
                   <span>Change hosting</span>
                 </button>
               </div>
@@ -339,7 +339,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
                   className="btn btn-outline-primary d-flex"
                   onClick={() => setShowSiteVariablesEditorOverlay(true)}
                 >
-                  <span className="material-icons mr-2">create</span>
+                  <span className="material-symbols-outlined mr-2">create</span>
                   <span>Edit Variables</span>
                 </button>
               </div>
@@ -354,7 +354,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
                   className="btn btn-outline-primary d-flex"
                   onClick={() => openPublicDir()}
                 >
-                  <span className="material-icons mr-2">folder</span>
+                  <span className="material-symbols-outlined mr-2">folder</span>
                   <span>Open Public Dir</span>
                 </button>
               </div>

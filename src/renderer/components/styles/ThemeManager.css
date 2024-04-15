@@ -7,7 +7,7 @@
   flex: 1;
   width: 100%;
 }
-.ThemeManager .content .theme-list .right-align .material-icons {
+.ThemeManager .content .theme-list .right-align .material-symbols-outlined {
   font-size: 21px;
   color: #2c2c2c;
   opacity: 0.6;

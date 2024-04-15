@@ -42,15 +42,15 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     setHeaderLeftComponent(
       <Fragment>
         <div className="align-center">
-          <i className="material-icons">public</i>
+          <i className="material-symbols-outlined">public</i>
           <a onClick={() => history.push(`/sites/${siteId}`)}>{title}</a>
         </div>
         <div className="align-center">
-          <i className="material-icons">keyboard_arrow_right</i>
+          <i className="material-symbols-outlined">keyboard_arrow_right</i>
           <a onClick={() => history.push(`/sites/${siteId}/posts`)}>Posts</a>
         </div>
         <div className="align-center">
-          <i className="material-icons">keyboard_arrow_right</i>
+          <i className="material-symbols-outlined">keyboard_arrow_right</i>
           <a onClick={() => history.push(`/sites/${siteId}/posts/create`)}>
             Create Post
           </a>
@@ -179,7 +179,7 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         <h1>
           <div className="left-align">
             <i
-              className="material-icons clickable"
+              className="material-symbols-outlined clickable"
               onClick={() => history.goBack()}
             >
               arrow_back
@@ -192,7 +192,7 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
               className="btn btn-primary"
               onClick={() => handleSubmit()}
             >
-              <span className="material-icons mr-2">save</span>
+              <span className="material-symbols-outlined mr-2">save</span>
               <span>Create</span>
             </button>
           </div>

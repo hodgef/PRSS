@@ -45,11 +45,11 @@ const ThemeManager: FunctionComponent<IProps> = ({
     setHeaderLeftComponent(
       <Fragment>
         <div className="align-center">
-          <i className="material-icons">public</i>
+          <i className="material-symbols-outlined">public</i>
           <a onClick={() => history.push(`/sites/${siteId}`)}>{title}</a>
         </div>
         <div className="align-center">
-          <i className="material-icons">keyboard_arrow_right</i>
+          <i className="material-symbols-outlined">keyboard_arrow_right</i>
           <a onClick={() => history.push(`/sites/${siteId}/themes`)}>Themes</a>
         </div>
       </Fragment>
@@ -185,7 +185,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
         <h1>
           <div className="left-align">
             <i
-              className="material-icons clickable"
+              className="material-symbols-outlined clickable"
               onClick={() => history.goBack()}
             >
               arrow_back
@@ -198,7 +198,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
               className="btn btn-outline-primary"
               onClick={() => getThemes()}
             >
-              <i className="material-icons">refresh</i>
+              <i className="material-symbols-outlined">refresh</i>
             </button>
           </div>
         </h1>
@@ -250,7 +250,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
                     </div>
                     <div className="right-align">
                       {authorFormatted && (
-                        <span className="material-icons" title="Theme Info" onClick={() => showThemeDetails(theme)}>
+                        <span className="material-symbols-outlined" title="Theme Info" onClick={() => showThemeDetails(theme)}>
                           info
                         </span>
                       )}
@@ -286,7 +286,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
             className="theme-list-item add-new-theme-btn clickable"
             onClick={() => addTheme()}
           >
-            <i className="material-icons">add_circle</i>
+            <i className="material-symbols-outlined">add_circle</i>
           </div>
         </div>
       </div>

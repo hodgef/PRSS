@@ -20,7 +20,7 @@
   align-items: center;
   height: 100%;
 }
-.ListSites .content ul .left-align > .material-icons {
+.ListSites .content ul .left-align > .material-symbols-outlined {
   margin-right: 10px;
 }
 .ListSites .content ul .left-align .form-check {

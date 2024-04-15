@@ -39,7 +39,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     setHeaderLeftComponent(
       <Fragment>
         <div className="align-center">
-          <i className="material-icons">public</i>
+          <i className="material-symbols-outlined">public</i>
           <a onClick={() => history.push("/settings")}>Settings</a>
         </div>
       </Fragment>
@@ -110,7 +110,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         <h1>
           <div className="left-align">
             <i
-              className="material-icons clickable"
+              className="material-symbols-outlined clickable"
               onClick={() => history.goBack()}
             >
               arrow_back
@@ -123,7 +123,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                             className="btn btn-primary"
                             onClick={() => handleSubmit()}
                         >
-                            <span className="material-icons mr-2">save</span>
+                            <span className="material-symbols-outlined mr-2">save</span>
                             <span>Save Changes</span>
                         </button>
     </div>*/}
@@ -149,7 +149,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                       className="btn btn-outline-primary"
                       onClick={() => handleChangeConfigDir()}
                     >
-                      <span className="material-icons mr-2">folder</span>
+                      <span className="material-symbols-outlined mr-2">folder</span>
                       <span>Change Config Directory</span>
                     </button>
                   </div>

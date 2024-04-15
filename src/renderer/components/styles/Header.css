@@ -16,7 +16,7 @@ header .logo img {
   pointer-events: none;
 }
 header .back-overlay {
-  background: #020202 d1;
+  background: rgb(74 69 104 / 50%);
   position: fixed;
   left: 0;
   top: 50px;
@@ -45,7 +45,7 @@ header .header-cont .right-align button {
   display: flex;
   height: 40px;
 }
-header .header-cont .right-align button span.material-icons {
+header .header-cont .right-align button span.material-symbols-outlined {
   font-size: 25px;
 }
 header .header-cont .right-align .btn {
@@ -74,7 +74,7 @@ header .header-cont .right-align .drop-menu li a {
   display: flex;
   align-items: center;
 }
-header .header-cont .right-align .drop-menu li .material-icons {
+header .header-cont .right-align .drop-menu li .material-symbols-outlined {
   margin-right: 10px;
 }
 header .header-cont .right-align .window-controls {
@@ -106,13 +106,13 @@ header .header-subtitle span {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-header .header-subtitle .material-icons {
+header .header-subtitle .material-symbols-outlined {
   margin: 0 5px;
   font-size: 20px;
 }
-header .header-subtitle > div:first-child .material-icons:first-child {
+header .header-subtitle > div:first-child .material-symbols-outlined:first-child {
   margin-left: 0;
 }
-header .expanded .material-icons {
+header .expanded .material-symbols-outlined {
   transform: rotate(180deg);
 }

@@ -13,7 +13,7 @@
 .slug-editor:not(.editing) {
   align-items: center;
 }
-.slug-editor .material-icons {
+.slug-editor .material-symbols-outlined {
   font-size: 20px;
 }
 .slug-editor input {

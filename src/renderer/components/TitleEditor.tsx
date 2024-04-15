@@ -76,21 +76,21 @@ const TitleEditor: FunctionComponent<IProps> = ({
             className="btn btn-outline-primary btn-sm"
             onClick={() => setEditing(false)}
           >
-            <i className="material-icons">clear</i>
+            <i className="material-symbols-outlined">clear</i>
           </button>
           <button
             type="button"
             className="btn btn-primary btn-sm"
             onClick={() => save()}
           >
-            <i className="material-icons">check</i>
+            <i className="material-symbols-outlined">check</i>
           </button>
         </Fragment>
       ) : (
         <Fragment>
           <span title={post.title}>{post.title}</span>
           <i
-            className="material-icons clickable"
+            className="material-symbols-outlined clickable"
             onClick={() => {
               setValue(post.title);
               setEditing(true);

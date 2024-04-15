@@ -51,15 +51,15 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     setHeaderLeftComponent(
       <Fragment>
         <div className="align-center">
-          <i className="material-icons">public</i>
+          <i className="material-symbols-outlined">public</i>
           <a onClick={() => history.push(`/sites/${siteId}`)}>{title}</a>
         </div>
         <div className="align-center">
-          <i className="material-icons">keyboard_arrow_right</i>
+          <i className="material-symbols-outlined">keyboard_arrow_right</i>
           <a onClick={() => history.push(`/sites/${siteId}/menus`)}>Menus</a>
         </div>
         <div className="align-center">
-          <i className="material-icons">keyboard_arrow_right</i>
+          <i className="material-symbols-outlined">keyboard_arrow_right</i>
           <a onClick={() => history.push(`/sites/${siteId}/menus/${menuId}`)}>
             {menuId}
           </a>
@@ -269,7 +269,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         <h1>
           <div className="left-align">
             <i
-              className="material-icons clickable"
+              className="material-symbols-outlined clickable"
               onClick={() => history.goBack()}
             >
               arrow_back
@@ -293,7 +293,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                 className="btn btn-outline-danger"
                 onClick={() => deleteSelectedMenuEntries()}
               >
-                <i className="material-icons">delete</i>
+                <i className="material-symbols-outlined">delete</i>
               </button>
             )}
             <button
@@ -301,7 +301,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
               className="btn btn-primary"
               onClick={() => addNew()}
             >
-              <i className="material-icons">add</i>
+              <i className="material-symbols-outlined">add</i>
               <span>Add Item</span>
             </button>
             {menuChanged && (
@@ -310,7 +310,7 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                 className="btn btn-primary mr-2"
                 onClick={() => handleSave()}
               >
-                <span className="material-icons mr-2">save</span>
+                <span className="material-symbols-outlined mr-2">save</span>
                 <span>Save</span>
               </button>
             )}

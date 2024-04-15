@@ -56,7 +56,7 @@ const AboutModalContent = ({ version }) => {
         </div>
       </div>
       {/*<div className="row separator-bar mt-4 pt-4">
-        <i className="material-icons mr-2">insert_emoticon</i> If you like PRSS,
+        <i className="material-symbols-outlined mr-2">insert_emoticon</i> If you like PRSS,
         please consider&nbsp;
         <a
           href="https://github.com/hodgef/PRSS"

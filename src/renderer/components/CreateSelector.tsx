@@ -16,7 +16,7 @@ const CreateSelector: FunctionComponent = () => {
           <div className="left-align">
             {state.showBack && (
               <i
-                className="material-icons clickable"
+                className="material-symbols-outlined clickable"
                 onClick={() => history.goBack()}
               >
                 arrow_back

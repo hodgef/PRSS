@@ -24,7 +24,7 @@
 .editor-sidebar ul li:last-child {
   border-bottom: none;
 }
-.editor-sidebar ul li .material-icons {
+.editor-sidebar ul li .material-symbols-outlined {
   margin-right: 5px;
 }
 .editor-sidebar #theme-selector {
@@ -39,7 +39,7 @@
   align-items: center;
   opacity: 0.7;
 }
-.editor-sidebar .sidebar-more-toggle .material-icons {
+.editor-sidebar .sidebar-more-toggle .material-symbols-outlined {
   margin-right: 5px;
 }
 .editor-sidebar .editor-sidebar-more {

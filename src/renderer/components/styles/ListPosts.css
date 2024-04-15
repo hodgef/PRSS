@@ -20,7 +20,7 @@
   align-items: center;
   height: 100%;
 }
-.ListPosts .content ul .left-align > .material-icons {
+.ListPosts .content ul .left-align > .material-symbols-outlined {
   margin-right: 10px;
 }
 .ListPosts .content ul .left-align .form-check {
@@ -41,7 +41,7 @@
   display: flex;
   align-items: center;
 }
-.ListPosts .content .left-align > .material-icons {
+.ListPosts .content .left-align > .material-symbols-outlined {
   margin-right: 10px;
 }
 .ListPosts .site-post {

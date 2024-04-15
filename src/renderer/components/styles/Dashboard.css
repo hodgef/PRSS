@@ -2,9 +2,21 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  display: inline-flex;
+  display: flex;
+  gap: 20px;
   width: 100%;
   flex-wrap: wrap;
+}
+
+#app .Dashboard.page.fixed .content > .items {
+  flex: 1;
+  overflow: auto;
+  padding: 5px;
+}
+#app .Dashboard.page .content > .items {
+  flex: 1;
+  overflow: auto;
+  padding: 5px;
 }
 .Dashboard .content ul li {
   box-sizing: border-box;
@@ -15,7 +27,6 @@
   padding: 0 20px;
   height: 60px;
   align-items: center;
-  margin-bottom: 10px;
 }
 .Dashboard .content ul .left-align {
   flex: 1;
@@ -23,7 +34,7 @@
   align-items: center;
   height: 100%;
 }
-.Dashboard .content ul .left-align > .material-icons {
+.Dashboard .content ul .left-align > .material-symbols-outlined {
   margin-right: 10px;
 }
 .Dashboard .content ul .left-align .form-check {
@@ -40,23 +51,14 @@
   margin-left: 20px;
 }
 .Dashboard .content ul li {
-  width: calc(50% - 10px);
-  margin-bottom: 20px;
+  width: calc(90%/4);
+  min-width: 240px;
+  max-width: 400px;
   min-height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-flow: column;
-}
-.Dashboard .content ul li:nth-child(2n + 1) {
-  margin-right: 20px;
-}
-.Dashboard .content ul li {
-  width: calc(33% - 10px);
-  margin-right: 20px;
-}
-.Dashboard .content ul li:nth-child(2n + 1) {
-  margin-right: auto;
 }
 .Dashboard .content ul li:nth-child(3n) {
   margin-right: 0;
@@ -65,7 +67,7 @@
   box-shadow: 0 0 10px #ffc107;
   border-color: #e8c55f;
 }
-.Dashboard .content ul .material-icons {
+.Dashboard .content ul .material-symbols-outlined {
   font-size: 40px;
   margin-bottom: 10px;
   color: #464646;

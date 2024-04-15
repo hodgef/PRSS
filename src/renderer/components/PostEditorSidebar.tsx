@@ -102,7 +102,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
           {buildLoading ? (
             <Loading small classNames="mr-1" />
           ) : (
-            <i className="material-icons">save_alt</i>
+            <i className="material-symbols-outlined">save_alt</i>
           )}
 
           <span>{buildLoading ? loadingStatus : buildStr}</span>
@@ -125,7 +125,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
             {buildAllLoading ? (
               <Loading small classNames="mr-1" />
             ) : (
-              <i className="material-icons">all_inbox</i>
+              <i className="material-symbols-outlined">all_inbox</i>
             )}
 
             <span>{buildAllLoading ? loadingStatus : "Save & Build All"}</span>
@@ -149,7 +149,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
             {previewLoading ? (
               <Loading small classNames="mr-1" />
             ) : (
-              <i className="material-icons">stop</i>
+              <i className="material-symbols-outlined">stop</i>
             )}
             <span>Stop Preview</span>
           </li>
@@ -158,7 +158,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
             {previewLoading ? (
               <Loading small classNames="mr-1" />
             ) : (
-              <i className="material-icons">play_arrow</i>
+              <i className="material-symbols-outlined">play_arrow</i>
             )}
             <span>{previewLoading ? loadingStatus : "Preview"}</span>
           </li>
@@ -179,7 +179,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
           {deployLoading ? (
             <Loading small classNames="mr-1" />
           ) : (
-            <i className="material-icons">publish</i>
+            <i className="material-symbols-outlined">publish</i>
           )}
           <span>{deployLoading ? loadingStatus : "Publish"}</span>
           {publishSuggested && (
@@ -217,11 +217,11 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
             </div>
           </li>
           <li className="clickable" onClick={() => onOpenRawHTMLOverlay()}>
-            <span className="material-icons">code</span>{" "}
+            <span className="material-symbols-outlined">code</span>{" "}
             <span>Add Raw HTML code</span>
           </li>
           <li className="clickable" onClick={() => onOpenVarEditorOverlay()}>
-            <span className="material-icons">create</span>{" "}
+            <span className="material-symbols-outlined">create</span>{" "}
             <span>Edit Variables</span>
           </li>
           {/*<li className="clickable">
@@ -250,12 +250,12 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
       >
         {showMoreOptions ? (
           <Fragment>
-            <span className="material-icons">keyboard_arrow_up</span>{" "}
+            <span className="material-symbols-outlined">keyboard_arrow_up</span>{" "}
             <span>Less Settings</span>
           </Fragment>
         ) : (
           <Fragment>
-            <span className="material-icons">keyboard_arrow_down</span>{" "}
+            <span className="material-symbols-outlined">keyboard_arrow_down</span>{" "}
             <span>More Settings</span>
           </Fragment>
         )}

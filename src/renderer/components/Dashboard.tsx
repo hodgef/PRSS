@@ -44,7 +44,7 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     setHeaderLeftComponent(
       <Fragment>
         <div className="align-center">
-          <i className="material-icons">public</i>
+          <i className="material-symbols-outlined">public</i>
           <span>{title}</span>
         </div>
       </Fragment>
@@ -204,7 +204,7 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         <h1>
           <div className="left-align">
             <i
-              className="material-icons clickable"
+              className="material-symbols-outlined clickable"
               onClick={() => history.push("/sites")}
             >
               arrow_back
@@ -234,7 +234,7 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                   {loading === id ? (
                     <Loading medium classNames="mr-1" />
                   ) : (
-                    <i className="material-icons">{icon}</i>
+                    <i className="material-symbols-outlined">{icon}</i>
                   )}
 
                   <div className="feature-title">{title}</div>

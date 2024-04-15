@@ -20,7 +20,7 @@
   align-items: center;
   height: 100%;
 }
-.MenuEditor .content ul .left-align > .material-icons {
+.MenuEditor .content ul .left-align > .material-symbols-outlined {
   margin-right: 10px;
 }
 .MenuEditor .content ul .left-align .form-check {
@@ -45,7 +45,7 @@
   display: flex;
   align-items: center;
 }
-.MenuEditor .content .left-align > .material-icons {
+.MenuEditor .content .left-align > .material-symbols-outlined {
   margin-right: 10px;
 }
 .MenuEditor .site-post {

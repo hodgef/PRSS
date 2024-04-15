@@ -85,7 +85,7 @@ const ListSites: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         title,
         icon: (
           (!domain || (domain && domain.includes("github"))) ?
-          <i className="material-icons mr-2">public</i> : 
+          <i className="material-symbols-outlined mr-2">public</i> : 
           <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=24`} height="24" width="24" />
         ),
         children: [],
@@ -133,7 +133,7 @@ const ListSites: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                 className="btn btn-outline-danger"
                 onClick={() => deleteSelectedSites()}
               >
-                <i className="material-icons">delete</i>
+                <i className="material-symbols-outlined">delete</i>
               </button>
             )}
             <button
@@ -146,7 +146,7 @@ const ListSites: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                 })
               }
             >
-              <i className="material-icons">add</i>
+              <i className="material-symbols-outlined">add</i>
               <span>Create New</span>
             </button>
           </div>

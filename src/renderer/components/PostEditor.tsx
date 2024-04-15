@@ -91,16 +91,16 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     setHeaderLeftComponent(
       <Fragment>
         <div className="align-center">
-          <i className="material-icons">public</i>
+          <i className="material-symbols-outlined">public</i>
           <a onClick={() => history.push(`/sites/${siteId}`)}>{title}</a>
         </div>
         <div className="align-center">
-          <i className="material-icons">keyboard_arrow_right</i>
+          <i className="material-symbols-outlined">keyboard_arrow_right</i>
           <a onClick={() => history.push(`/sites/${siteId}/posts`)}>Posts</a>
         </div>
         {post && (
           <div className="align-center">
-            <i className="material-icons">keyboard_arrow_right</i>
+            <i className="material-symbols-outlined">keyboard_arrow_right</i>
             <span>{truncateString(post.title, 30)}</span>
           </div>
         )}
@@ -421,7 +421,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         <h1>
           <div className="left-align">
             <i
-              className="material-icons clickable"
+              className="material-symbols-outlined clickable"
               onClick={() => history.goBack()}
             >
               arrow_back

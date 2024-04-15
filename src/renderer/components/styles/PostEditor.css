@@ -8,7 +8,7 @@
   align-items: center;
   width: 65%;
 }
-#app .PostEditor > .content > h1 .left-align > .material-icons {
+#app .PostEditor > .content > h1 .left-align > .material-symbols-outlined {
   margin-right: 10px;
 }
 #app .PostEditor > .content > h1 .right-align {
@@ -37,7 +37,7 @@
   align-items: center;
   height: 100%;
 }
-#app .PostEditor > .content > h1 ul .left-align > .material-icons {
+#app .PostEditor > .content > h1 ul .left-align > .material-symbols-outlined {
   margin-right: 10px;
 }
 #app .PostEditor > .content > h1 ul .left-align .form-check {

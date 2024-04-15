@@ -78,7 +78,7 @@ const SiteSetupGithub: FunctionComponent<IProps> = ({ onChange }) => {
             modal.alert(repoDescription, null, "hosting-field-desc", null, "gh-create-repo-info")
           }
         >
-          <span className="material-icons mr-2">info</span>
+          <span className="material-symbols-outlined mr-2">info</span>
         </div>
       </div>
     </div>

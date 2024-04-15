@@ -21,7 +21,7 @@
     align-items: center;
     height: 100%;
 
-    > .material-icons {
+    > .material-symbols-outlined {
       margin-right: 10px;
     }
 
@@ -131,7 +131,7 @@
       align-items: center;
     }
 
-    .material-icons {
+    .material-symbols-outlined {
       margin-right: 10px;
     }
   }
