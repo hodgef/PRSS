@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "prss",
-  "version": "1.8.4",
+  "version": "1.9.0",
   "description": "Powerful Blogging",
   "license": "GPL-3.0-or-later",
   "main": "build/index.js",
@@ -87,7 +87,9 @@
     "html-webpack-plugin": "^5.5.0",
     "jest": "^27.5.1",
     "live-server": "^1.2.1",
+    "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^2.6.0",
+    "node-machine-id": "^1.1.12",
     "react": "^17.0.0",
     "react-ace": "^10.1.0",
     "react-dom": "^17.0.0",

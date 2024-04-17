@@ -6,6 +6,8 @@ import cx from "classnames";
 import { noop } from "../services/utils";
 import { flattenStructure, structureHasItem } from "../services/build";
 import { IStructureItem } from "../../common/interfaces";
+import { storeInt } from "../../common/bootstrap";
+import { uniq, compact } from "lodash";
 
 interface IProps {
   checkable?: boolean;
@@ -31,6 +33,8 @@ interface IState {
   expandedKeys: React.Key[];
   firstItemTitle: string;
   firstItemKey: string;
+  blogItemKey: string;
+  savedExpandedKeys: string[];
 }
 
 const { Search } = Input;
@@ -42,6 +46,12 @@ class DraggableTree extends React.Component<IProps, IState> {
     const firstItemKey = props.data?.[0]?.key;
     const firstItemTitle = props.data?.[0]?.title;
 
+    // Expand blog key 
+    const blogItemKey = props.data?.[0]?.children?.length < 10 ? props.data?.[0]?.children?.[0]?.key : null;
+    
+    // Track posts last expanded
+    const savedExpandedKeys = compact([...(storeInt.get("postsLastExpanded") || []), blogItemKey]);
+
     this.state = {
       gData: props.data,
       searchValue: "",
@@ -49,7 +59,9 @@ class DraggableTree extends React.Component<IProps, IState> {
       itemsContainingSearch: [],
       expandedKeys: [],
       firstItemKey,
-      firstItemTitle
+      firstItemTitle,
+      blogItemKey,
+      savedExpandedKeys
     };
   }
 
@@ -146,7 +158,10 @@ class DraggableTree extends React.Component<IProps, IState> {
   onExpand = (newExpandedKeys: React.Key[]) => {
     this.setState({
       expandedKeys: newExpandedKeys,
+      savedExpandedKeys: [],
       autoExpandParent: false
+    }, () => {
+      storeInt.set("postsLastExpanded", newExpandedKeys);
     })
   }
 
@@ -238,7 +253,7 @@ class DraggableTree extends React.Component<IProps, IState> {
           onDragEnter={this.onDragEnter}
           onDrop={this.onDrop}
           treeData={this.state.gData}
-          expandedKeys={[this.state.firstItemKey, ...this.state.expandedKeys]}
+          expandedKeys={uniq([this.state.firstItemKey, ...this.state.savedExpandedKeys, ...this.state.expandedKeys])}
           onExpand={this.onExpand}
           onSelect={onSelect}
           onCheck={(chk: any) => {
