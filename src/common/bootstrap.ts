@@ -6,7 +6,7 @@ import {
   mapFieldsFromJSON,
   getPRSSConfig,
 } from "../renderer/services/utils";
-import { getConfigPath, getCurrentVersion, getStaticPath } from "./utils";
+import { getConfigPath, getCurrentVersion, getPlatform, getStaticPath, isAppx } from "./utils";
 import { IConfig, IStore, IStoreInternal } from "./interfaces";
 import { machineIdSync } from 'node-machine-id';
 
@@ -37,10 +37,22 @@ let machineId;
 const cache = {};
 
 const expressUrl = "http://127.0.0.1:3001";
-export const getApiUrl = (path = "/") => `https://prss.volted.co/${path}`;
-export const getApiUrlWithParams = (path = "/") => {
-  return getApiUrl(machineId ? `${path}/${getCurrentVersion()}/${machineId}`: `${path}/${getCurrentVersion()}`);
-}
+export const getApiUrl = (path = "/") => {
+  const url = new URL(`https://prss.volted.co/${path}`);
+  if(isAppx()){
+    url.searchParams.set("s", "1");
+  }
+  if(getPlatform()){
+    url.searchParams.set("p", getPlatform());
+  }
+  if(machineId){
+    url.searchParams.set("m", machineId);
+  }
+  if(getCurrentVersion()){
+    url.searchParams.set("v", getCurrentVersion());
+  }
+  return url.href;
+};
 
 export const setHook = (name, fct) => {
   hooks[name] = fct;

@@ -5,7 +5,6 @@ import stopwords from "../json/stopwords.json";
 import React from "react";
 import {
   getApiUrl,
-  getApiUrlWithParams,
   getCache,
   setCache,
   storeInt,
@@ -100,7 +99,7 @@ export const dispatchPRSSEvent = (inputBody) => {
 };
 
 export const enableAddon = (addon_id: string) => {
-  const url = getApiUrlWithParams('addons');
+  const url = getApiUrl('addons');
   require("request")(
     {
       url,
@@ -116,7 +115,7 @@ export const enableAddon = (addon_id: string) => {
 };
 
 export const disableAddon = (addon_id: string) => {
-  const url = getApiUrlWithParams('addons');
+  const url = getApiUrl('addons');
   require("request")(
     {
       url,
@@ -370,7 +369,7 @@ export const sanitizeSite = (siteObj) => {
 };
 
 export const getPRSSConfig = async (): Promise<IConfig> => {
-  return ((await getJson(getApiUrlWithParams("config"))) || {}) as any;
+  return ((await getJson(getApiUrl("config"))) || {}) as any;
 };
 
 export const getLatestVersion = async () => {

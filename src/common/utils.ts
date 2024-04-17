@@ -95,8 +95,12 @@ export const getRootPath = (): string => {
   return app.isPackaged ? app.getPath('userData') : app.getPath('exe').split("node_modules")[0];
 }
 
+export const isAppx = () => process.resourcesPath?.includes("WindowsApps");
+
+export const getPlatform = () => process.platform;
+
 export const getStaticPath = (): string => {
-  return path.join(app.isPackaged && !process.resourcesPath?.includes("WindowsApps") ? process.resourcesPath : getRootPath(), 'static');
+  return path.join(app.isPackaged && !isAppx() ? process.resourcesPath : getRootPath(), 'static');
 };
 
 export const getCurrentVersion = () => {
