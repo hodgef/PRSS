@@ -509,7 +509,11 @@ const PRSSAI: FunctionComponent<IProps> = ({
                     <Accordion.Body>
                       <div className="mb-4">Ask anything to the model.</div>
                       <InputGroup className="mb-3">
-                        <Form.Control value={prompt} onChange={(e) => setPrompt(e.target.value)} disabled={promptBusy} />
+                        <Form.Control value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handlePrompt();
+                          }
+                        }} disabled={promptBusy} />
                         <Button variant="outline-secondary" onClick={() => handlePrompt()} disabled={promptBusy}>
                             {promptBusy ? (
                               <Spinner animation="grow" size="sm" />
