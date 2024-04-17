@@ -211,7 +211,7 @@ const PRSSAI: FunctionComponent<IProps> = ({
           articleText
             .slice(0, articleText.indexOf("\n"))
             .replace("Headline:", "")
-            .replace("Title:")
+            .replace("Title:", "")
             .replace(/[\*]+?/gm, '')
             .trim();
 
