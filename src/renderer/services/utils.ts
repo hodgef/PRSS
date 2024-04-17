@@ -1,14 +1,16 @@
 import fs from "fs";
-import { configSet } from "../../common/utils";
+import { configSet, getCurrentVersion } from "../../common/utils";
 import { modal } from "../components/Modal";
 import stopwords from "../json/stopwords.json";
 import React from "react";
 import {
   getApiUrl,
+  getApiUrlWithParams,
   getCache,
   setCache,
   storeInt,
 } from "../../common/bootstrap";
+import { IConfig } from "../../common/interfaces";
 
 export const merge = (var1, var2) => {
   if (Array.isArray(var1) && Array.isArray(var2)) {
@@ -56,6 +58,10 @@ export const camelCase = (str: string) => {
     .replace(/\s+/g, "");
 };
 
+export const removeSpecialChars = (str: string) => {
+  return str?.match(/[\p{L}\s\d\?\.\+\*!-]+/ug)?.join(" ")?.replace(/[ |\s|\n]{2,}/g, " ") || ""
+}
+
 export const getJson = (url, cache = false) => {
   return new Promise((resolve) => {
     if (cache && getCache(url)) {
@@ -78,7 +84,7 @@ export const getJson = (url, cache = false) => {
 };
 
 export const dispatchPRSSEvent = (inputBody) => {
-  const url = getApiUrl(`r/v${getCurrentVersion()}`);
+  const url = getApiUrl(`r/${getCurrentVersion()}`);
   require("request")(
     {
       url,
@@ -86,6 +92,38 @@ export const dispatchPRSSEvent = (inputBody) => {
       headers: { "User-Agent": getUserAgent() },
       method: "POST",
       body: inputBody
+    },
+    function (error, response, body) {
+      console.log("Request", url, response?.statusCode);
+    }
+  );
+};
+
+export const enableAddon = (addon_id: string) => {
+  const url = getApiUrlWithParams('addons');
+  require("request")(
+    {
+      url,
+      json: true,
+      headers: { "User-Agent": getUserAgent() },
+      method: "POST",
+      body: { addon_id }
+    },
+    function (error, response, body) {
+      console.log("Request", url, response?.statusCode);
+    }
+  );
+};
+
+export const disableAddon = (addon_id: string) => {
+  const url = getApiUrlWithParams('addons');
+  require("request")(
+    {
+      url,
+      json: true,
+      headers: { "User-Agent": getUserAgent() },
+      method: "DELETE",
+      body: { addon_id }
     },
     function (error, response, body) {
       console.log("Request", url, response?.statusCode);
@@ -321,7 +359,7 @@ export const sanitizeSite = (siteObj) => {
     "theme",
     "publishedAt",
     "headHtml",
-    "footerHtml",
+  "footerHtml",
     "sidebarHtml",
     "vars",
   ].forEach((field) => {
@@ -331,28 +369,12 @@ export const sanitizeSite = (siteObj) => {
   return newObj;
 };
 
-export const getPRSSConfig = async () => {
-  const res = ((await getJson(getApiUrl(`config/v${getCurrentVersion()}`))) || {}) as any;
-  return res;
+export const getPRSSConfig = async (): Promise<IConfig> => {
+  return ((await getJson(getApiUrlWithParams("config"))) || {}) as any;
 };
 
 export const getLatestVersion = async () => {
-  const res = ((await getJson(getApiUrl("version"))) || {}) as any;
-  return res;
-};
-
-export const getCurrentVersion = () => {
-  const isDevelopment = process.env.NODE_ENV !== "production";
-  const { app } = require("@electron/remote");
-  let currentVersion;
-
-  if (isDevelopment) {
-    currentVersion = require("../../../package.json").version;
-  } else {
-    currentVersion = app.getVersion();
-  }
-
-  return currentVersion;
+  return ((await getJson(getApiUrl("version"))) || {}) as any;
 };
 
 export const notifyNewVersion = async (newVersion) => {

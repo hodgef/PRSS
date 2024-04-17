@@ -1,0 +1,39 @@
+.Addons .page-card {
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px;
+  box-shadow: 0 5px 10px #0600ff4a;
+  padding: 10px 0 25px 10px;
+  overflow: hidden;
+}
+
+.Addons .card-content {
+  height: 100%;
+  width: 47%;
+  min-width: 450px;
+  background: white;
+  border-radius: 10px;
+  display: flex;
+  flex-flow: column;
+  overflow: hidden;
+  box-shadow: 0 5px 5px #00000021;
+}
+
+.Addons .card-content-desc {
+  padding: 30px;
+  flex: 1;
+}
+
+.Addons .card-text {
+  flex: 1;
+}
+
+.Addons .card-button-area {
+  background: #f0f0f0;
+  padding: 20px;
+}
+
+.Addons button.btn {
+  display: flex;
+  align-items: center;
+}

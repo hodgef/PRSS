@@ -25,6 +25,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
   onSave,
   previewMode,
 }) => {
+  const [isUneditable] = useState(post.slug.toLowerCase() === "home" || post.slug.toLowerCase() === "blog");
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(post.slug);
   const [bufferItems, setBufferItems] = useState(null);
@@ -49,6 +50,11 @@ const SlugEditor: FunctionComponent<IProps> = ({
   const save = async () => {
     if (!value.trim()) {
       modal.alert(["site_slug_val", []]);
+      return;
+    }
+
+    if(isUneditable){
+      modal.alert(["site_slug_protected", [value]]);
       return;
     }
 
@@ -133,15 +139,17 @@ const SlugEditor: FunctionComponent<IProps> = ({
                 {value}
               </a>
 
-              <i
-                className="material-symbols-outlined clickable"
-                onClick={() => {
-                  setValue(post.slug);
-                  setEditing(true);
-                }}
-              >
-                edit
-              </i>
+              {!isUneditable && (
+                <i
+                  className="material-symbols-outlined clickable"
+                  onClick={() => {
+                    setValue(post.slug);
+                    setEditing(true);
+                  }}
+                >
+                  edit
+                </i>
+              )}
             </Fragment>
           ) : (
             <a

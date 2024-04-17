@@ -22,6 +22,8 @@ import { configGet } from "../../common/utils";
 import Header from "./Header";
 import SiteSetup from "./SiteSetup";
 import RouteWrapper from "./RouteWrapper";
+import Addons from "./Addons";
+import PRSSAI from "./PRSSAI";
 
 const App: FunctionComponent = () => {
   const [headerLeft, setHeaderLeft] = useState(null);
@@ -88,6 +90,18 @@ const App: FunctionComponent = () => {
             exact
             path="/sites/:siteId/settings"
             render={(props) => handleRoute(SiteSettings, props)}
+          />
+
+          <Route
+            exact
+            path="/sites/:siteId/addons"
+            render={(props) => handleRoute(Addons, props)}
+          />
+
+          <Route
+            exact
+            path="/sites/:siteId/prssai"
+            render={(props) => handleRoute(PRSSAI, props)}
           />
 
           <Route

@@ -9,6 +9,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-height: 22px;
 }
 .slug-editor:not(.editing) {
   align-items: center;

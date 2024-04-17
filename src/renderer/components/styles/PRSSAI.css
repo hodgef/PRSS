@@ -1,0 +1,14 @@
+.PRSSAI .form-group {
+    display: flex;
+    flex-flow: column;
+    margin-bottom: 0;
+}
+
+.PRSSAI button.btn.btn-outline-primary {
+    display: flex;
+}
+
+.PRSSAI .accordion .fade.toast.show {
+    max-width: unset;
+    width: 100%;
+}

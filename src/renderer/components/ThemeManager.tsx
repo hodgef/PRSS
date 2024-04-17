@@ -250,7 +250,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
                     </div>
                     <div className="right-align">
                       {authorFormatted && (
-                        <span className="material-symbols-outlined" title="Theme Info" onClick={() => showThemeDetails(theme)}>
+                        <span style={{ cursor: "pointer" }} className="material-symbols-outlined" title="Theme Info" onClick={() => showThemeDetails(theme)}>
                           info
                         </span>
                       )}

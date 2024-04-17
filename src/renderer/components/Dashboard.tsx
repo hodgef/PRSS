@@ -25,7 +25,6 @@ interface IProps {
 
 const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const { siteId } = useParams() as any;
-
   const [site, setSite] = useState<ISite>(null);
   const [publishSuggested, setPublishSuggested] = useState(null);
   const [loading, setLoading] = useState(null);
@@ -137,6 +136,45 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       },
     },
   ];
+
+  if (prssConfig.available_addons) {
+    features.push({
+      id: "addons",
+      title: getString("addons"),
+      description: getString("addons_description"),
+      icon: "extension",
+      className: "",
+      tooltip: "",
+      onClick: () => {
+        history.push({
+          pathname: `/sites/${siteId}/addons`,
+          state: { showBack: true },
+        });
+      },
+    })
+
+    if(prssConfig.subscribed_addons){
+      prssConfig.available_addons.forEach(addon => {
+        if(!prssConfig.subscribed_addons.includes(addon.id)){
+          return;
+        }
+        features.push({
+          id: addon.id,
+          title: addon.display_name,
+          description: addon.short_description,
+          icon: addon.icon,
+          className: "",
+          tooltip: "",
+          onClick: () => {
+            history.push({
+              pathname: `/sites/${siteId}/${addon.id}`,
+              state: { showBack: true },
+            });
+          },
+        });
+      })
+    }
+  }
 
   if (url) {
     features.push({

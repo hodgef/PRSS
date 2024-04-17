@@ -71,10 +71,23 @@
   width: 100%;
   max-height: 45px;
 }
+#app .modal-wide {
+  max-width: unset !important;
+  width: 90% !important;
+}
+#app .modal-wide > div > div > div {
+  max-height: 50vh;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
 #app h1 button.btn {
   display: flex;
   align-items: center;
   margin-right: 10px;
+}
+#app button.btn[class*=btn-] {
+  display: flex;
+  align-items: center;
 }
 #app h1 button.btn:last-child {
   margin-right: 0;
@@ -95,11 +108,54 @@
   display: flex;
   align-items: center;
 }
+#app h1 .left-align span {
+  margin-top: -5px;
+}
+#app label.form-label, #app label.col-form-label {
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+#app .accordion {
+  box-shadow: 0 0 8px #dfdfdf;
+  border-radius: 19px;
+  overflow: hidden;
+  border: 1px solid #d5d5d5;
+}
+#app .accordion-body {
+  padding: 5px 20px 15px;
+}
+#app .accordion-button {
+  transition: all 0.3s ease-in-out;
+}
+#app .accordion-button.collapsed {
+  opacity: 0.7;
+  background: #fbfbfb;
+}
+#app .accordion-body .input-group button.btn[class*="btn-outline"] {
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+}
+#app .accordion-button:hover {
+  opacity: 1;
+}
+#app .accordion-button:not(.collapsed) {
+  color: unset;
+  background-color: unset;
+  box-shadow: unset;
+  font-size: 20px;
+  font-weight: 500;
+  padding: 20px 20px 10px 20px;
+}
+#app .accordion-item {
+  border: none;
+}
 #app h1 .left-align .material-symbols-outlined {
   font-size: 30px;
   margin-right: 10px;
 }
-#app h2 {
+#app .editor-content h2 {
   font-size: 20px;
   margin: 15px 0;
 }
@@ -184,7 +240,7 @@
   color: white;
   background: #4c4c4c;
   border-radius: 8px;
-  padding: 5px 10px;
+  padding: 2px 10px;
   overflow-x: hidden;
   overflow-y: auto;
 }

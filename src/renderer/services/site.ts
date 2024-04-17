@@ -57,15 +57,17 @@ export const getSampleSiteStructure = (): {
   };
 };
 
+const getCommonProps = () => ({
+  headHtml: null,
+  footerHtml: null,
+  sidebarHtml: null,
+  updatedAt: null,
+  createdAt: Date.now(),
+  vars: {},
+});
+
 export const getSampleSiteItems = (siteUUID: string) => {
-  const commonProps = {
-    headHtml: null,
-    footerHtml: null,
-    sidebarHtml: null,
-    updatedAt: null,
-    createdAt: Date.now(),
-    vars: {},
-  };
+  const commonProps = getCommonProps();
 
   return {
     home: {
@@ -102,6 +104,20 @@ export const getSampleSiteItems = (siteUUID: string) => {
     },
   };
 };
+
+export const getSamplePost = (siteUUID: string, partialPost: Partial<IPostItem> = {}): IPostItem => {
+  const commonProps = getCommonProps();
+  return {
+    ...commonProps,
+    uuid: uuidv4(),
+    siteId: siteUUID,
+    slug: "my-post",
+    title: "My Post",
+    content: "<p>This is my first post.</p>",
+    template: "post",
+    ...partialPost
+  }
+}
 
 export const getSampleSiteIntStructure = () => {
   return {

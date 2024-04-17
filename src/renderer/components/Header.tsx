@@ -18,10 +18,10 @@ import maxImg from "../images/icons/max-k-30.png";
 import restoreImg from "../images/icons/restore-k-30.png";
 import closeImg from "../images/icons/close-k-30.png";
 
-import { configGet } from "../../common/utils";
+import { configGet, getCurrentVersion } from "../../common/utils";
 import { modal } from "./Modal";
 import AboutModalContent from "./AboutModalContent";
-import { getCurrentVersion, notifyNewVersion } from "../services/utils";
+import { notifyNewVersion } from "../services/utils";
 import { prssConfig } from "../../common/bootstrap";
 import versionCompare from "semver-compare";
 

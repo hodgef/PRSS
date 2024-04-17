@@ -1,4 +1,4 @@
-#app footer {
+#app .page > footer {
   padding: 5px 10px;
   box-sizing: border-box;
   display: flex;
@@ -9,25 +9,25 @@
   box-shadow: -6px -6px 12px 2px #eaeaea;
   border-top: 1px solid whitesmoke;
 }
-#app footer .left-align,
-#app footer .right-align {
+#app .page > footer .left-align,
+#app .page > footer .right-align {
   display: flex;
   flex: 1;
 }
-#app footer .left-align {
+#app .page > footer .left-align {
   justify-content: flex-start;
 }
-#app footer .right-align {
+#app .page > footer .right-align {
   justify-content: flex-end;
 }
-#app footer .right-align .version-tag {
+#app .page > footer .right-align .version-tag {
   opacity: 0.3;
   text-transform: none;
 }
-#app footer .right-align .version-tag:hover {
+#app .page > footer .right-align .version-tag:hover {
   opacity: 1;
 }
-#app footer .credit {
+#app .page > footer .credit {
   opacity: 0.3;
   color: #343435;
 }

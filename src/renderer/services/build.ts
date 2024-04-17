@@ -551,7 +551,7 @@ export const getStructurePaths = (nodes, prefix = "", store = []) => {
   return store;
 };
 
-export const parseNodes = (node, itemCb?: any, posts: any[] = []) => {
+export const parseNodes = (node: IStructureItem, itemCb?: (post: IPostItem, node?: IStructureItem) => any, posts: any[] = []) => {
   const { key, title, children = [] } = node;
   const post = posts.find((p) => p.uuid === node.key/* && p.siteId === siteUUID*/);
   if (!post) return node;
@@ -658,7 +658,7 @@ export const findParentInStructure = (
 
 export const insertStructureChildren = (
   structureItemIn: IStructureItem,
-  itemToInsert,
+  itemToInsert: IStructureItem,
   parentPostId: string
 ) => {
   const structureItem = { ...structureItemIn };

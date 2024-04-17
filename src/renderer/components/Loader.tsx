@@ -26,11 +26,11 @@ const Loader: FunctionComponent = () => {
     React.useEffect(() => {
         //openDevTools();
         const init = async () => {
-            setLoadingText("Initializing Configuration");
-            await initConfig();
-
             setLoadingText("Initializing Storage");
             await initStore();
+
+            setLoadingText("Initializing Configuration");
+            await initConfig();
 
             setLoadingText("Initializing Database");
             await initDb();

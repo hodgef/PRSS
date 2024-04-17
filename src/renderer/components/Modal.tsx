@@ -112,7 +112,8 @@ class Modal extends Component {
           <div
             style={{
               width: "100%",
-              maxWidth: 300,
+              maxWidth: 450,
+              minWidth: 450,
               overflow: "hidden",
             }}
             className={this.state.contentClassName}
@@ -220,7 +221,8 @@ class Modal extends Component {
           <div
             style={{
               width: "100%",
-              maxWidth: 300,
+              maxWidth: 450,
+              minWidth: 450,
               overflow: "hidden",
             }}
             className={this.state.contentClassName}
@@ -319,7 +321,8 @@ class Modal extends Component {
           <div
             style={{
               width: "100%",
-              maxWidth: 300,
+              maxWidth: 450,
+              minWidth: 450,
               overflow: "hidden",
             }}
             className={this.state.contentClassName}

@@ -13,6 +13,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: -5px;
+  min-height: 40px;
 }
 .title-editor input {
   height: 36px;

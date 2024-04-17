@@ -19,6 +19,28 @@ export interface ISite {
     menus: ISiteMenus;
 }
 
+export interface IConfigThemes {
+    [key: string]: string;
+}
+
+export interface IConfigAddons {
+    id: string;
+    display_name: string;
+    short_description: string;
+    title: string;
+    description: string;
+    min_version: string;
+    icon: string;
+}
+
+export interface IConfig {
+    version: string;
+    latest: string;
+    themes: IConfigThemes;
+    subscribed_addons: string[];
+    available_addons: IConfigAddons[];
+}
+
 export interface ISiteVar {
     [key: string]: string;
 }

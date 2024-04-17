@@ -6,8 +6,9 @@ import {
   mapFieldsFromJSON,
   getPRSSConfig,
 } from "../renderer/services/utils";
-import { getConfigPath, getStaticPath } from "./utils";
-import { IStore, IStoreInternal } from "./interfaces";
+import { getConfigPath, getCurrentVersion, getStaticPath } from "./utils";
+import { IConfig, IStore, IStoreInternal } from "./interfaces";
+import { machineIdSync } from 'node-machine-id';
 
 export const JSON_FIELDS = [
   "structure",
@@ -31,11 +32,15 @@ export let db;
 export let expressApp;
 export let expressServer;
 export let hooks = {};
-export let prssConfig;
+export let prssConfig: IConfig;
+let machineId;
 const cache = {};
 
 const expressUrl = "http://127.0.0.1:3001";
 export const getApiUrl = (path = "/") => `https://prss.volted.co/${path}`;
+export const getApiUrlWithParams = (path = "/") => {
+  return getApiUrl(machineId ? `${path}/${getCurrentVersion()}/${machineId}`: `${path}/${getCurrentVersion()}`);
+}
 
 export const setHook = (name, fct) => {
   hooks[name] = fct;
@@ -149,6 +154,12 @@ export const initStore = () => {
       defaultsInt,
     } as any);
 
+    machineId = storeInt.get("machineId");
+    if(!machineId){
+      machineId = machineIdSync();
+      storeInt.set({ machineId });
+    }
+
     const staticsPath = getStaticPath();
 
     console.log("_static", staticsPath);
@@ -177,8 +188,6 @@ export const initStore = () => {
     storeInt.set({
       paths: storeIntPaths
     });
-
-    console.log("storeIntPaths", storeIntPaths);
     
     /**
      * Store

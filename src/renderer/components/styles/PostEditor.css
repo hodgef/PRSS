@@ -1,6 +1,7 @@
 #app .PostEditor > .content > h1 {
   padding-bottom: 0;
   margin-bottom: 10px;
+  height: 45px;
 }
 #app .PostEditor > .content > h1 .left-align {
   flex: 1;
