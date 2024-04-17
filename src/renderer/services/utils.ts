@@ -1,5 +1,5 @@
 import fs from "fs";
-import { configSet, getCurrentVersion } from "../../common/utils";
+import { getCurrentVersion } from "../../common/utils";
 import { modal } from "../components/Modal";
 import stopwords from "../json/stopwords.json";
 import React from "react";
@@ -403,7 +403,7 @@ export const notifyNewVersion = async (newVersion) => {
      */
     window.open("https://hodgef.com/prss/?d=update");
   } else if (response === 1) {
-    configSet("updateCheckSnoozeUntil", Date.now() + 604800000);
+    storeInt.set("updateCheckSnoozeUntil", Date.now() + 604800000);
   }
 };
 

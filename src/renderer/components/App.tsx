@@ -2,15 +2,16 @@ import "./styles/App.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "react-toastify/dist/ReactToastify.css";
 
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+import versionCompare from "semver-compare";
 import cx from "classnames";
 
 import Dashboard from "./Dashboard";
 import ListPosts from "./ListPosts";
 import ListSites from "./ListSites";
-import { StandardModal } from "./Modal";
+import { StandardModal, modal } from "./Modal";
 import PostEditor from "./PostEditor";
 import CreatePost from "./CreatePost";
 import SiteSettings from "./SiteSettings";
@@ -18,12 +19,14 @@ import AppSettings from "./AppSettings";
 import ThemeManager from "./ThemeManager";
 import ListMenus from "./ListMenus";
 import MenuEditor from "./MenuEditor";
-import { configGet } from "../../common/utils";
+import { configGet, getCurrentVersion } from "../../common/utils";
 import Header from "./Header";
 import SiteSetup from "./SiteSetup";
 import RouteWrapper from "./RouteWrapper";
 import Addons from "./Addons";
 import PRSSAI from "./PRSSAI";
+import { prssConfig, storeInt } from "../../common/bootstrap";
+import { notifyNewVersion } from "../services/utils";
 
 const App: FunctionComponent = () => {
   const [headerLeft, setHeaderLeft] = useState(null);
@@ -49,6 +52,25 @@ const App: FunctionComponent = () => {
       />
     );
   };
+
+  useEffect(() => {
+    if(!prssConfig?.latest){
+      modal.alert("The PRSS Configuration could not be loaded. Some functionality (such as themes) will be broken. Please ensure that PRSS has internet connection.", "PRSS Config Error");
+    } else {
+      // Appx: Notify about updates
+      const latestVersion = prssConfig.latest;
+      if(latestVersion && versionCompare(latestVersion, getCurrentVersion()) > 0){
+          const snooze = storeInt.get("updateCheckSnoozeUntil");
+          console.log("updateCheckSnoozeUntil", snooze);
+
+          if(!snooze || (snooze && new Date() > new Date(parseInt(snooze)))){
+              new Notification(`PRSS version ${latestVersion} is available`, { body: "Click here to learn more." }).onclick = () => {
+                  notifyNewVersion(latestVersion);
+              }
+          }
+      }
+    }
+  }, []);
 
   return (
     <div className={cx("app-content", appClass)}>
@@ -156,7 +178,6 @@ const App: FunctionComponent = () => {
           <Redirect to="/" />
         </Switch>
       </HashRouter>
-
       <StandardModal />
       <ToastContainer
         className="toast-container"

@@ -162,8 +162,10 @@ app.whenReady().then(() => {
   createWindow();
 
   // Check for updates
-  autoUpdater.checkForUpdatesAndNotify();
-
+  if(!process.resourcesPath?.includes("WindowsApps")){
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+  
   // Handle protocol launch
   handleProtocolLaunch(process.argv);
 
