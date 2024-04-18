@@ -8,12 +8,18 @@ Enzyme.configure({ adapter: new Adapter() });
 jest.mock("../../../common/bootstrap", () => ({
   store: {
     get: () => ({}),
+    set: () => ({}),
+  },
+  storeInt: {
+    get: () => ({}),
+    set: () => ({}),
   },
   prssConfig: {
     version: "1.0.0",
   },
   clearHooks: () => {},
   setHook: () => {},
+  getApiUrl: () => {}
 }));
 
 it("app-content container should be defined", () => {
