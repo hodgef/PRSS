@@ -1,8 +1,8 @@
 
 <p align="center">
- <img src="https://github.com/hodgef/PRSS/assets/25509135/b3d5710c-9ef2-487a-9c6f-b8e69b4a527e" width="150" />
+ <a href="https://prss.io"><img src="https://github.com/hodgef/PRSS/assets/25509135/b3d5710c-9ef2-487a-9c6f-b8e69b4a527e" width="150" /></a>
  <p align="center">Cross-platform static site generator for blazing fast blogs, documentation sites and more.</p>
- <p align="center"><img src="https://github.com/hodgef/PRSS/assets/25509135/07351dab-0c87-4560-a5cf-a34dadc4f180" width="800" /></p>
+ <p align="center"><a href="https://prss.io"><img src="https://github.com/hodgef/PRSS/assets/25509135/07351dab-0c87-4560-a5cf-a34dadc4f180" width="800" /></a></p>
 </p>
 
 ### 📦 Installation & Usage
