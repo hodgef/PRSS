@@ -41,7 +41,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
   } = siteInt;
 
   const [site, setSite] = useState<ISite>(null);
-  const { title, headHtml, footerHtml, sidebarHtml } = site || {};
+  const { title, headHtml, footerHtml, sidebarHtml, url: resSiteUrl } = site || {};
 
   const [siteTitle, setSiteTitle] = useState("");
   const [editedSiteName, setEditedSiteName] = useState("");
@@ -123,7 +123,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
       return;
     }
 
-    if (!siteUrl) {
+    if (!siteUrl && resSiteUrl) {
       modal.alert(["site_cfg_url_missing", []]);
       return;
     }
