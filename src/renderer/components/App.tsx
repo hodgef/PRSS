@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import versionCompare from "semver-compare";
 import cx from "classnames";
 
@@ -27,8 +27,10 @@ import Addons from "./Addons";
 import PRSSAI from "./PRSSAI";
 import { prssConfig, storeInt } from "../../common/bootstrap";
 import { notifyNewVersion } from "../services/utils";
+import { Provider } from "./UseProvider";
+import { Helmet } from "react-helmet";
 
-const App: FunctionComponent = () => {
+export const App: FunctionComponent = () => {
   const [headerLeft, setHeaderLeft] = useState(null);
   const [appClass, setAppClass] = useState("");
   const [history, setHistory] = useState(null);
@@ -73,119 +75,128 @@ const App: FunctionComponent = () => {
   }, []);
 
   return (
-    <div className={cx("app-content", appClass)}>
-      <div className="app-background" />
-      <Header headerLeft={headerLeft} history={history} />
-      <HashRouter>
-        <Switch>
-          <Route
-            exact
-            path="/sites"
-            render={(props) => handleRoute(ListSites, props)}
-          />
+    <Provider>
+      <Helmet>
+        <style type="text/css">{`
+            body.jodit_fullsize-box_true, html.jodit_fullsize-box_true {
+              height: unset !important;
+              overflow: unset !important;
+              width: unset !important;
+            }
+        `}</style>
+      </Helmet>
+      <div className={cx("app-content", appClass)}>
+        <div className="app-background" />
+        <Header headerLeft={headerLeft} history={history} />
+        <HashRouter>
+          <Switch>
+            <Route
+              exact
+              path="/sites"
+              render={(props) => handleRoute(ListSites, props)}
+            />
 
-          <Route
-            exact
-            path="/settings"
-            render={(props) => handleRoute(AppSettings, props)}
-          />
+            <Route
+              exact
+              path="/settings"
+              render={(props) => handleRoute(AppSettings, props)}
+            />
 
-          <Route
-            exact
-            path="/sites/create"
-            render={(props) => handleRoute(SiteSetup, props)}
-          />
+            <Route
+              exact
+              path="/sites/create"
+              render={(props) => handleRoute(SiteSetup, props)}
+            />
 
-          <Route
-            exact
-            path="/sites/:siteId/posts"
-            render={(props) => handleRoute(ListPosts, props)}
-          />
+            <Route
+              exact
+              path="/sites/:siteId/posts"
+              render={(props) => handleRoute(ListPosts, props)}
+            />
 
-          <Route
-            exact
-            path="/sites/:siteId/themes"
-            render={(props) => handleRoute(ThemeManager, props)}
-          />
+            <Route
+              exact
+              path="/sites/:siteId/themes"
+              render={(props) => handleRoute(ThemeManager, props)}
+            />
 
-          <Route
-            exact
-            path="/sites/:siteId/settings"
-            render={(props) => handleRoute(SiteSettings, props)}
-          />
+            <Route
+              exact
+              path="/sites/:siteId/settings"
+              render={(props) => handleRoute(SiteSettings, props)}
+            />
 
-          <Route
-            exact
-            path="/sites/:siteId/addons"
-            render={(props) => handleRoute(Addons, props)}
-          />
+            <Route
+              exact
+              path="/sites/:siteId/addons"
+              render={(props) => handleRoute(Addons, props)}
+            />
 
-          <Route
-            exact
-            path="/sites/:siteId/prssai"
-            render={(props) => handleRoute(PRSSAI, props)}
-          />
+            <Route
+              exact
+              path="/sites/:siteId/prssai"
+              render={(props) => handleRoute(PRSSAI, props)}
+            />
 
-          <Route
-            exact
-            path="/sites/:siteId/menus"
-            render={(props) => handleRoute(ListMenus, props)}
-          />
+            <Route
+              exact
+              path="/sites/:siteId/menus"
+              render={(props) => handleRoute(ListMenus, props)}
+            />
 
-          <Route
-            exact
-            path="/sites/:siteId/menus/:menuId"
-            render={(props) => handleRoute(MenuEditor, props)}
-          />
+            <Route
+              exact
+              path="/sites/:siteId/menus/:menuId"
+              render={(props) => handleRoute(MenuEditor, props)}
+            />
 
-          <Route
-            exact
-            path="/sites/:siteId/hosting"
-            render={(props) => handleRoute(SiteSetup, props)}
-          />
+            <Route
+              exact
+              path="/sites/:siteId/hosting"
+              render={(props) => handleRoute(SiteSetup, props)}
+            />
 
-          <Route
-            exact
-            path="/sites/:siteId/posts/editor/:postId"
-            render={(props) => handleRoute(PostEditor, props)}
-          />
+            <Route
+              exact
+              path="/sites/:siteId/posts/editor/:postId"
+              render={(props) => handleRoute(PostEditor, props)}
+            />
 
-          <Route
-            exact
-            path="/sites/:siteId/posts/create"
-            render={(props) => handleRoute(CreatePost, props)}
-          />
+            <Route
+              exact
+              path="/sites/:siteId/posts/create"
+              render={(props) => handleRoute(CreatePost, props)}
+            />
 
-          <Route
-            exact
-            path="/sites/:siteId"
-            render={(props) => handleRoute(Dashboard, props)}
-          />
+            <Route
+              exact
+              path="/sites/:siteId"
+              render={(props) => handleRoute(Dashboard, props)}
+            />
 
-          <Route
-            exact
-            path="/"
-            render={() => {
-              const sites = configGet("sites");
-              return Object.keys(sites) && Object.keys(sites).length ? (
-                <Redirect to="/sites" />
-              ) : (
-                <Redirect to="/sites/create" />
-              );
-            }}
-          />
+            <Route
+              exact
+              path="/"
+              render={() => {
+                const sites = configGet("sites");
+                return Object.keys(sites) && Object.keys(sites).length ? (
+                  <Redirect to="/sites" />
+                ) : (
+                  <Redirect to="/sites/create" />
+                );
+              }}
+            />
 
-          <Redirect to="/" />
-        </Switch>
-      </HashRouter>
-      <StandardModal />
-      <ToastContainer
-        className="toast-container"
-        hideProgressBar
-        position={toast.POSITION.BOTTOM_RIGHT}
-      />
-    </div>
+            <Redirect to="/" />
+          </Switch>
+        </HashRouter>
+        <StandardModal />
+        <ToastContainer
+          className="toast-container"
+          hideProgressBar
+          position="bottom-right"
+        />
+      </div>
+    </Provider>
   );
 };
-
-export default App;

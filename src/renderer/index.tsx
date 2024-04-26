@@ -2,7 +2,7 @@
 import "./index.css";
 
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 import Loader from "./components/Loader";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -25,7 +25,8 @@ const initApp = async () => {
       <Loader />
     </ErrorBoundary>
   );
-  ReactDOM.render(<PRSS />, document.getElementById("app"));
+  const root = createRoot(document.getElementById("app"));
+  root.render(<PRSS />);
 };
 
 initApp();

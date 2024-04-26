@@ -69,6 +69,10 @@ export const runHook = (name, params?) => {
   }
 };
 
+export const clearHook = (name) => {
+  delete hooks[name];
+};
+
 export const clearHooks = () => {
   hooks = {};
 };

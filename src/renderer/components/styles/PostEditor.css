@@ -106,7 +106,6 @@
   border: 1px solid #f3f3f3;
   border-radius: 10px;
   padding: 3px 5px !important;
-  margin-bottom: 10px;
 }
 #app .PostEditor .jodit-container .jodit-toolbar__box .jodit-toolbar-button {
   margin-right: 3px !important;
@@ -129,6 +128,9 @@
   padding-right: 10px;
   border-radius: 3px;
   height: 27px;
+}
+#app .PostEditor .jodit-container .jodit-status-bar__item-right:last-child {
+  display: none;
 }
 #app .PostEditor .jodit-container .jodit-toolbar-button_size_tiny {
   min-width: 34px;

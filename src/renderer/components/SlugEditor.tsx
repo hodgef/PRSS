@@ -8,6 +8,8 @@ import { getBufferItems } from "../services/build";
 import { isValidSlug } from "../services/hosting";
 import { modal } from "./Modal";
 import { IPostItem, ISite } from "../../common/interfaces";
+import { isPreviewActive } from "../services/preview";
+import { setHook } from "../../common/bootstrap";
 
 interface IProps {
   site: ISite;
@@ -15,7 +17,6 @@ interface IProps {
   items: IPostItem[];
   url?: string;
   onSave: (s: string) => any;
-  previewMode?: boolean;
 }
 
 const SlugEditor: FunctionComponent<IProps> = ({
@@ -23,12 +24,18 @@ const SlugEditor: FunctionComponent<IProps> = ({
   post,
   items,
   onSave,
-  previewMode,
 }) => {
   const [isUneditable] = useState(post.slug.toLowerCase() === "home" || post.slug.toLowerCase() === "blog");
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(post.slug);
   const [bufferItems, setBufferItems] = useState(null);
+  const [previewMode, setPreviewMode] = useState<boolean>(isPreviewActive());
+
+  useEffect(() => {
+    setHook("SlugEditor_previewMode", (value: boolean) => {
+      setPreviewMode(value);
+    });
+  }, []);
 
   useEffect(() => {
     const getData = async () => {

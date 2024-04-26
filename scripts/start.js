@@ -24,7 +24,7 @@ let electronStarted = false;
      */
     const renderSrvOpts = {
       liveReload: false,
-      hot: false,
+      hot: true,
       host: "localhost",
       port: 9000
     };

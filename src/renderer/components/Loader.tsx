@@ -1,16 +1,16 @@
 import "./styles/App.css";
 import "react-toastify/dist/ReactToastify.css";
 
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useRef } from "react";
 import { initConfig, initStore, initDb, initExpress } from "../../common/bootstrap";
 import { checkDirs } from "../services/utils";
-import App from "./App";
 
 // const remote = require("@electron/remote");
 // const win = remote.getCurrentWindow();
 // const openDevTools = remote.getGlobal("openDevTools");
 
 const Loader: FunctionComponent = () => {
+    const App = useRef<React.FunctionComponent<{}>>(null);
     const [isLoading, setIsLoading] = React.useState(true);
     const [loadingText, setLoadingText] = React.useState("");
   
@@ -41,6 +41,9 @@ const Loader: FunctionComponent = () => {
             setLoadingText("Finalizing Startup");
             await checkDirs();
 
+            const { App: AppImport } = await import("./App") as { App: React.FunctionComponent<{}>};
+            App.current = AppImport;
+
             unsetLoading();
             setIsLoading(false);
         }
@@ -56,7 +59,7 @@ const Loader: FunctionComponent = () => {
 
     return (
         <>
-            {isLoading ? <Loading /> : <App />}
+            {isLoading ? <Loading /> : <App.current />}
         </>
     );
 };

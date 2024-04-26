@@ -25,11 +25,6 @@ body {
   overflow-x: hidden;
 }
 
-body.jodit-fullsize_box,
-html.jodit-fullsize_box {
-  min-width: 100% !important;
-}
-
 #app {
   flex: 1;
   display: flex;

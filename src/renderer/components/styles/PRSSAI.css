@@ -12,3 +12,11 @@
     max-width: unset;
     width: 100%;
 }
+
+.PRSSAI .toast-body {
+    white-space: pre-line;
+}
+
+.PRSSAI .toast-header {
+    user-select: none;
+}

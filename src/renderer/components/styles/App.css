@@ -31,7 +31,6 @@
   flex: 1;
   display: flex;
   flex-flow: column;
-  user-select: none;
   max-height: calc(100vh - 50px);
 }
 #app .page.fixed header {
@@ -294,4 +293,8 @@
 }
 #app .custom-select {
   -webkit-appearance: none;
+}
+
+#app .clickable, #app button, #app h1, #app label {
+  user-select: none;
 }

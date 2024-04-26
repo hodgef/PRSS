@@ -4,22 +4,16 @@ import React, { FunctionComponent, useState, Fragment, useEffect } from "react";
 import cx from "classnames";
 import { noop, confirmation } from "../services/utils";
 import Loading from "./Loading";
-import { getString } from "../../common/utils";
+import { configGet, getString } from "../../common/utils";
 import { modal } from "./Modal";
 import { getTemplateList } from "../services/theme";
 import { IPostItem, ISite, Noop } from "../../common/interfaces";
+import { setHook } from "../../common/bootstrap";
+import { isPreviewActive } from "../services/preview";
 
 interface IProps {
   site: ISite;
   item: IPostItem;
-  previewStarted: boolean;
-  editorChanged: boolean;
-  previewLoading: boolean;
-  buildLoading: boolean;
-  buildAllLoading: boolean;
-  deployLoading: boolean;
-  publishSuggested: boolean;
-  loadingStatus: string;
   forceRawHTMLEditing: boolean;
   onSave?: Noop;
   onStopPreview?: Noop;
@@ -35,14 +29,6 @@ interface IProps {
 const PostEditorSidebar: FunctionComponent<IProps> = ({
   site,
   item,
-  previewStarted,
-  editorChanged,
-  previewLoading,
-  buildLoading,
-  buildAllLoading,
-  deployLoading,
-  publishSuggested,
-  loadingStatus,
   forceRawHTMLEditing = false,
   onSave = noop,
   onSaveRebuildAll = noop,
@@ -55,14 +41,53 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
   onToggleRawHTMLOnly = noop,
 }) => {
   const themeName = site.theme;
-  const currentTemplate = item.template;
+  const [deployLoading, setDeployLoading] = useState<boolean>(false);
+  const [buildLoading, setBuildLoading] = useState<boolean>(false);
+  const [buildAllLoading, setBuildAllLoading] = useState<boolean>(false);
+  const [editorChanged, setEditorChanged] = useState<boolean>(false);
+  const [loadingStatus, setLoadingStatus] = useState<string>(null)
+  const [currentTemplate, setCurrentTemplate] = useState<string>(item.template);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
-
   const [templateList, setTemplateList] = useState(null);
+  const [previewStarted, setPreviewStarted] = useState<boolean>(isPreviewActive());
+  const [previewLoading, setPreviewLoading] = useState<boolean>(false);
+  const [publishSuggested, setPublishSuggested] = useState(configGet(`sites.${site.uuid}.publishSuggested`));
 
   useEffect(() => {
     getTemplateList(themeName).then((res) => {
       setTemplateList(res);
+    });
+
+    setHook("PostEditorSidebar_publishSuggested", (value: boolean) => {
+      setPublishSuggested(value);
+    });
+
+    setHook("PostEditorSidebar_previewStarted", (value: boolean) => {
+      setPreviewStarted(value);
+    });
+
+    setHook("PostEditorSidebar_loadingStatus", (value: string) => {
+      setLoadingStatus(value);
+    });
+
+    setHook("PostEditorSidebar_editorChanged", (value: boolean) => {
+      setEditorChanged(value);
+    });
+
+    setHook("PostEditorSidebar_previewLoading", (value: boolean) => {
+      setPreviewLoading(value);
+    });
+
+    setHook("PostEditorSidebar_buildLoading", (value: boolean) => {
+      setBuildLoading(value);
+    });
+
+    setHook("PostEditorSidebar_buildAllLoading", (value: boolean) => {
+      setBuildAllLoading(value);
+    });
+
+    setHook("PostEditorSidebar_deployLoading", (value: boolean) => {
+      setDeployLoading(value);
     });
   }, []);
 
@@ -205,7 +230,10 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
               <select
                 className="custom-select"
                 id="theme-selector"
-                onChange={(e) => onChangePostTemplate(e.target.value)}
+                onChange={(e) => {
+                  onChangePostTemplate(e.target.value);
+                  setCurrentTemplate(e.target.value);
+                }}
                 value={currentTemplate}
               >
                 {templateList.map((templateName) => (

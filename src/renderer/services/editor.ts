@@ -98,7 +98,6 @@ export const editorOptions = {
   uploader: {
     insertImageAsBase64URI: true,
   },
-  mediaBlocks: [],
   buttons:
     "source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,|,font,fontsize,brush,paragraph,align,|,image,video,table,link,|,fullsize",
   buttonsMD:

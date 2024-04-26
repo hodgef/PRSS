@@ -1,5 +1,4 @@
 import "./styles/PostEditor.css";
-import "jodit/build/jodit.min.css";
 
 import React, {
   Fragment,
@@ -8,11 +7,12 @@ import React, {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
+  useMemo,
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { getString, configGet, configSet } from "../../common/utils";
+import { getString, configGet, configSet, isAutosaveEnabled } from "../../common/utils";
 import { modal } from "./Modal";
-import { toast } from "react-toastify";
 import {
   stopPreview,
   bufferAndStartPreview,
@@ -29,60 +29,95 @@ import PostEditorSidebar from "./PostEditorSidebar";
 import HTMLEditorOverlay from "./HTMLEditorOverlay";
 import SiteVariablesEditorOverlay from "./SiteVariablesEditorOverlay";
 import { getSite, getItems, updateItem, updateSite } from "../services/db";
-import { editorOptions } from "../services/editor";
 import { truncateString } from "../services/utils";
-import { ISite } from "../../common/interfaces";
+import { IPostItem, ISite } from "../../common/interfaces";
+import { runHook } from "../../common/bootstrap";
+import Footer from "./Footer";
+import { debounce } from "lodash";
+import JoditEditor from "jodit-react";
+import { editorOptions } from "../services/editor";
 
 const remote = require("@electron/remote");
 const win = remote.getCurrentWindow();
-
-require("jodit");
-const Editor = require("jodit-react").default;
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
 }
 
+const Editor = ({ item, editorContent, setEditorChanged }: { item: IPostItem, editorContent: any, setEditorChanged: any }) => {
+  const editor = useRef(null);
+
+  if (!item) {
+    return;
+  }
+
+  return useMemo(() => (
+    <JoditEditor
+      ref={editor}
+      config={editorOptions}
+      value={item.content}
+      onChange={content => {
+        editorContent.current = content;
+        setEditorChanged(editorContent.current !== item.content);
+      }}
+    />
+  ), []);
+}
+
 const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const { siteId, postId } = useParams() as any;
-  const [publishSuggested, setPublishSuggested] = useState(null);
 
+  const autoSaveTimeout = useRef<NodeJS.Timeout>(null);
+  const statusMessageTimeout = useRef<NodeJS.Timeout>(null);
   const [site, setSite] = useState<ISite>(null);
-  const [items, setItems] = useState(null);
+  const post = useRef<IPostItem>(null);
+  const items = useRef<IPostItem[]>(null);
   const { title, url } = site || {};
 
-  const [post, setPost] = useState(null);
-
   const history = useHistory();
-  const editorContent = useRef("");
+  const editorContent = useRef<string>();
   const editorMode = useRef("");
-  const itemIndex = post ? items.findIndex((item) => item.uuid === postId) : -1;
+  const postStatusRef = useRef<HTMLDivElement>(null);
+  const itemIndex = items.current ? items.current.findIndex((item) => item.uuid === postId) : -1;
 
-  const editorChangedContent = useRef("");
-
-  const [previewStarted, setPreviewStarted] = useState(isPreviewActive());
-  const [showRawHTMLEditorOverlay, setShowRawHTMLEditorOverlay] =
-    useState(false);
-
-  const [showSiteVariablesEditorOverlay, setShowSiteVariablesEditorOverlay] =
-    useState(false);
-
-  const [editorChanged, setEditorChanged] = useState(false);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [buildLoading, setBuildLoading] = useState(false);
-  const [buildAllLoading, setBuildAllLoading] = useState(false);
-  const [deployLoading, setDeployLoading] = useState(false);
-  const [loadingStatus, setLoadingStatus] = useState("");
-
-  const editorResizeFix = () => {
+  const editorResizeFix = useCallback(() => {
     if (!win.isMaximized()) {
       window.resizeTo(window.outerWidth - 1, window.outerHeight - 1);
       window.resizeTo(window.outerWidth + 1, window.outerHeight + 1);
     }
-  };
+  }, []);
+
+  const setPublishSuggested = useCallback((state: boolean) => {
+    runHook("PostEditorSidebar_publishSuggested", state);
+  }, []);
+
+  const setEditorChanged = useCallback((state: boolean) => {
+    runHook("PostEditorSidebar_editorChanged", state);
+  }, []);
+
+  const setPreviewStarted = useCallback((state: boolean) => {
+    runHook("SlugEditor_previewMode", state);
+    runHook("PostEditorSidebar_previewStarted", state);
+  }, []);
+
+  const setPreviewLoading = useCallback((state: boolean) => {
+    runHook("PostEditorSidebar_previewLoading", state);
+  }, []);
+
+  const setBuildLoading = useCallback((state: boolean) => {
+    runHook("PostEditorSidebar_buildLoading", state);
+  }, []);
+
+  const setBuildAllLoading = useCallback((state: boolean) => {
+    runHook("PostEditorSidebar_buildAllLoading", state);
+  }, []);
+
+  const setDeployLoading = useCallback((state: boolean) => {
+    runHook("PostEditorSidebar_deployLoading", state);
+  }, []);
 
   useEffect(() => {
-    if (!title || !post) {
+    if (!title || !post.current) {
       return;
     }
 
@@ -101,34 +136,80 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         {post && (
           <div className="align-center">
             <i className="material-symbols-outlined">keyboard_arrow_right</i>
-            <span>{truncateString(post.title, 30)}</span>
+            <span>{truncateString(post.current.title, 30)}</span>
           </div>
         )}
       </Fragment>
     );
   }, [title, post]);
 
+  const setStatusMessage = useCallback(debounce((type: string, message: string) => {
+    const prefix = type === "error" ? "⭕" : "✅";
+    postStatusRef.current.innerHTML = prefix + " " + message;
+
+    if(statusMessageTimeout.current){
+      clearTimeout(statusMessageTimeout.current);
+    }
+    statusMessageTimeout.current = setTimeout(() => {
+      if (postStatusRef.current) {
+        postStatusRef.current.innerHTML = "";
+      }
+    }, 5000);
+  }, 100), []);
+
+  const startAutosave = () => {
+    if (autoSaveTimeout.current) {
+      clearTimeout(autoSaveTimeout.current);
+    }
+
+    autoSaveTimeout.current = setTimeout(async () => {
+      if (editorContent.current && editorContent.current !== post.current.content) {
+        await handleSave(true);
+        post.current.content = editorContent.current;
+      }
+      startAutosave();
+    }, 120000 /* 2 mins*/);
+  };
+
   useEffect(() => {
     const getData = async () => {
       const siteRes = await getSite(siteId);
       const itemsRes = await getItems(siteId);
-      setSite(siteRes);
-      setItems(itemsRes);
-      const post = itemsRes.find((item) => item.uuid === postId);
+      const currentItem = itemsRes.find((item) => item.uuid === postId);
 
-      setPost(post);
+      items.current = itemsRes;
+      post.current = currentItem;
 
       const { publishSuggested } = configGet(`sites.${siteId}`);
       setPublishSuggested(publishSuggested);
-      editorContent.current = post.content || "";
-      editorMode.current = post.isContentRaw ? "html" : "";
+      editorContent.current = post.current.content || "";
+      editorMode.current = post.current.isContentRaw ? "html" : "";
+
+      setSite(siteRes);
     };
     getData();
   }, []);
 
-  if (!site || !items || !post) {
-    return null;
-  }
+  useEffect(() => {
+    if (itemIndex === -1) {
+      return;
+    }
+
+    // Start autosave
+    if (isAutosaveEnabled()) {
+      startAutosave();
+    }
+
+    return () => {
+      if (autoSaveTimeout.current) {
+        clearTimeout(autoSaveTimeout.current);
+      }
+    }
+  }, [itemIndex]);
+
+  const setLoadingStatus = useCallback((status) => {
+    runHook("PostEditorSidebar_loadingStatus", status);
+  }, []);
 
   const handleSave = async (isAutosave = false, buildAll = false) => {
     if (buildAll) {
@@ -137,9 +218,9 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       setBuildLoading(true);
     }
 
-    const prevContent = post.content;
+    const prevContent = post.current?.content;
 
-    if (editorMode.current === "html" && post && !post.isContentRaw) {
+    if (editorMode.current === "html" && post && !post.current?.isContentRaw) {
       modal.alert(["error_save_text_editor", []]);
       if (buildAll) {
         setBuildAllLoading(false);
@@ -160,7 +241,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
     if (itemIndex > -1) {
       const updatedAt = Date.now();
-      const updatedItem = { ...post, content, updatedAt };
+      const updatedItem = { ...post.current, content, updatedAt };
       const updatedSite = { ...site, updatedAt };
 
       /**
@@ -177,33 +258,27 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       await updateSite(siteId, {
         updatedAt,
       });
-
-      setPost(updatedItem);
-      setSite(updatedSite);
+      post.current = updatedItem;
 
       if (isAutosave) {
-        toast.success("Post autosaved");
+        setStatusMessage("success", `Post autosaved at <div class="badge badge-secondary">${new Date(post.current.updatedAt).toLocaleTimeString()}</div>`);
       } else {
         if (isPreviewActive()) {
           await buildPost(buildAll ? null : postId, setLoadingStatus);
           reloadPreview();
 
           if (buildAll) {
-            toast.success(
-              "Post saved. The entire site has been rebuilt and the preview reloaded."
-            );
+            setStatusMessage("success", "Post saved. The entire site has been rebuilt and the preview reloaded.");
           } else {
-            toast.success(
-              "Post saved. The page has been rebuilt and the preview reloaded."
-            );
+            setStatusMessage("success", "Post saved. The page has been rebuilt and the preview reloaded.");
           }
         } else {
-          toast.success("Post saved!");
+          setStatusMessage("success", `Post saved at <div class="badge badge-secondary">${new Date(post.current.updatedAt).toLocaleTimeString()}</div>`);
         }
-
-        editorChangedContent.current = "";
-        setEditorChanged(false);
       }
+
+      setEditorChanged(false);
+      setSite(updatedSite);
     }
 
     if (buildAll) {
@@ -215,7 +290,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   const handleSaveTitle = async (title, slug) => {
     const updatedAt = Date.now();
-    const updatedItem = { ...post, title, updatedAt };
+    const updatedItem = { ...post.current, title, updatedAt };
     updatedItem.slug = slug ? slug : updatedItem.slug;
 
     const itemSlug = slug ? slug : updatedItem.slug;
@@ -229,16 +304,16 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       updatedAt,
     });
 
-    setPost(updatedItem);
+    post.current = updatedItem;
 
     configSet(`sites.${siteId}.publishSuggested`, true);
     setPublishSuggested(true);
-    toast.success("Title saved");
+    setStatusMessage("success", "Title saved");
   };
 
   const handleSaveSlug = async (slug, silent?: boolean) => {
     const updatedAt = Date.now();
-    const updatedItem = { ...post, slug, updatedAt };
+    const updatedItem = { ...post.current, slug, updatedAt };
 
     /**
      *  Update item
@@ -248,52 +323,52 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       updatedAt,
     });
 
-    setPost(updatedItem);
+    post.current = updatedItem;
 
     configSet(`sites.${siteId}.publishSuggested`, true);
     setPublishSuggested(true);
 
     if (!silent) {
-      toast.success("Slug saved");
+      setStatusMessage("success", "Slug saved");
     }
   };
 
   const changePostTemplate = async (template) => {
     if (!template || itemIndex === -1) return;
-    const updatedItem = { ...post, template };
+    const updatedItem = { ...post.current, template };
     const updatedAt = Date.now();
 
     /**
      *  Update item
      */
     await updateItem(siteId, postId, { template, updatedAt });
-    setPost(updatedItem);
+    post.current = updatedItem;
 
     configSet(`sites.${siteId}.publishSuggested`, true);
     setPublishSuggested(true);
-    toast.success("Template changed successfully");
+    setStatusMessage("success", "Template changed successfully");
   };
 
   const toggleRawHTMLOnly = async () => {
-    const isHTMLForced = !!post.isContentRaw;
+    const isHTMLForced = !!post.current?.isContentRaw;
     const isContentRaw = !isHTMLForced;
     const updatedAt = Date.now();
 
-    const updatedItem = { ...post, isContentRaw };
+    const updatedItem = { ...post.current, isContentRaw };
 
     /**
      *  Update item
      */
     await updateItem(siteId, postId, { isContentRaw, updatedAt });
 
-    setPost(updatedItem);
+    post.current = updatedItem;
 
-    toast.success("Raw HTML content flag changed successfully. Refreshing.");
+    setStatusMessage("success", "Raw HTML content flag changed successfully. Refreshing.");
 
     if (isHTMLForced) {
       stopPreview();
       history.replace(`/sites/${siteId}/posts/editor`);
-      history.replace(`/sites/${siteId}/posts/editor/${post.uuid}`);
+      history.replace(`/sites/${siteId}/posts/editor/${post.current?.uuid}`);
     }
   };
 
@@ -310,7 +385,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const handleStartPreview = async () => {
     setPreviewLoading(true);
 
-    if (editorMode.current === "html" && post && !post.isContentRaw) {
+    if (editorMode.current === "html" && post && !post.current?.isContentRaw) {
       modal.alert(["error_preview_text_editor", []]);
       setPreviewLoading(false);
       return;
@@ -332,7 +407,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const handleStopPreview = () => {
     setPreviewLoading(true);
 
-    if (editorMode.current === "html" && post && !post.isContentRaw) {
+    if (editorMode.current === "html" && post && !post.current?.isContentRaw) {
       modal.alert(["error_preview_text_editor", []]);
       setPreviewLoading(false);
       return;
@@ -345,7 +420,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   const handlePublish = async () => {
     if (!url) {
-      toast.error("Site URL not defined! Please add one in your Site Settings");
+      setStatusMessage("error", "Site URL not defined! Please add one in your Site Settings");
       return;
     }
 
@@ -359,7 +434,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     );
 
     if (deployRes) {
-      toast.success(getString("publish_completed"));
+      setStatusMessage("success", getString("publish_completed"));
     }
 
     if (typeof deployRes === "object") {
@@ -368,23 +443,24 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       }
     }
 
-    if (publishSuggested) {
-      configSet(`sites.${siteId}.publishSuggested`, false);
-      setPublishSuggested(false);
-    }
-
+    configSet(`sites.${siteId}.publishSuggested`, false);
     setDeployLoading(false);
+    setPublishSuggested(false);
   };
 
-  const openRawHTMLOverlay = () => {
-    setShowRawHTMLEditorOverlay(true);
-  };
+  const openRawHTMLOverlay = useCallback(() => {
+    runHook("HTMLEditorOverlay_setPost", post.current);
+  }, []);
 
-  const openVariablesOverlay = () => {
-    setShowSiteVariablesEditorOverlay(true);
-  };
+  const openVariablesOverlay = useCallback(() => {
+    runHook("SiteVariablesEditorOverlay_setPostId", post.current.uuid);
+  }, []);
 
-  const handleRawHTMLOverlaySave = async (
+  const handleVariablesOverlaySave = useCallback(() => {
+    setStatusMessage("success", "Post updated");
+  }, []);
+
+  const handleRawHTMLOverlaySave = useCallback(async (
     headHtml,
     footerHtml,
     sidebarHtml
@@ -393,7 +469,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
     if (itemIndex > -1) {
       const updatedItem = {
-        ...post,
+        ...post.current,
         headHtml,
         footerHtml,
         sidebarHtml,
@@ -409,11 +485,18 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         updatedAt,
       });
 
-      setPost(updatedItem);
-
-      toast.success("Post updated");
+      post.current = updatedItem;
+      setStatusMessage("success", "Post updated");
     }
-  };
+  }, []);
+
+  const handleNoChangesSave = useCallback(() => {
+    setStatusMessage("success", "No changes detected");
+  }, []);
+
+  if (!site || !items.current || !post.current) {
+    return null;
+  }
 
   return (
     <div className="PostEditor page">
@@ -430,7 +513,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
               <TitleEditor
                 siteId={siteId}
                 postId={postId}
-                initValue={post ? post.title : null}
+                initValue={post ? post.current?.title : null}
                 onSave={handleSaveTitle}
               />
             ) : (
@@ -442,11 +525,10 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
               <Fragment>
                 <span className="slug-label mr-1">Editing:</span>
                 <SlugEditor
-                  post={post}
-                  items={items}
+                  post={post.current}
+                  items={items.current}
                   site={site}
                   url={url}
-                  previewMode={previewStarted}
                   onSave={handleSaveSlug}
                 />
               </Fragment>
@@ -456,59 +538,13 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
         <div className="editor-container">
           <div className="left-align">
-            <Editor
-              value={post ? post.content : ""}
-              config={editorOptions}
-              onChange={(content) => {
-                editorContent.current = content;
-
-                if (!editorChangedContent.current) {
-                  editorChangedContent.current = content;
-                }
-
-                if (editorChangedContent.current === content) {
-                  setEditorChanged(false);
-                } else {
-                  setEditorChanged(true);
-                }
-              }}
-            />
-            {/*<StandardEditor
-                            value={post ? post.content : ''}
-                            onChange={content => {
-                                editorContent.current = content;
-
-                                if (!editorChangedContent.current) {
-                                    editorChangedContent.current = content;
-                                }
-
-                                if (editorChangedContent.current === content) {
-                                    setEditorChanged(false);
-                                } else {
-                                    setEditorChanged(true);
-                                }
-                            }}
-                            onEditModeChange={mode =>
-                                (editorMode.current = mode)
-                            }
-                            forceMode={
-                                post && post.isContentRaw ? 'html' : null
-                            }
-                        />*/}
+            <Editor item={post.current} editorContent={editorContent} setEditorChanged={setEditorChanged} />
           </div>
           <div className="right-align">
             <PostEditorSidebar
               site={site}
-              item={post}
-              publishSuggested={publishSuggested}
-              previewStarted={previewStarted}
-              editorChanged={editorChanged}
-              previewLoading={previewLoading}
-              buildLoading={buildLoading}
-              buildAllLoading={buildAllLoading}
-              deployLoading={deployLoading}
-              loadingStatus={loadingStatus}
-              forceRawHTMLEditing={post ? post.isContentRaw : null}
+              item={post.current}
+              forceRawHTMLEditing={post ? post.current?.isContentRaw : null}
               onSave={handleSave}
               onSaveRebuildAll={() => handleSave(false, true)}
               onStopPreview={handleStopPreview}
@@ -524,25 +560,13 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       </div>
       {post && (
         <Fragment>
-          {showRawHTMLEditorOverlay && (
-            <HTMLEditorOverlay
-              headDefaultValue={post.headHtml}
-              footerDefaultValue={post.footerHtml}
-              sidebarDefaultValue={post.sidebarHtml}
-              onSave={handleRawHTMLOverlaySave}
-              onClose={() => setShowRawHTMLEditorOverlay(false)}
-            />
-          )}
-
-          {showSiteVariablesEditorOverlay && (
-            <SiteVariablesEditorOverlay
-              siteId={siteId}
-              postId={postId}
-              onClose={() => setShowSiteVariablesEditorOverlay(false)}
-            />
-          )}
+          <HTMLEditorOverlay onSave={handleRawHTMLOverlaySave} onNoChangesSave={handleNoChangesSave} />
+          <SiteVariablesEditorOverlay siteId={siteId} onSave={handleVariablesOverlaySave} />
         </Fragment>
       )}
+      <Footer
+        rightComponent={<div ref={postStatusRef} className="post-status"></div>}
+      />
     </div>
   );
 };

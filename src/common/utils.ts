@@ -103,6 +103,10 @@ export const getStaticPath = (): string => {
   return path.join(app.isPackaged && !isAppx() ? process.resourcesPath : getRootPath(), 'static');
 };
 
+export const isAutosaveEnabled = async () => {
+  return (await storeInt.get("autosaveEnabled")) === false ? false : true;
+};
+
 export const getCurrentVersion = () => {
   const isDevelopment = process.env.NODE_ENV !== "production";
   const { app } = require("@electron/remote");

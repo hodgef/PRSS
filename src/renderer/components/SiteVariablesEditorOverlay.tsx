@@ -10,7 +10,7 @@ import React, {
 import { Link } from "react-router-dom";
 import cx from "classnames";
 
-import { noop, camelCase } from "../services/utils";
+import { camelCase } from "../services/utils";
 
 import "ace-builds/webpack-resolver";
 import "ace-builds/src-noconflict/mode-html";
@@ -20,75 +20,78 @@ import { modal } from "./Modal";
 import { siteVarToArray } from "../services/hosting";
 import { getBufferItems } from "../services/build";
 import { getSite, getItems, updateSite, updateItem } from "../services/db";
-import { Noop } from "../../common/interfaces";
+import { IPostItem, ISite } from "../../common/interfaces";
+import { setHook } from "../../common/bootstrap";
 
 interface IProps {
   siteId: string;
-  postId?: string;
-  onClose: Noop;
+  onSave: () => void;
 }
 
 const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
   siteId,
-  postId,
-  onClose = noop,
+  onSave = () => {}
 }) => {
-  const [site, setSite] = useState(null);
-  const [items, setItems] = useState(null);
-  const [post, setPost] = useState(null);
+  const [postId, setPostId] = useState<string>(null)
+  const site = useRef<ISite>(null);
+  const post = useRef<IPostItem>(null);
+  const items = useRef<IPostItem[]>(null);
 
   const [bufferItem, setBufferItem] = useState(null);
 
-  const [parsedVariables, setParsedVariables] = useState([]);
-  const [parsedInheritedVariables, setParsedInheritedVariables] = useState([]);
+  const [parsedVariables, setParsedVariables] = useState<{[key: string]: string}[]>([]);
+  const [parsedInheritedVariables, setParsedInheritedVariables] = useState<{[key: string]: string}[]>([]);
 
-  const [variables, setVariables] = useState(parsedVariables);
-  const [exclusiveVariables, setExclusiveVariables] = useState([]);
+  const [variables, setVariables] = useState<{[key: string]: string}[]>(parsedVariables);
+  const [exclusiveVariables, setExclusiveVariables] = useState<string[]>([]);
 
   const variablesBuffer = useRef(parsedVariables) as any;
 
   useEffect(() => {
-    const getData = async () => {
-      const siteRes = await getSite(siteId);
-      const itemsRes = await getItems(siteId);
-
-      setSite(siteRes);
-      setItems(itemsRes);
-
-      const bufferItems = await getBufferItems(siteRes);
-
-      const post = postId
-        ? itemsRes.find((item) => item.uuid === postId)
-        : null;
-      setPost(post);
-
-      const bufferItem =
-        bufferItems && post
-          ? bufferItems.find((bufferItem) => bufferItem.item.uuid === post.uuid)
+    setHook("SiteVariablesEditorOverlay_setPostId", async (value: string) => {
+        const siteRes = await getSite(siteId);
+        const itemsRes = await getItems(siteId);
+  
+        site.current = siteRes;
+        items.current = itemsRes;
+  
+        const bufferItems = await getBufferItems(siteRes);
+  
+        const currentPost = value
+          ? itemsRes.find((item) => item.uuid === value)
           : null;
+        
+        post.current = currentPost;
+  
+        const bufferItem =
+          bufferItems && post
+            ? bufferItems.find((bufferItem) => bufferItem.item.uuid === currentPost.uuid)
+            : null;
+  
+        setBufferItem(bufferItem);
+  
+        const baseVars = post ? currentPost.vars || {} : siteRes.vars || {};
+  
+        const parsedVariables = siteVarToArray(
+          Object.keys(baseVars).length ? baseVars : { "": "" }
+        );
+  
+        setParsedVariables(parsedVariables);
+        setVariables(parsedVariables);
+  
+        const exclusiveVariables = post ? currentPost.exclusiveVars || [] : [];
+        setExclusiveVariables(exclusiveVariables);
+  
+        variablesBuffer.current = variablesBuffer;
+        bufferItem &&
+          setParsedInheritedVariables(siteVarToArray(bufferItem.vars));
 
-      setBufferItem(bufferItem);
-
-      const baseVars = post ? post.vars || {} : siteRes.vars || {};
-
-      const parsedVariables = siteVarToArray(
-        Object.keys(baseVars).length ? baseVars : { "": "" }
-      );
-
-      setParsedVariables(parsedVariables);
-      setVariables(parsedVariables);
-
-      const exclusiveVariables = post ? post.exclusiveVars || [] : [];
-      setExclusiveVariables(exclusiveVariables);
-
-      variablesBuffer.current = variablesBuffer;
-      bufferItem &&
-        setParsedInheritedVariables(siteVarToArray(bufferItem.vars));
-    };
-    getData();
+        setPostId(value);
+      });
   }, []);
 
   if (
+    !postId ||
     !site ||
     !items ||
     (postId && (!post || !bufferItem)) ||
@@ -186,7 +189,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
      */
     if (post) {
       const updatedItem = {
-        ...post,
+        ...post.current,
         vars: varObj,
         exclusiveVars: newExclusiveVarsArr,
         updatedAt,
@@ -201,14 +204,15 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
         updatedAt,
       });
 
-      setPost(updatedItem);
-      toast.success("Post variables saved!");
+      post.current = updatedItem;
+
+      onSave();
     } else {
       /**
        * Save to site
        */
       const updatedSite = {
-        ...site,
+        ...site.current,
         vars: varObj,
         updatedAt,
       };
@@ -221,7 +225,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
         updatedAt,
       });
 
-      setSite(updatedSite);
+      site.current = updatedSite;
       toast.success("Site variables saved!");
     }
   };
@@ -280,7 +284,9 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
             <button
               type="button"
               className="btn btn-outline-primary"
-              onClick={() => onClose()}
+              onClick={() => {
+                setPostId(null);
+              }}
             >
               <span className="material-symbols-outlined">clear</span>
             </button>

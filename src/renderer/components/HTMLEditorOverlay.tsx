@@ -1,49 +1,57 @@
 import "./styles/HTMLEditorOverlay.css";
 
-import React, { FunctionComponent, useRef, Fragment, useState } from "react";
+import React, { FunctionComponent, useRef, Fragment, useState, useEffect } from "react";
 import cx from "classnames";
-import { noop } from "../services/utils";
 
 import AceEditor from "react-ace";
 import "ace-builds/webpack-resolver";
 import "ace-builds/src-noconflict/mode-html";
 import "ace-builds/src-noconflict/theme-github";
 import pretty from "pretty";
-import { toast } from "react-toastify";
 import { modal } from "./Modal";
 import bufferItemMockJson from "../json/bufferItem.json";
-import { Noop } from "../../common/interfaces";
+import { IPostItem } from "../../common/interfaces";
+import { setHook } from "../../common/bootstrap";
 
 const htmlMinifier = require("html-minifier-terser");
+
 interface IProps {
-  headDefaultValue?: string;
-  footerDefaultValue?: string;
-  sidebarDefaultValue?: string;
   onSave: (headHtml: string, footerHtml: string, sidebarHtml: string) => void;
-  onClose: Noop;
+  onNoChangesSave: () => void;
 }
 
 const HTMLEditorOverlay: FunctionComponent<IProps> = ({
-  headDefaultValue = "",
-  footerDefaultValue = "",
-  sidebarDefaultValue = "",
   onSave = (h, f, s) => {},
-  onClose = noop,
+  onNoChangesSave = () => {}
 }) => {
-  const [headHtmlEnabled, setHeadHtmlEnabled] = useState(true);
+  const headHTMLState = useRef<string>(null);
+  const footerHTMLState = useRef<string>(null);
+  const sidebarHTMLState = useRef<string>(null);
+
+  const [headHtmlEnabled, setHeadHtmlEnabled] = useState(false);
   const [footerHtmlEnabled, setFooterHtmlEnabled] = useState(false);
   const [sidebarHtmlEnabled, setSidebarHtmlEnabled] = useState(false);
+  const [post, setPost] = useState<IPostItem>(null);
 
-  const headHTMLState = useRef(headDefaultValue);
-  const footerHTMLState = useRef(footerDefaultValue);
-  const sidebarHTMLState = useRef(sidebarDefaultValue);
+  useEffect(() => {
+    setHook("HTMLEditorOverlay_setPost", (value: IPostItem) => {
+      headHTMLState.current = value.headHtml;
+      footerHTMLState.current = value.footerHtml;
+      sidebarHTMLState.current = value.sidebarHtml;
+      setPost(value);
+    });
+  }, []);
+  
+  if(!post){
+    return null;
+  }
 
   const handleSave = () => {
     if (
       onSave &&
-      (headHTMLState.current !== headDefaultValue ||
-        footerHTMLState.current !== footerDefaultValue ||
-        sidebarHTMLState.current !== sidebarDefaultValue)
+      (headHTMLState.current !== post.headHtml ||
+        footerHTMLState.current !== post.footerHtml ||
+        sidebarHTMLState.current !== post.sidebarHtml)
     ) {
       onSave(
         htmlMinifier.minify(headHTMLState.current || ""),
@@ -51,7 +59,7 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
         htmlMinifier.minify(sidebarHTMLState.current || "")
       );
     } else {
-      toast.success("No changes detected");
+      onNoChangesSave();
     }
   };
 
@@ -91,8 +99,10 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
           </button>
           <button
             type="button"
-            className="btn btn-outline-primary"
-            onClick={() => onClose()}
+            className="btn btn-outline-secondary"
+            onClick={() => {
+              setPost(null);
+            }}
           >
             <span className="material-symbols-outlined">clear</span>
           </button>
