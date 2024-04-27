@@ -107,6 +107,10 @@ export const isAutosaveEnabled = async () => {
   return (await storeInt.get("autosaveEnabled")) === false ? false : true;
 };
 
+export const isAddThemesReminderEnabled = async () => {
+  return (await storeInt.get("addThemesReminderEnabled")) === false ? false : true;
+};
+
 export const getCurrentVersion = () => {
   const isDevelopment = process.env.NODE_ENV !== "production";
   const { app } = require("@electron/remote");

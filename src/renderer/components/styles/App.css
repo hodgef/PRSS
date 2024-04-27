@@ -25,7 +25,7 @@
   padding-bottom: 0;
   display: flex;
   flex-flow: column;
-  max-height: calc(100vh - 80px);
+  max-height: calc(100vh - 50px);
 }
 #app .page {
   flex: 1;
@@ -180,45 +180,11 @@
 #app .color-red {
   color: red;
 }
-#app .toast-container .Toastify__toast {
-  padding: 10px 15px;
-  border-radius: 5px;
-  background: white !important;
-  color: #383838;
-}
-#app .toast-container .Toastify__toast .Toastify__toast-body {
-  margin-left: 10px;
-}
-#app .toast-container .Toastify__toast .Toastify__toast-body:before {
-  content: "";
-  height: 100%;
-  width: 5px;
-  display: inline-block;
-  position: absolute;
-  bottom: 0px;
-  left: 0;
-  opacity: 0.5;
-}
-#app .toast-container .Toastify__toast .Toastify__close-button {
-  color: #b7b6b6;
-}
-#app
-  .toast-container
-  .Toastify__toast.Toastify__toast--success
-  .Toastify__toast-body:before {
-  background: #07bc0c;
-}
-#app
-  .toast-container
-  .Toastify__toast.Toastify__toast--error
-  .Toastify__toast-body:before {
-  background: #e74c3c;
-}
-#app
-  .toast-container
-  .Toastify__toast.Toastify__toast--info
-  .Toastify__toast-body:before {
-  background: #3498db;
+#app .Toastify__toast-container.Toastify__toast-container--bottom-right.toast-container {
+  width: 100%;
+  max-width: 400px;
+  pointer-events: unset;
+  user-select: none;
 }
 #app .code-dark {
   white-space: pre;
@@ -294,7 +260,18 @@
 #app .custom-select {
   -webkit-appearance: none;
 }
-
 #app .clickable, #app button, #app h1, #app label {
   user-select: none;
+}
+#app .page .content {
+  overflow: auto;
+}
+
+#app .page > h1 {
+  margin: 40px 40px 10px 40px;
+  width: unset;
+}
+
+#app .page > h1 + .content {
+  padding: 0 40px 0 40px;
 }

@@ -10,19 +10,16 @@ import "ace-builds/src-noconflict/theme-github";
 import pretty from "pretty";
 import { modal } from "./Modal";
 import bufferItemMockJson from "../json/bufferItem.json";
-import { IPostItem } from "../../common/interfaces";
 import { setHook } from "../../common/bootstrap";
 
 const htmlMinifier = require("html-minifier-terser");
 
 interface IProps {
   onSave: (headHtml: string, footerHtml: string, sidebarHtml: string) => void;
-  onNoChangesSave: () => void;
 }
 
 const HTMLEditorOverlay: FunctionComponent<IProps> = ({
-  onSave = (h, f, s) => {},
-  onNoChangesSave = () => {}
+  onSave = (h, f, s) => {}
 }) => {
   const headHTMLState = useRef<string>(null);
   const footerHTMLState = useRef<string>(null);
@@ -31,35 +28,28 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
   const [headHtmlEnabled, setHeadHtmlEnabled] = useState(false);
   const [footerHtmlEnabled, setFooterHtmlEnabled] = useState(false);
   const [sidebarHtmlEnabled, setSidebarHtmlEnabled] = useState(false);
-  const [post, setPost] = useState<IPostItem>(null);
+  const [show, setShow] = useState<boolean>(false);
 
   useEffect(() => {
-    setHook("HTMLEditorOverlay_setPost", (value: IPostItem) => {
-      headHTMLState.current = value.headHtml;
-      footerHTMLState.current = value.footerHtml;
-      sidebarHTMLState.current = value.sidebarHtml;
-      setPost(value);
+    setHook("HTMLEditorOverlay_setVariables", ({ headHtml, footerHtml, sidebarHtml }) => {
+      headHTMLState.current = headHtml;
+      footerHTMLState.current = footerHtml;
+      sidebarHTMLState.current = sidebarHtml;
+      setShow(true);
     });
   }, []);
   
-  if(!post){
+  if(!show){
     return null;
   }
 
   const handleSave = () => {
-    if (
-      onSave &&
-      (headHTMLState.current !== post.headHtml ||
-        footerHTMLState.current !== post.footerHtml ||
-        sidebarHTMLState.current !== post.sidebarHtml)
-    ) {
+    if (onSave) {
       onSave(
         htmlMinifier.minify(headHTMLState.current || ""),
         htmlMinifier.minify(footerHTMLState.current || ""),
         htmlMinifier.minify(sidebarHTMLState.current || "")
       );
-    } else {
-      onNoChangesSave();
     }
   };
 
@@ -101,7 +91,7 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
             type="button"
             className="btn btn-outline-secondary"
             onClick={() => {
-              setPost(null);
+              setShow(null);
             }}
           >
             <span className="material-symbols-outlined">clear</span>

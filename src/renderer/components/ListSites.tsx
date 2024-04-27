@@ -112,45 +112,45 @@ const ListSites: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   return (
     <div className="ListSites page">
-      <div className="content">
-        <h1>
-          <div className="left-align">
-            <span>Your Sites</span>
-          </div>
-          <div className="right-align">
-            {!!Object.keys(sites).length && (
-              <button
-                type="button"
-                className="btn btn-outline-primary"
-                onClick={toggleSelectEnabled}
-              >
-                Toggle Select
-              </button>
-            )}
-            {!!selectedItems.length && (
-              <button
-                type="button"
-                className="btn btn-outline-danger"
-                onClick={() => deleteSelectedSites()}
-              >
-                <i className="material-symbols-outlined">delete</i>
-              </button>
-            )}
+      <h1>
+        <div className="left-align">
+          <span>Your Sites</span>
+        </div>
+        <div className="right-align">
+          {!!Object.keys(sites).length && (
             <button
               type="button"
-              className="btn btn-primary"
-              onClick={() =>
-                history.push({
-                  pathname: "/sites/create",
-                  state: { showBack: true },
-                })
-              }
+              className="btn btn-outline-primary"
+              onClick={toggleSelectEnabled}
             >
-              <i className="material-symbols-outlined">add</i>
-              <span>Create New</span>
+              Toggle Select
             </button>
-          </div>
-        </h1>
+          )}
+          {!!selectedItems.length && (
+            <button
+              type="button"
+              className="btn btn-outline-danger"
+              onClick={() => deleteSelectedSites()}
+            >
+              <i className="material-symbols-outlined">delete</i>
+            </button>
+          )}
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() =>
+              history.push({
+                pathname: "/sites/create",
+                state: { showBack: true },
+              })
+            }
+          >
+            <i className="material-symbols-outlined">add</i>
+            <span>Create New</span>
+          </button>
+        </div>
+      </h1>
+      <div className="content">
         <div className="items">
           <DraggableTree
             showIcon

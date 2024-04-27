@@ -20,11 +20,11 @@ export const getTemplate = async (templateId: string, extension: string) => {
       true
     );
   } else {
-    const templateRelPath = templateId.split(".").join("/");
+    const templateRelPath = templateId.split(".")[1];
     const templatePathName = `${templateRelPath}.${extension}`;
 
     const templatePath = path.join(
-      await storeInt.get("paths.themes"),
+      getLocalThemePath(theme),
       templatePathName
     );
 
@@ -39,11 +39,7 @@ export const getThemeIndex = async (themeName: string) => {
       true
     )) as string;
   } else {
-    const themeDir = path.join(
-      await storeInt.get("paths.themes"),
-      themeName,
-      "index.html"
-    );
+    const themeDir = path.join(getLocalThemePath(themeName), "index.html");
     return fs.readFileSync(themeDir, "utf8");
   }
 };
@@ -106,19 +102,35 @@ export const getThemeManifest = async (theme: string) => {
     return false;
   }
 
-  const manifestPath = path.join(
-    await storeInt.get("paths.themes"),
-    theme,
-    "manifest.json"
-  );
+  let manifest;
 
-  const manifest = prssConfig.themes[theme]
-    ? await getJson(prssConfig.themes[theme] + "/manifest.json", true)
-    : JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  // Config theme
+  if(prssConfig.themes[theme]){
+    manifest = await getJson(prssConfig.themes[theme] + "/manifest.json", true);
+  } else {
+    const themePath = getLocalThemePath(theme);
+    let manifestPath = path.join(themePath, "manifest.json");
+    manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    manifest.isLocal = true;
+  }
 
-  setCache(`manifest-${theme}`, manifest);
-  return manifest;
+  if(manifest) {
+    setCache(`manifest-${theme}`, manifest);
+    return manifest;
+  }
 };
+
+export const getLocalThemePath = (themeName: string) => {
+  const themesDir = storeInt.get("paths.themes");
+  const themePath = path.join(themesDir, themeName);
+
+  if(fs.existsSync(path.join(themePath, "build"))){
+    return path.join(themePath, "build");
+  } else {
+    return path.join(themePath);
+  }
+}
+
 
 export const baseTemplate = ({ head = "", body = "" }: any) => {
   return `

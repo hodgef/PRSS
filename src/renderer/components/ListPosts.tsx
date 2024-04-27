@@ -196,68 +196,68 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   return (
     <div className="ListPosts page">
-      <div className="content">
-        <h1>
-          <div className="left-align">
-            <i
-              className="material-symbols-outlined clickable"
-              onClick={() => history.goBack()}
+      <h1>
+        <div className="left-align">
+          <i
+            className="material-symbols-outlined clickable"
+            onClick={() => history.goBack()}
+          >
+            arrow_back
+          </i>
+          <span>Posts</span>
+        </div>
+        <div className="right-align">
+          {!!items.length && (
+            <button
+              type="button"
+              className="btn btn-outline-primary"
+              onClick={toggleSelectEnabled}
             >
-              arrow_back
-            </i>
-            <span>Posts</span>
-          </div>
-          <div className="right-align">
-            {!!items.length && (
+              Toggle Select
+            </button>
+          )}
+
+          {!!selectedItems.length && (
+            <Fragment>
               <button
                 type="button"
                 className="btn btn-outline-primary"
-                onClick={toggleSelectEnabled}
+                onClick={() => cloneSelectedPosts()}
+                title="Clone Selected Posts"
               >
-                Toggle Select
+                <i className="material-symbols-outlined">file_copy</i>
               </button>
-            )}
-
-            {!!selectedItems.length && (
-              <Fragment>
-                <button
-                  type="button"
-                  className="btn btn-outline-primary"
-                  onClick={() => cloneSelectedPosts()}
-                  title="Clone Selected Posts"
-                >
-                  <i className="material-symbols-outlined">file_copy</i>
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-outline-danger"
-                  onClick={() => deleteSelectedPosts()}
-                  title="Delete Selected Posts"
-                >
-                  <i className="material-symbols-outlined">delete</i>
-                </button>
-              </Fragment>
-            )}
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => history.push(`/sites/${siteId}/posts/create`)}
-            >
-              <i className="material-symbols-outlined">add</i>
-              <span>Add New</span>
-            </button>
-            {showPublishButton && hosting.name !== "none" && (
               <button
                 type="button"
-                className="btn btn-outline-success"
-                onClick={() => publishSite()}
+                className="btn btn-outline-danger"
+                onClick={() => deleteSelectedPosts()}
+                title="Delete Selected Posts"
               >
-                <i className="material-symbols-outlined">publish</i>
-                <span>Publish Changes</span>
+                <i className="material-symbols-outlined">delete</i>
               </button>
-            )}
-          </div>
-        </h1>
+            </Fragment>
+          )}
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => history.push(`/sites/${siteId}/posts/create`)}
+          >
+            <i className="material-symbols-outlined">add</i>
+            <span>Add New</span>
+          </button>
+          {showPublishButton && hosting.name !== "none" && (
+            <button
+              type="button"
+              className="btn btn-outline-success"
+              onClick={() => publishSite()}
+            >
+              <i className="material-symbols-outlined">publish</i>
+              <span>Publish Changes</span>
+            </button>
+          )}
+        </div>
+      </h1>
+      <div className="content">
         <div className="items">
           <DraggableTree
             showSearch

@@ -1,0 +1,13 @@
+.ThemeCreator .content {
+  display: flex;
+  align-items: flex-start;
+  flex-flow: column;
+}
+.ThemeCreator .form-group {
+  display: flex;
+  flex-flow: column;
+}
+
+.ThemeCreator form {
+  width: 100%;
+}

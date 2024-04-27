@@ -17,12 +17,28 @@ export const useProvider = <T,>(key: string) => {
     return {
         set value(v: T) {
             context[key] = v;
+        },
+        get value() {
+            if (!context[key]) {
+                console.warn(`contextMap: Key '${key}' Not Found!`);
+                return null;
+            }
+            return context[key] as T;
+        }
+    }
+};
+
+export const usePersist = <T,>(key: string) => {
+    const context = useContext(Context);
+    return {
+        set value(v: T) {
+            context[key] = v;
             const json = JSON.stringify(contextMap);
             storeInt.set("contextMap", json);
         },
         get value() {
             if (!context[key]) {
-                console.error(`contextMap: Key '${key}' Not Found!`);
+                console.warn(`contextMap: Key '${key}' Not Found!`);
                 return null;
             }
             return context[key] as T;

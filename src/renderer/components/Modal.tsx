@@ -105,7 +105,7 @@ class Modal extends Component {
             top: 0,
             left: 0,
             display: "flex",
-            zIndex: 9999,
+            zIndex: 99999999,
             paddingTop: "40px",
           }}
         >
@@ -215,7 +215,7 @@ class Modal extends Component {
             top: 0,
             left: 0,
             display: "flex",
-            zIndex: 9999,
+            zIndex: 99999999,
           }}
         >
           <div
@@ -315,7 +315,7 @@ class Modal extends Component {
             top: 0,
             left: 0,
             display: "flex",
-            zIndex: 9999,
+            zIndex: 99999999,
           }}
         >
           <div

@@ -6,6 +6,7 @@ import React, {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
@@ -20,7 +21,7 @@ import { getSite, updateSite } from "../services/db";
 import { shell } from "electron";
 import path from "path";
 import fs from "fs";
-import { storeInt } from "../../common/bootstrap";
+import { runHook, storeInt } from "../../common/bootstrap";
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Col from 'react-bootstrap/Col';
@@ -47,12 +48,6 @@ const SiteSettings: FunctionComponent<IProps> = ({
   const [editedSiteName, setEditedSiteName] = useState("");
   const [siteTheme, setSiteTheme] = useState("");
   const [siteUrl, setSiteUrl] = useState("");
-
-  const [showRawHTMLEditorOverlay, setShowRawHTMLEditorOverlay] =
-    useState(false);
-
-  const [showSiteVariablesEditorOverlay, setShowSiteVariablesEditorOverlay] =
-    useState(false);
 
   const [themeList, setThemeList] = useState(null);
   const history = useHistory();
@@ -90,6 +85,22 @@ const SiteSettings: FunctionComponent<IProps> = ({
       setThemeList(await getThemeList());
     };
     getData();
+  }, []);
+
+  const setShowRawHTMLEditorOverlay = useCallback(() => {
+    runHook("HTMLEditorOverlay_setVariables", {
+      headHtml: site.headHtml,
+      footerHtml: site.footerHtml,
+      sidebarHtml: site.sidebarHtml
+    });
+  }, [site]);
+
+  const setShowSiteVariablesEditorOverlay = useCallback(() => {
+    runHook("SiteVariablesEditorOverlay_show");
+  }, []);
+
+  const handleVariablesOverlaySave = useCallback(() => {
+    toast.success("Post updated");
   }, []);
 
   if (!site || !themeList) {
@@ -203,29 +214,28 @@ const SiteSettings: FunctionComponent<IProps> = ({
 
   return (
     <div className="SiteSettings page">
+      <h1>
+        <div className="left-align">
+          <i
+            className="material-symbols-outlined clickable"
+            onClick={() => history.goBack()}
+          >
+            arrow_back
+          </i>
+          <span>Site Settings</span>
+        </div>
+        <div className="right-align">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => handleSubmit()}
+          >
+            <span className="material-symbols-outlined mr-2">save</span>
+            <span>Save Changes</span>
+          </button>
+        </div>
+      </h1>
       <div className="content">
-        <h1>
-          <div className="left-align">
-            <i
-              className="material-symbols-outlined clickable"
-              onClick={() => history.goBack()}
-            >
-              arrow_back
-            </i>
-            <span>Site Settings</span>
-          </div>
-          <div className="right-align">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => handleSubmit()}
-            >
-              <span className="material-symbols-outlined mr-2">save</span>
-              <span>Save Changes</span>
-            </button>
-          </div>
-        </h1>
-
         <Form className="mt-4">
           <Form.Group className="form-group row">
             <InputGroup className="input-group-lg">
@@ -304,7 +314,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
                 <button
                   type="button"
                   className="btn btn-outline-primary d-flex"
-                  onClick={() => setShowRawHTMLEditorOverlay(true)}
+                  onClick={() => setShowRawHTMLEditorOverlay()}
                 >
                   <span className="material-symbols-outlined mr-2">code</span>
                   <span>Add Site Raw HTML</span>
@@ -337,7 +347,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
                 <button
                   type="button"
                   className="btn btn-outline-primary d-flex"
-                  onClick={() => setShowSiteVariablesEditorOverlay(true)}
+                  onClick={() => setShowSiteVariablesEditorOverlay()}
                 >
                   <span className="material-symbols-outlined mr-2">create</span>
                   <span>Edit Variables</span>
@@ -362,21 +372,8 @@ const SiteSettings: FunctionComponent<IProps> = ({
           </div>
         </Form>
       </div>
-      {showRawHTMLEditorOverlay && (
-        <HTMLEditorOverlay
-          headDefaultValue={headHtml}
-          footerDefaultValue={footerHtml}
-          sidebarDefaultValue={sidebarHtml}
-          onSave={handleRawHTMLOverlaySave}
-          onClose={() => setShowRawHTMLEditorOverlay(false)}
-        />
-      )}
-      {showSiteVariablesEditorOverlay && (
-        <SiteVariablesEditorOverlay
-          siteId={siteId}
-          onClose={() => setShowSiteVariablesEditorOverlay(false)}
-        />
-      )}
+      <SiteVariablesEditorOverlay site={site} onSave={handleVariablesOverlaySave} />
+      <HTMLEditorOverlay onSave={handleRawHTMLOverlaySave} />
     </div>
   );
 };

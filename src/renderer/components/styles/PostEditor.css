@@ -1,27 +1,27 @@
-#app .PostEditor > .content > h1 {
+#app .PostEditor > h1 {
   padding-bottom: 0;
   margin-bottom: 10px;
   height: 45px;
 }
-#app .PostEditor > .content > h1 .left-align {
+#app .PostEditor > h1 .left-align {
   flex: 1;
   display: flex;
   align-items: center;
   width: 65%;
 }
-#app .PostEditor > .content > h1 .left-align > .material-symbols-outlined {
+#app .PostEditor > h1 .left-align > .material-symbols-outlined {
   margin-right: 10px;
 }
-#app .PostEditor > .content > h1 .right-align {
+#app .PostEditor > h1 .right-align {
   display: block;
   width: 250px;
 }
-#app .PostEditor > .content > h1 ul {
+#app .PostEditor > h1 ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-#app .PostEditor > .content > h1 ul li {
+#app .PostEditor > h1 ul li {
   box-sizing: border-box;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 5px;
@@ -32,25 +32,25 @@
   align-items: center;
   margin-bottom: 10px;
 }
-#app .PostEditor > .content > h1 ul .left-align {
+#app .PostEditor > h1 ul .left-align {
   flex: 1;
   display: flex;
   align-items: center;
   height: 100%;
 }
-#app .PostEditor > .content > h1 ul .left-align > .material-symbols-outlined {
+#app .PostEditor > h1 ul .left-align > .material-symbols-outlined {
   margin-right: 10px;
 }
-#app .PostEditor > .content > h1 ul .left-align .form-check {
+#app .PostEditor > h1 ul .left-align .form-check {
   margin-right: 10px;
 }
-#app .PostEditor > .content > h1 ul .left-align .site-title.clickable {
+#app .PostEditor > h1 ul .left-align .site-title.clickable {
   flex: 1;
   height: 100%;
   display: flex;
   align-items: center;
 }
-#app .PostEditor > .content > h1 ul .right-align {
+#app .PostEditor > h1 ul .right-align {
   display: flex;
   margin-left: 20px;
 }
@@ -94,7 +94,14 @@
 }
 #app .PostEditor .jodit-container.jodit_fullsize {
   top: 49px;
-  height: calc(100vh - 50px) !important;
+  height: calc(100vh - 80px) !important;
+}
+#app .PostEditor .jodit-container .jodit-wysiwyg {
+  margin-top: 10px;
+}
+#app .PostEditor .jodit-container.jodit_fullsize .jodit-wysiwyg {
+  padding: 0 30px !important;
+  margin-top: 15px;
 }
 #app .PostEditor .jodit-container .jodit-workplace {
   flex: 1;
@@ -129,7 +136,7 @@
   border-radius: 3px;
   height: 27px;
 }
-#app .PostEditor .jodit-container .jodit-status-bar__item-right:last-child {
+#app .PostEditor .jodit-container .jodit-status-bar__item-right .jodit-status-bar-link {
   display: none;
 }
 #app .PostEditor .jodit-container .jodit-toolbar-button_size_tiny {

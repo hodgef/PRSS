@@ -88,20 +88,19 @@ const Addons: FunctionComponent<IProps> = ({
 
   return (
     <div className="Addons page">
+      <h1>
+        <div className="left-align">
+          <i
+            className="material-symbols-outlined clickable"
+            onClick={() => history.goBack()}
+          >
+            arrow_back
+          </i>
+          <span>Addons</span>
+        </div>
+        <div className="right-align"></div>
+      </h1>
       <div className="content">
-        <h1>
-          <div className="left-align">
-            <i
-              className="material-symbols-outlined clickable"
-              onClick={() => history.goBack()}
-            >
-              arrow_back
-            </i>
-            <span>Addons</span>
-          </div>
-          <div className="right-align"></div>
-        </h1>
-
         <Row className="mt-3">
           <Col>
             {prssConfig.available_addons?.map(addon => {

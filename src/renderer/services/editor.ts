@@ -1,5 +1,3 @@
-//import draftToHtml from 'draftjs-to-html';
-
 export const imageUploadCallback = (file) => {
   new Promise((resolve) => {
     const reader = new FileReader();
@@ -84,31 +82,4 @@ export const convertImages = (htmlText) => {
     });
   }
   return htmlText;
-};
-
-// export const handleDraftToHtml = editorState => {
-//     const htmlText = draftToHtml(editorState);
-//     const htmlConverted = convertImages(htmlText); //here I call the function that converts the <img/> to <div><img/></div>.
-
-//     return htmlConverted;
-// };
-
-export const editorOptions = {
-  autofocus: true,
-  uploader: {
-    insertImageAsBase64URI: true,
-  },
-  buttons:
-    "source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,|,font,fontsize,brush,paragraph,align,|,image,video,table,link,|,fullsize",
-  buttonsMD:
-    "source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,|,font,fontsize,paragraph,align,|,image,link,dots",
-  buttonsSM:
-    "source,|,bold,strikethrough,underline,italic,|,font,paragraph,align,image,link,dots",
-  buttonsXS:
-    "source,|,bold,underline,italic,|,font,paragraph,align,image,link,dots",
-  cleanHTML: {
-    removeEmptyElements: false,
-    fillEmptyParagraph: false,
-    replaceNBSP: false,
-  },
 };

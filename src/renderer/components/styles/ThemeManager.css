@@ -4,8 +4,10 @@
   flex-flow: column;
 }
 .ThemeManager .content .theme-list {
-  flex: 1;
   width: 100%;
+  display: flex;
+  flex-flow: wrap;
+  gap: 20px;
 }
 .ThemeManager .content .theme-list .right-align .material-symbols-outlined {
   font-size: 21px;
@@ -19,18 +21,24 @@
   overflow: hidden;
   position: relative;
   display: inline-flex;
-  width: 270px;
-  height: 250px;
-  margin-right: 20px;
   flex-flow: column;
   vertical-align: top;
-  margin-bottom: 20px;
+  width: calc((100% / 4) - 15px);
+  max-width: 500px;
+  min-width: 300px;
+  height: 300px;
 }
+
 .ThemeManager .content .theme-list-item.add-new-theme-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
+
+.ThemeManager .content .theme-list-item .feature-title {
+  font-size: 20px;
+}
+
 .ThemeManager .content .theme-list-item.add-new-theme-btn i {
   font-size: 40px;
 }
@@ -66,6 +74,8 @@
 .ThemeManager .content .theme-list-item .theme-list-item-desc {
   padding: 10px 15px;
   box-sizing: border-box;
+  display: flex;
+  flex-flow: column;
 }
 .ThemeManager .content .theme-list-item.selected-theme::after {
   content: "check_circle";
@@ -83,7 +93,24 @@
 }
 .ThemeManager .content .theme-list-item-image {
   height: 150px;
-  width: 265px;
+  width: 100%;
   background-size: cover;
   background-repeat: no-repeat;
+  background-position: center;
+  flex: 1;
+}
+
+
+@media (max-width: 1330px) {
+  .ThemeManager .content .theme-list-item {
+    width: calc((100% / 3) - 15px);
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 1020px) {
+  .ThemeManager .content .theme-list-item {
+    width: calc((100% / 2) - 15px);
+    min-height: 300px;
+  }
 }

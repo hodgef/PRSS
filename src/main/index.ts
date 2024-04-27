@@ -29,9 +29,9 @@ function createWindow () {
         title: "PRSS",
         icon: iconPath,
         frame: isDevelopment || process.platform === 'darwin',
-        width: 1250,
-        height: 720,
-        minWidth: 860,
+        width: 1350,
+        height: 750,
+        minWidth: 900,
         minHeight: 500,
         webPreferences: {
             nodeIntegration: true,

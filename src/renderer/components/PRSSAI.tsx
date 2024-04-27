@@ -377,22 +377,21 @@ const PRSSAI: FunctionComponent<IProps> = ({
 
   return (
     <div className="PRSSAI page">
+      <h1>
+        <div className="left-align">
+          <i
+            className="material-symbols-outlined clickable"
+            onClick={() => history.goBack()}
+          >
+            arrow_back
+          </i>
+          <span>AI</span>
+        </div>
+        <div className="right-align">
+          <img src={prssaiLogo} width={150} className="mb-3" />
+        </div>
+      </h1>
       <div className="content">
-        <h1>
-          <div className="left-align">
-            <i
-              className="material-symbols-outlined clickable"
-              onClick={() => history.goBack()}
-            >
-              arrow_back
-            </i>
-            <span>AI</span>
-          </div>
-          <div className="right-align">
-            <img src={prssaiLogo} width={150} className="mb-3" />
-          </div>
-        </h1>
-
         <Row className="mt-3">
           <Col>
             <Accordion defaultActiveKey={typeof activeSection !== "undefined" ? activeSection : status ? "1" : "0"} onSelect={(activeKey: string) => {

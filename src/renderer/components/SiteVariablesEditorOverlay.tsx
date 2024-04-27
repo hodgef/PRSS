@@ -6,6 +6,7 @@ import React, {
   useRef,
   Fragment,
   useEffect,
+  useCallback,
 } from "react";
 import { Link } from "react-router-dom";
 import cx from "classnames";
@@ -19,86 +20,70 @@ import { toast } from "react-toastify";
 import { modal } from "./Modal";
 import { siteVarToArray } from "../services/hosting";
 import { getBufferItems } from "../services/build";
-import { getSite, getItems, updateSite, updateItem } from "../services/db";
+import { getItems, updateSite, updateItem } from "../services/db";
 import { IPostItem, ISite } from "../../common/interfaces";
 import { setHook } from "../../common/bootstrap";
 
 interface IProps {
-  siteId: string;
+  site: ISite;
+  post?: IPostItem;
   onSave: () => void;
 }
 
 const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
-  siteId,
-  onSave = () => {}
+  site,
+  post,
+  onSave = () => { }
 }) => {
-  const [postId, setPostId] = useState<string>(null)
-  const site = useRef<ISite>(null);
-  const post = useRef<IPostItem>(null);
   const items = useRef<IPostItem[]>(null);
 
   const [bufferItem, setBufferItem] = useState(null);
+  const [show, setShow] = useState<boolean>(false);
+  const [parsedVariables, setParsedVariables] = useState<{ [key: string]: string }[]>([]);
+  const [parsedInheritedVariables, setParsedInheritedVariables] = useState<{ [key: string]: string }[]>([]);
 
-  const [parsedVariables, setParsedVariables] = useState<{[key: string]: string}[]>([]);
-  const [parsedInheritedVariables, setParsedInheritedVariables] = useState<{[key: string]: string}[]>([]);
-
-  const [variables, setVariables] = useState<{[key: string]: string}[]>(parsedVariables);
+  const [variables, setVariables] = useState<{ [key: string]: string }[]>(parsedVariables);
   const [exclusiveVariables, setExclusiveVariables] = useState<string[]>([]);
 
   const variablesBuffer = useRef(parsedVariables) as any;
 
   useEffect(() => {
-    setHook("SiteVariablesEditorOverlay_setPostId", async (value: string) => {
-        const siteRes = await getSite(siteId);
-        const itemsRes = await getItems(siteId);
-  
-        site.current = siteRes;
-        items.current = itemsRes;
-  
-        const bufferItems = await getBufferItems(siteRes);
-  
-        const currentPost = value
-          ? itemsRes.find((item) => item.uuid === value)
-          : null;
-        
-        post.current = currentPost;
-  
-        const bufferItem =
-          bufferItems && post
-            ? bufferItems.find((bufferItem) => bufferItem.item.uuid === currentPost.uuid)
-            : null;
-  
-        setBufferItem(bufferItem);
-  
-        const baseVars = post ? currentPost.vars || {} : siteRes.vars || {};
-  
-        const parsedVariables = siteVarToArray(
-          Object.keys(baseVars).length ? baseVars : { "": "" }
-        );
-  
-        setParsedVariables(parsedVariables);
-        setVariables(parsedVariables);
-  
-        const exclusiveVariables = post ? currentPost.exclusiveVars || [] : [];
-        setExclusiveVariables(exclusiveVariables);
-  
-        variablesBuffer.current = variablesBuffer;
-        bufferItem &&
-          setParsedInheritedVariables(siteVarToArray(bufferItem.vars));
-
-        setPostId(value);
-      });
+    setHook("SiteVariablesEditorOverlay_show", async (value: string) => {
+      setData();
+    });
   }, []);
 
-  if (
-    !postId ||
-    !site ||
-    !items ||
-    (postId && (!post || !bufferItem)) ||
-    !parsedVariables
-  ) {
-    return null;
-  }
+  const setData = useCallback(async () => {
+    const itemsRes = await getItems(site.uuid);
+    items.current = itemsRes;
+
+    const bufferItems = await getBufferItems(site);
+
+    const bufferItem =
+      bufferItems && post
+        ? bufferItems.find((bufferItem) => bufferItem.item.uuid === post.uuid)
+        : null;
+
+    setBufferItem(bufferItem);
+
+    const baseVars = post ? post.vars || {} : site.vars || {};
+
+    const parsedVariables = siteVarToArray(
+      Object.keys(baseVars).length ? baseVars : { "": "" }
+    );
+
+    setParsedVariables(parsedVariables);
+    setVariables(parsedVariables);
+
+    const exclusiveVariables = post ? post.exclusiveVars || [] : [];
+    setExclusiveVariables(exclusiveVariables);
+
+    variablesBuffer.current = variablesBuffer;
+    bufferItem &&
+      setParsedInheritedVariables(siteVarToArray(bufferItem.vars));
+
+    setShow(true);
+  }, []);
 
   const addNew = () => {
     setVariables((prevVars) => [...prevVars, { name: "", content: "" }]);
@@ -189,7 +174,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
      */
     if (post) {
       const updatedItem = {
-        ...post.current,
+        ...post,
         vars: varObj,
         exclusiveVars: newExclusiveVarsArr,
         updatedAt,
@@ -198,13 +183,13 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
       /**
        *  Update item
        */
-      await updateItem(siteId, postId, {
+      await updateItem(site.uuid, post.uuid, {
         vars: varObj,
         exclusiveVars: newExclusiveVarsArr,
         updatedAt,
       });
 
-      post.current = updatedItem;
+      post = updatedItem;
 
       onSave();
     } else {
@@ -212,7 +197,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
        * Save to site
        */
       const updatedSite = {
-        ...site.current,
+        ...site,
         vars: varObj,
         updatedAt,
       };
@@ -220,12 +205,12 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
       /**
        * Update site updatedAt
        */
-      await updateSite(siteId, {
+      await updateSite(site.uuid, {
         vars: varObj,
         updatedAt,
       });
 
-      site.current = updatedSite;
+      site = updatedSite;
       toast.success("Site variables saved!");
     }
   };
@@ -257,6 +242,14 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
     );
   };
 
+  if (
+    !show ||
+    !site ||
+    !parsedVariables
+  ) {
+    return null;
+  }
+
   return (
     <div className="sitevars-editor-overlay">
       <div className="editor-content">
@@ -285,7 +278,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
               type="button"
               className="btn btn-outline-primary"
               onClick={() => {
-                setPostId(null);
+                setShow(false);
               }}
             >
               <span className="material-symbols-outlined">clear</span>
@@ -370,36 +363,36 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
             <h2>Computed Variables</h2>
             <p>
               This includes global variables from{" "}
-              <Link to={`/sites/${siteId}/settings`}>Site Settings</Link> as
+              <Link to={`/sites/${site.uuid}/settings`}>Site Settings</Link> as
               well as parent variables.
             </p>
             <div className="inherited-variable-list">
-            <ul>
-              {parsedInheritedVariables.map((variable, index) => {
-                return (
-                  <li key={`inehrited-${variable}-${index}`} className="mb-2">
-                    <div className="input-group input-group-lg">
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Name"
-                        value={variable.name}
-                        maxLength={20}
-                        readOnly
-                      />
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Content"
-                        value={variable.content}
-                        readOnly
-                      />
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+              <ul>
+                {parsedInheritedVariables.map((variable, index) => {
+                  return (
+                    <li key={`inehrited-${variable}-${index}`} className="mb-2">
+                      <div className="input-group input-group-lg">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Name"
+                          value={variable.name}
+                          maxLength={20}
+                          readOnly
+                        />
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Content"
+                          value={variable.content}
+                          readOnly
+                        />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           </>
         )}
       </div>

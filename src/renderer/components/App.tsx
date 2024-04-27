@@ -29,6 +29,7 @@ import { prssConfig, storeInt } from "../../common/bootstrap";
 import { notifyNewVersion } from "../services/utils";
 import { Provider } from "./UseProvider";
 import { Helmet } from "react-helmet";
+import ThemeCreator from "./ThemeCreator";
 
 export const App: FunctionComponent = () => {
   const [headerLeft, setHeaderLeft] = useState(null);
@@ -57,7 +58,7 @@ export const App: FunctionComponent = () => {
 
   useEffect(() => {
     if(!prssConfig?.latest){
-      modal.alert("The PRSS Configuration could not be loaded. Some functionality (such as themes) will be broken. Please ensure that PRSS has internet connection.", "PRSS Config Error");
+      modal.alert("The PRSS Configuration could not be loaded. Some functionality (such as themes) will be broken. Please ensure that PRSS has internet connection and restart the app.", "PRSS Config Error");
     } else {
       // Appx: Notify about updates
       const latestVersion = prssConfig.latest;
@@ -118,6 +119,12 @@ export const App: FunctionComponent = () => {
               exact
               path="/sites/:siteId/themes"
               render={(props) => handleRoute(ThemeManager, props)}
+            />
+
+            <Route
+              exact
+              path="/sites/:siteId/themes/create"
+              render={(props) => handleRoute(ThemeCreator, props)}
             />
 
             <Route
@@ -193,8 +200,11 @@ export const App: FunctionComponent = () => {
         <StandardModal />
         <ToastContainer
           className="toast-container"
-          hideProgressBar
           position="bottom-right"
+          autoClose={3000}
+          closeOnClick
+          pauseOnHover
+          draggable
         />
       </div>
     </Provider>

@@ -35,7 +35,6 @@ import { runHook } from "../../common/bootstrap";
 import Footer from "./Footer";
 import { debounce } from "lodash";
 import JoditEditor from "jodit-react";
-import { editorOptions } from "../services/editor";
 
 const remote = require("@electron/remote");
 const win = remote.getCurrentWindow();
@@ -44,17 +43,52 @@ interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
 }
 
-const Editor = ({ item, editorContent, setEditorChanged }: { item: IPostItem, editorContent: any, setEditorChanged: any }) => {
+const Editor = ({ item, editorContent, setEditorChanged, onKeyPress }: { item: IPostItem, editorContent: any, setEditorChanged: any, onKeyPress: (e: KeyboardEvent) => void }) => {
   const editor = useRef(null);
 
   if (!item) {
     return;
   }
 
+  const config = {
+    autofocus: true,
+    uploader: {
+      insertImageAsBase64URI: true,
+    },
+    buttons:
+      "source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,|,font,fontsize,brush,paragraph,align,|,image,video,table,link,|,fullsize",
+    buttonsMD:
+      "source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,|,font,fontsize,paragraph,align,|,image,link,dots",
+    buttonsSM:
+      "source,|,bold,strikethrough,underline,italic,|,font,paragraph,align,image,link,dots",
+    buttonsXS:
+      "source,|,bold,underline,italic,|,font,paragraph,align,image,link,dots",
+    cleanHTML: {
+      removeEmptyElements: false,
+      fillEmptyParagraph: false,
+      replaceNBSP: false,
+    },
+    commandToHotkeys: {
+      removeFormat: ['ctrl+shift+m', 'cmd+shift+m'],
+      insertOrderedList: ['ctrl+shift+7', 'cmd+shift+7'],
+      insertUnorderedList: ['ctrl+shift+8, cmd+shift+8'],
+      selectall: ['ctrl+a', 'cmd+a'],
+      bold: ['ctrl+b']
+    },
+    events: {
+      afterInit(instance) {
+        const container = instance.container.querySelector(".jodit-wysiwyg");
+        if (container) {
+          container.onkeydown = onKeyPress;
+        }
+      },
+    },
+  };
+
   return useMemo(() => (
     <JoditEditor
       ref={editor}
-      config={editorOptions}
+      config={config}
       value={item.content}
       onChange={content => {
         editorContent.current = content;
@@ -79,6 +113,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const editorMode = useRef("");
   const postStatusRef = useRef<HTMLDivElement>(null);
   const itemIndex = items.current ? items.current.findIndex((item) => item.uuid === postId) : -1;
+  const buildBusy = useRef<boolean>(false);
 
   const editorResizeFix = useCallback(() => {
     if (!win.isMaximized()) {
@@ -102,18 +137,22 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   const setPreviewLoading = useCallback((state: boolean) => {
     runHook("PostEditorSidebar_previewLoading", state);
+    buildBusy.current = state;
   }, []);
 
   const setBuildLoading = useCallback((state: boolean) => {
     runHook("PostEditorSidebar_buildLoading", state);
+    buildBusy.current = state;
   }, []);
 
   const setBuildAllLoading = useCallback((state: boolean) => {
     runHook("PostEditorSidebar_buildAllLoading", state);
+    buildBusy.current = state;
   }, []);
 
   const setDeployLoading = useCallback((state: boolean) => {
     runHook("PostEditorSidebar_deployLoading", state);
+    buildBusy.current = state;
   }, []);
 
   useEffect(() => {
@@ -147,14 +186,14 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     const prefix = type === "error" ? "⭕" : "✅";
     postStatusRef.current.innerHTML = prefix + " " + message;
 
-    if(statusMessageTimeout.current){
+    if (statusMessageTimeout.current) {
       clearTimeout(statusMessageTimeout.current);
     }
     statusMessageTimeout.current = setTimeout(() => {
       if (postStatusRef.current) {
         postStatusRef.current.innerHTML = "";
       }
-    }, 5000);
+    }, 3000);
   }, 100), []);
 
   const startAutosave = () => {
@@ -449,16 +488,49 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   };
 
   const openRawHTMLOverlay = useCallback(() => {
-    runHook("HTMLEditorOverlay_setPost", post.current);
+    runHook("HTMLEditorOverlay_setVariables", {
+      headHtml: post.current.headHtml,
+      footerHtml: post.current.footerHtml,
+      sidebarHtml: post.current.sidebarHtml
+    });
   }, []);
 
   const openVariablesOverlay = useCallback(() => {
-    runHook("SiteVariablesEditorOverlay_setPostId", post.current.uuid);
+    runHook("SiteVariablesEditorOverlay_show");
   }, []);
 
   const handleVariablesOverlaySave = useCallback(() => {
     setStatusMessage("success", "Post updated");
   }, []);
+
+  const onEditorKeyPress = (e: KeyboardEvent) => {
+    if (e) {
+      if (e.ctrlKey) {
+        switch (e.key) {
+          // ctrl+s: Save
+          case "s":
+            handleSave();
+            break;
+
+          // ctrl+p: Preview
+          case "p":
+            !buildBusy.current && (isPreviewActive() ?
+              (() => {
+                handleStopPreview();
+                setStatusMessage("success", "Stopped Preview");
+
+              })() : (() => {
+                handleStartPreview();
+                setStatusMessage("success", "Started Preview");
+              })());
+            break;
+
+          default:
+            break;
+        }
+      }
+    }
+  };
 
   const handleRawHTMLOverlaySave = useCallback(async (
     headHtml,
@@ -488,11 +560,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       post.current = updatedItem;
       setStatusMessage("success", "Post updated");
     }
-  }, []);
-
-  const handleNoChangesSave = useCallback(() => {
-    setStatusMessage("success", "No changes detected");
-  }, []);
+  }, [itemIndex, site]);
 
   if (!site || !items.current || !post.current) {
     return null;
@@ -500,45 +568,44 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   return (
     <div className="PostEditor page">
-      <div className="content">
-        <h1>
-          <div className="left-align">
-            <i
-              className="material-symbols-outlined clickable"
-              onClick={() => history.goBack()}
-            >
-              arrow_back
-            </i>
-            {post ? (
-              <TitleEditor
-                siteId={siteId}
-                postId={postId}
-                initValue={post ? post.current?.title : null}
-                onSave={handleSaveTitle}
+      <h1>
+        <div className="left-align">
+          <i
+            className="material-symbols-outlined clickable"
+            onClick={() => history.goBack()}
+          >
+            arrow_back
+          </i>
+          {post ? (
+            <TitleEditor
+              siteId={siteId}
+              postId={postId}
+              initValue={post ? post.current?.title : null}
+              onSave={handleSaveTitle}
+            />
+          ) : (
+            <span>Post Editor</span>
+          )}
+        </div>
+        <div className="right-align">
+          {post && (
+            <Fragment>
+              <span className="slug-label mr-1">Editing:</span>
+              <SlugEditor
+                post={post.current}
+                items={items.current}
+                site={site}
+                url={url}
+                onSave={handleSaveSlug}
               />
-            ) : (
-              <span>Post Editor</span>
-            )}
-          </div>
-          <div className="right-align">
-            {post && (
-              <Fragment>
-                <span className="slug-label mr-1">Editing:</span>
-                <SlugEditor
-                  post={post.current}
-                  items={items.current}
-                  site={site}
-                  url={url}
-                  onSave={handleSaveSlug}
-                />
-              </Fragment>
-            )}
-          </div>
-        </h1>
-
+            </Fragment>
+          )}
+        </div>
+      </h1>
+      <div className="content">
         <div className="editor-container">
           <div className="left-align">
-            <Editor item={post.current} editorContent={editorContent} setEditorChanged={setEditorChanged} />
+            <Editor item={post.current} editorContent={editorContent} setEditorChanged={setEditorChanged} onKeyPress={onEditorKeyPress} />
           </div>
           <div className="right-align">
             <PostEditorSidebar
@@ -560,8 +627,8 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       </div>
       {post && (
         <Fragment>
-          <HTMLEditorOverlay onSave={handleRawHTMLOverlaySave} onNoChangesSave={handleNoChangesSave} />
-          <SiteVariablesEditorOverlay siteId={siteId} onSave={handleVariablesOverlaySave} />
+          <HTMLEditorOverlay onSave={handleRawHTMLOverlaySave} />
+          <SiteVariablesEditorOverlay site={site} post={post.current} onSave={handleVariablesOverlaySave} />
         </Fragment>
       )}
       <Footer

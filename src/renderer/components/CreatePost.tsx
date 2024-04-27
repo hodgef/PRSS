@@ -6,6 +6,7 @@ import React, {
   useState,
   useEffect,
   ReactNode,
+  useRef,
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -33,6 +34,9 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const [postTitle, setPostTitle] = useState("");
   const [postSlug, setPostSlug] = useState("");
   const [postParent, setPostParent] = useState("");
+
+  const postTitleRef = useRef<HTMLInputElement>(null);
+
   const history = useHistory();
 
   useEffect(() => {
@@ -74,6 +78,18 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     };
     getData();
   }, []);
+
+  useEffect(() => {
+    if (site && postTitleRef.current) {
+      console.log(postTitleRef.current)
+      postTitleRef.current.onkeydown = (e: KeyboardEvent) => {
+        if (e.key === "Enter") {
+          handleSubmit();
+        }
+      };
+      postTitleRef.current.focus();
+    }
+  }, [postTitle, site]);
 
   if (!site || !items) {
     return null;
@@ -175,29 +191,28 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   return (
     <div className="CreatePost page">
+      <h1>
+        <div className="left-align">
+          <i
+            className="material-symbols-outlined clickable"
+            onClick={() => history.goBack()}
+          >
+            arrow_back
+          </i>
+          <span>Create Post</span>
+        </div>
+        <div className="right-align">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => handleSubmit()}
+          >
+            <span className="material-symbols-outlined mr-2">save</span>
+            <span>Create</span>
+          </button>
+        </div>
+      </h1>
       <div className="content">
-        <h1>
-          <div className="left-align">
-            <i
-              className="material-symbols-outlined clickable"
-              onClick={() => history.goBack()}
-            >
-              arrow_back
-            </i>
-            <span>Create Post</span>
-          </div>
-          <div className="right-align">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => handleSubmit()}
-            >
-              <span className="material-symbols-outlined mr-2">save</span>
-              <span>Create</span>
-            </button>
-          </div>
-        </h1>
-
         <form className="mt-4">
           <div className="form-group">
             <div className="input-group input-group-lg">
@@ -207,6 +222,7 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                 placeholder="Post Title"
                 value={postTitle}
                 onChange={(e) => setPostTitle(e.target.value)}
+                ref={postTitleRef}
               ></input>
             </div>
           </div>

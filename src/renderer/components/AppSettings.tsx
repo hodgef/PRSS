@@ -106,29 +106,18 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   return (
     <div className="AppSettings page">
+      <h1>
+        <div className="left-align">
+          <i
+            className="material-symbols-outlined clickable"
+            onClick={() => history.goBack()}
+          >
+            arrow_back
+          </i>
+          <span>Settings</span>
+        </div>
+      </h1>
       <div className="content">
-        <h1>
-          <div className="left-align">
-            <i
-              className="material-symbols-outlined clickable"
-              onClick={() => history.goBack()}
-            >
-              arrow_back
-            </i>
-            <span>Settings</span>
-          </div>
-          {/*<div className="right-align">
-                        <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={() => handleSubmit()}
-                        >
-                            <span className="material-symbols-outlined mr-2">save</span>
-                            <span>Save Changes</span>
-                        </button>
-    </div>*/}
-        </h1>
-
         <Form className="mt-4">
           <div className="form-group row">
             <div className="input-group input-group-lg">

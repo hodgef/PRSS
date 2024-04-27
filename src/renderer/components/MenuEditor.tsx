@@ -265,57 +265,57 @@ const MenuEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   return (
     <div className="MenuEditor page">
-      <div className="content">
-        <h1>
-          <div className="left-align">
-            <i
-              className="material-symbols-outlined clickable"
-              onClick={() => history.goBack()}
-            >
-              arrow_back
-            </i>
-            <span>Menu: {menuId}</span>
-          </div>
-          <div className="right-align">
-            {!!items.length && (
-              <button
-                type="button"
-                className="btn btn-outline-primary"
-                onClick={toggleSelectEnabled}
-              >
-                Toggle Select
-              </button>
-            )}
-
-            {!!selectedItems.length && (
-              <button
-                type="button"
-                className="btn btn-outline-danger"
-                onClick={() => deleteSelectedMenuEntries()}
-              >
-                <i className="material-symbols-outlined">delete</i>
-              </button>
-            )}
+      <h1>
+        <div className="left-align">
+          <i
+            className="material-symbols-outlined clickable"
+            onClick={() => history.goBack()}
+          >
+            arrow_back
+          </i>
+          <span>Menu: {menuId}</span>
+        </div>
+        <div className="right-align">
+          {!!items.length && (
             <button
               type="button"
-              className="btn btn-primary"
-              onClick={() => addNew()}
+              className="btn btn-outline-primary"
+              onClick={toggleSelectEnabled}
             >
-              <i className="material-symbols-outlined">add</i>
-              <span>Add Item</span>
+              Toggle Select
             </button>
-            {menuChanged && (
-              <button
-                type="button"
-                className="btn btn-primary mr-2"
-                onClick={() => handleSave()}
-              >
-                <span className="material-symbols-outlined mr-2">save</span>
-                <span>Save</span>
-              </button>
-            )}
-          </div>
-        </h1>
+          )}
+
+          {!!selectedItems.length && (
+            <button
+              type="button"
+              className="btn btn-outline-danger"
+              onClick={() => deleteSelectedMenuEntries()}
+            >
+              <i className="material-symbols-outlined">delete</i>
+            </button>
+          )}
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => addNew()}
+          >
+            <i className="material-symbols-outlined">add</i>
+            <span>Add Item</span>
+          </button>
+          {menuChanged && (
+            <button
+              type="button"
+              className="btn btn-primary mr-2"
+              onClick={() => handleSave()}
+            >
+              <span className="material-symbols-outlined mr-2">save</span>
+              <span>Save</span>
+            </button>
+          )}
+        </div>
+      </h1>
+      <div className="content">
         <div className="items">
           <DraggableTree
             checkable={selectEnabled}

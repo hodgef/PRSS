@@ -6,11 +6,12 @@ import React, {
   useState,
   useEffect,
   ReactNode,
+  useRef,
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import cx from "classnames";
 
-import { getString, configGet, configSet, configRem } from "../../common/utils";
+import { configGet, configSet, configRem } from "../../common/utils";
 import {
   handleHostingFields,
   getHostingTypes,
@@ -55,6 +56,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
   const [loading, setLoading] = useState(null);
   const hostingTypes = getHostingTypes();
   const [loadingStatus, setLoadingStatus] = useState("");
+  const siteTitleRef = useRef<HTMLInputElement>(null);
 
   // Default to "none" hosting
   const [hostingFields, setHostingFields] = useState<any>(hasSites ? null : {
@@ -64,6 +66,17 @@ const SiteSetup: FunctionComponent<IProps> = ({
 
   const history = useHistory();
   const [title, setTitle] = useState(site ? site.title : "");
+
+  useEffect(() => {
+    if (hostingFields && siteTitleRef.current) {
+      siteTitleRef.current.onkeydown = (e: KeyboardEvent) => {
+        if (e.key === "Enter") {
+          handleSubmit();
+        }
+      };
+      siteTitleRef.current.focus();
+    }
+  }, [title, hostingFields]);
 
   useEffect(() => {
     setAppClass("app-site-setup");
@@ -408,6 +421,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
                 className="form-control mb-3"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                ref={siteTitleRef}
               />
             </div>
             {hostingFields.name === "github" && (

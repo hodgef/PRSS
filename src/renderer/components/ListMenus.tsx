@@ -165,46 +165,46 @@ const ListMenus: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   return (
     <div className="ListMenus page">
-      <div className="content">
-        <h1>
-          <div className="left-align">
-            <i
-              className="material-symbols-outlined clickable"
-              onClick={() => history.goBack()}
-            >
-              arrow_back
-            </i>
-            <span>Menus</span>
-          </div>
-          <div className="right-align">
-            {!!Object.keys(menus).length && (
-              <button
-                type="button"
-                className="btn btn-outline-primary"
-                onClick={toggleSelectEnabled}
-              >
-                Toggle Select
-              </button>
-            )}
-            {!!selectedItems.length && (
-              <button
-                type="button"
-                className="btn btn-outline-danger"
-                onClick={() => deleteSelectedMenus()}
-              >
-                <i className="material-symbols-outlined">delete</i>
-              </button>
-            )}
+      <h1>
+        <div className="left-align">
+          <i
+            className="material-symbols-outlined clickable"
+            onClick={() => history.goBack()}
+          >
+            arrow_back
+          </i>
+          <span>Menus</span>
+        </div>
+        <div className="right-align">
+          {!!Object.keys(menus).length && (
             <button
               type="button"
-              className="btn btn-primary"
-              onClick={async () => addNew()}
+              className="btn btn-outline-primary"
+              onClick={toggleSelectEnabled}
             >
-              <i className="material-symbols-outlined">add</i>
-              <span>Create New</span>
+              Toggle Select
             </button>
-          </div>
-        </h1>
+          )}
+          {!!selectedItems.length && (
+            <button
+              type="button"
+              className="btn btn-outline-danger"
+              onClick={() => deleteSelectedMenus()}
+            >
+              <i className="material-symbols-outlined">delete</i>
+            </button>
+          )}
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={async () => addNew()}
+          >
+            <i className="material-symbols-outlined">add</i>
+            <span>Create New</span>
+          </button>
+        </div>
+      </h1>
+      <div className="content">
         <div className="items">
           <DraggableTree
             checkable={selectEnabled}

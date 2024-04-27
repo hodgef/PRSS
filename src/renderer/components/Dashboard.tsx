@@ -238,18 +238,18 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
 
   return (
     <div className="Dashboard page">
+      <h1>
+        <div className="left-align">
+          <i
+            className="material-symbols-outlined clickable"
+            onClick={() => history.push("/sites")}
+          >
+            arrow_back
+          </i>
+          <span>Dashboard</span>
+        </div>
+      </h1>
       <div className="content">
-        <h1>
-          <div className="left-align">
-            <i
-              className="material-symbols-outlined clickable"
-              onClick={() => history.push("/sites")}
-            >
-              arrow_back
-            </i>
-            <span>Dashboard</span>
-          </div>
-        </h1>
         <div className="items">
           <ul>
             {features.map((item, index) => {

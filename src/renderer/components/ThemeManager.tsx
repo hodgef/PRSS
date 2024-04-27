@@ -6,6 +6,7 @@ import React, {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import path from "path";
@@ -16,12 +17,13 @@ import { confirmation } from "../services/utils";
 import { toast } from "react-toastify";
 import { modal } from "./Modal";
 import { shell } from "electron";
-import { getThemeListDetails } from "../services/theme";
+import { getLocalThemePath, getThemeListDetails } from "../services/theme";
 import defaultThumbnail from "../images/defaultThemeThumbnail.png";
 import { getSite, updateSite } from "../services/db";
-import { configSet } from "../../common/utils";
+import { configSet, isAddThemesReminderEnabled } from "../../common/utils";
 import { prssConfig, storeInt } from "../../common/bootstrap";
 import { ISite } from "../../common/interfaces";
+import { useProvider } from "./UseProvider";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -30,6 +32,7 @@ interface IProps {
 const ThemeManager: FunctionComponent<IProps> = ({
   setHeaderLeftComponent,
 }) => {
+  const history = useHistory();
   const { siteId } = useParams() as any;
 
   const [site, setSite] = useState(null);
@@ -37,6 +40,8 @@ const ThemeManager: FunctionComponent<IProps> = ({
 
   const [siteTheme, setSiteTheme] = useState(null);
   const [themeList, setThemeList] = useState([]);
+
+  const providerThemeList = useProvider<any[]>("providerThemeList");
 
   useEffect(() => {
     if (!title) {
@@ -75,20 +80,25 @@ const ThemeManager: FunctionComponent<IProps> = ({
 
     const themesWithManifest = await getThemeListDetails(true);
     setThemeList(themesWithManifest);
+
+    // Save themeList in provider
+    providerThemeList.value = themesWithManifest.filter(({ name }) => Object.keys(prssConfig.themes).includes(name));
   };
 
   useEffect(() => {
     getThemes(true);
   }, []);
 
-  const history = useHistory();
+  const createTheme = useCallback(() => {
+    history.push(`/sites/${siteId}/themes/create`);
+  }, [siteId, themeList]);
 
   if (!site || !siteTheme) {
     return null;
   }
 
   const showThemeDetails = (theme) => {
-    const authorFormatted =
+    let authorFormatted =
       theme.author === "Francisco Hodge" ? "PRSS" : theme.author;
 
     modal.alert(
@@ -149,30 +159,34 @@ const ThemeManager: FunctionComponent<IProps> = ({
   };
 
   const addTheme = async () => {
-    const confirmationRes = await confirmation({
-      title: (
-        <Fragment>
-          <p>The PRSS theme directory will be opened.</p>
-          <p>You will need to add any theme files to that directory.</p>
-          <p>
-            Please ensure you get themes from trusted sources, such as the{" "}
-            <a
-              href="https://hodgef.com/prss/themes/"
-              title="https://hodgef.com/prss/themes/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <u>PRSS Themes</u>
-            </a>{" "}
-            page.
-          </p>
-          <p>Continue?</p>
-        </Fragment>
-      ),
-    });
-
-    if (confirmationRes !== 0) {
-      return;
+    if(await isAddThemesReminderEnabled()){
+      const confirmationRes = await confirmation({
+        title: (
+          <Fragment>
+            <p>The PRSS theme directory will be opened.</p>
+            <p>You will need to add any theme files to that directory.</p>
+            <p>
+              Please ensure you get themes from trusted sources, such as the{" "}
+              <a
+                href="https://hodgef.com/prss/themes/"
+                title="https://hodgef.com/prss/themes/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <u>PRSS Themes</u>
+              </a>{" "}
+              page.
+            </p>
+            <p>Continue?</p>
+          </Fragment>
+        ),
+      });
+  
+      if (confirmationRes !== 0) {
+        return;
+      } else {
+        storeInt.set("addThemesReminderEnabled", false);
+      }
     }
 
     const themesDir = storeInt.get("paths.themes");
@@ -181,31 +195,39 @@ const ThemeManager: FunctionComponent<IProps> = ({
 
   return (
     <div className="ThemeManager page">
+      <h1>
+        <div className="left-align">
+          <i
+            className="material-symbols-outlined clickable"
+            onClick={() => history.goBack()}
+          >
+            arrow_back
+          </i>
+          <span>Themes</span>
+        </div>
+        <div className="right-align">
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            onClick={() => addTheme()}
+          >
+            <i className="material-symbols-outlined">folder</i>
+            <span>Open Themes Directory</span>
+          </button>
+          <button
+            type="button"
+            className="btn btn-outline-primary"
+            onClick={() => getThemes()}
+          >
+            <i className="material-symbols-outlined">refresh</i>
+            <span>Refresh List</span>
+          </button>
+        </div>
+      </h1>
       <div className="content">
-        <h1>
-          <div className="left-align">
-            <i
-              className="material-symbols-outlined clickable"
-              onClick={() => history.goBack()}
-            >
-              arrow_back
-            </i>
-            <span>Themes</span>
-          </div>
-          <div className="right-align">
-            <button
-              type="button"
-              className="btn btn-outline-primary"
-              onClick={() => getThemes()}
-            >
-              <i className="material-symbols-outlined">refresh</i>
-            </button>
-          </div>
-        </h1>
-
         <div className="theme-list">
           {themeList.map((theme) => {
-            const { name, title, author, url, themeDir } = theme;
+            const { name, title, author, url } = theme;
             let image = defaultThumbnail;
 
             const authorFormatted =
@@ -217,7 +239,7 @@ const ThemeManager: FunctionComponent<IProps> = ({
               } else {
                 image =
                   "data:image/png;base64," +
-                  fs.readFileSync(path.join(themeDir, "thumbnail.png"), {
+                  fs.readFileSync(path.join(getLocalThemePath(name), "thumbnail.png"), {
                     encoding: "base64",
                   });
               }
@@ -271,8 +293,11 @@ const ThemeManager: FunctionComponent<IProps> = ({
                         ) : (
                           <span>by <b>{authorFormatted}</b></span>
                         )}
-                        {authorFormatted === "PRSS" && (
-                          <span className="badge badge-secondary ml-2">Official</span>
+                        {(authorFormatted === "PRSS" && !theme.isLocal) && (
+                          <span className="badge badge-info ml-2">Official</span>
+                        )}
+                        {theme.isLocal && (
+                          <span className="badge badge-secondary ml-2">Local</span>
                         )}
                       </div>
                       <div className="right-align"></div>
@@ -284,9 +309,10 @@ const ThemeManager: FunctionComponent<IProps> = ({
           })}
           <div
             className="theme-list-item add-new-theme-btn clickable"
-            onClick={() => addTheme()}
+            onClick={() => createTheme()}
           >
             <i className="material-symbols-outlined">add_circle</i>
+            <div className="feature-title mt-3">Create Theme</div>
           </div>
         </div>
       </div>
