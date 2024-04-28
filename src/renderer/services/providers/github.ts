@@ -203,7 +203,13 @@ class GithubProvider {
      */
     try {
       const bufferDir = storeInt.get("paths.buffer");
-      runCommand(bufferDir, `git clone "${repositoryUrl}" .`);
+      const cloneRes = runCommand(bufferDir, `git clone "${repositoryUrl}" .`);
+
+      if (cloneRes.error) {
+        modal.alert(cloneRes.res.message, null, null, null, `deploy_clone_error: ${repositoryUrl}`);
+        console.error(cloneRes);
+        return;
+      }
 
       console.log("repositoryUrl", repositoryUrl);
       console.log("bufferDir", bufferDir);
@@ -213,7 +219,8 @@ class GithubProvider {
         onUpdate,
         itemIdToDeploy,
         !clearRemote,
-        generateSiteMap
+        generateSiteMap,
+        "deploy"
       );
 
       if (!buildRes) {
@@ -225,15 +232,18 @@ class GithubProvider {
 
       await new Promise((resolve) => {
         setTimeout(() => {
-          const { res: e, error: commitError } = runCommand(
-            bufferDir,
-            `git add --all && git commit -m "${commitMessage}" && git push`
-          );
-
-          if (commitError) {
-            modal.alert(e.message, null, null, null, `commit_error: ${repositoryUrl}`);
-            console.error(e);
-          }
+          [
+            runCommand(bufferDir, "git config --global core.safecrlf false"),
+            runCommand(bufferDir, "git add --all"),
+            runCommand(bufferDir, `git commit -m "${commitMessage}"`),
+            runCommand(bufferDir, "git push --force")
+          ].forEach((data) => {
+            // If working space is empty, git commit exits with "1"
+            if (data.error && !data.res.message?.includes("git commit")) {
+              modal.alert(data.res.message, null, null, null, `commit_error: ${repositoryUrl}`);
+              console.error(data);
+            }
+          });
           resolve(null);
         }, 1000);
       });
@@ -243,7 +253,7 @@ class GithubProvider {
     }
 
     // TODO: Re-enable if it's needed
-    //await clearBuffer(true);
+    // await clearBuffer(true);
     await del([path.join(bufferDir, ".git")], { force: true });
 
     return true;

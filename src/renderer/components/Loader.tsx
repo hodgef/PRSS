@@ -2,12 +2,11 @@ import "./styles/App.css";
 import "react-toastify/dist/ReactToastify.css";
 
 import React, { FunctionComponent, useRef } from "react";
-import { initConfig, initStore, initDb, initExpress } from "../../common/bootstrap";
+import { initConfig, initStore, initDb, initExpress, storeInt } from "../../common/bootstrap";
 import { checkDirs } from "../services/utils";
 
-// const remote = require("@electron/remote");
-// const win = remote.getCurrentWindow();
-// const openDevTools = remote.getGlobal("openDevTools");
+const remote = require("@electron/remote");
+const openDevTools = remote.getGlobal("openDevTools");
 
 const Loader: FunctionComponent = () => {
     const App = useRef<React.FunctionComponent<{}>>(null);
@@ -24,10 +23,15 @@ const Loader: FunctionComponent = () => {
     };
 
     React.useEffect(() => {
-        //openDevTools();
         const init = async () => {
             setLoadingText("Initializing Storage");
             await initStore();
+
+            const devToolsEnabled = storeInt.get("_devToolsEnabled");
+
+            if(devToolsEnabled){
+                openDevTools();
+            }
 
             setLoadingText("Initializing Configuration");
             await initConfig();

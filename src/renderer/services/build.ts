@@ -30,7 +30,8 @@ export const build = async (
   onUpdate = (a?) => {},
   itemIdToLoad?,
   skipClear?,
-  generateSiteMap = false
+  generateSiteMap = false,
+  mode: "build" | "deploy" = "build"
 ) => {
   if (!siteUUID) {
     console.error("No UUID was provided to build()");
@@ -73,7 +74,7 @@ export const build = async (
    * Buffer items
    */
   const { itemsToLoad, mainBufferItem, bufferItems } =
-    await getFilteredBufferItems(siteUUID, itemIdToLoad);
+    await getFilteredBufferItems(siteUUID, itemIdToLoad, mode);
 
   /**
    * Load buffer
@@ -221,10 +222,11 @@ export const getParentIds = (itemUUID: string, nodes: IStructureItem[]) => {
 
 export const getFilteredBufferItems = async (
   siteUUID: string,
-  itemIdToLoad?: string
+  itemIdToLoad?: string,
+  mode: "build" | "deploy" = "build"
 ) => {
   const site = await getSite(siteUUID);
-  const bufferItems = await getBufferItems(site);
+  const bufferItems = await getBufferItems(site, mode);
   let itemsToLoad = bufferItems;
   let mainBufferItem;
 
@@ -356,8 +358,29 @@ export const buildBufferItem = async (bufferItem: IBufferItem) => {
   return true;
 };
 
+const processVars = (site: ISite, vars, mode) => {
+  if(mode === "deploy" && site?.url && vars){
+    const processedVars = {...vars};
+
+    Object.keys(processedVars).forEach(varName => {
+      if (varName) {
+        let value = processedVars[varName] as string;
+        const varNameLowercase = varName.toLowerCase();
+
+        if(value?.startsWith("/assets/") && (varNameLowercase.includes("image") || varNameLowercase.includes("url"))){
+          processedVars[varName] = site.url+value.substring(1);
+        }
+      }
+    });
+    return processedVars;
+  } else {
+    return vars;
+  }
+}
+
 export const getBufferItems = async (
-  siteUUIDOrSite
+  siteUUIDOrSite,
+  mode: "build" | "deploy" = "build"
 ): Promise<IBufferItem[]> => {
   const site =
     typeof siteUUIDOrSite === "string"
@@ -397,12 +420,12 @@ export const getBufferItems = async (
     /**
      * Aggregate data
      */
-    const vars = {
+    const vars = processVars(site, {
       ...(site.vars || {}),
       ...(getAggregateItemPropValues("item.vars", parentIds, bufferItems) ||
         {}),
       ...(post.vars || {}),
-    };
+    }, mode);
 
     const headHtml =
       (site.headHtml || "") +
