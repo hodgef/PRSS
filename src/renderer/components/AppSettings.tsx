@@ -31,7 +31,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const [reportIssues, setReportIssues] = useState(true);
 
   const getData = async () => {
-    setCurrentConfigPath(await getConfigPath());
+    setCurrentConfigPath(getConfigPath());
     setReportIssues(await isReportIssuesEnabled());
   };
 
@@ -61,7 +61,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         const confirmationRes = await confirmation({
           title: (
             <Fragment>
-              <p>The config will be moved to the new location.</p>
+              <p>The config, database & static files (such as site images) will be moved to the new location.</p>
               <p>
                 If you plan to commit these to Git or Google Drive, please
                 ensure they remain private.
@@ -90,8 +90,15 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
           path.join(configPath, "prss.json"),
           { overwrite: true }
         );
+        if(fs.existsSync(path.join(currentConfigPath, "static"))){
+          fs.copySync(
+            path.join(currentConfigPath, "static"),
+            path.join(configPath, "static"),
+            { overwrite: true }
+          );
+        }
 
-        await storeInt.set("paths.config", configPath);
+        storeInt.set("paths.config", configPath);
         setCurrentConfigPath(configPath);
 
         modal.alert(["config_path_changed", []]);
@@ -122,7 +129,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
           <div className="form-group row">
             <div className="input-group input-group-lg">
               <label htmlFor="siteConfig" className="col-sm-3 col-form-label">
-                Config Location (prss.db, prss.json)
+                Config Location (prss.db, prss.json, statics)
               </label>
               <div className="col-sm-9">
                 <div className="input-group">
@@ -161,7 +168,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                     label="This allows PRSS to quickly identify issues and correct them as soon as possible."
                     onChange={async (e) => {
                       setReportIssues(e.target.checked);
-                      await storeInt.set("reportIssues", e.target.checked);
+                      storeInt.set("reportIssues", e.target.checked);
                     }}
                   />
                 </InputGroup>

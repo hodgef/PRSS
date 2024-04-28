@@ -354,7 +354,7 @@ const PRSSAI: FunctionComponent<IProps> = ({
       const configPath = pathObj?.filePaths[0];
 
       if (configPath !== prssaiPath) {
-        await storeInt.set("prssaiPath", configPath);
+        storeInt.set("prssaiPath", configPath);
         setPrssaiPath(configPath);
 
         toast.success('Path changed. Reloading status');

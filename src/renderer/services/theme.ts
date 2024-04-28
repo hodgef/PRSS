@@ -53,7 +53,7 @@ export const getDefaultReadme = () => {
 
 export const getThemeListDetails = async (fetchManifest?: boolean) => {
   const themeNameList = await getThemeList();
-  const themePath = await storeInt.get("paths.themes");
+  const themePath = storeInt.get("paths.themes");
 
   const manifestPromises = [];
   let manifestPromiseData = {};
@@ -77,7 +77,7 @@ export const getThemeListDetails = async (fetchManifest?: boolean) => {
 };
 
 export const getThemeList = async () => {
-  const themeDir = await storeInt.get("paths.themes");
+  const themeDir = storeInt.get("paths.themes");
   const templateList = getDirPaths(themeDir).map((filePath) =>
     path.basename(filePath)
   );

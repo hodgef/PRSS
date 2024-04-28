@@ -85,7 +85,7 @@ export const getCache = (name) => cache[name];
 export const deleteCache = (name) => delete cache[name];
 
 export const initDb = async () => {
-  const storePath = await getConfigPath();
+  const storePath = getConfigPath();
   const dbFile = path.join(storePath, "prss.db");
   const dbExists = fs.existsSync(dbFile);
 
@@ -180,10 +180,10 @@ export const initStore = () => {
 
     console.log("_static", staticsPath);
 
-    const paths = (await storeInt.get("paths")) || {};
+    const paths = (storeInt.get("paths")) || {};
 
     const envPath = path.join(staticsPath, "env");
-    const configPath = await getConfigPath();
+    const configPath = getConfigPath();
     const assetsPath = path.join(staticsPath, "assets");
     const themesPath = path.join(staticsPath, "themes");
     const bufferPath = path.join(staticsPath, "buffer");

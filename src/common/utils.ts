@@ -79,20 +79,20 @@ export const runCommandAsync = async (dir, cmd) => {
   }
 };
 
-export const getConfigPath = async (): Promise<string> => {
-  return (await storeInt.get("paths.config")) || app.getPath("userData");
+export const getConfigPath =  (): string => {
+  return (storeInt.get("paths.config")) || app.getPath("userData");
 };
 
 export const isReportIssuesEnabled = async () => {
-  return (await storeInt.get("reportIssues")) === false ? false : true;
+  return (storeInt.get("reportIssues")) === false ? false : true;
 };
 
 export const getMachineId = async () => {
-  return await storeInt.get("machineId");
+  return storeInt.get("machineId");
 };
 
 export const getRootPath = (): string => {
-  return app.isPackaged ? app.getPath('userData') : app.getPath('exe').split("node_modules")[0];
+  return app.isPackaged ? getConfigPath() : app.getPath('exe').split("node_modules")[0];
 }
 
 export const isAppx = () => process.resourcesPath?.includes("WindowsApps");
@@ -100,15 +100,15 @@ export const isAppx = () => process.resourcesPath?.includes("WindowsApps");
 export const getPlatform = () => process.platform;
 
 export const getStaticPath = (): string => {
-  return path.join(app.isPackaged && !isAppx() ? process.resourcesPath : getRootPath(), 'static');
+  return path.join(getRootPath(), 'static');
 };
 
-export const isAutosaveEnabled = async () => {
-  return (await storeInt.get("autosaveEnabled")) === false ? false : true;
+export const isAutosaveEnabled = () => {
+  return (storeInt.get("autosaveEnabled")) === false ? false : true;
 };
 
-export const isAddThemesReminderEnabled = async () => {
-  return (await storeInt.get("addThemesReminderEnabled")) === false ? false : true;
+export const isAddThemesReminderEnabled = () => {
+  return (storeInt.get("addThemesReminderEnabled")) === false ? false : true;
 };
 
 export const getCurrentVersion = () => {
