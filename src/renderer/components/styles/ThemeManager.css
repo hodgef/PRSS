@@ -101,14 +101,14 @@
 }
 
 
-@media (max-width: 1330px) {
+@media (max-width: 1360px) {
   .ThemeManager .content .theme-list-item {
     width: calc((100% / 3) - 15px);
     min-height: 300px;
   }
 }
 
-@media (max-width: 1020px) {
+@media (max-width: 1040px) {
   .ThemeManager .content .theme-list-item {
     width: calc((100% / 2) - 15px);
     min-height: 300px;

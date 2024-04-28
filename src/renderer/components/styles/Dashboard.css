@@ -10,12 +10,10 @@
 
 #app .Dashboard.page.fixed .content > .items {
   flex: 1;
-  overflow: auto;
   padding: 5px;
 }
 #app .Dashboard.page .content > .items {
   flex: 1;
-  overflow: auto;
   padding: 5px;
 }
 .Dashboard .content ul li {

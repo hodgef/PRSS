@@ -11,7 +11,7 @@ import React, {
 import { Link } from "react-router-dom";
 import cx from "classnames";
 
-import { camelCase } from "../services/utils";
+import { camelCase, removeAssetImage, uploadAssetImage } from "../services/utils";
 
 import "ace-builds/webpack-resolver";
 import "ace-builds/src-noconflict/mode-html";
@@ -20,15 +20,18 @@ import { toast } from "react-toastify";
 import { modal } from "./Modal";
 import { siteVarToArray } from "../services/hosting";
 import { getBufferItems } from "../services/build";
-import { getItems, updateSite, updateItem } from "../services/db";
-import { IPostItem, ISite } from "../../common/interfaces";
-import { setHook } from "../../common/bootstrap";
+import { getItems, updateSite, updateItem, getSite } from "../services/db";
+import { IPostItem, ISite, IThemeManifest } from "../../common/interfaces";
+import { runHook, setHook } from "../../common/bootstrap";
+import { getThemeManifest } from "../services/theme";
 
 interface IProps {
   site: ISite;
   post?: IPostItem;
   onSave: () => void;
 }
+
+type IVarsKV = { name: string, content: string, type?: string };
 
 const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
   site,
@@ -37,15 +40,17 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
 }) => {
   const items = useRef<IPostItem[]>(null);
 
+  const [updatedSite, setUpdatedSite] = useState<ISite>(site);
   const [bufferItem, setBufferItem] = useState(null);
   const [show, setShow] = useState<boolean>(false);
-  const [parsedVariables, setParsedVariables] = useState<{ [key: string]: string }[]>([]);
-  const [parsedInheritedVariables, setParsedInheritedVariables] = useState<{ [key: string]: string }[]>([]);
+  const [parsedVariables, setParsedVariables] = useState<IVarsKV[]>([]);
+  const [parsedInheritedVariables, setParsedInheritedVariables] = useState<IVarsKV[]>([]);
 
-  const [variables, setVariables] = useState<{ [key: string]: string }[]>(parsedVariables);
+  const [themeManifest, setThemeManifest] = useState<IThemeManifest>(null);
+  const [suggestedVariables, setSuggestedVariables] = useState<string[]>([]);
+
+  const [variables, setVariables] = useState<IVarsKV[]>(parsedVariables);
   const [exclusiveVariables, setExclusiveVariables] = useState<string[]>([]);
-
-  const variablesBuffer = useRef(parsedVariables) as any;
 
   useEffect(() => {
     setHook("SiteVariablesEditorOverlay_show", async (value: string) => {
@@ -54,19 +59,21 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
   }, []);
 
   const setData = useCallback(async () => {
-    const itemsRes = await getItems(site.uuid);
+    const siteRes = await getSite(site.uuid);
+    const itemsRes = await getItems(siteRes.uuid);
+    const currentItem = post ? itemsRes.find((item) => item.uuid === post.uuid) : null;
+    const baseVars = currentItem ? currentItem.vars || {} : siteRes.vars || {};
+
     items.current = itemsRes;
 
-    const bufferItems = await getBufferItems(site);
+    const bufferItems = await getBufferItems(siteRes);
 
     const bufferItem =
-      bufferItems && post
-        ? bufferItems.find((bufferItem) => bufferItem.item.uuid === post.uuid)
+      bufferItems && currentItem
+        ? bufferItems.find((bufferItem) => bufferItem.item.uuid === currentItem.uuid)
         : null;
 
     setBufferItem(bufferItem);
-
-    const baseVars = post ? post.vars || {} : site.vars || {};
 
     const parsedVariables = siteVarToArray(
       Object.keys(baseVars).length ? baseVars : { "": "" }
@@ -75,18 +82,40 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
     setParsedVariables(parsedVariables);
     setVariables(parsedVariables);
 
-    const exclusiveVariables = post ? post.exclusiveVars || [] : [];
+    const exclusiveVariables = currentItem ? currentItem.exclusiveVars || [] : [];
     setExclusiveVariables(exclusiveVariables);
 
-    variablesBuffer.current = variablesBuffer;
-    bufferItem &&
-      setParsedInheritedVariables(siteVarToArray(bufferItem.vars));
+    if (bufferItem) {
+      const bufferItemVars = siteVarToArray(bufferItem.vars);
+      setParsedInheritedVariables(bufferItemVars);
+    }
 
+    // Get theme vars
+    if (siteRes.theme) {
+      const manifest = await getThemeManifest(siteRes.theme);
+
+      // Add to parsed variables >> parsedVariables
+      // Must not be in computed variables
+      let suggestedVars = [];
+
+      if (manifest.siteVars) {
+        Object.keys(manifest.siteVars).forEach(manifestSiteVarName => {
+          suggestedVars.push(manifestSiteVarName);
+        });
+
+        if (suggestedVars.length) {
+          setThemeManifest(manifest);
+          setSuggestedVariables(suggestedVars);
+        }
+      }
+    }
+
+    setUpdatedSite(siteRes);
     setShow(true);
   }, []);
 
-  const addNew = () => {
-    setVariables((prevVars) => [...prevVars, { name: "", content: "" }]);
+  const addNew = (input?: IVarsKV) => {
+    setVariables((prevVars) => [(input || { name: "", content: "" }), ...prevVars]);
   };
 
   const setVar = (
@@ -103,16 +132,48 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
         [fieldName]: isNormalized ? camelCase(e.target.value) : e.target.value,
       };
 
-      variablesBuffer;
       setVariables(newVars);
     }
   };
 
-  const delVar = (varIndex: number) => {
+  const delVar = async (varIndex: number) => {
     const newVars = [...variables];
     delete newVars[varIndex];
 
-    return setVariables([...newVars.filter((variable) => !!variable)]);
+    // If type is image and local path is used, we need to remove local image and update the site
+    if(themeManifest.siteVars?.[variables[varIndex].name]?.type === "image"){
+      await removeAssetImage(site.name, variables[varIndex].content);
+
+      // Update site or post
+      const siteRes = await getSite(site.uuid);
+      const itemsRes = await getItems(siteRes.uuid);
+      const currentItem = post ? itemsRes.find((item) => item.uuid === post.uuid) : null;
+      const baseVars = currentItem ? currentItem.vars || {} : siteRes.vars || {};
+      
+      delete baseVars[variables[varIndex].name];
+      await handleSave(siteVarToArray(baseVars));
+    }
+
+    setVariables([...newVars.filter((variable) => !!variable)]);
+  };
+
+  
+  const uploadImage = async (
+    varIndex: number
+  ) => {
+    const newVars = [...variables];
+
+    if (varIndex > -1) {
+      const filePath = await uploadAssetImage(site.name);
+
+      // Update variable
+      newVars[varIndex] = {
+        ...newVars[varIndex],
+        content: filePath,
+      };
+
+      setVariables([...newVars]);
+    }
   };
 
   const preventVarToggle = (varIndex: number) => {
@@ -138,13 +199,17 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (inputVars = variables) => {
     const updatedAt = Date.now();
 
     /**
      * Removing empty vars
      */
-    const varsArray = variables.filter((varItem) => !!varItem.name.trim());
+    const varsArray = inputVars.filter((varItem) => {
+      const emptyName = !varItem.name.trim();
+      //const emptyValAndSuggested = varItem.name && suggestedVariables.includes(varItem.name) && !varItem.content.trim();
+      return !emptyName/* && !emptyValAndSuggested*/;
+    });
 
     /**
      * Removing orphan exclusiveVars or duplicated
@@ -183,15 +248,16 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
       /**
        *  Update item
        */
-      await updateItem(site.uuid, post.uuid, {
+      await updateItem(updatedSite.uuid, post.uuid, {
         vars: varObj,
         exclusiveVars: newExclusiveVarsArr,
         updatedAt,
       });
 
       post = updatedItem;
-
+      
       onSave();
+      runHook("PostEditorSidebar_setUpdatedItem", updatedItem);
     } else {
       /**
        * Save to site
@@ -205,33 +271,48 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
       /**
        * Update site updatedAt
        */
-      await updateSite(site.uuid, {
+      await updateSite(updatedSite.uuid, {
         vars: varObj,
         updatedAt,
       });
 
       site = updatedSite;
-      toast.success("Site variables saved!");
+
+      if(inputVars === variables){
+        toast.success("Site variables saved!");
+      }
     }
   };
+
+  const getVarIcon = useCallback((name: string, type = "string") => {
+    if (type === "image") {
+      return "image";
+    } else if (type === "url" || name.toLowerCase().includes("url")) {
+      return "link";
+    } else if (name.toLowerCase().includes("html")) {
+      return "code";
+    } else {
+      return "text_fields"
+    }
+  }, []);
 
   const showInfo = () => {
     modal.alert(
       <Fragment>
         <p>Site Variables are variables that your templates can use.</p>
         <p>
-          For example: <span className="code-dark-inline">headerImageUrl</span>
+          For example: <span className="code-dark-inline">featuredImageUrl</span>
         </p>
         <p>
           This variable would be used by some templates as a header image url.
         </p>
-        <p>Each template generally documents the siteVars it uses.</p>
+        <p>To see the available variables, check out the "Suggested Variables" section.</p>
         <p>
-          Note: A variable defined at the post level will override one set at
+          <b>Note:</b> A variable defined at the post level will override one set at
           the site level.
         </p>
         <p>
-          Note 2: Variables are published to your site and therefore public. Do
+          <b>Note #2:</b> Variables are published to your site and therefore public. Do
           not store sensitive data in variables.
         </p>
       </Fragment>,
@@ -255,7 +336,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
       <div className="editor-content">
         <h2>
           <div className="left-align">
-            <span>Scoped Variables</span>
+            <span>Variables Editor</span>
           </div>
           <div className="right-align">
             <button
@@ -285,116 +366,165 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
             </button>
           </div>
         </h2>
-
-        <div className="title-label">
-          <div className="left-align">
-            <span>Add, edit or delete variables</span>
-          </div>
-          <div
-            className="right-align available-parameters clickable"
-            onClick={() => showInfo()}
-          >
-            <span className="material-symbols-outlined mr-1">info</span>
-            <span>What are variables?</span>
-          </div>
-        </div>
-
-        <div className="variable-list mt-2">
-          <ul>
-            {variables.map((variable, index) => {
-              const isRestricted = exclusiveVariables.includes(variable.name);
-
-              return (
-                <li
-                  key={`${variable}-${index}`}
-                  className={cx("mb-2", {
-                    "restricted-var": isRestricted,
-                  })}
+        <div className="editor-sections">
+          <div className="section-top">
+            <div className="editor-section section-scoped">
+              <h3>
+                <div className="left-align">
+                  <span>Scoped</span>
+                </div>
+                <div
+                  className="right-align available-parameters clickable"
+                  onClick={() => showInfo()}
                 >
-                  <div className="input-group input-group-lg">
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Name"
-                      value={variable.name}
-                      maxLength={20}
-                      onChange={(e) => setVar(e, index, "name")}
-                      onBlur={(e) => setVar(e, index, "name", true)}
-                    />
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Content"
-                      value={variable.content}
-                      onChange={(e) => setVar(e, index, "content")}
-                    />
-                    {post && (
-                      <button
-                        title="Prevent children from inheriting this variable"
-                        type="button"
-                        className={cx(
-                          "btn btn-outline-primary ml-2 restrict-btn",
-                          {
-                            "bg-dark text-white": isRestricted,
-                          }
-                        )}
-                        onClick={() => preventVarToggle(index)}
-                      >
-                        <span className="material-symbols-outlined">block</span>
-                      </button>
-                    )}
-                    <button
-                      title="Delete Variable"
-                      type="button"
-                      className="btn btn-outline-primary ml-2"
-                      onClick={() => delVar(index)}
-                    >
-                      <span className="material-symbols-outlined">delete</span>
-                    </button>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+                  <span className="material-symbols-outlined mr-1">info</span>
+                  <span>What are variables?</span>
+                </div>
+              </h3>
+              <div className="title-label">
+                <div className="left-align">
+                  <span>Add, edit or delete variables for this page and descendants.</span>
+                </div>
+              </div>
+              <div className="variable-list mt-2">
+                <ul>
+                  {variables.map((variable, index) => {
+                    const isRestricted = exclusiveVariables.includes(variable.name);
 
-        {post && !!parsedInheritedVariables.length && (
-          <>
-            <h2>Computed Variables</h2>
-            <p>
-              This includes global variables from{" "}
-              <Link to={`/sites/${site.uuid}/settings`}>Site Settings</Link> as
-              well as parent variables.
-            </p>
-            <div className="inherited-variable-list">
-              <ul>
-                {parsedInheritedVariables.map((variable, index) => {
-                  return (
-                    <li key={`inehrited-${variable}-${index}`} className="mb-2">
-                      <div className="input-group input-group-lg">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Name"
-                          value={variable.name}
-                          maxLength={20}
-                          readOnly
-                        />
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Content"
-                          value={variable.content}
-                          readOnly
-                        />
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+                    return (
+                      <li
+                        key={`${variable}-${index}`}
+                        className={cx("mb-2", {
+                          "restricted-var": isRestricted,
+                        })}
+                      >
+                        <div className="input-group input-group-lg">
+                          <span className="material-symbols-outlined mr-2">
+                            {getVarIcon(variable.name, themeManifest.siteVars?.[variable.name]?.type)}
+                          </span>
+                          <div className="input-container">
+                            <textarea
+                              className="form-control"
+                              placeholder="Name"
+                              value={variable.name}
+                              maxLength={20}
+                              onChange={(e) => setVar(e, index, "name")}
+                              onBlur={(e) => setVar(e, index, "name", true)}
+                            />
+                          </div>
+                          <div className="input-container">
+                            <textarea
+                              className="form-control"
+                              placeholder="Content"
+                              value={variable.content}
+                              onChange={(e) => setVar(e, index, "content")}
+                            />
+                          </div>
+                          {themeManifest.siteVars?.[variable.name]?.type === "image" && (
+                            <button
+                              title="Upload image"
+                              type="button"
+                              className={cx(
+                                "btn btn-outline-secondary upload-btn",
+                              )}
+                              onClick={() => uploadImage(index)}
+                            >
+                              <span className="material-symbols-outlined">upload</span>
+                            </button>
+                          )}
+                          {post && (
+                            <button
+                              title="Prevent children from inheriting this variable"
+                              type="button"
+                              className={cx(
+                                "btn btn-outline-secondary restrict-btn",
+                                {
+                                  "bg-dark text-white": isRestricted,
+                                }
+                              )}
+                              onClick={() => preventVarToggle(index)}
+                            >
+                              <span className="material-symbols-outlined">block</span>
+                            </button>
+                          )}
+                          <button
+                            title="Delete Variable"
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            onClick={() => delVar(index)}
+                          >
+                            <span className="material-symbols-outlined">delete</span>
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             </div>
-          </>
-        )}
+            {post && !!parsedInheritedVariables.length && (
+              <div className="editor-section section-computed">
+                <h3>Computed</h3>
+                <p>
+                  This includes inherited variables from{" "}
+                  <Link to={`/sites/${updatedSite.uuid}/settings`}>Site Settings</Link> as
+                  well as parent variables.
+                </p>
+                <div className="inherited-variable-list">
+                  <ul>
+                    {parsedInheritedVariables.map((variable, index) => {
+                      return (
+                        <li key={`inehrited-${variable}-${index}`} className="mb-2">
+                          <div className="input-group input-group-lg">
+                            <div className="input-container">
+                              <textarea
+                                className="form-control"
+                                placeholder="Name"
+                                value={variable.name}
+                                maxLength={20}
+                                readOnly
+                              />
+                            </div>
+                            <div className="input-container">
+                              <textarea
+                                className="form-control"
+                                placeholder="Content"
+                                value={variable.content}
+                                readOnly
+                              />
+                            </div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+          {(themeManifest && suggestedVariables.length) && (
+            <div className="editor-section section-suggested">
+              <h3>Suggested Variables</h3>
+              <p>These are variables supported by your current theme (<Link to={`/sites/${updatedSite.uuid}/themes`}>{updatedSite.theme}</Link>)</p>
+              <div className="suggested-variables">
+                <ul>
+                  {suggestedVariables.map((suggestedVar, suggestedVarIndex) => {
+                    return (
+                      <li
+                        key={`${suggestedVar}-${suggestedVarIndex}`}
+                        className="suggested-var"
+                        title={themeManifest.siteVars?.[suggestedVar]?.description}
+                        onClick={() => addNew({ name: suggestedVar, content: "", type: themeManifest.siteVars?.[suggestedVar]?.type } as IVarsKV)}
+                      >
+                        <span className="material-symbols-outlined mr-2">{getVarIcon(suggestedVar, themeManifest.siteVars?.[suggestedVar]?.type)}</span><span>{suggestedVar}</span>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

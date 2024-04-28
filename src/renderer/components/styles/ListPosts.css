@@ -56,5 +56,4 @@
 }
 .ListPosts .items {
   flex: 1;
-  overflow-y: auto;
 }

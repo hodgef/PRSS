@@ -9,6 +9,7 @@ import {
   getCache,
   storeInt,
 } from "../../common/bootstrap";
+import { IThemeManifest } from "../../common/interfaces";
 
 export const getTemplate = async (templateId: string, extension: string) => {
   const theme = templateId.split(".")[0];
@@ -97,16 +98,16 @@ export const getTemplateList = async (themeName) => {
   return res.templates;
 };
 
-export const getThemeManifest = async (theme: string) => {
+export const getThemeManifest = async (theme: string): Promise<IThemeManifest> => {
   if (!theme) {
-    return false;
+    return;
   }
 
-  let manifest;
+  let manifest: IThemeManifest;
 
   // Config theme
   if(prssConfig.themes[theme]){
-    manifest = await getJson(prssConfig.themes[theme] + "/manifest.json", true);
+    manifest = (await getJson(prssConfig.themes[theme] + "/manifest.json", true)) as IThemeManifest;
   } else {
     const themePath = getLocalThemePath(theme);
     let manifestPath = path.join(themePath, "manifest.json");

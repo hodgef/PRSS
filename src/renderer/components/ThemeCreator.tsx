@@ -19,7 +19,7 @@ import { shell } from "electron";
 import { getSite } from "../services/db";
 import { runCommand } from "../../common/utils";
 import { prssConfig, storeInt } from "../../common/bootstrap";
-import { ISite } from "../../common/interfaces";
+import { ISite, IThemeManifest } from "../../common/interfaces";
 import { Col, Form, InputGroup } from "react-bootstrap";
 import Loading from "./Loading";
 import { useProvider } from "./UseProvider";
@@ -161,7 +161,7 @@ const ThemeCreator: FunctionComponent<IProps> = ({
       /**
        * Amend public manifest
        */
-      const manifestJsonPublic = JSON.parse(fs.readFileSync(path.join(themesDir, themeId, "public", "manifest.json"), "utf-8"));
+      const manifestJsonPublic = JSON.parse(fs.readFileSync(path.join(themesDir, themeId, "public", "manifest.json"), "utf-8")) as IThemeManifest;
       
       if(!manifestJsonPublic){
         toast.error("Could not find manifest.json. The theme was not cloned correctly.");
@@ -174,7 +174,7 @@ const ThemeCreator: FunctionComponent<IProps> = ({
       /**
        * Amend build manifest
        */
-      const manifestJsonBuild = JSON.parse(fs.readFileSync(path.join(themesDir, themeId, "build", "manifest.json"), "utf-8"));
+      const manifestJsonBuild = JSON.parse(fs.readFileSync(path.join(themesDir, themeId, "build", "manifest.json"), "utf-8")) as IThemeManifest;
       
       if(!manifestJsonBuild){
         toast.error("Could not find manifest.json. The theme was not cloned correctly.");

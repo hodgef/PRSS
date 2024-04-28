@@ -1,8 +1,9 @@
-import fs from "fs";
 import { getCurrentVersion } from "../../common/utils";
 import { modal } from "../components/Modal";
 import stopwords from "../json/stopwords.json";
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
+import path from "path";
 import {
   getApiUrl,
   getCache,
@@ -10,6 +11,9 @@ import {
   storeInt,
 } from "../../common/bootstrap";
 import { IConfig } from "../../common/interfaces";
+
+const { dialog } = require("@electron/remote");
+const fs = require("fs-extra");
 
 export const merge = (var1, var2) => {
   if (Array.isArray(var1) && Array.isArray(var2)) {
@@ -490,3 +494,45 @@ export const removeStopWords = (str = "") => {
     .filter((word) => !stopwords.includes(word.toLowerCase()))
     .join(" ");
 };
+
+export const uploadAssetImage = async (siteName: string) => {
+  const result = dialog.showOpenDialog({
+    properties: ["openFile"],
+    filters: [{ name: "Images", extensions: ["png","jpg","jpeg"] }]
+  });
+
+  const { filePaths } = await result || {};
+
+  if(filePaths && filePaths[0]){
+    const filePath = filePaths[0];
+
+    const publicImagesDir = path.join(storeInt.get("paths.public"), siteName, "assets", "images");
+    const fileName = uuidv4().split("-").join("").substring(0, 10) + "." + filePath.split('.').pop();
+    const targetFilePath =  path.join(publicImagesDir, fileName)
+    
+    fs.copySync(
+      filePath,
+      targetFilePath,
+      { overwrite: true }
+    );
+
+    return `/assets/images/${fileName}`;
+  }
+}
+
+export const removeAssetImage = async (siteName: string, imagePath: string) => {
+   /**
+   * Delete image if it's a local one
+   */
+   if(imagePath?.startsWith("/assets/images/") && (
+    imagePath?.endsWith(".jpg") ||
+    imagePath?.endsWith(".jpeg") ||
+    imagePath?.endsWith(".png")
+  )){
+    const imageFullPath = path.join(storeInt.get("paths.public"), siteName, imagePath);
+    fs.removeSync(imageFullPath);
+    return true;
+  }
+
+  return false;
+}

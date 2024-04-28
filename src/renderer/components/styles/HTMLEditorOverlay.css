@@ -14,10 +14,6 @@
   padding: 20px;
   box-sizing: border-box;
   overflow: hidden;
-  border-radius: 10px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  margin-top: 20px;
   flex-flow: column;
   overflow-y: auto !important;
   position: relative;
@@ -27,12 +23,15 @@
   min-height: 400px;
   flex: 1;
 }
-.html-editor-overlay .editor-content h2 {
+.html-editor-overlay .editor-content h3 {
+  font-size: 18px;
+  margin: 10px 0;
+}
+.html-editor-overlay .editor-content h3, .html-editor-overlay .editor-content h2 {
   display: flex;
   align-items: center;
-  margin: 10px 0 !important;
 }
-.html-editor-overlay .editor-content h2 button.btn {
+.html-editor-overlay .editor-content h3 button.btn {
   background: #ededed;
   margin-right: 15px;
   padding: 0;
@@ -42,22 +41,21 @@
   align-items: center;
   justify-content: center;
 }
-.html-editor-overlay .editor-content h2 button.btn span {
+.html-editor-overlay .editor-content h3 button.btn span {
   height: 10px;
   line-height: 10px;
 }
-.html-editor-overlay .editor-content h2 button.btn.expanded span {
+.html-editor-overlay .editor-content h3 button.btn.expanded span {
   transform: rotate(180deg)
 }
-.html-editor-overlay .editor-content h2:first-child {
+.html-editor-overlay .editor-content h3:first-child {
   margin-top: 0 !important;
 }
-.html-editor-overlay .editor-content h2 .left-align {
+.html-editor-overlay .editor-content .left-align {
   flex: 1;
 }
 .html-editor-overlay .editor-content .right-align {
   display: flex;
-  height: 40px;
 }
 .html-editor-overlay .editor-content .right-align button {
   display: flex;
@@ -66,24 +64,21 @@
   display: flex;
   margin-bottom: 10px;
 }
-.html-editor-overlay .editor-content .title-label .left-align {
-  flex: 1;
-}
 .html-editor-overlay .editor-content .right-align {
   display: flex;
   align-items: center;
-  position: absolute;
-  right: 20px;
 }
-.html-editor-overlay
-  .editor-content
-  .title-label
-  .right-align.available-parameters {
-  color: #0093ff;
-}
-.parameters-info-content {
+.html-editor-overlay  .parameters-info-content {
   max-width: 600px !important;
 }
-.parameters-info-content .parameters-info-inner-content .code-dark {
+.html-editor-overlay  .parameters-info-content .parameters-info-inner-content .code-dark {
   max-height: 370px;
+}
+.html-editor-overlay  .editor-section {
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.html-editor-overlay .right-align.available-parameters {
+  color: #0093ff;
 }

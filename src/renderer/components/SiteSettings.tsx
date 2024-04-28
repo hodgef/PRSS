@@ -236,7 +236,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
         </div>
       </h1>
       <div className="content">
-        <Form className="mt-4">
+        <Form>
           <Form.Group className="form-group row">
             <InputGroup className="input-group-lg">
               <Form.Label className="col-sm-2 col-form-label">Site ID</Form.Label>

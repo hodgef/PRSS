@@ -92,6 +92,13 @@
   margin: 20px;
   border-radius: 50%;
 }
+#app .app-site-setup header {
+  background-color: unset;
+  border-bottom-color: transparent;
+}
+#app .app-site-setup header .header-cont .right-align .drop-menu {
+  background: #d0fcfd;
+}
 @keyframes circanim {
   0% {
     width: 10px;
@@ -105,11 +112,4 @@
     margin: -75vw;
     background-color: #e7ffff;
   }
-}
-#app .app-site-setup header {
-  background-color: unset;
-  border-bottom-color: transparent;
-}
-#app .app-site-setup header .header-cont .right-align .drop-menu {
-  background: #d0fcfd;
 }

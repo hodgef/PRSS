@@ -2,91 +2,237 @@
   position: fixed;
   top: 50px;
   width: 100%;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0, 0, 0, 0.9);
   height: calc(100vh - 80px);
   z-index: 100;
   display: flex;
 }
+
 .sitevars-editor-overlay .editor-content {
   margin: 0 auto;
   width: 100%;
   background: white;
-  padding: 20px;
   box-sizing: border-box;
   overflow: hidden;
-  border-radius: 10px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  margin-top: 20px;
   flex-flow: column;
   overflow-y: auto !important;
   position: relative;
   display: flex;
+  gap: 10px;
+  padding: 20px;
 }
+
+.sitevars-editor-overlay .editor-content h3,
 .sitevars-editor-overlay .editor-content h2 {
   display: flex;
   align-items: center;
 }
+
 .sitevars-editor-overlay .editor-content h2:first-child {
   margin-top: 0 !important;
   margin-bottom: 5px !important;
 }
+
 .sitevars-editor-overlay .editor-content h2 .left-align {
   flex: 1;
 }
+
 .sitevars-editor-overlay .editor-content h2 .right-align {
   display: flex;
   height: 40px;
 }
+
 .sitevars-editor-overlay .editor-content h2 .right-align button {
   display: flex;
 }
+
 .sitevars-editor-overlay .editor-content .title-label {
   display: flex;
   margin-bottom: 10px;
 }
+
 .sitevars-editor-overlay .editor-content .title-label .left-align {
   flex: 1;
 }
-.sitevars-editor-overlay .editor-content .title-label .right-align {
+
+.sitevars-editor-overlay .editor-content .right-align {
   display: flex;
   align-items: center;
 }
-.sitevars-editor-overlay
-  .editor-content
-  .title-label
-  .right-align.available-parameters {
+
+.sitevars-editor-overlay .editor-content .right-align.available-parameters {
   color: #0093ff;
+  font-size: 14px;
 }
+
 .sitevars-editor-overlay .editor-content .variable-list,
 .sitevars-editor-overlay .editor-content .inherited-variable-list {
   flex: 1;
   overflow-y: auto;
-  border-bottom: 2px solid #dbdbdb;
 }
+
 .sitevars-editor-overlay .editor-content .variable-list ul,
 .sitevars-editor-overlay .editor-content .inherited-variable-list ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.sitevars-editor-overlay .editor-content .variable-list ul li input:first-child,
-.sitevars-editor-overlay
-  .editor-content
-  .inherited-variable-list
-  ul
-  li
-  input:first-child {
-  max-width: 250px;
-}
+
 .sitevars-editor-overlay .editor-content .variable-list ul li button,
 .sitevars-editor-overlay .editor-content .inherited-variable-list ul li button {
   display: flex;
   align-items: center;
 }
-.parameters-info-content {
+
+.sitevars-editor-overlay .parameters-info-content {
   max-width: 600px !important;
 }
-.parameters-info-content .parameters-info-inner-content .code-dark {
+
+.sitevars-editor-overlay .parameters-info-content .parameters-info-inner-content .code-dark {
   max-height: 370px;
+}
+
+.sitevars-editor-overlay .suggested-variables {
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.sitevars-editor-overlay .suggested-variables ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  gap: 10px;
+  padding: 0;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.sitevars-editor-overlay .suggested-variables ul li.suggested-var {
+  padding: 5px 14px;
+  background: #e9f1ff;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.sitevars-editor-overlay .suggested-variables ul li.suggested-var  span.material-symbols-outlined {
+  font-size: 17px;
+}
+
+.sitevars-editor-overlay .suggested-variables ul li.suggested-var:hover {
+  opacity: 0.7;
+}
+
+.sitevars-editor-overlay .editor-content h3 {
+  margin: 10px 0;
+  font-size: 18px;
+  gap: 15px;
+}
+
+.sitevars-editor-overlay .editor-content p {
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.sitevars-editor-overlay .editor-section {
+  display: flex;
+  flex-flow: column;
+  overflow-y: auto;
+}
+
+.sitevars-editor-overlay .section-top {
+  display: flex;
+  flex-flow: row;
+  flex: 1;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.sitevars-editor-overlay .editor-section {
+  background: white;
+  border-radius: 10px;
+  padding: 10px 15px;
+  border: 2px solid #ededed;
+}
+
+.sitevars-editor-overlay .section-top>.editor-section {
+  flex: 1;
+}
+
+.sitevars-editor-overlay .editor-sections {
+  display: flex;
+  flex-flow: column;
+  flex: 1;
+  overflow: hidden;
+  gap: 10px;
+}
+
+.sitevars-editor-overlay .input-group {
+ position: relative;
+}
+
+.sitevars-editor-overlay .input-group button {
+  padding: 0;
+  height: 42px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sitevars-editor-overlay .input-group span.material-symbols-outlined {
+  align-self: center;
+}
+
+.sitevars-editor-overlay .input-container {
+  display: flex;
+}
+
+.sitevars-editor-overlay textarea.form-control {
+  font-size: 15px;
+  height: 42px !important;
+  width: 100% !important;
+  padding: 0 5px 0 10px;
+  resize: none;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-wrap: initial;
+  padding: 10px;
+  white-space: nowrap;
+}
+
+.sitevars-editor-overlay .input-group .input-container textarea.form-control:focus {
+  width: 100% !important;
+  height: 300px !important;
+  position: absolute;
+  overflow-x: auto;
+  border-radius: 5px !important;
+  top: 0;
+  background: white;
+  z-index: 9;
+  word-wrap: revert-layer;
+  overflow-y: auto;
+  left: 0;
+  white-space: initial;
+}
+
+.sitevars-editor-overlay .input-group .input-container:last-of-type {
+  flex: 1;
+}
+
+.sitevars-editor-overlay .input-group .input-container:first-of-type textarea.form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.sitevars-editor-overlay .input-group .input-container:last-of-type textarea.form-control {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.sitevars-editor-overlay .variable-list  .input-group .input-container:last-of-type textarea.form-control {
+  border-radius: 0;
 }

@@ -19,6 +19,22 @@ export interface ISite {
     menus: ISiteMenus;
 }
 
+export type IManifestSiteVarsType = "string" | "image" | "url";
+
+export interface IThemeManifest {
+    name: string;
+    title: string;
+    version: string;
+    author: string;
+    homepage: string;
+    license: string;
+    type: string;
+    parser: string;
+    templates: string[];
+    siteVars: { type: IManifestSiteVarsType, description: string }[];
+    isLocal?: boolean;
+}
+
 export interface IConfigThemes {
     [key: string]: string;
 }
@@ -77,7 +93,7 @@ export interface ITemplateComponent {
 }
 
 export interface ISites {
-    [name: string]: ISite; 
+    [name: string]: ISite;
 }
 
 export interface IPaths {
@@ -89,7 +105,7 @@ export interface IStore {
 }
 
 export interface ISitesInternal {
-    [name: string]: ISiteInternal; 
+    [name: string]: ISiteInternal;
 }
 
 export interface IStoreInternal {

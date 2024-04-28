@@ -101,7 +101,7 @@ const Addons: FunctionComponent<IProps> = ({
         <div className="right-align"></div>
       </h1>
       <div className="content">
-        <Row className="mt-3">
+        <Row>
           <Col>
             {prssConfig.available_addons?.map(addon => {
               return (

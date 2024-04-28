@@ -2,7 +2,7 @@ import "./styles/PostEditorSidebar.css";
 
 import React, { FunctionComponent, useState, Fragment, useEffect } from "react";
 import cx from "classnames";
-import { noop, confirmation } from "../services/utils";
+import { noop, uploadAssetImage, removeAssetImage } from "../services/utils";
 import Loading from "./Loading";
 import { configGet, getString } from "../../common/utils";
 import { modal } from "./Modal";
@@ -10,6 +10,7 @@ import { getTemplateList } from "../services/theme";
 import { IPostItem, ISite, Noop } from "../../common/interfaces";
 import { setHook } from "../../common/bootstrap";
 import { isPreviewActive } from "../services/preview";
+import { updateItem } from "../services/db";
 
 interface IProps {
   site: ISite;
@@ -24,6 +25,7 @@ interface IProps {
   onOpenRawHTMLOverlay?: Noop;
   onOpenVarEditorOverlay?: Noop;
   onToggleRawHTMLOnly?: Noop;
+  onFeaturedImageSet?: Noop;
 }
 
 const PostEditorSidebar: FunctionComponent<IProps> = ({
@@ -35,12 +37,14 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
   onStopPreview = noop,
   onStartPreview = noop,
   onPublish = noop,
-  onChangePostTemplate = (t) => {},
+  onChangePostTemplate = (t) => { },
   onOpenRawHTMLOverlay = noop,
   onOpenVarEditorOverlay = noop,
   onToggleRawHTMLOnly = noop,
+  onFeaturedImageSet = noop,
 }) => {
   const themeName = site.theme;
+  const [updatedItem, setUpdatedItem] = useState<IPostItem>(item);
   const [deployLoading, setDeployLoading] = useState<boolean>(false);
   const [buildLoading, setBuildLoading] = useState<boolean>(false);
   const [buildAllLoading, setBuildAllLoading] = useState<boolean>(false);
@@ -89,26 +93,80 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
     setHook("PostEditorSidebar_deployLoading", (value: boolean) => {
       setDeployLoading(value);
     });
+
+    setHook("PostEditorSidebar_setUpdatedItem", (value: IPostItem) => {
+      setUpdatedItem(value);
+    });
   }, []);
 
   if (!templateList) {
     return null;
   }
 
-  const toggleForceRawHTML = async () => {
-    if (forceRawHTMLEditing) {
-      const confirmationRes = await confirmation({
-        title: getString("warn_force_raw_html_disable"),
-      });
-
-      if (confirmationRes !== 0) {
-        modal.alert(["action_cancelled", []]);
-        return;
-      }
+  const setFeaturedImage = async () => {
+    if (!updatedItem) {
+      return;
     }
 
-    onToggleRawHTMLOnly();
-  };
+    const filePath = await uploadAssetImage(site.name);
+
+    if (filePath) {
+      // Update post vars
+      const newItem = {
+        ...updatedItem,
+        vars: {
+          ...updatedItem.vars,
+          featuredImageUrl: filePath
+        },
+        updatedAt: Date.now()
+      };
+
+      /**
+       *  Update item
+       */
+      await updateItem(site.uuid, item.uuid, {
+        vars: {
+          ...item.vars,
+          featuredImageUrl: filePath
+        },
+        updatedAt: Date.now()
+      });
+
+      item = newItem;
+      setUpdatedItem(newItem);
+      onFeaturedImageSet();
+    }
+  }
+
+  const removeFeaturedImage = async () => {
+    if (!updatedItem) {
+      return;
+    }
+
+    const updatedVars = { ...updatedItem.vars };
+    await removeAssetImage(site.name, updatedVars.featuredImageUrl);
+
+    delete updatedVars.featuredImageUrl;
+
+    // Update post vars
+    const newItem = {
+      ...updatedItem,
+      vars: updatedVars,
+      updatedAt: Date.now()
+    };
+
+    /**
+     *  Update item
+     */
+    await updateItem(site.uuid, updatedItem.uuid, {
+      vars: updatedVars,
+      updatedAt: Date.now()
+    });
+
+    item = newItem;
+    setUpdatedItem(newItem);
+    onFeaturedImageSet();
+  }
 
   const buildStr = previewStarted ? "Save & Build" : "Save";
 
@@ -244,6 +302,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
               </select>
             </div>
           </li>
+
           <li className="clickable" onClick={() => onOpenRawHTMLOverlay()}>
             <span className="material-symbols-outlined">code</span>{" "}
             <span>Add Raw HTML code</span>
@@ -252,23 +311,18 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
             <span className="material-symbols-outlined">create</span>{" "}
             <span>Edit Variables</span>
           </li>
-          {/*<li className="clickable">
-                        <div className="form-check">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                checked={forceRawHTMLEditing}
-                                id="force-html-edit"
-                                onChange={() => toggleForceRawHTML()}
-                            />
-                            <label
-                                className="form-check-label"
-                                htmlFor="force-html-edit"
-                            >
-                                Force Raw HTML Editing
-                            </label>
-                        </div>
-                                </li>*/}
+
+          {updatedItem?.vars.featuredImageUrl ? (
+            <li className="clickable" onClick={() => removeFeaturedImage()}>
+              <span className="material-symbols-outlined">close</span>{" "}
+              <span>Remove Featured Image</span>
+            </li>
+          ) : (
+            <li className="clickable" onClick={() => setFeaturedImage()}>
+              <span className="material-symbols-outlined">image</span>{" "}
+              <span>Set Featured Image</span>
+            </li>
+          )}
         </ul>
       )}
 

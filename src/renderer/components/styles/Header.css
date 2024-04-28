@@ -4,7 +4,6 @@ header {
   z-index: 999999999999999;
   height: 50px;
   user-select: none;
-  background-color: white;
 }
 header .logo {
   -webkit-app-region: none;

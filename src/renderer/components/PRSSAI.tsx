@@ -392,7 +392,7 @@ const PRSSAI: FunctionComponent<IProps> = ({
         </div>
       </h1>
       <div className="content">
-        <Row className="mt-3">
+        <Row className="">
           <Col>
             <Accordion defaultActiveKey={typeof activeSection !== "undefined" ? activeSection : status ? "1" : "0"} onSelect={(activeKey: string) => {
               storeInt.set("prssaiLastActiveSection", activeKey);

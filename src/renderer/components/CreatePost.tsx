@@ -213,7 +213,7 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         </div>
       </h1>
       <div className="content">
-        <form className="mt-4">
+        <form>
           <div className="form-group">
             <div className="input-group input-group-lg">
               <input

@@ -503,6 +503,10 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     setStatusMessage("success", "Post updated");
   }, []);
 
+  const handleFeaturedImageSet = useCallback(() => {
+    setStatusMessage("success", "Post updated");
+  }, []);
+
   const onEditorKeyPress = (e: KeyboardEvent) => {
     if (e) {
       if (e.ctrlKey) {
@@ -621,6 +625,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
               onOpenRawHTMLOverlay={openRawHTMLOverlay}
               onOpenVarEditorOverlay={openVariablesOverlay}
               onToggleRawHTMLOnly={toggleRawHTMLOnly}
+              onFeaturedImageSet={handleFeaturedImageSet}
             />
           </div>
         </div>

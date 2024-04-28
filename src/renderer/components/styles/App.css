@@ -43,11 +43,9 @@
 }
 #app .page.fixed .content > .items {
   flex: 1;
-  overflow: auto;
 }
 #app .page .content > .items {
   flex: 1;
-  overflow: auto;
 }
 #app .page .content .content-header.full-size {
   margin: -30px -40px 0;
@@ -156,7 +154,7 @@
 }
 #app .editor-content h2 {
   font-size: 20px;
-  margin: 15px 0;
+  margin: 0 0 5px 0;
 }
 #app .clickable {
   transition: opacity 0.1s ease-in-out;
@@ -268,10 +266,36 @@
 }
 
 #app .page > h1 {
-  margin: 40px 40px 10px 40px;
+  padding: 15px 45px 20px 40px;
   width: unset;
+  box-sizing: border-box;
+  height: unset;
+  max-height: unset;
+  margin-bottom: 0;
+  height: 85px;
 }
 
 #app .page > h1 + .content {
-  padding: 0 40px 0 40px;
+  padding: 20px 40px 40px 40px;
+}
+
+#app .page .content > .items {
+  flex: 1;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 10rem;
+  border: 3px solid #fff;
+  background-clip: padding-box;
+}
+#app .app-background {
+  height: 135px;
+  overflow: hidden;
+  background: #f9f9f9;
+  transition: 0.2s height ease-in-out;
+  z-index: -1;
 }

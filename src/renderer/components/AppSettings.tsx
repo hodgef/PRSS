@@ -118,7 +118,7 @@ const AppSettings: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         </div>
       </h1>
       <div className="content">
-        <Form className="mt-4">
+        <Form>
           <div className="form-group row">
             <div className="input-group input-group-lg">
               <label htmlFor="siteConfig" className="col-sm-3 col-form-label">

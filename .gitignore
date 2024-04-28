@@ -9,6 +9,7 @@
 /dist
 static/buffer/
 static/public/
+static/themes/
 static/.env
 .vscode
 
