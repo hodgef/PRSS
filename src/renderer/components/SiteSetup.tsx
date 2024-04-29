@@ -262,6 +262,7 @@ const SiteSetup: FunctionComponent<IProps> = ({
       const setupRes = await setupRemote(siteUUID, setLoadingStatus);
       if (!setupRes) {
         setLoading(false);
+        setAppClass("app-site-setup");
 
         /**
          * Rollback siteInt changes

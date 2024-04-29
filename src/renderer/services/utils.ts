@@ -1,4 +1,4 @@
-import { getCurrentVersion } from "../../common/utils";
+import { getCurrentVersion, isReportIssuesEnabled } from "../../common/utils";
 import { modal } from "../components/Modal";
 import stopwords from "../json/stopwords.json";
 import React from "react";
@@ -535,4 +535,39 @@ export const removeAssetImage = async (siteName: string, imagePath: string) => {
   }
 
   return false;
+}
+
+export const showCoachmark = (target, id: string, message: string, className = "", onClick = () => {}) => {
+  if(!target){
+    return;
+  }
+  var offsets = target.getBoundingClientRect();
+  var top = parseInt(offsets.top);
+  var left = parseInt(offsets.left);
+
+  const closeCoachmark = async () => {
+    onClick();
+    coachmarkElem.remove();
+
+    if(await isReportIssuesEnabled()){
+      dispatchPRSSEvent({
+        id: "coachmark",
+        context: id
+      });
+    }
+  }
+
+  const coachmarkElem = document.createElement("div")
+  coachmarkElem.className = "coachmark bg-primary " + className;
+  coachmarkElem.style.cssText = `top: ${top}px; left: ${left}px`;
+  coachmarkElem.innerHTML = message;
+  coachmarkElem.setAttribute("tabindex", "-1");
+  coachmarkElem.onclick = closeCoachmark;
+
+  document.querySelector(".page").appendChild(coachmarkElem);
+
+  setTimeout(() => {
+    coachmarkElem.focus();
+    coachmarkElem.onblur = closeCoachmark;
+  }, 500);
 }

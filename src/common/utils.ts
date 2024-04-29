@@ -111,6 +111,10 @@ export const isAddThemesReminderEnabled = () => {
   return (storeInt.get("addThemesReminderEnabled")) === false ? false : true;
 };
 
+export const isVariablesCoachmarkEnabled = () => {
+  return (storeInt.get("variablesCoachmarkEnabled")) === false ? false : true;
+};
+
 export const getCurrentVersion = () => {
   const isDevelopment = process.env.NODE_ENV !== "production";
   const { app } = require("@electron/remote");

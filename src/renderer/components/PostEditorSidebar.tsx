@@ -1,14 +1,14 @@
 import "./styles/PostEditorSidebar.css";
 
-import React, { FunctionComponent, useState, Fragment, useEffect } from "react";
+import React, { FunctionComponent, useState, Fragment, useEffect, useRef } from "react";
 import cx from "classnames";
-import { noop, uploadAssetImage, removeAssetImage } from "../services/utils";
+import { noop, uploadAssetImage, removeAssetImage, showCoachmark } from "../services/utils";
 import Loading from "./Loading";
-import { configGet, getString } from "../../common/utils";
+import { configGet, getString, isVariablesCoachmarkEnabled } from "../../common/utils";
 import { modal } from "./Modal";
 import { getTemplateList } from "../services/theme";
 import { IPostItem, ISite, Noop } from "../../common/interfaces";
-import { setHook } from "../../common/bootstrap";
+import { setHook, storeInt } from "../../common/bootstrap";
 import { isPreviewActive } from "../services/preview";
 import { updateItem } from "../services/db";
 
@@ -44,6 +44,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
   onFeaturedImageSet = noop,
 }) => {
   const themeName = site.theme;
+  const themesCoachmarkEnabled = useRef<boolean>(isVariablesCoachmarkEnabled());
   const [updatedItem, setUpdatedItem] = useState<IPostItem>(item);
   const [deployLoading, setDeployLoading] = useState<boolean>(false);
   const [buildLoading, setBuildLoading] = useState<boolean>(false);
@@ -51,7 +52,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
   const [editorChanged, setEditorChanged] = useState<boolean>(false);
   const [loadingStatus, setLoadingStatus] = useState<string>(null)
   const [currentTemplate, setCurrentTemplate] = useState<string>(item.template);
-  const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const [showMoreOptions, setShowMoreOptions] = useState(themesCoachmarkEnabled.current);
   const [templateList, setTemplateList] = useState(null);
   const [previewStarted, setPreviewStarted] = useState<boolean>(isPreviewActive());
   const [previewLoading, setPreviewLoading] = useState<boolean>(false);
@@ -97,6 +98,10 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
     setHook("PostEditorSidebar_setUpdatedItem", (value: IPostItem) => {
       setUpdatedItem(value);
     });
+
+    if(isVariablesCoachmarkEnabled()){
+      storeInt.set("variablesCoachmarkEnabled", false);
+    }
   }, []);
 
   if (!templateList) {
@@ -307,7 +312,13 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
             <span className="material-symbols-outlined">code</span>{" "}
             <span>Add Raw HTML code</span>
           </li>
-          <li className="clickable" onClick={() => onOpenVarEditorOverlay()}>
+          <li className="clickable" onClick={() => onOpenVarEditorOverlay()} ref={r => {
+            if(themesCoachmarkEnabled.current){
+              showCoachmark(r, "variables-coachmark", "You can customize your Template here", "coachmark-left", () => {
+                storeInt.set("variablesCoachmarkEnabled", false);
+              });
+            }
+          }}>
             <span className="material-symbols-outlined">create</span>{" "}
             <span>Edit Variables</span>
           </li>

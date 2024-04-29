@@ -48,6 +48,8 @@
   "visit_site_description": "Visit your live site",
   "repository": "Repository",
   "repository_description": "View files in your hosting",
+  "build_status": "Publish Log",
+  "build_status_description": "Check Publish Status",
   "error_delete_single_post": "You cannot delete your only post. Create another post before deleting this one.",
   "error_delete_root_post": "You cannot delete the site index. Please edit it instead",
   "warn_delete_post_with_children": "At least one selected post contains children. These will be deleted as well. Continue?",
@@ -85,5 +87,7 @@
   "slug_existing": "There is already an item with the same slug (%s) at this position. Please change the slug or drop elsewhere",
   "no_clone_root": "You cannot clone the root post. Please unselect it and try again.",
   "title_missing": "The title must have a value",
-  "slug_missing": "URL Slug error. Please provide a URL Slug for your post or choose a different title."
+  "slug_missing": "URL Slug error. Please provide a URL Slug for your post or choose a different title.",
+  "enable_pages_error": "Could not enable Github Pages on this repository.",
+  "enable_pages_branch_error": "The default branch for the repository could not be found."
 }

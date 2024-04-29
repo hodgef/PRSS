@@ -57,14 +57,15 @@ class GithubProvider {
     /**
      * Creating repo
      */
-    const { hosting } = await this.fetchSiteConfig();
+    const { hosting } = this.fetchSiteConfig();
     const username = await this.getUsername();
+    let createdRepoRes;
 
     if (username === hosting.username) {
       onUpdate(getString("creating_repository"));
-      const createRepoRes = await this.createRepo();
+      createdRepoRes = await this.createRepo();
 
-      if (!createRepoRes) return false;
+      if (!createdRepoRes) return false;
     }
 
     /**
@@ -82,7 +83,7 @@ class GithubProvider {
     /**
      * Enabling pages site
      */
-    const siteUrl = await this.enablePagesSite();
+    const siteUrl = await this.enablePagesSite(createdRepoRes);
 
     if (!siteUrl) {
       if (!modal.isShown()) {
@@ -105,8 +106,8 @@ class GithubProvider {
     return true;
   };
 
-  getUsername = async () => {
-    const { hosting } = await this.fetchSiteConfig();
+  getUsername = () => {
+    const { hosting } = this.fetchSiteConfig();
     const { username, repository } = hosting;
 
     if (repository && repository.includes("/")) {
@@ -116,11 +117,11 @@ class GithubProvider {
     }
   };
 
-  getRepositoryName = async () => {
+  getRepositoryName = () => {
     const {
       name,
       hosting: { repository },
-    } = await this.fetchSiteConfig();
+    } = this.fetchSiteConfig();
 
     if (repository) {
       if (repository.includes("/")) {
@@ -340,7 +341,17 @@ class GithubProvider {
     return true;
   };
 
-  enablePagesSite = async () => {
+  enablePagesSite = async (repo: any) => {
+    if(!repo){
+      modal.alert(["enable_pages_error", []]);
+      return;
+    }
+
+    if(!repo.default_branch){
+      modal.alert(["enable_pages_branch_error", []]);
+      return;
+    }
+
     const repositoryName = await this.getRepositoryName();
     const username = await this.getUsername();
 
@@ -357,7 +368,7 @@ class GithubProvider {
         endpoint,
         {
           source: {
-            branch: "master",
+            branch: repo.default_branch,
             directory: "/",
           },
         },
@@ -481,13 +492,13 @@ class GithubProvider {
         modal.alert(["action_cancelled", [repoUrl]]);
         return false;
       } else {
-        return true;
+        return repo;
       }
     }
 
     const repositoryName = await this.getRepositoryName();
 
-    const { created_at } =
+    const res =
       (await this.request("POST", "user/repos", {
         name: repositoryName,
         description: getString("created_with"),
@@ -495,12 +506,12 @@ class GithubProvider {
         auto_init: true,
       })) || {};
 
-    if (!created_at) {
+    if (!res?.created_at) {
       modal.alert(["error_repo_creation", [repoUrl]]);
       return false;
     }
 
-    return true;
+    return res;
   };
 
   getRepo = async () => {

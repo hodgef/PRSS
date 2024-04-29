@@ -11,7 +11,7 @@ import { useHistory, useParams } from "react-router-dom";
 import cx from "classnames";
 
 import { getString, configGet, configSet } from "../../common/utils";
-import { buildAndDeploy, getRepositoryUrl } from "../services/hosting";
+import { buildAndDeploy, getRepositoryHosting, getRepositoryUrl } from "../services/hosting";
 import { toast } from "react-toastify";
 import Loading from "./Loading";
 import { getSite } from "../services/db";
@@ -202,6 +202,22 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         require("electron").shell.openExternal(repositoryUrl);
       },
     });
+
+    const repoHosting = getRepositoryHosting(siteId);
+    if(repoHosting === "github"){
+      const actionsUrl = `${repositoryUrl}/actions`;
+      features.push({
+        id: "build_status",
+        title: getString("build_status"),
+        description: getString("build_status_description"),
+        icon: "handyman",
+        className: "",
+        tooltip: actionsUrl,
+        onClick: () => {
+          require("electron").shell.openExternal(actionsUrl);
+        },
+      });
+    }
   }
 
   if (publishSuggested) {
@@ -235,7 +251,7 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       },
     });
   }
-
+  
   return (
     <div className="Dashboard page">
       <h1>

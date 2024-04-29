@@ -66,6 +66,15 @@ export const deploy = (siteUUID: string, params = []) => {
   }
 };
 
+export const getRepositoryHosting = (siteUUID: string) => {
+  const {
+    hosting: { name: hostingName },
+  } = configGet(`sites.${siteUUID}`);
+
+  return hostingName;
+};
+
+
 export const getRepositoryUrl = async (siteUUID: string) => {
   const {
     hosting: { name: hostingName },
