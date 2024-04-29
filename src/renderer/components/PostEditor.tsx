@@ -594,7 +594,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
         <div className="right-align">
           {post && (
             <Fragment>
-              <span className="slug-label mr-1">Editing:</span>
+              <span className="slug-label mr-1">Slug:</span>
               <SlugEditor
                 post={post.current}
                 items={items.current}

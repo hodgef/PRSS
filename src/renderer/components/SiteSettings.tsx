@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
-import { normalizeStrict, appendSlash } from "../services/utils";
+import { normalizeStrict, appendSlash, isValidUrl } from "../services/utils";
 import { toast } from "react-toastify";
 import HTMLEditorOverlay from "./HTMLEditorOverlay";
 import { modal } from "./Modal";
@@ -134,8 +134,8 @@ const SiteSettings: FunctionComponent<IProps> = ({
       return;
     }
 
-    if (!siteUrl && resSiteUrl) {
-      modal.alert(["site_cfg_url_missing", []]);
+    if (siteUrl && !isValidUrl(siteUrl)) {
+      modal.alert(["site_cfg_url_error", []]);
       return;
     }
 
@@ -302,7 +302,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
                   className="form-control"
                   value={siteUrl}
                   onChange={(e) => setSiteUrl(e.target.value)}
-                  onBlur={(e) => setSiteUrl(appendSlash(e.target.value))}
+                  onBlur={(e) => e.target.value ? setSiteUrl(appendSlash(e.target.value)) : ""}
                 />
               </div>
             </div>

@@ -13,6 +13,7 @@ import {
   sanitizeSiteItems,
   toJson,
   appendSlash,
+  processVars,
 } from "./utils";
 import { modal } from "../components/Modal";
 import { getThemeManifest, getDefaultReadme } from "./theme";
@@ -59,7 +60,7 @@ export const build = async (
   /**
    * Adding items file
    */
-  const buildBufferItemsConfigRes = await buildBufferSiteItemsConfig(siteUUID);
+  const buildBufferItemsConfigRes = await buildBufferSiteItemsConfig(siteUUID, siteUrl, mode);
 
   /**
    * Copying anything under static/public
@@ -307,11 +308,11 @@ export const buildBufferSiteConfig = async (siteUUID: string) => {
   return true;
 };
 
-export const buildBufferSiteItemsConfig = async (siteUUID: string) => {
+export const buildBufferSiteItemsConfig = async (siteUUID: string, siteUrl: string, mode: "build" | "deploy") => {
   const bufferDir = storeInt.get("paths.buffer");
   const items = await getItems(siteUUID);
   const { code } = minify(
-    `var PRSSItems = ${JSON.stringify(sanitizeSiteItems(items))}`
+    `var PRSSItems = ${JSON.stringify(sanitizeSiteItems(items, siteUrl, mode))}`
   );
 
   try {
@@ -358,26 +359,6 @@ export const buildBufferItem = async (bufferItem: IBufferItem) => {
   return true;
 };
 
-const processVars = (site: ISite, vars, mode) => {
-  if(mode === "deploy" && site?.url && vars){
-    const processedVars = {...vars};
-
-    Object.keys(processedVars).forEach(varName => {
-      if (varName) {
-        let value = processedVars[varName] as string;
-        const varNameLowercase = varName.toLowerCase();
-
-        if(value?.startsWith("/assets/") && (varNameLowercase.includes("image") || varNameLowercase.includes("url"))){
-          processedVars[varName] = site.url+value.substring(1);
-        }
-      }
-    });
-    return processedVars;
-  } else {
-    return vars;
-  }
-}
-
 export const getBufferItems = async (
   siteUUIDOrSite,
   mode: "build" | "deploy" = "build"
@@ -385,7 +366,7 @@ export const getBufferItems = async (
   const site =
     typeof siteUUIDOrSite === "string"
       ? await getSite(siteUUIDOrSite)
-      : siteUUIDOrSite;
+      : (siteUUIDOrSite as ISite);
   const structurePaths = getStructurePaths(site.structure);
   const themeManifest = await getThemeManifest(site.theme);
   const rootPost = getRootPost(site);
@@ -400,7 +381,7 @@ export const getBufferItems = async (
 
   structurePaths.forEach((item) => {
     const path = item.split("/");
-    let post;
+    let post: IPostItem;
 
     const mappedPath = path.map((postId) => {
       if (!postId) {
@@ -420,7 +401,7 @@ export const getBufferItems = async (
     /**
      * Aggregate data
      */
-    const vars = processVars(site, {
+    const vars = processVars(site.url, {
       ...(site.vars || {}),
       ...(getAggregateItemPropValues("item.vars", parentIds, bufferItems) ||
         {}),
@@ -471,8 +452,13 @@ export const getBufferItems = async (
         path: "/" + postPath,
         templateId: `${site.theme}.${post.template}`,
         parser: themeManifest.parser,
-        item: post as IPostItem,
-        site: site as ISite, // Will be removed in bufferItem parser, replaced by PRSSConfig
+        item: post ? {
+          ...post,
+          vars: {
+            ...processVars(site.url, post?.vars, mode),
+          }
+        }: null,
+        site: site, // Will be removed in bufferItem parser, replaced by PRSSConfig
         rootPath,
         headHtml,
         footerHtml,

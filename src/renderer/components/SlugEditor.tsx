@@ -60,7 +60,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
       return;
     }
 
-    if(isUneditable){
+    if (isUneditable) {
       modal.alert(["site_slug_protected", [value]]);
       return;
     }
@@ -98,7 +98,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
   };
 
   const getUrlPath = (path = "") => {
-    let host = site.url;
+    let host = site?.url;
 
     if (previewMode) {
       // TODO: Find a way to get host from BrowserSync
@@ -136,38 +136,54 @@ const SlugEditor: FunctionComponent<IProps> = ({
         <Fragment>
           {bufferItem.path !== "/" ? (
             <Fragment>
-              <a
-                href={getUrlPath(bufferItem.path.substring(1))}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={getUrlPath(bufferItem.path.substring(1))}
-                className="mr-2"
-              >
-                {value}
-              </a>
+              <>
+                {(site?.url || previewMode) ? (
+                  <a
+                    href={getUrlPath(bufferItem.path.substring(1))}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={getUrlPath(bufferItem.path.substring(1))}
+                    className="mr-2"
+                    onClick={() => {
 
-              {!isUneditable && (
-                <i
-                  className="material-symbols-outlined clickable"
-                  onClick={() => {
-                    setValue(post.slug);
-                    setEditing(true);
-                  }}
-                >
-                  edit
-                </i>
-              )}
+                    }}
+                  >
+                    {value}
+                  </a>
+                ) : (
+                  <span>{value}</span>
+                )}
+              </>
+              <>
+                {!isUneditable && (
+                  <i
+                    className="material-symbols-outlined clickable"
+                    onClick={() => {
+                      setValue(post.slug);
+                      setEditing(true);
+                    }}
+                  >
+                    edit
+                  </i>
+                )}
+              </>
             </Fragment>
           ) : (
-            <a
-              href={getUrlPath()}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={getUrlPath()}
-              className="mr-2 font-italic"
-            >
-              Site Index
-            </a>
+            <>
+              {(site?.url || previewMode) ? (
+                <a
+                  href={getUrlPath()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={getUrlPath()}
+                  className="mr-2 font-italic"
+                >
+                  Site Index
+                </a>
+              ) : (
+                <span>Site Index</span>
+              )}
+            </>
           )}
         </Fragment>
       )}

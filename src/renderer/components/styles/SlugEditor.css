@@ -4,7 +4,7 @@
   max-height: 35px;
   margin-bottom: 10px;
 }
-.slug-editor a {
+.slug-editor a, .slug-editor span {
   width: 250px;
   white-space: nowrap;
   overflow: hidden;

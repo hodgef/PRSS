@@ -411,15 +411,37 @@ export const notifyNewVersion = async (newVersion) => {
   }
 };
 
-export const sanitizeSiteItems = (items) => {
-  /**
-   * Update items
-   */
+/**
+ * Update items
+ */
+export const sanitizeSiteItems = (items, siteUrl: string, mode: "build" | "deploy") => {
   return items.map((item) => {
     item.content = truncateString(stripTags(item.content));
+    item.vars = processVars(siteUrl, item.vars, mode);
     return sanitizeItem(item);
   });
 };
+
+export const processVars = (siteUrl: string, vars, mode) => {
+  if(mode === "deploy" && siteUrl && vars){
+    const processedVars = {...vars};
+
+    Object.keys(processedVars).forEach(varName => {
+      if (varName) {
+        let value = processedVars[varName] as string;
+        const varNameLowercase = varName.toLowerCase();
+
+        if(value?.startsWith("/assets/") && (varNameLowercase.includes("image") || varNameLowercase.includes("url"))){
+          processedVars[varName] = siteUrl+value.substring(1);
+        }
+      }
+    });
+
+    return processedVars;
+  } else {
+    return vars;
+  }
+}
 
 export const sanitizeItem = (itemObj) => {
   const newObj = JSON.parse(JSON.stringify(itemObj));
@@ -547,7 +569,9 @@ export const showCoachmark = (target, id: string, message: string, className = "
 
   const closeCoachmark = async () => {
     onClick();
-    coachmarkElem.remove();
+    if(coachmarkElem){
+      coachmarkElem.remove();
+    }
 
     if(await isReportIssuesEnabled()){
       dispatchPRSSEvent({
@@ -562,7 +586,6 @@ export const showCoachmark = (target, id: string, message: string, className = "
   coachmarkElem.style.cssText = `top: ${top}px; left: ${left}px`;
   coachmarkElem.innerHTML = message;
   coachmarkElem.setAttribute("tabindex", "-1");
-  coachmarkElem.onclick = closeCoachmark;
 
   document.querySelector(".page").appendChild(coachmarkElem);
 
@@ -570,4 +593,14 @@ export const showCoachmark = (target, id: string, message: string, className = "
     coachmarkElem.focus();
     coachmarkElem.onblur = closeCoachmark;
   }, 500);
+}
+
+export const isValidUrl = (string: string) => {
+  let url;
+  try {
+    url = new URL(string);
+  } catch (e) {
+    return false;  
+  }
+  return url.protocol === "http:" || url.protocol === "https:";
 }

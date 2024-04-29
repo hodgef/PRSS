@@ -316,6 +316,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
             if(themesCoachmarkEnabled.current){
               showCoachmark(r, "variables-coachmark", "You can customize your Template here", "coachmark-left", () => {
                 storeInt.set("variablesCoachmarkEnabled", false);
+                themesCoachmarkEnabled.current = false;
               });
             }
           }}>

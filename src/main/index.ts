@@ -18,6 +18,7 @@ const ElectronStore = require('electron-store');
 ElectronStore.initRenderer();
 
 initialize();
+app.setAppUserModelId('PRSS');
 
 let mainWindow;
 let appLink;

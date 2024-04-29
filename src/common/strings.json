@@ -78,6 +78,7 @@
   "site_cfg_title_missing": "Your site must have a title",
   "site_cfg_theme_missing": "Your site must have a theme",
   "site_cfg_url_missing": "Your site must have an URL",
+  "site_cfg_url_error": "Your site must have a valid URL",
   "theme_mgr_reqtheme": "Your site must have a theme",
   "build_theme_parseerr": "There was an error parsing the template for post id (%s)",
   "build_manifest_missing": "Could not find theme manifest.",
