@@ -20,6 +20,7 @@
 }
 #app .page > footer .right-align {
   justify-content: flex-end;
+  font-weight: 500;
 }
 #app .page > footer .right-align .version-tag {
   opacity: 0.3;

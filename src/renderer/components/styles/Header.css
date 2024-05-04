@@ -4,6 +4,7 @@ header {
   z-index: 999999999999999;
   height: 50px;
   user-select: none;
+  background: #f9f9f9;
 }
 header .logo {
   -webkit-app-region: none;
@@ -50,6 +51,7 @@ header .header-cont .right-align .btn {
   box-shadow: none !important;
   border: none !important;
   height: 50px;
+  width: 47px;
   display: flex;
   align-items: center;
   border-radius: 0;

@@ -114,20 +114,22 @@
   align-items: center;
 }
 #app .accordion {
-  box-shadow: 0 0 8px #dfdfdf;
-  border-radius: 19px;
   overflow: hidden;
-  border: 1px solid #d5d5d5;
 }
 #app .accordion-body {
-  padding: 5px 20px 15px;
+  padding: 25px 20px 35px;
 }
 #app .accordion-button {
   transition: all 0.3s ease-in-out;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+#app .accordion-button i.material-symbols-outlined {
+  font-size: 20px;
 }
 #app .accordion-button.collapsed {
   opacity: 0.7;
-  background: #fbfbfb;
 }
 #app .accordion-body .input-group button.btn[class*="btn-outline"] {
   padding: 0 10px;
@@ -138,12 +140,13 @@
   opacity: 1;
 }
 #app .accordion-button:not(.collapsed) {
+  opacity: 1;
   color: unset;
-  background-color: unset;
   box-shadow: unset;
   font-size: 20px;
   font-weight: 500;
-  padding: 20px 20px 10px 20px;
+  padding: 20px 20px 20px 20px;
+  background: unset;
 }
 #app .accordion-item {
   border: none;
@@ -314,7 +317,6 @@
   position: absolute;
   border-width: 8px;
   border-style: solid;
-  border-color: transparent transparent transparent rgba(13,110,253,1);
 }
 
 #app .page .coachmark-left {
@@ -326,4 +328,21 @@
   top: 50%;
   transform: translateY(-50%);
   right: -15px;
+  border-color: transparent transparent transparent rgba(13,110,253,1);
+}
+
+#app .page .coachmark-right {
+  transform: translateX(-105%);
+  margin-top: 5px;
+}
+
+#app .page .coachmark-bottom {
+  text-align: center;
+  margin-top: 10px;
+}
+
+#app .page .coachmark.coachmark-bottom::after {
+  top: -15px;
+  left: 15px;
+  border-color: transparent transparent rgba(13,110,253,1) transparent;
 }

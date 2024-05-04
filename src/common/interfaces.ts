@@ -179,3 +179,19 @@ export type getThemeFilesType = (
 
 export type hostingType = hostingGithubType;
 export type Noop = () => void;
+
+export interface PRSSAIEnv {
+    chrome_host: string;
+    chrome_port: string;
+    ollama_host: string;
+    ollama_model: string;
+    ollama_port: string;
+    ollama_scheme: string;
+    redis_host: string;
+    redis_port: string;
+    res_format: string;
+    res_seo_keywords: string;
+    res_word_count: string;
+    search_follow_links: string;
+    system_prompt: string;
+}

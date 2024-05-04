@@ -31,10 +31,11 @@ import SiteVariablesEditorOverlay from "./SiteVariablesEditorOverlay";
 import { getSite, getItems, updateItem, updateSite } from "../services/db";
 import { truncateString } from "../services/utils";
 import { IPostItem, ISite } from "../../common/interfaces";
-import { runHook } from "../../common/bootstrap";
+import { runHook, setHook } from "../../common/bootstrap";
 import Footer from "./Footer";
 import { debounce } from "lodash";
-import JoditEditor from "jodit-react";
+import Editor from "./EditorCore";
+import Loading from "./Loading";
 
 const remote = require("@electron/remote");
 const win = remote.getCurrentWindow();
@@ -43,60 +44,6 @@ interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
 }
 
-const Editor = ({ item, editorContent, setEditorChanged, onKeyPress }: { item: IPostItem, editorContent: any, setEditorChanged: any, onKeyPress: (e: KeyboardEvent) => void }) => {
-  const editor = useRef(null);
-
-  if (!item) {
-    return;
-  }
-
-  const config = {
-    autofocus: true,
-    uploader: {
-      insertImageAsBase64URI: true,
-    },
-    buttons:
-      "source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,|,font,fontsize,brush,paragraph,align,|,image,video,table,link,|,fullsize",
-    buttonsMD:
-      "source,|,bold,strikethrough,underline,italic,eraser,|,ul,ol,|,font,fontsize,paragraph,align,|,image,link,dots",
-    buttonsSM:
-      "source,|,bold,strikethrough,underline,italic,|,font,paragraph,align,image,link,dots",
-    buttonsXS:
-      "source,|,bold,underline,italic,|,font,paragraph,align,image,link,dots",
-    cleanHTML: {
-      removeEmptyElements: false,
-      fillEmptyParagraph: false,
-      replaceNBSP: false,
-    },
-    commandToHotkeys: {
-      removeFormat: ['ctrl+shift+m', 'cmd+shift+m'],
-      insertOrderedList: ['ctrl+shift+7', 'cmd+shift+7'],
-      insertUnorderedList: ['ctrl+shift+8, cmd+shift+8'],
-      selectall: ['ctrl+a', 'cmd+a'],
-      bold: ['ctrl+b']
-    },
-    events: {
-      afterInit(instance) {
-        const container = instance.container.querySelector(".jodit-wysiwyg");
-        if (container) {
-          container.onkeydown = onKeyPress;
-        }
-      },
-    },
-  };
-
-  return useMemo(() => (
-    <JoditEditor
-      ref={editor}
-      config={config}
-      value={item.content}
-      onChange={content => {
-        editorContent.current = content;
-        setEditorChanged(editorContent.current !== item.content);
-      }}
-    />
-  ), []);
-}
 
 const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const { siteId, postId } = useParams() as any;
@@ -104,6 +51,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const autoSaveTimeout = useRef<NodeJS.Timeout>(null);
   const statusMessageTimeout = useRef<NodeJS.Timeout>(null);
   const [site, setSite] = useState<ISite>(null);
+  const [isAIBusy, setIsAIBusy] = useState(false);
   const post = useRef<IPostItem>(null);
   const items = useRef<IPostItem[]>(null);
   const { title, url } = site || {};
@@ -202,7 +150,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     }
 
     autoSaveTimeout.current = setTimeout(async () => {
-      if (editorContent.current && editorContent.current !== post.current.content) {
+      if (editorContent.current && editorContent.current !== post.current.content && !isAIBusy && !document.querySelector(".editor-context-menu")) {
         await handleSave(true);
         post.current.content = editorContent.current;
       }
@@ -225,6 +173,14 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       editorMode.current = post.current.isContentRaw ? "html" : "";
 
       setSite(siteRes);
+
+      setHook("PostEditor_setIsAIBusy", (value: boolean) => {
+        setIsAIBusy(value);
+      });
+
+      setHook("PostEditor_setStatusMessage", (params: string[]) => {
+        setStatusMessage(...params);
+      });
     };
     getData();
   }, []);
@@ -609,7 +565,7 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       <div className="content">
         <div className="editor-container">
           <div className="left-align">
-            <Editor item={post.current} editorContent={editorContent} setEditorChanged={setEditorChanged} onKeyPress={onEditorKeyPress} />
+            <Editor site={site} item={post.current} editorContent={editorContent} setEditorChanged={setEditorChanged} onKeyPress={onEditorKeyPress} />
           </div>
           <div className="right-align">
             <PostEditorSidebar
@@ -627,6 +583,12 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
               onToggleRawHTMLOnly={toggleRawHTMLOnly}
               onFeaturedImageSet={handleFeaturedImageSet}
             />
+            {isAIBusy && (
+              <div className="ai-sidebar mt-2">
+                <span><b>🤖 PRSSAI</b> is performing an action. Please stay on the page while it completes.</span>
+                <Loading small classNames="mr-1" />
+              </div>
+            )}
           </div>
         </div>
       </div>

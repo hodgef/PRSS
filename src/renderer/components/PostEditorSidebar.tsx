@@ -98,10 +98,6 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
     setHook("PostEditorSidebar_setUpdatedItem", (value: IPostItem) => {
       setUpdatedItem(value);
     });
-
-    if(isVariablesCoachmarkEnabled()){
-      storeInt.set("variablesCoachmarkEnabled", false);
-    }
   }, []);
 
   if (!templateList) {
@@ -314,8 +310,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
           </li>
           <li className="clickable" onClick={() => onOpenVarEditorOverlay()} ref={r => {
             if(themesCoachmarkEnabled.current){
-              showCoachmark(r, "variables-coachmark", "You can customize your Template here", "coachmark-left", () => {
-                storeInt.set("variablesCoachmarkEnabled", false);
+              showCoachmark(r, "intro-variables-editor", "You can customize your Template here", "coachmark-left", () => {
                 themesCoachmarkEnabled.current = false;
               });
             }

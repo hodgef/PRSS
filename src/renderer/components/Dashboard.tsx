@@ -18,6 +18,7 @@ import { getSite } from "../services/db";
 import { prssConfig } from "../../common/bootstrap";
 import { getThemeManifest } from "../services/theme";
 import { ISite, ISiteInternal } from "../../common/interfaces";
+import { showCoachmark } from "../services/utils";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -220,38 +221,6 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     }
   }
 
-  if (publishSuggested) {
-    features.push({
-      id: "publish",
-      title: getString("publish"),
-      description: publishDescription,
-      className: "box-highlight",
-      tooltip: "",
-      icon: "publish",
-      onClick: async () => {
-        setLoading("publish");
-        const publishRes = await buildAndDeploy(
-          siteId,
-          setPublishDescription,
-          null,
-          true
-        );
-
-        configSet(`sites.${siteId}.publishSuggested`, false);
-        setPublishSuggested(false);
-
-        toast.success("Publish complete");
-
-        if (typeof publishRes === "object") {
-          if (publishRes.type === "redirect") {
-            history.push(publishRes.value);
-          }
-        }
-        setLoading(null);
-      },
-    });
-  }
-  
   return (
     <div className="Dashboard page">
       <h1>
@@ -263,6 +232,38 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
             arrow_back
           </i>
           <span>Dashboard</span>
+        </div>
+        <div className="right-align">
+          {publishSuggested && (
+            <button
+              type="button"
+              className="btn btn-outline-primary"
+              onClick={async () => {
+                setLoading("publish");
+                const publishRes = await buildAndDeploy(
+                  siteId,
+                  setPublishDescription,
+                  null,
+                  true
+                );
+        
+                configSet(`sites.${siteId}.publishSuggested`, false);
+                setPublishSuggested(false);
+        
+                toast.success("Publish complete");
+        
+                if (typeof publishRes === "object") {
+                  if (publishRes.type === "redirect") {
+                    history.push(publishRes.value);
+                  }
+                }
+                setLoading(null);
+              }}
+            >
+              <i className="material-symbols-outlined">publish</i>
+              <span>Publish latest changes</span>
+            </button>
+          )}
         </div>
       </h1>
       <div className="content">
@@ -284,6 +285,11 @@ const Dashboard: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                   className={cx(className, "clickable")}
                   onClick={onClick}
                   title={tooltip}
+                  ref={r => {
+                    if(id === "posts"){
+                      showCoachmark(r, "intro-dashboard-posts", "Create new posts here", "coachmark-bottom");
+                    }
+                  }}
                 >
                   {loading === id ? (
                     <Loading medium classNames="mr-1" />

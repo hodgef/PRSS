@@ -1,6 +1,5 @@
 .editor-sidebar {
   width: 250px;
-  margin-left: 20px;
   display: flex;
   flex-flow: column;
 }

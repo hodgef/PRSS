@@ -15,6 +15,9 @@ import { IConfig } from "../../common/interfaces";
 const { dialog } = require("@electron/remote");
 const fs = require("fs-extra");
 
+let coachmarks = [];
+const dismissed_coachmark_ids = [];
+
 export const merge = (var1, var2) => {
   if (Array.isArray(var1) && Array.isArray(var2)) {
     return [...var1, ...var2];
@@ -157,12 +160,12 @@ export const getUrl = (url, cache = false) => {
 
 export const confirmation = ({
   title,
-  buttons = [{ label: "Yes", action: () => {} }] as any,
+  buttons = [{ label: "Yes", action: () => { } }] as any,
   showCancel = true,
   contentClassName = "",
 }) => {
   return new Promise((resolve) => {
-    const mappedButtons = buttons.map(({ label, action = () => {} }, index) => {
+    const mappedButtons = buttons.map(({ label, action = () => { } }, index) => {
       return {
         label,
         action: () => {
@@ -193,7 +196,7 @@ export const ask = ({
   renderInput = null,
 }) => {
   return new Promise((resolve) => {
-    const mappedButtons = buttons.map(({ label, action = (res?) => {} }) => {
+    const mappedButtons = buttons.map(({ label, action = (res?) => { } }) => {
       return {
         label,
         action: (res) => {
@@ -235,7 +238,7 @@ export const checkDirs = async () => {
   }
 };
 
-export const noop = () => {};
+export const noop = () => { };
 
 export const toJson = (o) => JSON.stringify(o);
 export const fromJson = (s: string) => JSON.parse(s);
@@ -362,7 +365,7 @@ export const sanitizeSite = (siteObj) => {
     "theme",
     "publishedAt",
     "headHtml",
-  "footerHtml",
+    "footerHtml",
     "sidebarHtml",
     "vars",
   ].forEach((field) => {
@@ -423,16 +426,16 @@ export const sanitizeSiteItems = (items, siteUrl: string, mode: "build" | "deplo
 };
 
 export const processVars = (siteUrl: string, vars, mode) => {
-  if(mode === "deploy" && siteUrl && vars){
-    const processedVars = {...vars};
+  if (mode === "deploy" && siteUrl && vars) {
+    const processedVars = { ...vars };
 
     Object.keys(processedVars).forEach(varName => {
       if (varName) {
         let value = processedVars[varName] as string;
         const varNameLowercase = varName.toLowerCase();
 
-        if(value?.startsWith("/assets/") && (varNameLowercase.includes("image") || varNameLowercase.includes("url"))){
-          processedVars[varName] = siteUrl+value.substring(1);
+        if (value?.startsWith("/assets/") && (varNameLowercase.includes("image") || varNameLowercase.includes("url"))) {
+          processedVars[varName] = siteUrl + value.substring(1);
         }
       }
     });
@@ -520,18 +523,18 @@ export const removeStopWords = (str = "") => {
 export const uploadAssetImage = async (siteName: string) => {
   const result = dialog.showOpenDialog({
     properties: ["openFile"],
-    filters: [{ name: "Images", extensions: ["png","jpg","jpeg"] }]
+    filters: [{ name: "Images", extensions: ["png", "jpg", "jpeg"] }]
   });
 
   const { filePaths } = await result || {};
 
-  if(filePaths && filePaths[0]){
+  if (filePaths && filePaths[0]) {
     const filePath = filePaths[0];
 
     const publicImagesDir = path.join(storeInt.get("paths.public"), siteName, "assets", "images");
     const fileName = uuidv4().split("-").join("").substring(0, 10) + "." + filePath.split('.').pop();
-    const targetFilePath =  path.join(publicImagesDir, fileName)
-    
+    const targetFilePath = path.join(publicImagesDir, fileName)
+
     fs.copySync(
       filePath,
       targetFilePath,
@@ -543,14 +546,14 @@ export const uploadAssetImage = async (siteName: string) => {
 }
 
 export const removeAssetImage = async (siteName: string, imagePath: string) => {
-   /**
-   * Delete image if it's a local one
-   */
-   if(imagePath?.startsWith("/assets/images/") && (
+  /**
+  * Delete image if it's a local one
+  */
+  if (imagePath?.startsWith("/assets/images/") && (
     imagePath?.endsWith(".jpg") ||
     imagePath?.endsWith(".jpeg") ||
     imagePath?.endsWith(".png")
-  )){
+  )) {
     const imageFullPath = path.join(storeInt.get("paths.public"), siteName, imagePath);
     fs.removeSync(imageFullPath);
     return true;
@@ -559,40 +562,79 @@ export const removeAssetImage = async (siteName: string, imagePath: string) => {
   return false;
 }
 
-export const showCoachmark = (target, id: string, message: string, className = "", onClick = () => {}) => {
-  if(!target){
+export const getCoachmarkPositionStyles = (target, className: string) => {
+  const offsets = target.getBoundingClientRect();
+  const top = parseInt(offsets.top);
+  const bottom = parseInt(offsets.bottom);
+  const left = parseInt(offsets.left);
+  const right = parseInt(offsets.right);
+
+  const leftStyle = className.includes("coachmark-left") ? `top: ${top}px; left: ${left}px;` : "";
+  const rightStyle = className.includes("coachmark-right") ? `top: ${top}px; left: ${right}px;` : "";
+  const bottomStyle = className.includes("coachmark-bottom") ? `top: ${bottom}px; left: ${left}px;` : "";
+
+  return `${bottomStyle}${leftStyle}${rightStyle}`;
+}
+
+export const showCoachmark = (target, id: string, message: string, className = "", onClick = () => { }) => {
+  if (!target || !id || dismissed_coachmark_ids.includes(id)) {
     return;
   }
-  var offsets = target.getBoundingClientRect();
-  var top = parseInt(offsets.top);
-  var left = parseInt(offsets.left);
-
-  const closeCoachmark = async () => {
-    onClick();
-    if(coachmarkElem){
-      coachmarkElem.remove();
+  requestIdleCallback(() => {
+    if (storeInt.get(`coachmark_${id}`) === false) {
+      return;
     }
 
-    if(await isReportIssuesEnabled()){
-      dispatchPRSSEvent({
-        id: "coachmark",
-        context: id
-      });
+    const duplicateCoachmarkIndex = coachmarks.findIndex(([i, c, e]) => i === id)
+
+    if (duplicateCoachmarkIndex > -1) {
+      coachmarks[duplicateCoachmarkIndex][1]?.remove();
+      delete coachmarks[duplicateCoachmarkIndex];
+      coachmarks = coachmarks.filter(e => !!e);
     }
-  }
 
-  const coachmarkElem = document.createElement("div")
-  coachmarkElem.className = "coachmark bg-primary " + className;
-  coachmarkElem.style.cssText = `top: ${top}px; left: ${left}px`;
-  coachmarkElem.innerHTML = message;
-  coachmarkElem.setAttribute("tabindex", "-1");
+    let coachmarkElem = document.createElement("div")
+    coachmarkElem.className = "coachmark bg-primary " + className;
+    coachmarkElem.style.cssText = getCoachmarkPositionStyles(target, className);
 
-  document.querySelector(".page").appendChild(coachmarkElem);
+    coachmarkElem.innerHTML = message;
+    coachmarkElem.setAttribute("tabindex", "-1");
 
-  setTimeout(() => {
-    coachmarkElem.focus();
-    coachmarkElem.onblur = closeCoachmark;
-  }, 500);
+    const closeCoachmark = async () => {
+      onClick();
+
+      if (coachmarkElem) {
+        coachmarkElem.remove();
+        coachmarkElem = null;
+      }
+
+      storeInt.set(`coachmark_${id}`, false);
+
+      if (await isReportIssuesEnabled()) {
+        dispatchPRSSEvent({
+          id: "coachmark",
+          context: `coachmark-${id}`
+        });
+      }
+    }
+
+    document.querySelector(".page").appendChild(coachmarkElem);
+    coachmarks.push([id, coachmarkElem, target]);
+
+    setTimeout(() => {
+      coachmarkElem.focus();
+      coachmarkElem.onblur = closeCoachmark;
+      dismissed_coachmark_ids.push(id);
+    }, 500);
+  })
+}
+
+export const updateCoachmarks = () => {
+  coachmarks.length && coachmarks
+    .filter(([i, c, e]) => !!c && !!e)
+    .forEach(([i, c, e]) => {
+      c.style.cssText = getCoachmarkPositionStyles(e, c.className);
+    });
 }
 
 export const isValidUrl = (string: string) => {
@@ -600,7 +642,7 @@ export const isValidUrl = (string: string) => {
   try {
     url = new URL(string);
   } catch (e) {
-    return false;  
+    return false;
   }
   return url.protocol === "http:" || url.protocol === "https:";
 }

@@ -80,6 +80,9 @@ const SiteSetup: FunctionComponent<IProps> = ({
 
   useEffect(() => {
     setAppClass("app-site-setup");
+  }, [site, loading, loadingStatus]);
+
+  useEffect(() => {
     if (!siteId && !hasSites) {
       setHeaderLeftComponent(/*
                 <Fragment>

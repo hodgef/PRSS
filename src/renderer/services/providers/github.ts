@@ -57,16 +57,10 @@ class GithubProvider {
     /**
      * Creating repo
      */
-    const { hosting } = this.fetchSiteConfig();
-    const username = await this.getUsername();
-    let createdRepoRes;
 
-    if (username === hosting.username) {
-      onUpdate(getString("creating_repository"));
-      createdRepoRes = await this.createRepo();
-
-      if (!createdRepoRes) return false;
-    }
+    onUpdate(getString("creating_repository"));
+    let createdRepoRes = await this.createRepo();
+    if (!createdRepoRes) return false;
 
     /**
      * Deploy project to set up repo's master branch
@@ -479,7 +473,7 @@ class GithubProvider {
   };
 
   createRepo = async () => {
-    const repo = await this.getRepo();
+    const { repo, user } = await this.getRepo();
     const repoUrl = await this.getRepositoryUrl();
 
     if (repo) {
@@ -497,9 +491,10 @@ class GithubProvider {
     }
 
     const repositoryName = await this.getRepositoryName();
+    const postPath = user?.type === "Organization" ? `orgs/${user.login}/repos` : "user/repos";
 
     const res =
-      (await this.request("POST", "user/repos", {
+      (await this.request("POST", postPath, {
         name: repositoryName,
         description: getString("created_with"),
         homepage: getString("prss_domain"),
@@ -518,16 +513,17 @@ class GithubProvider {
     const username = await this.getUsername();
     const requestUrl = `users/${username}/repos`;
 
-    const repos = (await this.request("GET", `users/${username}/repos`)) || [];
+    const user = (await this.request("GET", `users/${username}`)) || [];
+    const repos = (await this.request("GET", requestUrl)) || [];
 
     if (!Array.isArray(repos)) {
       modal.alert(["error_occurred", [requestUrl]]);
-      return false;
+      return {};
     }
 
     const repositoryName = await this.getRepositoryName();
     const repo = repos.find((item) => item.name === repositoryName);
-    return repo;
+    return { repo, repos, user };
   };
 
   request: requestType = async (method, endpoint, data = {}, headers) => {

@@ -2,7 +2,7 @@ import React, { FC, ReactNode, createContext, useContext } from "react";
 import { storeInt } from "../../common/bootstrap";
 
 const contextJson = storeInt.get("contextMap");
-const contextMap = contextJson ? JSON.parse(contextJson) : {};
+export const contextMap = contextJson ? JSON.parse(contextJson) : {};
 const Context = createContext(contextMap);
 
 export const Provider: FC<{ children: ReactNode }> = ({ children }) => {

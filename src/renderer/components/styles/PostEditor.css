@@ -67,6 +67,7 @@
 #app .PostEditor .editor-container {
   display: flex;
   flex: 1;
+  gap: 20px;
 }
 #app .PostEditor .editor-container .left-align {
   flex: 1;
@@ -74,7 +75,14 @@
 }
 #app .PostEditor .editor-container .right-align {
   display: flex;
-  width: 270px;
+  flex-flow: column;
+  max-width: 250px;
+}
+#app .PostEditor .editor-container .left-align,
+#app .PostEditor .editor-container .right-align {
+  max-height: calc(100vh - 185px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 #app .PostEditor .jodit-react-container {
   flex: 1;
@@ -97,6 +105,9 @@
 #app .PostEditor .jodit-container.jodit_fullsize {
   top: 49px;
   height: calc(100vh - 80px) !important;
+}
+#app .PostEditor .jodit-container .jodit-placeholder {
+  padding: 17px 10px !important;
 }
 #app .PostEditor .jodit-container .jodit-wysiwyg {
   margin-top: 10px;
@@ -152,3 +163,19 @@
   min-width: 34px;
   height: 34px;
 }
+#app .PostEditor .ai-sidebar {
+  background: #ecf3ff;
+  border-radius: 10px;
+  padding: 10px 20px;
+  display: flex;
+  text-align: left;
+  font-size: 13px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+#app .PostEditor .ai-sidebar .Loading {
+  min-width: 18px;
+}
+

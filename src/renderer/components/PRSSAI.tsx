@@ -9,11 +9,11 @@ import React, {
   useCallback,
   useRef,
 } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 import { createItems, getSite, updateSite } from "../services/db";
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import { IPostItem, ISite, IStructureItem } from "../../common/interfaces";
+import { IPostItem, ISite, IStructureItem, PRSSAIEnv } from "../../common/interfaces";
 import { Accordion, Badge, Button, ButtonGroup, Form, InputGroup, Spinner, Toast } from "react-bootstrap";
 import prssaiLogo from "../images/prssai.png";
 import { storeInt } from "../../common/bootstrap";
@@ -21,10 +21,13 @@ import { normalize, removeSpecialChars } from "../services/utils";
 import { modal } from "./Modal";
 import { toast } from "react-toastify";
 import { runCommand, runCommandAsync } from "../../common/utils";
-import { getSamplePost} from "../services/site";
+import { getSamplePost } from "../services/site";
 import { insertStructureChildren, walkStructure } from "../services/build";
 import { v4 as uuidv4 } from "uuid";
 import { cloneDeep } from "lodash";
+import { useProvider } from "./UseProvider";
+import Loading from "./Loading";
+import { restartPrssaiContainers } from "../services/prssai";
 const path = require("path");
 
 const { dialog } = require("@electron/remote");
@@ -38,21 +41,35 @@ const PRSSAI: FunctionComponent<IProps> = ({
   setHeaderLeftComponent,
 }) => {
   const { siteId } = useParams() as any;
+
+  const history = useHistory();
+  const { search } = useLocation();
+  const searchParams = new URLSearchParams(search);
+  const activeTab = searchParams.get("activeTab");
+
   const [inputTopics, setInputTopics] = useState<string[]>([""]);
-  const prssaiEnv = useRef<{[key:string]: string}>(null);
+  const [prssaiEnv, setPrssaiEnv] = useState<PRSSAIEnv>(null);
+  const updatedEnvString = useRef<string>("");
   const [status, setStatus] = useState<boolean>();
   const [prompt, setPrompt] = useState<string>("");
   const [promptBusy, setPromptBusy] = useState<boolean>(false);
   const [promptResponse, setPromptResponse] = useState<string>(null);
-  const [activeSection, setActiveSection] = useState<string>(storeInt.get("prssaiLastActiveSection"));
+  const [activeSection, setActiveSection] = useState<string>(activeTab || storeInt.get("prssaiLastActiveSection"));
   const [progressIndex, setProgressIndex] = useState<number>(null);
   const [progressSave, setProgressSave] = useState<boolean>(false);
+  const [isCommandBusy, setIsCommandBusy] = useState<boolean>(false);
   const [progressDocs, setProgressDocs] = useState<{ title: string; body: string; }[]>([]);
   const [prssaiPath, setPrssaiPath] = useState<string>(storeInt.get("prssaiPath") || "");
+  const [optionDisableEditor, setOptionDisableEditor] = useState<boolean>(storeInt.get("disablePrssaiEditorContextMenu") || false);
+
   const [site, setSite] = useState<ISite>(null);
   const { title } = site || {};
+  const prssaiStatus = useProvider("prssaiStatus");
 
-  const history = useHistory();
+  const updateStatus = (status: boolean) => {
+    prssaiStatus.value = status;
+    setStatus(status);
+  }
 
   useEffect(() => {
     if (!title) {
@@ -84,7 +101,7 @@ const PRSSAI: FunctionComponent<IProps> = ({
       ].every(condition => !!condition);
 
       if (!verify) {
-        setStatus(false);
+        updateStatus(false);
         return;
       }
 
@@ -102,7 +119,7 @@ const PRSSAI: FunctionComponent<IProps> = ({
           </Fragment>,
           "prssai not installed"
         );
-        setStatus(false);
+        updateStatus(false);
         return;
       }
 
@@ -114,16 +131,16 @@ const PRSSAI: FunctionComponent<IProps> = ({
       const redisOnline = runningContainers.includes("prssai_redis");
 
       if (!workerOnline || !chromeOnline || !redisOnline) {
-        setStatus(false);
+        updateStatus(false);
         return;
       }
 
       // Load envfile
       const { parsed } = require('dotenv').config({ path: path.join(prssaiPath, "app/.env") }) || {};
-      
+
 
       // Validate envfile
-      if(
+      if (
         !parsed ||
         ![
           "chrome_host",
@@ -139,7 +156,7 @@ const PRSSAI: FunctionComponent<IProps> = ({
           "res_word_count",
           "system_prompt"
         ].every(key => Object.keys(parsed).includes(key))
-      ){
+      ) {
         modal.alert(
           <Fragment>
             <p>Your prssai env file is invalid.</p>
@@ -147,17 +164,17 @@ const PRSSAI: FunctionComponent<IProps> = ({
           </Fragment>,
           "prssai env file invalid"
         );
-        setStatus(false);
+        updateStatus(false);
         return;
       }
 
-      prssaiEnv.current = parsed;
+      setPrssaiEnv(parsed);
       console.log("prssaiEnv", parsed)
 
-      setStatus(verify);
+      updateStatus(verify);
     } else {
       // Path not set, status offline
-      setStatus(false);
+      updateStatus(false);
     }
   }, [status, prssaiPath]);
 
@@ -276,11 +293,11 @@ const PRSSAI: FunctionComponent<IProps> = ({
       });
 
       const parsedBody = body
-          .slice(body.indexOf("\n"))
-          .replace(/\d\. (.*?)([ ]+)?(-|\:|\n)/gm, '<h3>$1</h3>')
-          .replace(/\*\*(.*?)\*\*/gm, '$1')
-          .replace(/(?:\r\n|\r|\n)/g, '<br>')
-          .trim();
+        .slice(body.indexOf("\n"))
+        .replace(/\d\. (.*?)([ ]+)?(-|\:|\n)/gm, '<h3>$1</h3>')
+        .replace(/\*\*(.*?)\*\*/gm, '$1')
+        .replace(/(?:\r\n|\r|\n)/g, '<br>')
+        .trim();
 
       // Push to newPostItems
       newPostItems.push({
@@ -341,6 +358,36 @@ const PRSSAI: FunctionComponent<IProps> = ({
     })();
   }, [prompt, promptBusy]);
 
+  const updatePrssaiEnv = (key: string, value: string) => {
+    const updatedEnv = {
+      ...prssaiEnv,
+      [key]: value
+    };
+
+    const envString = Object.keys(updatedEnv).map(envKey => {
+        return `${envKey}=${updatedEnv[envKey]}`;
+      }).join("\n");
+
+    console.log(envString)
+
+    updatedEnvString.current = envString;
+    setPrssaiEnv(updatedEnv);
+  };
+
+  const savePrssaiEnv = () => {
+    if(updatedEnvString.current){
+      fs.writeFileSync(path.join(prssaiPath, "app", ".env"), updatedEnvString.current);
+      toast.success("Env file saved successfully");
+    }
+  };
+
+  const restartPrssai = async () => {
+    setIsCommandBusy(true);
+    await restartPrssaiContainers();
+    setIsCommandBusy(false);
+    toast.success("Restart completed");
+  }
+
   useEffect(() => {
     checkStatus();
   }, [prssaiPath])
@@ -399,7 +446,7 @@ const PRSSAI: FunctionComponent<IProps> = ({
               setActiveSection(activeKey);
             }}>
               <Accordion.Item eventKey="0">
-                <Accordion.Header>Status {status ? (<Badge bg="success ml-2">Online</Badge>) : (<Badge bg="danger ml-2">Offline</Badge>)}</Accordion.Header>
+                <Accordion.Header><i className="material-symbols-outlined mr-2">sensors</i> Status {status ? (<Badge bg="success ml-2">Online</Badge>) : (<Badge bg="danger ml-2">Offline</Badge>)}</Accordion.Header>
                 <Accordion.Body>
                   <div className="mb-4">
                     To use PRSSAI, you must first set up the backend. Check out <a href="https://github.com/prss-io/prssai" target="_blank">github.com/prssai</a> for installation details.
@@ -434,7 +481,7 @@ const PRSSAI: FunctionComponent<IProps> = ({
               {status && (
                 <>
                   <Accordion.Item eventKey="1">
-                    <Accordion.Header>Batch Create Post</Accordion.Header>
+                    <Accordion.Header><i className="material-symbols-outlined mr-2">stacks</i> Batch Create Post</Accordion.Header>
                     <Accordion.Body>
                       <div className="mb-4">Add topics and PRSSAI will take care of the rest.</div>
                       {inputTopics && inputTopics.map((inputTopic, inputTopicIndex) => {
@@ -504,21 +551,21 @@ const PRSSAI: FunctionComponent<IProps> = ({
                     </Accordion.Body>
                   </Accordion.Item>
                   <Accordion.Item eventKey="2">
-                    <Accordion.Header>Prompt</Accordion.Header>
+                    <Accordion.Header><i className="material-symbols-outlined mr-2">chat</i> Prompt</Accordion.Header>
                     <Accordion.Body>
-                      <div className="mb-4">Ask anything to the model.</div>
-                      <InputGroup className="mb-3">
-                        <Form.Control value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyDown={(e) => {
+                      <div className="mb-4">Ask anything to <span className="model-wrap"><i>🤖</i> {prssaiEnv?.ollama_model}</span></div>
+                      <InputGroup className="mb-4">
+                        <Form.Control placeholder="Enter your message here..." value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             handlePrompt();
                           }
                         }} disabled={promptBusy} />
-                        <Button variant="outline-secondary" onClick={() => handlePrompt()} disabled={promptBusy}>
-                            {promptBusy ? (
-                              <Spinner animation="grow" size="sm" />
-                            ) : (
-                              <span title="Add New" className="material-symbols-outlined">send</span>
-                            )}
+                        <Button variant="primary" onClick={() => handlePrompt()} disabled={promptBusy}>
+                          {promptBusy ? (
+                            <Spinner animation="grow" size="sm" />
+                          ) : (
+                            <span title="Add New" className="material-symbols-outlined">send</span>
+                          )}
                         </Button>
                       </InputGroup>
                       {(prompt && (promptResponse || promptBusy)) && (
@@ -535,7 +582,7 @@ const PRSSAI: FunctionComponent<IProps> = ({
                       {promptResponse && (
                         <Toast className="mb-2">
                           <Toast.Header closeButton={false}>
-                            <strong className="me-auto">🤖 {prssaiEnv.current?.ollama_model}</strong>
+                            <strong className="me-auto">🤖 {prssaiEnv?.ollama_model}</strong>
                             <small>just now</small>
                           </Toast.Header>
                           <Toast.Body>
@@ -545,6 +592,60 @@ const PRSSAI: FunctionComponent<IProps> = ({
                       )}
                     </Accordion.Body>
                   </Accordion.Item>
+                  {prssaiEnv && (
+                    <Accordion.Item eventKey="3">
+                      <Accordion.Header><i className="material-symbols-outlined mr-2">settings</i> Options</Accordion.Header>
+                      <Accordion.Body>
+                        <Form>
+                          <Form.Group className="form-group row">
+                            {Object.keys(prssaiEnv).map(envKey => {
+                              return (
+                                <InputGroup key={envKey} className="input-group-lg mb-1">
+                                  <Form.Label className="col-sm-2 col-form-label">{envKey}</Form.Label>
+                                  <Col className="col-sm-10">
+                                    <Form.Control type="text" className="form-control" value={prssaiEnv[envKey]} onChange={e => {
+                                      updatePrssaiEnv(envKey, e.target.value);
+                                    }} />
+                                  </Col>
+                                </InputGroup>
+                              )
+                            })}
+                            <InputGroup className="input-group mt-3 mb-3">
+                              <Button variant="primary" onClick={savePrssaiEnv} disabled={isCommandBusy}>
+                                <i className="material-symbols-outlined mr-1">save</i> Update env file
+                              </Button>
+                              <Button variant="secondary" onClick={restartPrssai} disabled={isCommandBusy}>
+                                {isCommandBusy ? (
+                                  <Loading small classNames="mr-1" />
+                                ) : (
+                                  <i className="material-symbols-outlined mr-1">refresh</i>
+                                )}
+                                Restart Docker Containers
+                              </Button>
+                            </InputGroup>
+                            <InputGroup className="input-group mt-4">
+                              <h3 style={{ fontSize: 18 }}>More Options</h3>
+                            </InputGroup>
+                            <InputGroup className="input-group-lg mt-1">
+                              <Form.Label className="col-sm-2 col-form-label">Disable PRSSAI in Post Editor</Form.Label>
+                              <Col className="col-sm-10">
+                                <Form.Check
+                                  checked={optionDisableEditor}
+                                  type="switch"
+                                  id="report-issues"
+                                  label=""
+                                  onChange={async (e) => {
+                                    setOptionDisableEditor(e.target.checked);
+                                    storeInt.set("disablePrssaiEditorContextMenu", e.target.checked);
+                                  }}
+                                />
+                              </Col>
+                            </InputGroup>
+                          </Form.Group>
+                        </Form>
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  )}
                 </>
               )}
             </Accordion>

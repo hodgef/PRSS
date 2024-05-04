@@ -11,13 +11,14 @@ import React, {
 import { useHistory, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
-import { normalize, removeStopWords } from "../services/utils";
+import { normalize, removeStopWords, showCoachmark } from "../services/utils";
 import { walkStructure, insertStructureChildren } from "../services/build";
 import { toast } from "react-toastify";
 import { isValidSlug, getRootPost } from "../services/hosting";
 import { getSite, getItems, updateSite, createItems } from "../services/db";
 import { modal } from "./Modal";
 import { ISite } from "../../common/interfaces";
+import { storeInt } from "../../common/bootstrap";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -87,7 +88,10 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
           handleSubmit();
         }
       };
-      postTitleRef.current.focus();
+
+      if(storeInt.get("coachmark_intro-createposts-title") === false){
+        postTitleRef.current.focus();
+      }
     }
   }, [postTitle, site]);
 
@@ -222,7 +226,10 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
                 placeholder="Post Title"
                 value={postTitle}
                 onChange={(e) => setPostTitle(e.target.value)}
-                ref={postTitleRef}
+                ref={r => {
+                  postTitleRef.current = r;
+                  showCoachmark(r, "intro-createposts-title", "Enter a title for your post and hit Enter", "coachmark-bottom");
+                }}
               ></input>
             </div>
           </div>

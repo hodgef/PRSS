@@ -49,14 +49,15 @@
   margin-left: 20px;
 }
 .Dashboard .content ul li {
-  width: calc(90%/4);
+  width: calc((100%/4) - 15px);
   min-width: 240px;
-  max-width: 400px;
+  max-width: 500px;
   min-height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-flow: column;
+  box-shadow: 0 0 10px rgba(0,0,0,0.03);
 }
 .Dashboard .content ul li:nth-child(3n) {
   margin-right: 0;
@@ -76,4 +77,16 @@
 .Dashboard .content ul .feature-description {
   opacity: 0.5;
   text-align: center;
+}
+
+@media (max-width: 1360px) {
+  .Dashboard .content ul li {
+    width: calc((100% / 3) - 15px);
+  }
+}
+
+@media (max-width: 1040px) {
+  .Dashboard .content ul li {
+    width: calc((100% / 2) - 15px);
+  }
 }

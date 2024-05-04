@@ -7,6 +7,7 @@ import React, {
   useState,
   useEffect,
   useRef,
+  useCallback,
 } from "react";
 const isFrameless = process.platform !== "darwin";
 const remote = require("@electron/remote");
@@ -21,9 +22,10 @@ import closeImg from "../images/icons/close-k-30.png";
 import { configGet, getCurrentVersion } from "../../common/utils";
 import { modal } from "./Modal";
 import AboutModalContent from "./AboutModalContent";
-import { notifyNewVersion } from "../services/utils";
+import { notifyNewVersion, updateCoachmarks } from "../services/utils";
 import { prssConfig } from "../../common/bootstrap";
 import versionCompare from "semver-compare";
+import { throttle } from "lodash";
 
 interface IProps {
   headerLeft?: ReactNode;
@@ -54,13 +56,19 @@ const Header: FunctionComponent<IProps> = ({ headerLeft, history }) => {
     setIsMaximized(false);
   };
 
+  const onResize = useCallback(throttle(() => {
+    updateCoachmarks();
+  }, 50), []);
+
   useEffect(() => {
     win.on("maximize", maxHandler);
     win.on("unmaximize", minHandler);
+    window.addEventListener("resize", onResize)
 
     return () => {
       win.removeListener("maximize", maxHandler);
       win.removeListener("unmaximize", minHandler);
+      window.removeEventListener("resize", onResize)
     };
   }, []);
 

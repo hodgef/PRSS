@@ -260,9 +260,10 @@ export const clearBuffer = (noExceptions = false) => {
 
     if (bufferDir && bufferDir.includes("buffer")) {
       if (noExceptions) {
-        await del([path.join(bufferDir, "*"), path.join(bufferDir, ".git")], {
+        await del([path.join(bufferDir)], {
           force: true,
         });
+        fs.mkdirSync(path.join(bufferDir));
       } else {
         await del(
           [

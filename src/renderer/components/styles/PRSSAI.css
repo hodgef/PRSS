@@ -20,3 +20,43 @@
 .PRSSAI .toast-header {
     user-select: none;
 }
+
+.PRSSAI .model-wrap {
+    font-size: 15px;
+    font-weight: 500;
+    margin-left: 3px;
+    background: #727272;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 20px;
+    padding: 4px;
+    padding-right: 15px;
+    color: white;
+}
+
+.PRSSAI .model-wrap i {
+    font-style: normal;
+    padding: 5px;
+    height: 30px;
+    width: 30px;
+    display: inline-flex;
+    background: #292929;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    margin-right: 7px;
+}
+
+.PRSSAI .toast.show {
+    display: block;
+    opacity: 1;
+    box-shadow: none;
+    border-radius: 20px;
+    border: none;
+    background: #f9f9f9;
+}
+
+.PRSSAI .accordion button .Loading .spinner {
+    color: white;
+}

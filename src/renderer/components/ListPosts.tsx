@@ -27,6 +27,7 @@ import { getSite, getItems } from "../services/db";
 import { configGet, configSet } from "../../common/utils";
 import { modal } from "./Modal";
 import { ISite } from "../../common/interfaces";
+import { showCoachmark } from "../services/utils";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -241,6 +242,9 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
             type="button"
             className="btn btn-primary"
             onClick={() => history.push(`/sites/${siteId}/posts/create`)}
+            ref={r => {
+              showCoachmark(r, "intro-posts-addNew", "Create a new post", "coachmark-bottom");
+            }}
           >
             <i className="material-symbols-outlined">add</i>
             <span>Add New</span>

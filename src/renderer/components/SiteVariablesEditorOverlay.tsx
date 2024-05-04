@@ -141,7 +141,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
     delete newVars[varIndex];
 
     // If type is image and local path is used, we need to remove local image and update the site
-    if(themeManifest.siteVars?.[variables[varIndex].name]?.type === "image"){
+    if(themeManifest?.siteVars?.[variables[varIndex].name]?.type === "image"){
       await removeAssetImage(site.name, variables[varIndex].content);
 
       // Update site or post
@@ -400,7 +400,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                       >
                         <div className="input-group input-group-lg">
                           <span className="material-symbols-outlined mr-2">
-                            {getVarIcon(variable.name, themeManifest.siteVars?.[variable.name]?.type)}
+                            {getVarIcon(variable.name, themeManifest?.siteVars?.[variable.name]?.type)}
                           </span>
                           <div className="input-container">
                             <textarea
@@ -420,7 +420,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                               onChange={(e) => setVar(e, index, "content")}
                             />
                           </div>
-                          {themeManifest.siteVars?.[variable.name]?.type === "image" && (
+                          {themeManifest?.siteVars?.[variable.name]?.type === "image" && (
                             <button
                               title="Upload image"
                               type="button"
@@ -513,10 +513,10 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                       <li
                         key={`${suggestedVar}-${suggestedVarIndex}`}
                         className="suggested-var"
-                        title={themeManifest.siteVars?.[suggestedVar]?.description}
-                        onClick={() => addNew({ name: suggestedVar, content: "", type: themeManifest.siteVars?.[suggestedVar]?.type } as IVarsKV)}
+                        title={themeManifest?.siteVars?.[suggestedVar]?.description}
+                        onClick={() => addNew({ name: suggestedVar, content: "", type: themeManifest?.siteVars?.[suggestedVar]?.type } as IVarsKV)}
                       >
-                        <span className="material-symbols-outlined mr-2">{getVarIcon(suggestedVar, themeManifest.siteVars?.[suggestedVar]?.type)}</span><span>{suggestedVar}</span>
+                        <span className="material-symbols-outlined mr-2">{getVarIcon(suggestedVar, themeManifest?.siteVars?.[suggestedVar]?.type)}</span><span>{suggestedVar}</span>
                       </li>
                     )
                   })}

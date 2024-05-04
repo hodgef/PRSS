@@ -15,9 +15,7 @@
   opacity: 0.6;
 }
 .ThemeManager .content .theme-list-item {
-  box-shadow: 0 0 10px #e8e8e8;
-  border: 2px solid #e8e8e8;
-  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.03);
   overflow: hidden;
   position: relative;
   display: inline-flex;
@@ -27,6 +25,9 @@
   max-width: 500px;
   min-width: 300px;
   height: 300px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  border-bottom-width: 3px;
 }
 
 .ThemeManager .content .theme-list-item.add-new-theme-btn {
@@ -99,7 +100,6 @@
   background-position: center;
   flex: 1;
 }
-
 
 @media (max-width: 1360px) {
   .ThemeManager .content .theme-list-item {

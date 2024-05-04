@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "prss",
-  "version": "1.13.0",
+  "version": "1.14.0",
   "description": "Powerful Blogging",
   "license": "GPL-3.0-or-later",
   "main": "build/index.js",
@@ -33,7 +33,7 @@
     "electron-updater": "6.1.8",
     "express": "^4.17.3",
     "html-minifier-terser": "^5.1.1",
-    "jodit-react": "^1.0.42",
+    "jodit-react": "^4.1.2",
     "knex": "^3.1.0",
     "pretty": "^2.0.0",
     "react-bootstrap": "^2.10.2",

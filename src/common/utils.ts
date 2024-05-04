@@ -112,7 +112,7 @@ export const isAddThemesReminderEnabled = () => {
 };
 
 export const isVariablesCoachmarkEnabled = () => {
-  return (storeInt.get("variablesCoachmarkEnabled")) === false ? false : true;
+  return (storeInt.get("coachmark_intro-variables-editor")) === false ? false : true;
 };
 
 export const getCurrentVersion = () => {
