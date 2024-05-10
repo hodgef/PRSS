@@ -2,7 +2,7 @@ import { updateSite } from "./../db";
 import {
   localStorageGet,
   configGet,
-  runCommand,
+  runCommandAsync,
 } from "./../../../common/utils";
 import axios from "axios";
 import fs from "fs";
@@ -157,17 +157,17 @@ class GithubProvider {
       /**
        * Creating gh-pages branch
        */
-      runCommand(bufferDir, `git clone "${repositoryUrl}" .`);
-      runCommand(bufferDir, "git branch gh-pages");
-      runCommand(bufferDir, "git checkout gh-pages");
-      runCommand(bufferDir, "git config --global core.safecrlf false");
-      runCommand(bufferDir, `echo "${repositoryName}" > README.md`);
-      runCommand(bufferDir, "git add --all");
-      runCommand(bufferDir, 'git commit -m "Initial commit"');
-      const { error: ghPagesErrCreation } = runCommand(
+      await runCommandAsync(bufferDir, `git clone "${repositoryUrl}" .`);
+      await runCommandAsync(bufferDir, "git branch gh-pages");
+      await runCommandAsync(bufferDir, "git checkout gh-pages");
+      await runCommandAsync(bufferDir, "git config --global core.safecrlf false");
+      await runCommandAsync(bufferDir, `echo "${repositoryName}" > README.md`);
+      await runCommandAsync(bufferDir, "git add --all");
+      await runCommandAsync(bufferDir, 'git commit -m "Initial commit"');
+      const { error: ghPagesErrCreation } = (await runCommandAsync(
         bufferDir,
         "git push -u origin gh-pages"
-      );
+      ));
 
       if (!ghPagesErrCreation) {
         resolve(`https://${username}.github.io/${repositoryName}/`);
@@ -198,10 +198,10 @@ class GithubProvider {
      */
     try {
       const bufferDir = storeInt.get("paths.buffer");
-      const cloneRes = runCommand(bufferDir, `git clone "${repositoryUrl}" .`);
+      const cloneRes = (await runCommandAsync(bufferDir, `git clone "${repositoryUrl}" .`));
 
       if (cloneRes.error) {
-        modal.alert(cloneRes.res.message, null, null, null, `deploy_clone_error: ${repositoryUrl}`);
+        modal.alert(cloneRes.errorDetails?.message, null, null, null, `deploy_clone_error: ${repositoryUrl}`);
         console.error(cloneRes);
         return;
       }
@@ -226,16 +226,16 @@ class GithubProvider {
       onUpdate(deployText);
 
       await new Promise((resolve) => {
-        setTimeout(() => {
+        setTimeout(async () => {
           [
-            runCommand(bufferDir, "git config --global core.safecrlf false"),
-            runCommand(bufferDir, "git add --all"),
-            runCommand(bufferDir, `git commit -m "${commitMessage}"`),
-            runCommand(bufferDir, "git push --force")
+            await runCommandAsync(bufferDir, "git config --global core.safecrlf false"),
+            await runCommandAsync(bufferDir, "git add --all"),
+            await runCommandAsync(bufferDir, `git commit -m "${commitMessage}"`),
+            await runCommandAsync(bufferDir, "git push --force")
           ].forEach((data) => {
             // If working space is empty, git commit exits with "1"
-            if (data.error && !data.res.message?.includes("git commit")) {
-              modal.alert(data.res.message, null, null, null, `commit_error: ${repositoryUrl}`);
+            if (data.error && !data.errorDetails?.message?.includes("git commit")) {
+              modal.alert(data.errorDetails?.message, null, null, null, `commit_error: ${repositoryUrl}`);
               console.error(data);
             }
           });
@@ -314,7 +314,7 @@ class GithubProvider {
      */
     try {
       const bufferDir = storeInt.get("paths.buffer");
-      runCommand(bufferDir, `git clone "${repoUrl}" .`);
+      await runCommandAsync(bufferDir, `git clone "${repoUrl}" .`);
 
       if (bufferDir && bufferDir.includes("buffer")) {
         await del([path.join(bufferDir, "*"), "!.git"], {
@@ -322,7 +322,7 @@ class GithubProvider {
         });
       }
 
-      runCommand(
+      await runCommandAsync(
         bufferDir,
         'git add --all && git commit -m "Clearing for deployment" && git push'
       );

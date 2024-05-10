@@ -24,6 +24,7 @@ import { getItems, updateSite, updateItem, getSite } from "../services/db";
 import { IPostItem, ISite, IThemeManifest } from "../../common/interfaces";
 import { runHook, setHook } from "../../common/bootstrap";
 import { getThemeManifest } from "../services/theme";
+import Loading from "./Loading";
 
 interface IProps {
   site: ISite;
@@ -51,10 +52,15 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
 
   const [variables, setVariables] = useState<IVarsKV[]>(parsedVariables);
   const [exclusiveVariables, setExclusiveVariables] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setHook("SiteVariablesEditorOverlay_show", async (value: string) => {
       setData();
+    });
+
+    setHook("SiteVariablesEditorOverlay_setIsLoading", async (value: boolean) => {
+      setIsLoading(value);
     });
   }, []);
 
@@ -343,8 +349,13 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
               type="button"
               className="btn btn-primary mr-2"
               onClick={() => handleSave()}
+              disabled={isLoading}
             >
-              <span className="material-symbols-outlined mr-2">save</span>
+              {isLoading ? (
+                <Loading small classNames="mr-1" />
+              ) : (
+                <span className="material-symbols-outlined mr-2">save</span>
+              )}
               <span>Save</span>
             </button>
             <button

@@ -81,7 +81,7 @@ export const setCache = (name, val) => {
   cache[name] = val;
 };
 
-export const getCache = (name) => cache[name];
+export const getCache = <T>(name) => cache[name] as T;
 export const deleteCache = (name) => delete cache[name];
 
 export const initDb = async () => {

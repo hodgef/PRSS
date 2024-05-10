@@ -14,12 +14,13 @@ import {
   toJson,
   appendSlash,
   processVars,
+  prepareHiddenPost,
 } from "./utils";
 import { modal } from "../components/Modal";
 import { getThemeManifest, getDefaultReadme } from "./theme";
 import { getSite, getItems, getItem } from "./db";
 import { getRootPost } from "./hosting";
-import { storeInt } from "../../common/bootstrap";
+import { setCache, storeInt } from "../../common/bootstrap";
 import { IBufferItem, IPostItem, ISite, IStructureItem, handlerTypeReturn, loadBufferType } from "../../common/interfaces";
 
 export const bufferPathFileNames = ["index.html" /*, 'index.js'*/];
@@ -34,6 +35,8 @@ export const build = async (
   generateSiteMap = false,
   mode: "build" | "deploy" = "build"
 ) => {
+  setCache("buildMode", mode);
+
   if (!siteUUID) {
     console.error("No UUID was provided to build()");
     return false;
@@ -60,7 +63,7 @@ export const build = async (
   /**
    * Adding items file
    */
-  const buildBufferItemsConfigRes = await buildBufferSiteItemsConfig(siteUUID, siteUrl, mode);
+  const buildBufferItemsConfigRes = await buildBufferSiteItemsConfig(siteUUID, siteUrl);
 
   /**
    * Copying anything under static/public
@@ -75,7 +78,7 @@ export const build = async (
    * Buffer items
    */
   const { itemsToLoad, mainBufferItem, bufferItems } =
-    await getFilteredBufferItems(siteUUID, itemIdToLoad, mode);
+    await getFilteredBufferItems(siteUUID, itemIdToLoad);
 
   /**
    * Load buffer
@@ -150,14 +153,18 @@ export const createSiteMap = async (
 
   bufferItems.forEach((bufferItem) => {
     const post = bufferItem.item;
-    const postLastUpdated = post.updatedAt || post.createdAt;
-    const postPath = appendSlash(bufferItem.path);
+    const isUnbuildable = post.template === "component" || post.template === "none";
 
-    stream.write({
-      url: postPath,
-      lastmod: new Date(postLastUpdated).toISOString(),
-      changefreq: "daily",
-    });
+    if(!isUnbuildable){
+      const postLastUpdated = post.updatedAt || post.createdAt;
+      const postPath = appendSlash(bufferItem.path);
+
+      stream.write({
+        url: postPath,
+        lastmod: new Date(postLastUpdated).toISOString(),
+        changefreq: "daily",
+      });
+    }
   });
 
   stream.end();
@@ -223,11 +230,10 @@ export const getParentIds = (itemUUID: string, nodes: IStructureItem[]) => {
 
 export const getFilteredBufferItems = async (
   siteUUID: string,
-  itemIdToLoad?: string,
-  mode: "build" | "deploy" = "build"
+  itemIdToLoad?: string
 ) => {
   const site = await getSite(siteUUID);
-  const bufferItems = await getBufferItems(site, mode);
+  const bufferItems = await getBufferItems(site);
   let itemsToLoad = bufferItems;
   let mainBufferItem;
 
@@ -309,11 +315,11 @@ export const buildBufferSiteConfig = async (siteUUID: string) => {
   return true;
 };
 
-export const buildBufferSiteItemsConfig = async (siteUUID: string, siteUrl: string, mode: "build" | "deploy") => {
+export const buildBufferSiteItemsConfig = async (siteUUID: string, siteUrl: string) => {
   const bufferDir = storeInt.get("paths.buffer");
   const items = await getItems(siteUUID);
   const { code } = minify(
-    `var PRSSItems = ${JSON.stringify(sanitizeSiteItems(items, siteUrl, mode))}`
+    `var PRSSItems = ${JSON.stringify(sanitizeSiteItems(items, siteUrl))}`
   );
 
   try {
@@ -361,8 +367,7 @@ export const buildBufferItem = async (bufferItem: IBufferItem) => {
 };
 
 export const getBufferItems = async (
-  siteUUIDOrSite,
-  mode: "build" | "deploy" = "build"
+  siteUUIDOrSite
 ): Promise<IBufferItem[]> => {
   const site =
     typeof siteUUIDOrSite === "string"
@@ -389,7 +394,7 @@ export const getBufferItems = async (
         return "";
       }
 
-      post = posts[postId];
+      post = {... posts[postId] };
 
       return post.slug;
     });
@@ -407,7 +412,7 @@ export const getBufferItems = async (
       ...(getAggregateItemPropValues("item.vars", parentIds, bufferItems) ||
         {}),
       ...(post.vars || {}),
-    }, mode);
+    });
 
     const headHtml =
       (site.headHtml || "") +
@@ -449,6 +454,8 @@ export const getBufferItems = async (
       : "";
 
     if (post) {
+      prepareHiddenPost(post);
+
       bufferItems.push({
         path: "/" + postPath,
         templateId: `${site.theme}.${post.template}`,
@@ -456,7 +463,7 @@ export const getBufferItems = async (
         item: post ? {
           ...post,
           vars: {
-            ...processVars(site.url, post?.vars, mode),
+            ...processVars(site.url, post?.vars),
           }
         }: null,
         site: site, // Will be removed in bufferItem parser, replaced by PRSSConfig

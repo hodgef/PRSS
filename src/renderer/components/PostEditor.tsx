@@ -181,6 +181,10 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       setHook("PostEditor_setStatusMessage", (params: string[]) => {
         setStatusMessage(...params);
       });
+
+      setHook("PostEditor_handleSave", (value: boolean) => {
+        handleSave(value);
+      });
     };
     getData();
   }, []);
@@ -419,6 +423,11 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       return;
     }
 
+    if(post.current.template === "none"){
+      setStatusMessage("error", "A post with 'none' template cannot be published");
+      return;
+    }
+
     setDeployLoading(true);
 
     const deployRes = await buildAndDeploy(
@@ -455,8 +464,13 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
     runHook("SiteVariablesEditorOverlay_show");
   }, []);
 
-  const handleVariablesOverlaySave = useCallback(() => {
-    setStatusMessage("success", "Post updated");
+  const handleVariablesOverlaySave = useCallback(async () => {
+    runHook("SiteVariablesEditorOverlay_setIsLoading", true);
+
+    // Save post
+    await handleSave();
+
+    runHook("SiteVariablesEditorOverlay_setIsLoading", false);
   }, []);
 
   const handleFeaturedImageSet = useCallback(() => {
@@ -518,7 +532,13 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       });
 
       post.current = updatedItem;
-      setStatusMessage("success", "Post updated");
+
+      runHook("HTMLEditorOverlay_setIsLoading", true);
+
+      // Save post
+      await handleSave();
+
+      runHook("HTMLEditorOverlay_setIsLoading", false);
     }
   }, [itemIndex, site]);
 

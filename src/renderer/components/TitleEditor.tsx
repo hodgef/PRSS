@@ -88,7 +88,7 @@ const TitleEditor: FunctionComponent<IProps> = ({
         </Fragment>
       ) : (
         <Fragment>
-          <span title={post.title}>{post.title}</span>
+          <span title={post.title}>{post.template === "component" && <i>Component: </i>}{post.template === "none" && <i>Hidden: </i>}{post.title}</span>
           <i
             className="material-symbols-outlined clickable"
             style={{ fontSize: "26px" }}

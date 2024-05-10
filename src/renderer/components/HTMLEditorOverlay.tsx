@@ -11,6 +11,7 @@ import pretty from "pretty";
 import { modal } from "./Modal";
 import bufferItemMockJson from "../json/bufferItem.json";
 import { setHook } from "../../common/bootstrap";
+import Loading from "./Loading";
 
 const htmlMinifier = require("html-minifier-terser");
 
@@ -29,6 +30,7 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
   const [footerHtmlEnabled, setFooterHtmlEnabled] = useState(true);
   const [sidebarHtmlEnabled, setSidebarHtmlEnabled] = useState(true);
   const [show, setShow] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setHook("HTMLEditorOverlay_setVariables", ({ headHtml, footerHtml, sidebarHtml }) => {
@@ -36,6 +38,10 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
       footerHTMLState.current = footerHtml;
       sidebarHTMLState.current = sidebarHtml;
       setShow(true);
+    });
+
+    setHook("HTMLEditorOverlay_setIsLoading", async (value: boolean) => {
+      setIsLoading(value);
     });
   }, []);
 
@@ -87,8 +93,13 @@ const HTMLEditorOverlay: FunctionComponent<IProps> = ({
               type="button"
               className="btn btn-primary mr-2"
               onClick={() => handleSave()}
+              disabled={isLoading}
             >
-              <span className="material-symbols-outlined mr-2">save</span>
+              {isLoading ? (
+                <Loading small classNames="mr-1" />
+              ) : (
+                <span className="material-symbols-outlined mr-2">save</span>
+              )}
               <span>Save</span>
             </button>
             <button

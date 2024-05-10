@@ -26,6 +26,9 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Col from 'react-bootstrap/Col';
 import { ISite, ISiteInternal } from "../../common/interfaces";
+import { isPreviewActive, pausePreview, reloadPreview, resumePreview } from "../services/preview";
+import { build } from "../services/build";
+import Loading from "./Loading";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -48,7 +51,9 @@ const SiteSettings: FunctionComponent<IProps> = ({
   const [editedSiteName, setEditedSiteName] = useState("");
   const [siteTheme, setSiteTheme] = useState("");
   const [siteUrl, setSiteUrl] = useState("");
-
+  const [buildLoading, setBuildLoading] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState(false);
+  
   const [themeList, setThemeList] = useState(null);
   const history = useHistory();
 
@@ -99,13 +104,32 @@ const SiteSettings: FunctionComponent<IProps> = ({
     runHook("SiteVariablesEditorOverlay_show");
   }, []);
 
-  const handleVariablesOverlaySave = useCallback(() => {
-    toast.success("Post updated");
+  const handleVariablesOverlaySave = useCallback(async () => {
+    runHook("SiteVariablesEditorOverlay_setIsLoading", true);
+
+    // Build site
+    await buildSite();
+
+    runHook("SiteVariablesEditorOverlay_setIsLoading", false);
   }, []);
 
-  if (!site || !themeList) {
-    return null;
-  }
+  const buildSite = useCallback(async () => {
+    setBuildLoading(true);
+
+    if (isPreviewActive()) {
+      if (isPreviewActive()) {
+        pausePreview();
+      }
+      await build(siteId, setLoadingStatus, null, false);
+      if (isPreviewActive()) {
+        resumePreview();
+      }
+      reloadPreview();
+    }
+
+    toast.success("Site updated!");
+    setBuildLoading(false);
+  }, []);
 
   const openPublicDir = async () => {
     const { name: siteName } = site;
@@ -171,9 +195,7 @@ const SiteSettings: FunctionComponent<IProps> = ({
 
     setSite(updatedSite);
 
-    toast.success(
-      "Site updated! Please publish your changes from your Dashboard"
-    );
+    buildSite();
   };
 
   const handleRawHTMLOverlaySave = async (
@@ -206,11 +228,18 @@ const SiteSettings: FunctionComponent<IProps> = ({
 
       setSite(updatedSite);
 
-      toast.success(
-        "Site updated! Please publish your changes from your Dashboard"
-      );
+      runHook("HTMLEditorOverlay_setIsLoading", true);
+
+      // Build site
+      await buildSite();
+
+      runHook("HTMLEditorOverlay_setIsLoading", false);
     }
   };
+
+  if (!site || !themeList) {
+    return null;
+  }
 
   return (
     <div className="SiteSettings page">
@@ -229,9 +258,14 @@ const SiteSettings: FunctionComponent<IProps> = ({
             type="button"
             className="btn btn-primary"
             onClick={() => handleSubmit()}
+            disabled={buildLoading}
           >
-            <span className="material-symbols-outlined mr-2">save</span>
-            <span>Save Changes</span>
+              {buildLoading ? (
+                <Loading small classNames="mr-1" />
+              ) : (
+                <span className="material-symbols-outlined mr-2">save</span>
+              )}
+            <span>{buildLoading ? loadingStatus : "Save Changes"}</span>
           </button>
         </div>
       </h1>

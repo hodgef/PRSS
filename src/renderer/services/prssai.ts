@@ -1,17 +1,13 @@
 import { toast } from "react-toastify";
 import { storeInt } from "../../common/bootstrap";
-import { runCommand, runCommandAsync } from "../../common/utils";
+import { runCommandAsync } from "../../common/utils";
 import { contextMap } from "../components/UseProvider";
 import { removeSpecialChars } from "./utils";
 
 const path = require("path");
 
-export const getPrssaiStatus = (): boolean => {
-    if (!contextMap) {
-        return false;
-    }
-
-    if (contextMap.prssaiStatus) {
+export const getPrssaiStatus = async (): Promise<boolean> => {
+    if (contextMap?.prssaiStatus) {
         return contextMap.prssaiStatus;
     }
 
@@ -21,7 +17,7 @@ export const getPrssaiStatus = (): boolean => {
         return false;
     }
 
-    const runningContainers = runCommand(path.join(prssaiPath, "bin"), `docker ps --filter "name=prss" --filter "status=running"`).res;
+    const runningContainers = (await runCommandAsync(path.join(prssaiPath, "bin"), `docker ps --filter "name=prss" --filter "status=running"`)).res;
 
     const workerOnline = runningContainers.includes("prssai_worker");
     const chromeOnline = runningContainers.includes("prssai_chrome");

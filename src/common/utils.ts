@@ -10,7 +10,6 @@ export const configRem = (param: any) => store.delete(param);
 
 const util = require('util');
 const { app } = require("@electron/remote");
-const execSync = require("child_process").execSync;
 const execAsync = util.promisify(require('child_process').exec);
 const isDevelopment = process.env.NODE_ENV !== "production";
 const path = require('path');
@@ -45,37 +44,28 @@ export const localStorageDelete = async (key: string) => {
   return window.localStorage.removeItem(key);
 };
 
-export const runCommand = (dir, cmd) => {
-  if (!dir) throw new Error("Working dir must be provided.");
-
-  try {
-    const res = execSync(`cd ${dir} && ${cmd}`).toString();
-    if (isDevelopment) {
-      console.log("runCommand", cmd, res);
-    }
-    return { res, error: false };
-  } catch (e) {
-    if (isDevelopment) {
-      console.error("runCommand", cmd, e);
-    }
-    return { res: e, error: true };
-  }
-};
-
 export const runCommandAsync = async (dir, cmd) => {
   if (!dir) throw new Error("Working dir must be provided.");
 
   try {
-    const { stderr, stdout } = (await execAsync(`cd ${dir} && ${cmd}`));
-    if (isDevelopment) {
-      console.log("runCommand", cmd, stdout, stderr);
+    let command: string;
+
+    if(process.platform === 'win32'){
+      command = `cd /d ${dir} && ${cmd}`;
+    } else {
+      command = `cd ${dir} && ${cmd}`;
     }
-    return { res: stdout, error: false };
+
+    const { stderr, stdout } = (await execAsync(command));
+    if (isDevelopment) {
+      console.log("runCommandAsync", cmd, stdout, stderr);
+    }
+    return { res: stdout as string, error: false };
   } catch (e) {
     if (isDevelopment) {
-      console.error("runCommand", cmd, e);
+      console.error("runCommandAsync", cmd, e);
     }
-    return { res: e, error: true };
+    return { res: "", errorDetails: e, error: true };
   }
 };
 

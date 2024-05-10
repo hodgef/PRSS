@@ -20,7 +20,7 @@ import { storeInt } from "../../common/bootstrap";
 import { normalize, removeSpecialChars } from "../services/utils";
 import { modal } from "./Modal";
 import { toast } from "react-toastify";
-import { runCommand, runCommandAsync } from "../../common/utils";
+import { runCommandAsync } from "../../common/utils";
 import { getSamplePost } from "../services/site";
 import { insertStructureChildren, walkStructure } from "../services/build";
 import { v4 as uuidv4 } from "uuid";
@@ -106,7 +106,7 @@ const PRSSAI: FunctionComponent<IProps> = ({
       }
 
       // Check container installation status
-      const installedContainers = runCommand(path.join(prssaiPath, "bin"), `docker container ls --all`).res;
+      const installedContainers = (await runCommandAsync(path.join(prssaiPath, "bin"), `docker container ls --all`)).res;
       const workerInstalled = installedContainers.includes("prssai_worker");
       const chromeInstalled = installedContainers.includes("prssai_chrome");
       const redisInstalled = installedContainers.includes("prssai_redis");
@@ -124,7 +124,7 @@ const PRSSAI: FunctionComponent<IProps> = ({
       }
 
       // Check Container status
-      const runningContainers = runCommand(path.join(prssaiPath, "bin"), `docker ps --filter "name=prss" --filter "status=running"`).res;
+      const runningContainers = (await runCommandAsync(path.join(prssaiPath, "bin"), `docker ps --filter "name=prss" --filter "status=running"`)).res;
 
       const workerOnline = runningContainers.includes("prssai_worker");
       const chromeOnline = runningContainers.includes("prssai_chrome");

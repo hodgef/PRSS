@@ -10,7 +10,7 @@ import {
   setCache,
   storeInt,
 } from "../../common/bootstrap";
-import { IConfig } from "../../common/interfaces";
+import { IConfig, IPostItem } from "../../common/interfaces";
 
 const { dialog } = require("@electron/remote");
 const fs = require("fs-extra");
@@ -408,7 +408,7 @@ export const notifyNewVersion = async (newVersion) => {
     /**
      * Open PRSS download site
      */
-    window.open("https://hodgef.com/prss/?d=update");
+    window.open("https://prss.co/?d=update");
   } else if (response === 1) {
     storeInt.set("updateCheckSnoozeUntil", Date.now() + 604800000);
   }
@@ -417,16 +417,27 @@ export const notifyNewVersion = async (newVersion) => {
 /**
  * Update items
  */
-export const sanitizeSiteItems = (items, siteUrl: string, mode: "build" | "deploy") => {
+export const sanitizeSiteItems = (items, siteUrl: string) => {
   return items.map((item) => {
-    item.content = truncateString(stripTags(item.content));
-    item.vars = processVars(siteUrl, item.vars, mode);
-    return sanitizeItem(item);
+    item.content = item.template === "component" ? item.content : truncateString(stripTags(item.content));
+    item.vars = processVars(siteUrl, item.vars);
+    return prepareHiddenPost(sanitizeItem(item));
   });
 };
 
-export const processVars = (siteUrl: string, vars, mode) => {
-  if (mode === "deploy" && siteUrl && vars) {
+export const prepareHiddenPost = (item: IPostItem) => {
+  if(item.template === "none" && getCache<string>("buildMode") === "deploy"){
+    item.title = null;
+    item.content = null;
+    item.vars = {};
+    item.createdAt = Date.now();
+    item.updatedAt = null;
+  }
+  return item;
+}
+
+export const processVars = (siteUrl: string, vars) => {
+  if (getCache<string>("buildMode") === "deploy" && siteUrl && vars) {
     const processedVars = { ...vars };
 
     Object.keys(processedVars).forEach(varName => {
@@ -446,8 +457,16 @@ export const processVars = (siteUrl: string, vars, mode) => {
   }
 }
 
-export const sanitizeItem = (itemObj) => {
+export const sanitizeItem = (itemObj): IPostItem => {
   const newObj = JSON.parse(JSON.stringify(itemObj));
+
+  const fieldsToDelete = newObj.template === "component" ? 
+  [
+    "id",
+    "exclusiveVars",
+    "isContentRaw",
+    "siteId",
+  ] :
   [
     "id",
     "headHtml",
@@ -456,7 +475,9 @@ export const sanitizeItem = (itemObj) => {
     "exclusiveVars",
     "isContentRaw",
     "siteId",
-  ].forEach((field) => {
+  ];
+
+  fieldsToDelete.forEach((field) => {
     delete newObj[field];
   });
   return newObj;
@@ -464,7 +485,7 @@ export const sanitizeItem = (itemObj) => {
 
 export const sanitizeBufferItem = (itemObj, mergeObj = {}) => {
   const newObj = { ...JSON.parse(JSON.stringify(itemObj)), ...mergeObj };
-  newObj.item = sanitizeItem(newObj.item);
+  newObj.item = prepareHiddenPost(sanitizeItem(newObj.item));
   delete newObj.site;
   return newObj;
 };
@@ -645,4 +666,8 @@ export const isValidUrl = (string: string) => {
     return false;
   }
   return url.protocol === "http:" || url.protocol === "https:";
+}
+
+export const excludePostsWithUnbuildableTemplates = (items: IPostItem[]) => {
+  return items.filter(({ template }) => template !== "component" && template !== "none");
 }

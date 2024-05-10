@@ -12,6 +12,13 @@ const reactHandlerExtension = "js";
  * TODO: This needs a cleanup. Generic functionality to be moved elsewhere
  */
 const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
+  const templateName = templateId.split(".")[1];
+  const isUnbuildable = templateName === "component" || templateName === "none";
+
+  if (isUnbuildable) {
+    return [{ name: "index.html", content: "", path: "./" }]
+  }
+
   const templateIndex = await getThemeIndex(data.site.theme);
   const officialThemePath = prssConfig.themes[data.site.theme];
 
@@ -22,8 +29,6 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
   const templateJs = !officialThemePath
     ? await getTemplate(templateId, reactHandlerExtension)
     : "";
-
-  const templateName = templateId.split(".")[1];
 
   const baseTemplatePath = officialThemePath
     ? officialThemePath + "/"
@@ -77,39 +82,34 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
       `
         <head>
         
-        ${
-          metaDescription
-            ? `
+        ${metaDescription
+        ? `
                 <meta name="description" content="${metaDescription}" />
                 <meta name="twitter:description" content="${metaDescription}" />
                 `
-            : ""
-        }
+        : ""
+      }
         ${metaRobots ? `<meta name="robots" content="${metaRobots}" />` : ""}
-        ${
-          metaLocale
-            ? `<meta property="og:locale" content="${metaLocale}" />`
-            : ""
-        }
-        ${
-          metaTitle ? `<meta property="og:title" content="${metaTitle}" />` : ""
-        }
+        ${metaLocale
+        ? `<meta property="og:locale" content="${metaLocale}" />`
+        : ""
+      }
+        ${metaTitle ? `<meta property="og:title" content="${metaTitle}" />` : ""
+      }
         ${metaUrl ? `<link rel="canonical" href="${metaUrl}" />` : ""}
         ${metaUrl ? `<meta property="og:url" content="${metaUrl}" />` : ""}
-        ${
-          metaSiteName
-            ? `<meta property="og:site_name" content="${metaSiteName}" />`
-            : ""
-        }
-        ${
-          metaImage
-            ? `
+        ${metaSiteName
+        ? `<meta property="og:site_name" content="${metaSiteName}" />`
+        : ""
+      }
+        ${metaImage
+        ? `
                 <meta name="twitter:image:src" content="${metaImage}" />
                 <meta property="og:image" content="${metaImage}" />
                 <meta name="twitter:card" content="summary_large_image">
                 `
-            : ""
-        }
+        : ""
+      }
         `
     )
     .replace(
@@ -155,8 +155,8 @@ const reactHandler: handlerType = async (templateId, data: IBufferItem) => {
   const js = minifyJS(
     `
         var PRSSElement = React.createElement(PRSSComponent.default, Object.assign(${JSON.stringify(
-          sanitizedBufferItem
-        )}, { site: PRSSConfig }));
+      sanitizedBufferItem
+    )}, { site: PRSSConfig }));
         ReactDOM.render(PRSSElement, document.getElementById("root"));
     `
   );

@@ -26,7 +26,7 @@ import Loading from "./Loading";
 import { getSite, getItems } from "../services/db";
 import { configGet, configSet } from "../../common/utils";
 import { modal } from "./Modal";
-import { ISite } from "../../common/interfaces";
+import { IPostItem, ISite } from "../../common/interfaces";
 import { showCoachmark } from "../services/utils";
 
 interface IProps {
@@ -37,8 +37,8 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const { siteId } = useParams() as any;
 
   const [site, setSite] = useState<ISite>(null);
-  const [items, setItems] = useState(null);
-  const { title } = site|| {};
+  const [items, setItems] = useState<IPostItem[]>(null);
+  const { title } = site || {};
 
   const { hosting, publishSuggested } = configGet(`sites.${siteId}`);
   const [structureState, setStructureState] = useState(null);
@@ -275,6 +275,20 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
             checkedKeys={selectedItems}
             onCheck={(items) => {
               setSelectedItems(items);
+            }}
+            titleRender={(node, text) => {
+              const post = items.find(item => item.uuid === node.key);
+              return (
+                <>
+                  {post.template === "component" && (
+                    <span className="badge badge-secondary mr-2">Component</span>
+                  )}
+                  {post.template === "none" && (
+                    <span className="badge badge-danger mr-2">/* Hidden */</span>
+                  )}
+                  {post.title}
+                </>
+              );
             }}
             checkStrictly
           />

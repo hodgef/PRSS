@@ -52,7 +52,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
   const [editorChanged, setEditorChanged] = useState<boolean>(false);
   const [loadingStatus, setLoadingStatus] = useState<string>(null)
   const [currentTemplate, setCurrentTemplate] = useState<string>(item.template);
-  const [showMoreOptions, setShowMoreOptions] = useState(themesCoachmarkEnabled.current);
+  const [showMoreOptions, setShowMoreOptions] = useState(themesCoachmarkEnabled.current || updatedItem?.template === "component");
   const [templateList, setTemplateList] = useState(null);
   const [previewStarted, setPreviewStarted] = useState<boolean>(isPreviewActive());
   const [previewLoading, setPreviewLoading] = useState<boolean>(false);
@@ -169,14 +169,15 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
     onFeaturedImageSet();
   }
 
-  const buildStr = previewStarted ? "Save & Build" : "Save";
+  const isBuildable = item.template !== "component";
+  const buildStr = isBuildable && previewStarted ? "Save & Build" : "Save";
 
   return (
     <div className="editor-sidebar">
       <ul className="editor-sidebar-featured">
         <li
           title={
-            previewStarted
+            isBuildable && previewStarted
               ? "Save and build only this post"
               : "Save your changes locally"
           }
@@ -200,7 +201,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
             </span>
           )}
         </li>
-        {previewStarted && (
+        {isBuildable && previewStarted && (
           <li
             title="Build whole site"
             className="clickable"
@@ -224,57 +225,65 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
                         )*/}
           </li>
         )}
-        {previewStarted ? (
+
+        {isBuildable && (
+          <>
+            {previewStarted ? (
+              <li
+                title={getString("preview_description_message")}
+                className="clickable"
+                onClick={() => onStopPreview()}
+              >
+                {previewLoading ? (
+                  <Loading small classNames="mr-1" />
+                ) : (
+                  <i className="material-symbols-outlined">stop</i>
+                )}
+                <span>Stop Preview</span>
+              </li>
+            ) : (
+              <li className="clickable" onClick={() => onStartPreview()}>
+                {previewLoading ? (
+                  <Loading small classNames="mr-1" />
+                ) : (
+                  <i className="material-symbols-outlined">play_arrow</i>
+                )}
+                <span>{previewLoading ? loadingStatus : "Preview"}</span>
+              </li>
+            )}
+          </>
+        )}
+
+        {isBuildable && (
           <li
-            title={getString("preview_description_message")}
-            className="clickable"
-            onClick={() => onStopPreview()}
+            title={editorChanged ? getString("warn_unsaved_changes") : ""}
+            className={cx("clickable", {
+              disabled: editorChanged,
+            })}
+            onClick={() => {
+              if (!editorChanged) {
+                onPublish();
+              } else {
+                modal.alert(["error_publish_save_changes", []]);
+              }
+            }}
           >
-            {previewLoading ? (
+            {deployLoading ? (
               <Loading small classNames="mr-1" />
             ) : (
-              <i className="material-symbols-outlined">stop</i>
+              <i className="material-symbols-outlined">publish</i>
             )}
-            <span>Stop Preview</span>
-          </li>
-        ) : (
-          <li className="clickable" onClick={() => onStartPreview()}>
-            {previewLoading ? (
-              <Loading small classNames="mr-1" />
-            ) : (
-              <i className="material-symbols-outlined">play_arrow</i>
+            <span>{deployLoading ? loadingStatus : "Publish"}</span>
+            {publishSuggested && (
+              <span
+                className="color-red ml-1"
+                title={getString("warn_unpublished_changes")}
+              >
+                *
+              </span>
             )}
-            <span>{previewLoading ? loadingStatus : "Preview"}</span>
           </li>
         )}
-        <li
-          title={editorChanged ? getString("warn_unsaved_changes") : ""}
-          className={cx("clickable", {
-            disabled: editorChanged,
-          })}
-          onClick={() => {
-            if (!editorChanged) {
-              onPublish();
-            } else {
-              modal.alert(["error_publish_save_changes", []]);
-            }
-          }}
-        >
-          {deployLoading ? (
-            <Loading small classNames="mr-1" />
-          ) : (
-            <i className="material-symbols-outlined">publish</i>
-          )}
-          <span>{deployLoading ? loadingStatus : "Publish"}</span>
-          {publishSuggested && (
-            <span
-              className="color-red ml-1"
-              title={getString("warn_unpublished_changes")}
-            >
-              *
-            </span>
-          )}
-        </li>
       </ul>
 
       {showMoreOptions && (
@@ -300,6 +309,12 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
                     {templateName}
                   </option>
                 ))}
+                <option key={`option-component`} value={"component"}>
+                  Component
+                </option>
+                <option key={`option-none`} value={"none"}>
+                  None (Hidden)
+                </option>
               </select>
             </div>
           </li>
@@ -309,7 +324,7 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
             <span>Add Raw HTML code</span>
           </li>
           <li className="clickable" onClick={() => onOpenVarEditorOverlay()} ref={r => {
-            if(themesCoachmarkEnabled.current){
+            if (themesCoachmarkEnabled.current) {
               showCoachmark(r, "intro-variables-editor", "You can customize your Template here", "coachmark-left", () => {
                 themesCoachmarkEnabled.current = false;
               });
@@ -319,16 +334,20 @@ const PostEditorSidebar: FunctionComponent<IProps> = ({
             <span>Edit Variables</span>
           </li>
 
-          {updatedItem?.vars.featuredImageUrl ? (
-            <li className="clickable" onClick={() => removeFeaturedImage()}>
-              <span className="material-symbols-outlined">close</span>{" "}
-              <span>Remove Featured Image</span>
-            </li>
-          ) : (
-            <li className="clickable" onClick={() => setFeaturedImage()}>
-              <span className="material-symbols-outlined">image</span>{" "}
-              <span>Set Featured Image</span>
-            </li>
+          {isBuildable && (
+            <>
+              {updatedItem?.vars.featuredImageUrl ? (
+                <li className="clickable" onClick={() => removeFeaturedImage()}>
+                  <span className="material-symbols-outlined">close</span>{" "}
+                  <span>Remove Featured Image</span>
+                </li>
+              ) : (
+                <li className="clickable" onClick={() => setFeaturedImage()}>
+                  <span className="material-symbols-outlined">image</span>{" "}
+                  <span>Set Featured Image</span>
+                </li>
+              )}
+            </>
           )}
         </ul>
       )}

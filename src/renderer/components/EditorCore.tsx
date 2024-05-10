@@ -24,17 +24,17 @@ const ContextMenu = ({ site, textContent, currentEvent, innerRef, jodit, current
 
     const handlePrompt = async (promptValue = value) => {
         setShowContextMenu(false);
-        if(!promptValue?.trim() || !textContent?.trim()){
+        if (!promptValue?.trim() || !textContent?.trim()) {
             runHook("PostEditor_setStatusMessage", ["error", "The prompt is empty"]);
             return;
         }
 
         runHook("PostEditor_setIsAIBusy", true);
         console.log(textContent);
-        
+
         let promptText;
 
-        if(promptReplaceMode.current){
+        if (promptReplaceMode.current) {
             promptText = `Here's something I've written. ---- '${textContent}' ------. ${promptValue}. Important! Respond only with the updated text, nothing more.`;
         } else {
             promptText = `Here's something I've written. ---- '${textContent}' ------. ${promptValue}.`;
@@ -42,19 +42,19 @@ const ContextMenu = ({ site, textContent, currentEvent, innerRef, jodit, current
 
         const promptRes = await sendPrssaiPrompt(promptText);
 
-        if(promptRes){
+        if (promptRes) {
             console.log(promptRes);
 
-            if(promptReplaceMode.current){
+            if (promptReplaceMode.current) {
                 currentRange?.extractContents();
                 const div = jodit?.createInside.text(promptRes);
                 currentRange?.insertNode(div);
-                runHook("PostEditor_setStatusMessage", ["success", "Selection rewritten successfully by PRSSAI"]);
+                runHook("PostEditor_handleSave", true);
             } else {
                 modal.alert(promptRes, "🤖 PRSSAI says:");
             }
         }
-        
+
         runHook("PostEditor_setIsAIBusy", false);
         setShowContextMenu(false);
     }
@@ -74,7 +74,7 @@ const ContextMenu = ({ site, textContent, currentEvent, innerRef, jodit, current
 
     return showContextMenu && <div className="editor-context-menu" style={{ top: currentEvent?.clientY, left: leftPos }} ref={innerRef}>
         <button className="context-menu-prompt" onClick={() => {
-            if(isPromptMode) {
+            if (isPromptMode) {
                 setIsPromptMode(false);
                 promptReplaceMode.current = null;
             } else {
@@ -143,51 +143,52 @@ const Editor = ({ site, item, editorContent, setEditorChanged, onKeyPress }: { s
 
         // Init plugin
         requestIdleCallback(() => {
-            const status = getPrssaiStatus();
-            console.log("status", status);
+            setTimeout(async () => {
+                const status = await getPrssaiStatus();
+                console.log("status", status);
 
-            if (!status || storeInt.get("disablePrssaiEditorContextMenu")) {
-                return;
-            }
-
-            jodit.e.on(
-                document.body, 'mousedown',
-                (e) => {
-                    const container = document.querySelector(".jodit-wysiwyg");
-                    if(!container || !contextMenuRef?.current?.contains(e.target)){
-                        closeContextMenu(jodit);
-                    }
-                    mouseDownStartedInContainer.current = container?.contains(e.target);
+                if (!status || storeInt.get("disablePrssaiEditorContextMenu")) {
+                    return;
                 }
-            );
-            jodit.e.on(
-                document.body, 'mouseup',
-                (e) => {
-                    setTimeout(() => {
+
+                jodit.e.on(
+                    document.body, 'mousedown',
+                    (e) => {
                         const container = document.querySelector(".jodit-wysiwyg");
-
-                        if(!container){
-                            return;
+                        if (!container || !contextMenuRef?.current?.contains(e.target)) {
+                            closeContextMenu(jodit);
                         }
+                        mouseDownStartedInContainer.current = container?.contains(e.target);
+                    }
+                );
+                jodit.e.on(
+                    document.body, 'mouseup',
+                    (e) => {
+                        setTimeout(() => {
+                            const container = document.querySelector(".jodit-wysiwyg");
 
-                        const isContained = container.contains(e.target);
-
-                        if (isContained && mouseDownStartedInContainer.current) {
-                            const range = jodit.s.range;
-                            const fragment = range.cloneContents();
-
-                            if (fragment.textContent) {
-                                currentRange.current = jodit.s.range;
-                                currentFragment.current = range.cloneContents();
-                                openContextMenu(e, jodit);
-                            } else {
-                                closeContextMenu(jodit);
+                            if (!container) {
+                                return;
                             }
-                        }
-                    }, 50);
-                }, { top: true }
-            )
 
+                            const isContained = container.contains(e.target);
+
+                            if (isContained && mouseDownStartedInContainer.current) {
+                                const range = jodit.s.range;
+                                const fragment = range.cloneContents();
+
+                                if (fragment.textContent) {
+                                    currentRange.current = jodit.s.range;
+                                    currentFragment.current = range.cloneContents();
+                                    openContextMenu(e, jodit);
+                                } else {
+                                    closeContextMenu(jodit);
+                                }
+                            }
+                        }, 50);
+                    }, { top: true }
+                )
+            }, 1000);
         });
     }, [currentEvent]);
 

@@ -17,7 +17,7 @@ import { normalize } from "../services/utils";
 import { toast } from "react-toastify";
 import { shell } from "electron";
 import { getSite } from "../services/db";
-import { runCommand } from "../../common/utils";
+import { runCommandAsync } from "../../common/utils";
 import { prssConfig, storeInt } from "../../common/bootstrap";
 import { ISite, IThemeManifest } from "../../common/interfaces";
 import { Col, Form, InputGroup } from "react-bootstrap";
@@ -113,9 +113,9 @@ const ThemeCreator: FunctionComponent<IProps> = ({
     setLoadingMessage(`Cloning Base Theme (${themeBase.split("/prss-io/")[1]})`);
     setIsLoading(true);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       if(!fs.existsSync(path.join(themesDir, themeId))){
-        runCommand(themesDir, `git clone "${themeBase}.git" ${themeId}`);
+        await runCommandAsync(themesDir, `git clone "${themeBase}.git" ${themeId}`);
       }
   
       // Still not created?
