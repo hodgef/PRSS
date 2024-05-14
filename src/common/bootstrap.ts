@@ -81,7 +81,19 @@ export const setCache = (name, val) => {
   cache[name] = val;
 };
 
-export const getCache = <T>(name) => cache[name] as T;
+export const getCache = <T>(name) => {
+  const entry = cache[name];
+  if(Array.isArray(entry) && entry.length === 2 && Number.isInteger(entry[0])){
+    if(Date.now() - entry[0] < 300000/*5m*/){
+      return entry[1] as T;
+    } else {
+      return undefined as T;
+    }
+  } else {
+    return cache[name] as T;
+  }
+};
+
 export const deleteCache = (name) => delete cache[name];
 
 export const initDb = async () => {

@@ -1,9 +1,28 @@
 import { objGet } from "../utils";
 import { reactHandler, reactHandlerExtension } from "../handlers/react";
 import { IBufferItem, handlerType } from "../../../common/interfaces";
+import { getCache } from "../../../common/bootstrap";
 
 const htmlMinifier = require("html-minifier-terser");
 const Terser = require("terser");
+
+const minifyJSOptions_deploy = {
+  ecma: 5,
+  compress: true,
+  mangle: true,
+  output: {
+    comments: false,
+  },
+};
+
+const minifyJSOptions_build = {
+  ecma: 8,
+  compress: true,
+  mangle: false,
+  output: {
+    comments: false,
+  },
+};
 
 export const parseHtmlParams = (html = "", bufferItem: IBufferItem) => {
   let output = html;
@@ -66,23 +85,29 @@ export const getParserTemplateExtension = (parser) => {
 };
 
 export const minifyJS = (code) => {
-  const res = Terser.minify(code, {
-    ecma: 5,
-    compress: true,
-    mangle: true,
-  });
+  if(getCache<string>("buildMode") === "deploy"){
+    const res = Terser.minify(code, minifyJSOptions_deploy);
+    return !res.error ? res.code : "";
+  } else {
+    const res = Terser.minify(code, minifyJSOptions_build);
+    return !res.error ? res.code : "";
+  }
+};
 
-  return !res.error ? res.code : "";
+const minifierOptions = {
+  minifyCSS: true,
+  minifyJS: (text, inline) => minifyJS(text),
+  removeComments: true,
+  ignoreCustomComments: [],
+  collapseWhitespace: true,
+  collapseInlineTagWhitespace: true,
 };
 
 export const minifyHTML = (code = "") => {
-  const minifierOptions = {
-    minifyCSS: true,
-    minifyJS: (text, inline) => minifyJS(text),
-    removeComments: true,
-    collapseWhitespace: true,
-    collapseInlineTagWhitespace: true,
-  };
-
-  return htmlMinifier.minify(code, minifierOptions);
+  if(getCache<string>("buildMode") === "deploy"){
+  
+    return htmlMinifier.minify(code, minifierOptions);
+  } else {
+    return code;
+  }
 };

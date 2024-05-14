@@ -208,6 +208,17 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
           <span>Posts</span>
         </div>
         <div className="right-align">
+          {showPublishButton && hosting.name !== "none" && (
+            <button
+              type="button"
+              className="btn btn-outline-success"
+              onClick={() => publishSite()}
+            >
+              <i className="material-symbols-outlined">publish</i>
+              <span>Publish Changes</span>
+            </button>
+          )}
+
           {!!items.length && (
             <button
               type="button"
@@ -247,18 +258,19 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
             }}
           >
             <i className="material-symbols-outlined">add</i>
-            <span>Add New</span>
+            <span>New Page</span>
           </button>
-          {showPublishButton && hosting.name !== "none" && (
-            <button
-              type="button"
-              className="btn btn-outline-success"
-              onClick={() => publishSite()}
-            >
-              <i className="material-symbols-outlined">publish</i>
-              <span>Publish Changes</span>
-            </button>
-          )}
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => history.push(`/sites/${siteId}/posts/create?parent=blog`)}
+            ref={r => {
+              showCoachmark(r, "intro-posts-addNew", "Create a new post", "coachmark-bottom");
+            }}
+          >
+            <i className="material-symbols-outlined">add</i>
+            <span>New Blog Post</span>
+          </button>
         </div>
       </h1>
       <div className="content">

@@ -1,4 +1,5 @@
 import fs from "fs";
+import fse from "fs-extra";
 import path from "path";
 
 import { getDirPaths } from "./files";
@@ -12,14 +13,21 @@ import {
 import { IThemeManifest } from "../../common/interfaces";
 
 export const getTemplate = async (templateId: string, extension: string) => {
+  const cacheKey = `getThemeTemplate-${templateId}`;
+  let themeTemplate = getCache<string>(cacheKey);
+
+  if(themeTemplate){
+    return themeTemplate;
+  }
+
   const theme = templateId.split(".")[0];
   const template = templateId.split(".")[1];
 
   if (prssConfig.themes[theme]) {
-    return await getUrl(
+    themeTemplate = await getUrl(
       prssConfig.themes[theme] + `/${template}.${extension}`,
       true
-    );
+    ) as string;
   } else {
     const templateRelPath = templateId.split(".")[1];
     const templatePathName = `${templateRelPath}.${extension}`;
@@ -29,20 +37,31 @@ export const getTemplate = async (templateId: string, extension: string) => {
       templatePathName
     );
 
-    return fs.readFileSync(templatePath, "utf8");
+    themeTemplate = await fse.readFile(templatePath, "utf8");
   }
+  setCache(cacheKey, [Date.now(), themeTemplate]);
+  return themeTemplate;
 };
 
 export const getThemeIndex = async (themeName: string) => {
+  const cacheKey = `getThemeIndex-${themeName}`;
+  let themeIndex = getCache<string>(cacheKey);
+  
+  if(themeIndex){
+    return themeIndex;
+  }
+
   if (prssConfig.themes[themeName]) {
-    return (await getUrl(
+    themeIndex = (await getUrl(
       prssConfig.themes[themeName] + "/index.html",
       true
     )) as string;
   } else {
     const themeDir = path.join(getLocalThemePath(themeName), "index.html");
-    return fs.readFileSync(themeDir, "utf8");
+    themeIndex = await fse.readFile(themeDir, "utf8");
   }
+  setCache(cacheKey, [Date.now(), themeIndex]);
+  return themeIndex;
 };
 
 export const getDefaultReadme = () => {
@@ -111,7 +130,7 @@ export const getThemeManifest = async (theme: string): Promise<IThemeManifest> =
   } else {
     const themePath = getLocalThemePath(theme);
     let manifestPath = path.join(themePath, "manifest.json");
-    manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    manifest = JSON.parse(await fse.readFile(manifestPath, "utf8"));
     manifest.isLocal = true;
   }
 

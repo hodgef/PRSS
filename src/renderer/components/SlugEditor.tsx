@@ -10,6 +10,7 @@ import { modal } from "./Modal";
 import { IPostItem, ISite } from "../../common/interfaces";
 import { isPreviewActive } from "../services/preview";
 import { setHook } from "../../common/bootstrap";
+import { toast } from "react-toastify";
 
 interface IProps {
   site: ISite;
@@ -25,6 +26,7 @@ const SlugEditor: FunctionComponent<IProps> = ({
   items,
   onSave,
 }) => {
+  const [title, setTitle] = useState<string>(post.title);
   const [isUneditable] = useState(post.slug.toLowerCase() === "home" || post.slug.toLowerCase() === "blog");
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(post.slug);
@@ -34,6 +36,9 @@ const SlugEditor: FunctionComponent<IProps> = ({
   useEffect(() => {
     setHook("SlugEditor_previewMode", (value: boolean) => {
       setPreviewMode(value);
+    });
+    setHook("SlugEditor_setTitle", (value: string) => {
+      setTitle(value);
     });
   }, []);
 
@@ -53,6 +58,45 @@ const SlugEditor: FunctionComponent<IProps> = ({
   if (!site || !items || !post || !bufferItem) {
     return null;
   }
+
+  const refreshSlug = async () => {
+    if (!post) {
+      return;
+    }
+
+    if (isUneditable) {
+      modal.alert(["site_slug_protected", [post.slug]]);
+      return;
+    }
+
+    const normalizedSlug = normalize(title);
+
+    if (!(await isValidSlug(normalizedSlug, site.uuid, post.uuid))) {
+      modal.alert(["error_invalid_slug", []]);
+      return;
+    }
+
+    /**
+     * Ensure slug is unique
+     */
+    const itemsWithSlug = items.filter(
+        item => item.slug === normalizedSlug
+    );
+
+    if (itemsWithSlug.length > 1) {
+        toast.error('You have items with the same slug');
+        return;
+    }
+
+    if (itemsWithSlug.length === 1 && itemsWithSlug[0].uuid !== post.uuid) {
+        toast.error('You have an item with the same slug');
+        return;
+    }
+
+    await onSave(normalizedSlug);
+    setValue(normalizedSlug);
+    setEditing(false);
+  };
 
   const save = async () => {
     if (!value.trim()) {
@@ -79,21 +123,22 @@ const SlugEditor: FunctionComponent<IProps> = ({
     /**
      * Ensure slug is unique
      */
-    // const itemsWithSlug = items.filter(
-    //     item => item.slug === normalizedSlug
-    // );
+    const itemsWithSlug = items.filter(
+        item => item.slug === normalizedSlug
+    );
 
-    // if (itemsWithSlug.length > 1) {
-    //     error('You have items with the same slug');
-    //     return;
-    // }
+    if (itemsWithSlug.length > 1) {
+        toast.error('You have items with the same slug');
+        return;
+    }
 
-    // if (itemsWithSlug.length === 1 && itemsWithSlug[0].uuid !== post.uuid) {
-    //     error('You have an item with the same slug');
-    //     return;
-    // }
+    if (itemsWithSlug.length === 1 && itemsWithSlug[0].uuid !== post.uuid) {
+        toast.error('You have an item with the same slug');
+        return;
+    }
 
     await onSave(normalizedSlug);
+    setValue(normalizedSlug);
     setEditing(false);
   };
 
@@ -158,12 +203,24 @@ const SlugEditor: FunctionComponent<IProps> = ({
                 {!isUneditable && (
                   <i
                     className="material-symbols-outlined clickable"
+                    title="Edit Slug"
                     onClick={() => {
                       setValue(post.slug);
                       setEditing(true);
                     }}
                   >
                     edit
+                  </i>
+                )}
+              </>
+              <>
+                {!isUneditable && (
+                  <i
+                    className="material-symbols-outlined clickable"
+                    title="Refresh Slug to match title"
+                    onClick={refreshSlug}
+                  >
+                    refresh
                   </i>
                 )}
               </>

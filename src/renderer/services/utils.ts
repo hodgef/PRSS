@@ -15,6 +15,7 @@ import { IConfig, IPostItem } from "../../common/interfaces";
 const { dialog } = require("@electron/remote");
 const fs = require("fs-extra");
 
+let startTime, endTime;
 let coachmarks = [];
 const dismissed_coachmark_ids = [];
 
@@ -31,6 +32,7 @@ export const normalizeStrict = (str: string) => {
     .toString()
     .toLowerCase()
     .normalize("NFD")
+    .replace(/\./g, "-")
     .replace(/\s+/g, "-")
     .replace(/[^\w-]+/g, "")
     .replace(/--+/g, "-")
@@ -44,6 +46,7 @@ export const normalize = (str: string) => {
     .toString()
     .toLowerCase()
     .normalize("NFD")
+    .replace(/\./g, "-")
     .replace(/\s+/g, "-")
     .replace(/[^\w!.-]+/g, "")
     .replace(/--+/g, "-")
@@ -670,4 +673,17 @@ export const isValidUrl = (string: string) => {
 
 export const excludePostsWithUnbuildableTemplates = (items: IPostItem[]) => {
   return items.filter(({ template }) => template !== "component" && template !== "none");
+}
+
+export const perfStart = () => {
+  startTime = new Date();
+};
+
+export const perfEnd = () => {
+  endTime = new Date();
+  let timeDiff = endTime - startTime;
+  timeDiff /= 1000;
+  const seconds = timeDiff;
+  console.log("perfEnd: " + seconds + " seconds");
+  return seconds;
 }

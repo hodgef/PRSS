@@ -1,5 +1,4 @@
-import { getParserHandler } from "./handlers/index";
-import minify from "babel-minify";
+import { getParserHandler, minifyJS } from "./handlers/index";
 import del from "del";
 import fse from "fs-extra";
 import path from "path";
@@ -15,12 +14,14 @@ import {
   appendSlash,
   processVars,
   prepareHiddenPost,
+  perfStart,
+  perfEnd,
 } from "./utils";
 import { modal } from "../components/Modal";
 import { getThemeManifest, getDefaultReadme } from "./theme";
 import { getSite, getItems, getItem } from "./db";
 import { getRootPost } from "./hosting";
-import { setCache, storeInt } from "../../common/bootstrap";
+import { getCache, setCache, storeInt } from "../../common/bootstrap";
 import { IBufferItem, IPostItem, ISite, IStructureItem, handlerTypeReturn, loadBufferType } from "../../common/interfaces";
 
 export const bufferPathFileNames = ["index.html" /*, 'index.js'*/];
@@ -80,12 +81,16 @@ export const build = async (
   const { itemsToLoad, mainBufferItem, bufferItems } =
     await getFilteredBufferItems(siteUUID, itemIdToLoad);
 
+  perfStart();
+
   /**
    * Load buffer
    */
   const loadBufferRes = await loadBuffer(itemsToLoad, (progress) => {
     onUpdate && onUpdate(getString("building_progress", [progress]));
   });
+
+  perfEnd();
 
   if (!loadBufferRes) {
     return false;
@@ -171,13 +176,13 @@ export const createSiteMap = async (
   const res = (await streamToPromise(stream)).toString();
 
   try {
-    fse.outputFileSync(path.join(bufferDir, "sitemap.xml"), res);
+    await fse.outputFile(path.join(bufferDir, "sitemap.xml"), res);
 
     /**
      * Creating robots.txt if it doesn't exist
      */
     if (!fs.existsSync(path.join(bufferDir, "robots.txt"))) {
-      fse.outputFileSync(
+      await fse.outputFile(
         path.join(bufferDir, "robots.txt"),
         `Sitemap: ${appendSlash(siteUrl) + "sitemap.xml"}\n` +
           "User-agent:*\n" +
@@ -302,12 +307,14 @@ export const buildBufferSiteConfig = async (siteUUID: string) => {
   const bufferDir = storeInt.get("paths.buffer");
   const site = await getSite(siteUUID);
 
-  const { code } = minify(
-    `var PRSSConfig = ${JSON.stringify(sanitizeSite(site))}`
-  );
+  let code = `var PRSSConfig = ${JSON.stringify(sanitizeSite(site))}`;
+
+  if(getCache<string>("buildMode") === "deploy"){
+    code = minifyJS(code);
+  }
 
   try {
-    fse.outputFileSync(path.join(bufferDir, configFileName), code);
+    await fse.outputFile(path.join(bufferDir, configFileName), code);
   } catch (e) {
     return false;
   }
@@ -318,12 +325,14 @@ export const buildBufferSiteConfig = async (siteUUID: string) => {
 export const buildBufferSiteItemsConfig = async (siteUUID: string, siteUrl: string) => {
   const bufferDir = storeInt.get("paths.buffer");
   const items = await getItems(siteUUID);
-  const { code } = minify(
-    `var PRSSItems = ${JSON.stringify(sanitizeSiteItems(items, siteUrl))}`
-  );
+  let code = `var PRSSItems = ${JSON.stringify(sanitizeSiteItems(items, siteUrl))}`;
+
+  if(getCache<string>("buildMode") === "deploy"){
+    code = minifyJS(code);
+  }
 
   try {
-    fse.outputFileSync(path.join(bufferDir, itemsFileName), code);
+    await fse.outputFile(path.join(bufferDir, itemsFileName), code);
   } catch (e) {
     return false;
   }
@@ -350,18 +359,15 @@ export const buildBufferItem = async (bufferItem: IBufferItem) => {
   /**
    * Creating files
    */
-  outputFiles.forEach((file) => {
-    try {
-      fse.outputFileSync(
-        path.join(itemDir, file.path, file.name),
-        file.content
-      );
-    } catch (e) {
-      console.error(e);
-      modal.alert(e.message);
-      return;
-    }
-  });
+  const promises = outputFiles.map(file => fse.outputFile(path.join(itemDir, file.path, file.name), file.content));
+
+  try {
+    await Promise.all(promises);
+  } catch (e) {
+    console.error(e);
+    modal.alert(e.message);
+    return;
+  }
 
   return true;
 };

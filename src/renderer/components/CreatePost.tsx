@@ -17,8 +17,9 @@ import { toast } from "react-toastify";
 import { isValidSlug, getRootPost } from "../services/hosting";
 import { getSite, getItems, updateSite, createItems } from "../services/db";
 import { modal } from "./Modal";
-import { ISite } from "../../common/interfaces";
+import { IPostItem, ISite } from "../../common/interfaces";
 import { storeInt } from "../../common/bootstrap";
+import { useQuery } from "./UseQuery";
 
 interface IProps {
   setHeaderLeftComponent: (comp?: ReactNode) => void;
@@ -26,18 +27,19 @@ interface IProps {
 
 const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   const { siteId } = useParams() as any;
+  const query = useQuery();
+  const postParentSlug = query.get("parent");
 
   const [site, setSite] = useState<ISite>(null);
-  const [items, setItems] = useState(null);
+  const [items, setItems] = useState<IPostItem[]>(null);
   const { title, structure } = site || {};
 
   const [formattedStructure, setFormattedStructure] = useState(structure);
   const [postTitle, setPostTitle] = useState("");
   const [postSlug, setPostSlug] = useState("");
   const [postParent, setPostParent] = useState("");
-
+  
   const postTitleRef = useRef<HTMLInputElement>(null);
-
   const history = useHistory();
 
   useEffect(() => {
@@ -69,13 +71,18 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       const siteRes = await getSite(siteId);
       const itemsRes = await getItems(siteId);
       setFormattedStructure(
-        await walkStructure(siteId, siteRes.structure, ({ title }) => ({
+        await walkStructure(siteId, siteRes.structure, ({ title, slug }) => ({
           title,
+          slug
         }))
       );
 
       setSite(siteRes);
       setItems(itemsRes);
+
+      if(postParentSlug){
+        setPostParent(itemsRes?.find(({ slug }) => slug === postParentSlug)?.uuid);
+      }
     };
     getData();
   }, []);
@@ -150,13 +157,15 @@ const CreatePost: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
       normalizedSlug += `-${randomString}`;
     }
 
+    const isBlogPost = postParent ? items.some(item => item.slug === "blog" && item.uuid === postParent) : false;
+
     const newItem = {
       uuid: postId,
       title: postTitle.trim(),
       slug: normalizedSlug,
       siteId: siteId,
       content: "",
-      template: "post",
+      template: isBlogPost ? "post" : "page",
       updatedAt: null,
       createdAt: Date.now(),
       vars: {},

@@ -7,6 +7,7 @@ import cx from "classnames";
 import { getItem } from "../services/db";
 import { isValidSlug } from "../services/hosting";
 import { modal } from "./Modal";
+import { runHook } from "../../common/bootstrap";
 
 interface IProps {
   siteId: string;
@@ -63,6 +64,7 @@ const TitleEditor: FunctionComponent<IProps> = ({
 
     await onSave(value, slugChangeAllowed ? newSlug : null);
     setPost({ ...post, title: value });
+    runHook("SlugEditor_setTitle", value);
     setEditing(false);
   };
 
