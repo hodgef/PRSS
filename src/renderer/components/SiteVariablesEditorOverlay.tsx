@@ -125,9 +125,9 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
   };
 
   const setVar = (
-    e,
     varIndex: number,
     fieldName: string,
+    value: string,
     isNormalized?: boolean
   ) => {
     const newVars = [...variables];
@@ -135,7 +135,8 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
     if (varIndex > -1) {
       newVars[varIndex] = {
         ...newVars[varIndex],
-        [fieldName]: isNormalized ? camelCase(e.target.value) : e.target.value,
+        type: newVars[varIndex]?.type || themeManifest?.siteVars?.[fieldName]?.type || "string",
+        [fieldName]: isNormalized ? camelCase(value) : value,
       };
 
       setVariables(newVars);
@@ -290,17 +291,31 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
     }
   };
 
-  const getVarIcon = useCallback((name: string, type = "string") => {
-    if (type === "image") {
+  const getVarType = useCallback((name: string, type) => {
+    if(type){
+      return type;
+    } else if (name.toLowerCase().includes("image")) {
       return "image";
-    } else if (type === "url" || name.toLowerCase().includes("url")) {
+    } else if (name.toLowerCase().includes("url")) {
       return "link";
     } else if (name.toLowerCase().includes("html")) {
       return "code";
     } else {
+      return "string"
+    }
+  }, [variables]);
+
+  const getVarIcon = useCallback((type = "string") => {
+    if (type === "image") {
+      return "image";
+    } else if (type === "url") {
+      return "link";
+    } else if (type === "code") {
+      return "code";
+    } else {
       return "text_fields"
     }
-  }, []);
+  }, [variables]);
 
   const showInfo = () => {
     modal.alert(
@@ -401,6 +416,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                 <ul>
                   {variables.map((variable, index) => {
                     const isRestricted = exclusiveVariables.includes(variable.name);
+                    console.log(variable.name, variable.type)
 
                     return (
                       <li
@@ -410,8 +426,19 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                         })}
                       >
                         <div className="input-group input-group-lg">
-                          <span className="material-symbols-outlined mr-2">
-                            {getVarIcon(variable.name, themeManifest?.siteVars?.[variable.name]?.type)}
+                          <span className="material-symbols-outlined mr-2 variable-type-icon">
+                            {getVarIcon(getVarType(variable.name, variable.type || themeManifest?.siteVars?.[variable.name]?.type))}
+                            <ul>
+                              {["image", "url", "code", "string"].map((type, tIndex) => {
+                                return (
+                                  <li key={`var-selector-${variable.name}-${tIndex}`} data-vartype={type} title={type} onClick={() => setVar(index, "type", type)}>
+                                    <span className="material-symbols-outlined mr-2 variable-type-icon">
+                                      {getVarIcon(type)}
+                                    </span>
+                                  </li>
+                                )
+                              })}
+                            </ul>
                           </span>
                           <div className="input-container">
                             <textarea
@@ -419,8 +446,8 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                               placeholder="Name"
                               value={variable.name}
                               maxLength={20}
-                              onChange={(e) => setVar(e, index, "name")}
-                              onBlur={(e) => setVar(e, index, "name", true)}
+                              onChange={(e) => setVar(index, "name", e.target.value)}
+                              onBlur={(e) => setVar(index, "name", e.target.value, true)}
                             />
                           </div>
                           <div className="input-container">
@@ -428,10 +455,10 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                               className="form-control"
                               placeholder="Content"
                               value={variable.content}
-                              onChange={(e) => setVar(e, index, "content")}
+                              onChange={(e) => setVar(index, "content", e.target.value)}
                             />
                           </div>
-                          {themeManifest?.siteVars?.[variable.name]?.type === "image" && (
+                          {(getVarType(variable.name, variable.type || themeManifest?.siteVars?.[variable.name]?.type) === "image") && (
                             <button
                               title="Upload image"
                               type="button"
@@ -527,7 +554,7 @@ const SiteVariablesEditorOverlay: FunctionComponent<IProps> = ({
                         title={themeManifest?.siteVars?.[suggestedVar]?.description}
                         onClick={() => addNew({ name: suggestedVar, content: "", type: themeManifest?.siteVars?.[suggestedVar]?.type } as IVarsKV)}
                       >
-                        <span className="material-symbols-outlined mr-2">{getVarIcon(suggestedVar, themeManifest?.siteVars?.[suggestedVar]?.type)}</span><span>{suggestedVar}</span>
+                        <span className="material-symbols-outlined mr-2">{getVarIcon(getVarType(suggestedVar, themeManifest?.siteVars?.[suggestedVar]?.type))}</span><span>{suggestedVar}</span>
                       </li>
                     )
                   })}

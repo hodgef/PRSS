@@ -278,6 +278,11 @@ const ListPosts: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
             }}
             titleRender={(node, text) => {
               const post = items.find(item => item.uuid === node.key);
+
+              if(!post) {
+                return null;
+              }
+
               return (
                 <>
                   {post.template === "component" && (

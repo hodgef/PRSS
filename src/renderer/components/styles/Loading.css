@@ -38,6 +38,7 @@
   position: unset;
   width: 24px;
   height: 24px;
+  z-index: unset;
 }
 .Loading.loading-small .spinner:after {
   font-size: 28px;

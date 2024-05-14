@@ -465,13 +465,16 @@ const PostEditor: FunctionComponent<IProps> = ({ setHeaderLeftComponent }) => {
   }, []);
 
   const handleVariablesOverlaySave = useCallback(async () => {
+    if (!itemIndex) {
+      return;
+    }
     runHook("SiteVariablesEditorOverlay_setIsLoading", true);
 
     // Save post
     await handleSave();
 
     runHook("SiteVariablesEditorOverlay_setIsLoading", false);
-  }, []);
+  }, [itemIndex]);
 
   const handleFeaturedImageSet = useCallback(() => {
     setStatusMessage("success", "Post updated");
