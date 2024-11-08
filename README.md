@@ -1,4 +1,8 @@
 
+ <h3><p align="center">📣 Announcement: PRSS 2.0 is now live with a new design and more features!<br>Check out <a href="https://prss.io">https://prss.io</a> for details.</p></h3>
+
+
+_________________________________
 <p align="center">
  <a href="https://prss.io"><img src="https://github.com/hodgef/PRSS/assets/25509135/b3d5710c-9ef2-487a-9c6f-b8e69b4a527e" width="150" /></a>
  <p align="center">Cross-platform static site generator for blazing fast blogs, documentation sites and more.</p>
