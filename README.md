@@ -10,7 +10,7 @@ _________________________________
 </p>
 
 ### 📦 Installation & Usage
-You can download PRSS for Windows and Linux.
+You can download PRSS for Windows, MacOS and Linux.
 Check out the [Getting Started](https://prss.io) page to begin.
 
 
