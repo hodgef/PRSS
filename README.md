@@ -1,4 +1,3 @@
-
  <h3><p align="center">📣 Announcement: PRSS 2.0 is now live with a new design and more features!<br>Check out <a href="https://prss.io">https://prss.io</a> for details.</p></h3>
 
 
