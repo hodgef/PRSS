@@ -1,0 +1,32 @@
+name: PR Compliance
+
+on: pull_request_target
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    strategy:
+      matrix:
+        node-version: [20.x]
+        os: [ubuntu-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            throw "Pull requests are no longer accepted for PRSS 1.x"
+        env:
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Reject PR
+        if: failure()
+        uses: peter-evans/close-pull@v1
+        with:
+          pull-request-number: ${{github.event.number}}
+          comment: "Thank you for contribution, but we are no longer accepting pull requests for PRSS 1.x"
+          delete-branch: false
